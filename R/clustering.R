@@ -169,17 +169,27 @@ clusterMuscadet <- function(x, # muscadet object
     common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
 
     # Compute pairwise distances for each omic
-    dist_list <- lapply(mat_list, function(mat) {
+    dist_list <- lapply(
+      mat_list,
+      function(mat) {
         mat <- mat[common_cells, ]
         dist <- Rfast::Dist(mat, method = dist_method)
-        # Rfast::Dist returns a similarity matrix for cosine with 0 values in diagonal
+        # Test if Rfast is working properly for cosine
         if(dist_method == "cosine") {
+          # for version <=2.1, Rfast returns a similarity matrix for cosine with 0
+          # values in diagonal. The result should be converted into distance.
+          m <- matrix(c(1, 1, 1, 1), nrow = 2, byrow = TRUE)
+          m_dist <- Rfast::Dist(m, method = dist_method)
+          if (m_dist[[1, 2]] != 0) {
             diag(dist) <- 1
             dist <- 1-dist
+          }
         }
+        # ... otherwise, we trust the Rfast::Dist result
         dimnames(dist) <- list(rownames(mat), rownames(mat))
         return(dist)
-    })
+      }
+    )
 
     # Compute affinity matrices for each omic
     aff_list <- lapply(dist_list, function(dist) {
