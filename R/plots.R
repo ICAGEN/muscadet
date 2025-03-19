@@ -60,6 +60,9 @@
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). Default is `NULL`, which uses predefined colors.
 #'
+#' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
+#'   with the .png extension (`numeric`). Default is `300`.
+#'
 #' @param quiet Logical value indicating whether to suppress messages. Default
 #'   is `FALSE`.
 #'
@@ -141,6 +144,7 @@ heatmapMuscadet <- function(x,
                             show_missing = TRUE,
                             white_scale = c(0.3, 0.7),
                             colors = NULL,
+                            png_res = 300,
                             quiet = FALSE) {
     # Validate input: x must be a muscadet object
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
@@ -471,7 +475,7 @@ heatmapMuscadet <- function(x,
             width = ht_all@ht_list_param[["width"]],
             height = ht_all@ht_list_param[["height"]],
             units = "mm",
-            res = 300
+            res = png_res
         )
     } else if (!is.null(filename) & grepl(".pdf", basename(filename))) {
         pdf(

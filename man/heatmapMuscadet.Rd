@@ -14,6 +14,7 @@ heatmapMuscadet(
   show_missing = TRUE,
   white_scale = c(0.3, 0.7),
   colors = NULL,
+  png_res = 300,
   quiet = FALSE
 )
 }
@@ -68,6 +69,9 @@ loss of coverage, and are represented as white on the heatmap. Default is
 
 \item{colors}{Vector of colors for the cluster annotation (\code{character}
 vector). Default is \code{NULL}, which uses predefined colors.}
+
+\item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
+with the .png extension (\code{numeric}). Default is \code{300}.}
 
 \item{quiet}{Logical value indicating whether to suppress messages. Default
 is \code{FALSE}.}
