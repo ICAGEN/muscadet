@@ -22,10 +22,11 @@
 #'   [muscadet::clusterMuscadet()]). Should be provided if `clusters` is `NULL`.
 #'
 #' @param clusters (Optional) A custom named vector of cluster assignments
-#'   (`integer` named vector). Names must corresponds the cell names of the
-#'   `muscadet` object: to the totality of cells if `show_missing = TRUE`, or to
-#'   only common cells (cells with data in all omics) if `show_missing = FALSE`.
-#'   Should be provided if `k` is `NULL`.
+#'   (`integer` named vector). Names must corresponds to cell names within the
+#'   muscadet object `x`. If it contains less cells than the muscadet object
+#'   `x`, the missing cells are filtered out and not displayed in the heatmap.
+#'   If `show_missing = FALSE` only the provided cells with data in all omics
+#'   will be displayed. Should be provided if `k` is `NULL`.
 #'
 #' @param title Character string for the title of the heatmap (`character`
 #'   string). Default is an empty character string.
@@ -251,7 +252,7 @@ heatmapMuscadet <- function(x,
 
     # Check if output directory exists
     if (!is.null(filename))
-        stopifnot("The directory doesn't exist" = file.exists(dirname(filename)))
+        stopifnot("`filename`: the directory doesn't exist" = file.exists(dirname(filename)))
 
     if (!is.null(filename) & !grepl(".(png|pdf)$", filename)) {
         stop("The `filename` argument must end with either .png or .pdf.")
@@ -260,6 +261,32 @@ heatmapMuscadet <- function(x,
     # Get common and all cells in clustering order
     common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames)))
     all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), colnames)))
+
+    # Filter cells based on provided `clusters` argument
+    if (!is.null(clusters)) {
+
+        # Check `clusters` cells
+        stopifnot("The `clusters` argument must have names, corresponding to cell names within the muscadet object `x`." = !is.null(names(clusters)))
+
+        stopifnot(
+            "Names of `clusters` don't match cell names within the muscadet object `x`." = length(setdiff(names(clusters), all_cells)) == 0
+        )
+
+        # filter cells not in `clusters`
+        cells_filtered <- setdiff(all_cells, names(clusters))
+
+        if (length(cells_filtered) > 0) {
+            warning(
+                paste(
+                    "The `clusters` argument does not contain cluster assignments for all cells.",
+                    length(cells_filtered),
+                    "cells in the muscadet object `x` are filtered out."
+                )
+            )
+            common_cells <- common_cells[common_cells %in% names(clusters)]
+            all_cells <- all_cells[all_cells %in% names(clusters)]
+        }
+    }
 
     if (quiet == FALSE) {
         # Print information messages
@@ -460,7 +487,7 @@ heatmapMuscadet <- function(x,
                                        sort(unique(
                                            clusters
                                        ))),
-                row_order = names(clusters),
+                row_order = names(clusters)[names(clusters) %in% common_cells],
                 cluster_rows = F,
                 merge_legend = TRUE
             )

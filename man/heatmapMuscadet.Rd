@@ -32,10 +32,11 @@ the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
 \code{\link[=clusterMuscadet]{clusterMuscadet()}}). Should be provided if \code{clusters} is \code{NULL}.}
 
 \item{clusters}{(Optional) A custom named vector of cluster assignments
-(\code{integer} named vector). Names must corresponds the cell names of the
-\code{muscadet} object: to the totality of cells if \code{show_missing = TRUE}, or to
-only common cells (cells with data in all omics) if \code{show_missing = FALSE}.
-Should be provided if \code{k} is \code{NULL}.}
+(\code{integer} named vector). Names must corresponds to cell names within the
+muscadet object \code{x}. If it contains less cells than the muscadet object
+\code{x}, the missing cells are filtered out and not displayed in the heatmap.
+If \code{show_missing = FALSE} only the provided cells with data in all omics
+will be displayed. Should be provided if \code{k} is \code{NULL}.}
 
 \item{title}{Character string for the title of the heatmap (\code{character}
 string). Default is an empty character string.}
