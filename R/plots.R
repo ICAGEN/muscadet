@@ -1724,8 +1724,8 @@ heatmapStep <- function(obj,
         theme_classic()
 
     # Combine heatmap and histogram plots
-    final_plot <- patchwork::wrap_plots(c(list(ht_Tum_grob, ht_Ref_grob), list(hist_Tum, hist_Ref)), ncol = 2) +
-        plot_layout(nrow = 2, heights = c(3, 1)) +
+    final_plot <- patchwork::wrap_plots(c(list(ht_Tum_grob, hist_Tum), list(ht_Ref_grob, hist_Ref)), ncol = 2) +
+        plot_layout(ncol = 2, widths = c(2, 1)) +
         plot_annotation(title = title,
                         theme = theme(plot.title = element_text(size = 16)))
 
@@ -1733,8 +1733,8 @@ heatmapStep <- function(obj,
     if (grepl(".png", basename(filename))) {
         png(
             filename = filename,
-            width = ht_Tum_2@ht_list_param[["width"]] + ht_Ref_2@ht_list_param[["width"]],
-            height = ht_Tum_2@ht_list_param[["height"]] * 1.75,
+            width = ht_Tum_2@ht_list_param[["width"]] * 1.75,
+            height = ht_Tum_2@ht_list_param[["height"]] * 2.1,
             units = "mm",
             res = 300
         )
@@ -1744,11 +1744,11 @@ heatmapStep <- function(obj,
     } else if (grepl(".pdf", basename(filename))) {
         pdf(
             file = filename,
-            width = (ht_Tum_2@ht_list_param[["width"]] + ht_Ref_2@ht_list_param[["width"]]) / 25.4,
-            # in inches
-            height = (ht_Tum_2@ht_list_param[["height"]] * 1.75) / 25.4  # in inches
+            width = (ht_Tum_2@ht_list_param[["width"]] * 1.75) / 25.4, # in inches
+            height = (ht_Tum_2@ht_list_param[["height"]] * 2.1) / 25.4  # in inches
         )
         print(final_plot)
         dev.off()
     }
 }
+
