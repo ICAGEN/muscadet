@@ -23,6 +23,11 @@
 #' @param remove.raw `TRUE` or `FALSE` (`logical`). Whether to remove raw count
 #'   matrices. `TRUE` by default to reduce object size. Setting it to `FALSE`
 #'   will keep raw count matrices within the object.
+#' @param all_steps_dir Path to a directory to save plots for each step of the log
+#'   ratio computation (`character` string). IMPORTANT: if provided (not `NULL`)
+#'   the function does not return a muscadet object but a list with matrices for
+#'   each step of the log ratio computation (see Value section). Default is
+#'   `NULL`.
 #' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
 #'   default: `FALSE`.
 #'
@@ -34,6 +39,12 @@
 #' A \code{\link{muscadet}} object corresponding to the sample
 #' \code{\link{muscadet}} object (`x`) containing the computed log R ratio
 #' matrix in the `coverage` slot of the selected `omic`.
+#'
+#' If the `all_steps` argument is provided (path to directory to save plots for
+#' each step of the log ratio computation), it returns a list with intermediate
+#' matrices `matTumor` and `matRef` from every step from `step01` to `step08`
+#' (no `step06` for `method` = "ATAC"), `coord` table of features coordinates
+#' and associated data, and `params` list of parameters used for the function.
 #'
 #' @details
 #' Log R ratios computation steps are described in functions:
@@ -115,14 +126,15 @@ computeLogRatio <- function(x,
                             new.label.features = NULL,
                             remove.raw = TRUE,
                             quiet = FALSE,
+                            all_steps_dir = NULL,
                             ...) {
     # Validate input: x and reference must be muscadet objects
-    stopifnot("Input object 'x' must be of class 'muscadet'." = inherits(x, "muscadet"))
-    stopifnot("Input object 'reference' must be of class 'muscadet'." = inherits(reference, "muscadet"))
+    stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
+    stopifnot("Input object `reference` must be of class `muscadet`." = inherits(reference, "muscadet"))
 
     # Check omic is in the omics of 'x' and 'reference'
     stopifnot(
-        "'omic' argument must corresponds to an omic name in both muscadet objects 'x' and 'reference'." =
+        "`omic` argument must corresponds to an omic name in both muscadet objects `x` and `reference`." =
             omic %in% names(x@omics) &
             omic %in% names(reference@omics)
     )
@@ -130,7 +142,7 @@ computeLogRatio <- function(x,
     # Check that cell names do not overlap between x and reference
     common_cells <- intersect(Cells(x), Cells(reference))
     stopifnot(
-        "Cells in 'x' and 'reference' must have different names.
+        "Cells in `x` and `reference` must have different names.
         Found overlapping cell names between the two muscadet objects:
         - Verify that the same matrix is not used in both, or that some cells are not present in both.
         - Or rename cells to have unique cell names between the two objects (e.g. when names are numbers)." =
@@ -140,15 +152,22 @@ computeLogRatio <- function(x,
     # Check method
     if (is.null(method))
         method <- x@omics[[omic]]@type
-    stopifnot("'method' must be either 'ATAC' or 'RNA'." =
+    stopifnot("`method` must be either \"ATAC\" or \"RNA\"." =
                   method %in% c("ATAC", "RNA"))
 
     # Check raw count matrix in muscadet object
     stopifnot(
-        "Raw count matrix not found in the muscadet 'x' object." =
+        "Raw count matrix not found in the muscadet object `x`." =
             !is.null(x@omics[[omic]]@coverage[["mat.counts"]])
     )
 
+    # Check if output directory exists
+    if (!is.null(all_steps_dir)) {
+        stopifnot("`all_steps_dir`: The directory doesn't exist" = file.exists(dirname(all_steps_dir)))
+        do_steps <- TRUE
+    } else if (is.null(all_steps_dir)) {
+        do_steps <- FALSE
+    }
 
     # ATAC method ----------------------------------------------------------------
 
@@ -177,6 +196,7 @@ computeLogRatio <- function(x,
             peaksCoord = x@omics[[omic]]@coverage[["coord.features"]],
             genome = x@genome,
             quiet = quiet,
+            all_steps = do_steps,
             ...
         )
     }
@@ -208,35 +228,52 @@ computeLogRatio <- function(x,
             genesCoord = x@omics[[omic]]@coverage[["coord.features"]],
             genome = x@genome,
             quiet = quiet,
+            all_steps = do_steps,
             ...
         )
     }
 
-    if ("all_steps" %in% names(dots)) {
-        if (dots$all_steps == TRUE) {
-            obj <- list(
-                matTumor = obj$step08$matTumor,
-                matRef = obj$step08$matRef,
-                params = obj$params,
-                coord = obj$coord
+    # All steps ----------------------------------------------------------------
+
+    if (do_steps) {
+        for (step in names(obj)[grep("step", names(obj))]) {
+            filename <- file.path(all_steps_dir, paste0(omic, "_", step, ".pdf"))
+            title <- paste(omic, "-", "method", method, "-", step)
+
+            if (quiet == FALSE) {
+                message("Saving plot: ", filename)
+            }
+
+            heatmapStep(obj, step, filename = filename, title = title)
+        }
+
+        if (quiet == FALSE) {
+            message(
+                "IMPORTANT: with `all_steps_dir` provided, it returns a list of matrices for all steps."
             )
         }
+        return(obj)
+
+    } else {
+
+        # Return an updated muscadet object
+
+        x@omics[[omic]]@coverage[["log.ratio"]] <- obj$matTumor
+        x@omics[[omic]]@coverage[["ref.log.ratio.perc"]] <- setNames(quantile(obj$matRef, probs = seq(0, 1, 0.01), na.rm = TRUE),
+                                                                     seq(0, 1, 0.01))
+        x@omics[[omic]]@coverage[["coord.features"]] <- obj$coord
+        x@omics[[omic]]@coverage[["label.features"]] <- new.label.features[omic]
+
+        if (remove.raw == TRUE) {
+            x@omics[[omic]]@coverage[["mat.counts"]] <- NULL
+        }
+
+        if (quiet == FALSE) {
+            message("Done.")
+        }
+
+        return(x)
     }
-
-    x@omics[[omic]]@coverage[["log.ratio"]] <- obj$matTumor
-    x@omics[[omic]]@coverage[["ref.log.ratio.perc"]] <- setNames(quantile(obj$matRef, probs = seq(0, 1, 0.01), na.rm = TRUE), seq(0, 1, 0.01))
-    x@omics[[omic]]@coverage[["coord.features"]] <- obj$coord
-    x@omics[[omic]]@coverage[["label.features"]] <- new.label.features[omic]
-
-    if (remove.raw == TRUE) {
-        x@omics[[omic]]@coverage[["mat.counts"]] <- NULL
-    }
-
-    if (quiet == FALSE) {
-        message("Done.")
-    }
-
-    return(x)
 }
 
 
