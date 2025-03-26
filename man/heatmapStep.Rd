@@ -11,7 +11,8 @@ heatmapStep(
   filename,
   title = NULL,
   col_quantiles = c(0.1, 0.4, 0.6, 0.9),
-  col_boundaries = c("#00008E", "white", "white", "#630000")
+  col_breaks = NULL,
+  colors = c("#00008E", "white", "white", "#630000")
 )
 }
 \arguments{
@@ -31,10 +32,17 @@ automatically generated using the provided step argument and its
 corresponding value name (\code{obj[[step]]$name}).}
 
 \item{col_quantiles}{A numeric vector of length 4, specifying the quantiles
-to use for the color breaks in the heatmap (\code{numeric}). Default is \code{c(0.1, 0.4, 0.6, 0.9)}.}
+to use for the color breakpoints in the heatmap (\code{numeric}). Either
+\code{col_quantiles} or \code{col_breaks} must be provided, if both are provided
+\code{col_breaks} is used. Default is \code{c(0.1, 0.4, 0.6, 0.9)}.}
 
-\item{col_boundaries}{A character vector of 4 colors used for the color scale
-of the heatmap (\code{character} vector). Default is \code{c("#00008E", "white", "white", "#630000")}.}
+\item{col_breaks}{A numeric vector of length 4, specifying custom breakpoints
+for the color scale in the heatmap (\code{numeric}). Either \code{col_quantiles} or
+\code{col_breaks} must be provided, if both are provided \code{col_breaks} is used.
+Default is \code{NULL}.}
+
+\item{colors}{A character vector of 4 colors used for the color scale of the
+heatmap (\code{character} vector). Default is \code{c("#00008E", "white", "white", "#630000")}.}
 }
 \value{
 The function does not return any value but saves a heatmaps-histograms plot to the specified file.
@@ -97,10 +105,20 @@ obj_atac_all <- computeLogRatioATAC(
 )
 names(obj_atac_all)
 
-# Plot heatmap and distribution of values for Step04
+# Plot heatmap and distribution of values for Step01
 heatmapStep(obj = obj_atac_all,
             step = "step01",
-            filename = "step01.png",
+            filename = file.path(tempdir(), "step01.png"),
             title = "Example data - Step 01")
+
+# Plot heatmap and distribution of values for all steps
+for (step in names(obj_atac_all)[grep("step", names(obj_atac_all))]) {
+    heatmapStep(
+        obj_atac_all,
+        step,
+        filename = file.path(tempdir(), paste0("ATAC_", step, ".pdf")),
+        title = paste("ATAC -", step)
+    )
+}
 
 }

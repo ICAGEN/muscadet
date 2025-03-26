@@ -12,7 +12,7 @@ computeLogRatio(
   new.label.features = NULL,
   remove.raw = TRUE,
   quiet = FALSE,
-  all_steps_dir = NULL,
+  all_steps = FALSE,
   ...
 )
 }
@@ -44,11 +44,11 @@ will keep raw count matrices within the object.}
 \item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
 default: \code{FALSE}.}
 
-\item{all_steps_dir}{Path to a directory to save plots for each step of the log
-ratio computation (\code{character} string). IMPORTANT: if provided (not \code{NULL})
-the function does not return a muscadet object but a list with matrices for
-each step of the log ratio computation (see Value section). Default is
-\code{NULL}.}
+\item{all_steps}{Logical value to indicate whether matrices at each step of
+the log ratio computation are kept and returned (\code{logical}). IMPORTANT: if
+\code{TRUE}, the function does not return an updated \code{muscadet} object but a
+list with matrices at each step of the log ratio computation (see Value
+section). Default is \code{FALSE}.}
 
 \item{...}{
   Arguments passed on to \code{\link[=computeLogRatioATAC]{computeLogRatioATAC}}, \code{\link[=computeLogRatioRNA]{computeLogRatioRNA}}
@@ -77,8 +77,7 @@ A \code{\link{muscadet}} object corresponding to the sample
 \code{\link{muscadet}} object (\code{x}) containing the computed log R ratio
 matrix in the \code{coverage} slot of the selected \code{omic}.
 
-If the \code{all_steps} argument is provided (path to directory to save plots for
-each step of the log ratio computation), it returns a list with intermediate
+If the \code{all_steps} argument is set to \code{TRUE}, it returns a list with intermediate
 matrices \code{matTumor} and \code{matRef} from every step from \code{step01} to \code{step08}
 (no \code{step06} for \code{method} = "ATAC"), \code{coord} table of features coordinates
 and associated data, and \code{params} list of parameters used for the function.

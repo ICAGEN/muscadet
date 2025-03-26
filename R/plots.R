@@ -1442,11 +1442,16 @@ plotCNA <- function(x,
 #'   automatically generated using the provided step argument and its
 #'   corresponding value name (`obj[[step]]$name`).
 #' @param col_quantiles A numeric vector of length 4, specifying the quantiles
-#'   to use for the color breaks in the heatmap (`numeric`). Default is `c(0.1,
-#'   0.4, 0.6, 0.9)`.
-#' @param col_boundaries A character vector of 4 colors used for the color scale
-#'   of the heatmap (`character` vector). Default is `c("#00008E", "white",
-#'   "white", "#630000")`.
+#'   to use for the color breakpoints in the heatmap (`numeric`). Either
+#'   `col_quantiles` or `col_breaks` must be provided, if both are provided
+#'   `col_breaks` is used. Default is `c(0.1, 0.4, 0.6, 0.9)`.
+#' @param col_breaks A numeric vector of length 4, specifying custom breakpoints
+#'   for the color scale in the heatmap (`numeric`). Either `col_quantiles` or
+#'   `col_breaks` must be provided, if both are provided `col_breaks` is used.
+#'   Default is `NULL`.
+#' @param colors A character vector of 4 colors used for the color scale of the
+#'   heatmap (`character` vector). Default is `c("#00008E", "white", "white",
+#'   "#630000")`.
 #'
 #' @return The function does not return any value but saves a heatmaps-histograms plot to the specified file.
 #'
@@ -1509,11 +1514,21 @@ plotCNA <- function(x,
 #' )
 #' names(obj_atac_all)
 #'
-#' # Plot heatmap and distribution of values for Step04
+#' # Plot heatmap and distribution of values for Step01
 #' heatmapStep(obj = obj_atac_all,
 #'             step = "step01",
-#'             filename = "step01.png",
+#'             filename = file.path(tempdir(), "step01.png"),
 #'             title = "Example data - Step 01")
+#'
+#' # Plot heatmap and distribution of values for all steps
+#' for (step in names(obj_atac_all)[grep("step", names(obj_atac_all))]) {
+#'     heatmapStep(
+#'         obj_atac_all,
+#'         step,
+#'         filename = file.path(tempdir(), paste0("ATAC_", step, ".pdf")),
+#'         title = paste("ATAC -", step)
+#'     )
+#' }
 #'
 #' @export
 #'
@@ -1522,12 +1537,14 @@ heatmapStep <- function(obj,
                         filename,
                         title = NULL,
                         col_quantiles = c(0.1, 0.4, 0.6, 0.9),
-                        col_boundaries = c("#00008E", "white", "white", "#630000")) {
+                        col_breaks = NULL,
+                        colors = c("#00008E", "white", "white", "#630000")) {
     # Argument checks
-    if (!is.list(obj)) {
-        stop("The `obj` argument must be a list.")
-    }
 
+    # obj
+    stopifnot("The `obj` argument must be a list." = is.list(obj))
+
+    # step
     if (!(step %in% names(obj))) {
         stop(paste(
             "The specified `step` (`",
@@ -1537,17 +1554,31 @@ heatmapStep <- function(obj,
         ))
     }
 
-    if (!grepl(".(png|pdf)$", filename)) {
-        stop("The `filename` argument must end with either .png or .pdf.")
-    }
+    # filename extension
+    stopifnot("The `filename` argument must end with either .png or .pdf." = grepl(".(png|pdf)$", filename))
 
-    if (!is.numeric(col_quantiles) || length(col_quantiles) != 4) {
-        stop("The `col_quantiles` argument should be a numeric vector of length 4.")
+    # col_quantiles and col_breaks
+    stopifnot("Either `col_quantiles` or `col_breaks` must be provided." =
+                  !(is.null(col_quantiles) && is.null(col_breaks)))
+    if (!is.null(col_quantiles)) {
+        stopifnot("`col_quantiles` must be a numeric vector of length 4." =
+                      is.numeric(col_quantiles) && length(col_quantiles) == 4)
+        stopifnot("Values in `col_quantiles` must be between 0 and 1." =
+                      all(col_quantiles >= 0 & col_quantiles <= 1))
     }
+    if (!is.null(col_breaks)) {
+        stopifnot("`col_breaks` must be a numeric vector of length 4." =
+                      is.numeric(col_breaks) && length(col_breaks) == 4)
+        stopifnot("`col_breaks` must contain at least two distinct values." =
+                      length(unique(col_breaks)) >= 2)
+    }
+    # if (!is.null(col_quantiles) && !is.null(col_breaks)) {
+    #     message("Both `col_quantiles` and `col_breaks` are provided. Only `col_breaks` is used.")
+    # }
 
-    if (!is.character(col_boundaries) ||
-        length(col_boundaries) != 4) {
-        stop("The `col_boundaries` argument should be a character vector of length 4.")
+    # colors
+    if (!is.character(colors) || length(colors) != 4) {
+        stop("The `colors` argument should be a character vector of length 4.")
     }
 
     # Extract the tumor and reference matrices
@@ -1564,16 +1595,25 @@ heatmapStep <- function(obj,
     coord <- obj$coord
     chrom <- coord[which(coord$id %in% colnames(matTumor)), "CHROM"]
     chrom <- factor(chrom, levels = unique(chrom))
+    mat <- rbind(matTumor, matRef)
 
     # Combine matrices and calculate breaks for color scale
-    mat <- rbind(matTumor, matRef)
-    col_breaks <- quantile(mat, col_quantiles)
-
-    # Color scale function
-    col_fun <- circlize::colorRamp2(col_breaks, col_boundaries)
+    if(!is.null(col_breaks)) {
+        # Color scale function
+        col_fun <- circlize::colorRamp2(col_breaks, colors)
+    } else {
+        # define breaks based on quantiles
+        col_breaks <- quantile(mat, col_quantiles)
+        stopifnot("The breaks defined by `col_quantiles` must contain at least two distinct values." =
+                      length(unique(col_breaks)) >= 2)
+        # Color scale function
+        col_fun <- circlize::colorRamp2(col_breaks, colors)
+    }
 
     # Calculate bin_width
     bin_width <- (max(mat) - min(mat)) / 1000
+
+    ht_opt(message = F)
 
     # Create heatmaps
     ht_Tum <- ComplexHeatmap::Heatmap(
@@ -1586,6 +1626,7 @@ heatmapStep <- function(obj,
         show_row_names = FALSE,
         cluster_columns = FALSE,
         cluster_rows = TRUE,
+        show_row_dend = FALSE,
         column_split = chrom,
         column_title_gp = gpar(fontsize = 10),
         border_gp = gpar(col = "black", lwd = 1),
@@ -1606,6 +1647,7 @@ heatmapStep <- function(obj,
         show_row_names = FALSE,
         cluster_columns = FALSE,
         cluster_rows = TRUE,
+        show_row_dend = FALSE,
         column_split = chrom,
         column_title_gp = gpar(fontsize = 10),
         border_gp = gpar(col = "black", lwd = 1),

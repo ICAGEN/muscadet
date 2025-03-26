@@ -64,7 +64,7 @@ reference cells (\code{matrix}).}
 \code{minReads}, \code{minPeaks} and \code{thresh_capping} arguments (\code{list}).}
 \item{\code{coord}}{Data frame of coordinates for windows of peaks and associated
 data along the different steps (\code{data.frame}).
-Columns :
+Columns:
 \itemize{
 \item \code{CHROM}, \code{start}, \code{end}, \code{width}, \code{id}: coordinates and unique identifier of
 windows (depends on \code{windowSize} and \code{slidingSize} arguments).

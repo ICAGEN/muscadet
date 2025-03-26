@@ -23,11 +23,11 @@
 #' @param remove.raw `TRUE` or `FALSE` (`logical`). Whether to remove raw count
 #'   matrices. `TRUE` by default to reduce object size. Setting it to `FALSE`
 #'   will keep raw count matrices within the object.
-#' @param all_steps_dir Path to a directory to save plots for each step of the log
-#'   ratio computation (`character` string). IMPORTANT: if provided (not `NULL`)
-#'   the function does not return a muscadet object but a list with matrices for
-#'   each step of the log ratio computation (see Value section). Default is
-#'   `NULL`.
+#' @param all_steps Logical value to indicate whether matrices at each step of
+#'   the log ratio computation are kept and returned (`logical`). IMPORTANT: if
+#'   `TRUE`, the function does not return an updated `muscadet` object but a
+#'   list with matrices at each step of the log ratio computation (see Value
+#'   section). Default is `FALSE`.
 #' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
 #'   default: `FALSE`.
 #'
@@ -40,8 +40,7 @@
 #' \code{\link{muscadet}} object (`x`) containing the computed log R ratio
 #' matrix in the `coverage` slot of the selected `omic`.
 #'
-#' If the `all_steps` argument is provided (path to directory to save plots for
-#' each step of the log ratio computation), it returns a list with intermediate
+#' If the `all_steps` argument is set to `TRUE`, it returns a list with intermediate
 #' matrices `matTumor` and `matRef` from every step from `step01` to `step08`
 #' (no `step06` for `method` = "ATAC"), `coord` table of features coordinates
 #' and associated data, and `params` list of parameters used for the function.
@@ -126,7 +125,7 @@ computeLogRatio <- function(x,
                             new.label.features = NULL,
                             remove.raw = TRUE,
                             quiet = FALSE,
-                            all_steps_dir = NULL,
+                            all_steps = FALSE,
                             ...) {
     # Validate input: x and reference must be muscadet objects
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
@@ -161,13 +160,13 @@ computeLogRatio <- function(x,
             !is.null(x@omics[[omic]]@coverage[["mat.counts"]])
     )
 
-    # Check if output directory exists
-    if (!is.null(all_steps_dir)) {
-        stopifnot("`all_steps_dir`: The directory doesn't exist" = file.exists(dirname(all_steps_dir)))
-        do_steps <- TRUE
-    } else if (is.null(all_steps_dir)) {
-        do_steps <- FALSE
-    }
+    # # Check if output directory exists
+    # if (!is.null(all_steps_dir)) {
+    #     stopifnot("`all_steps_dir`: The directory doesn't exist" = file.exists(dirname(all_steps_dir)))
+    #     do_steps <- TRUE
+    # } else if (is.null(all_steps_dir)) {
+    #     do_steps <- FALSE
+    # }
 
     # ATAC method ----------------------------------------------------------------
 
@@ -196,7 +195,7 @@ computeLogRatio <- function(x,
             peaksCoord = x@omics[[omic]]@coverage[["coord.features"]],
             genome = x@genome,
             quiet = quiet,
-            all_steps = do_steps,
+            all_steps = all_steps,
             ...
         )
     }
@@ -228,34 +227,22 @@ computeLogRatio <- function(x,
             genesCoord = x@omics[[omic]]@coverage[["coord.features"]],
             genome = x@genome,
             quiet = quiet,
-            all_steps = do_steps,
+            all_steps = all_steps,
             ...
         )
     }
 
     # All steps ----------------------------------------------------------------
 
-    if (do_steps) {
-        for (step in names(obj)[grep("step", names(obj))]) {
-            filename <- file.path(all_steps_dir, paste0(omic, "_", step, ".pdf"))
-            title <- paste(omic, "-", "method", method, "-", step)
-
-            if (quiet == FALSE) {
-                message("Saving plot: ", filename)
-            }
-
-            heatmapStep(obj, step, filename = filename, title = title)
-        }
-
+    if (all_steps) {
         if (quiet == FALSE) {
             message(
-                "IMPORTANT: with `all_steps_dir` provided, it returns a list of matrices for all steps."
+                "IMPORTANT: with `all_steps` = TRUE, it returns a list of matrices for all steps."
             )
         }
         return(obj)
 
     } else {
-
         # Return an updated muscadet object
 
         x@omics[[omic]]@coverage[["log.ratio"]] <- obj$matTumor
@@ -319,7 +306,7 @@ computeLogRatio <- function(x,
 #'  `minReads`, `minPeaks` and `thresh_capping` arguments (`list`).}
 #'  \item{`coord`}{Data frame of coordinates for windows of peaks and associated
 #'  data along the different steps (`data.frame`).
-#'  Columns :
+#'  Columns:
 #'  - `CHROM`, `start`, `end`, `width`, `id`: coordinates and unique identifier of
 #'  windows (depends on `windowSize` and `slidingSize` arguments).
 #'  - `nPeaks`: number of peaks per window.
