@@ -9,7 +9,7 @@
 \alias{allele_counts_rna_ref}
 \title{Example data: Allele counts at variation positions}
 \format{
-A data frame with columns based on the \href{https://en.wikipedia.org/wiki/Variant_Call_Format}{variant calling format (VCF) format} columns.
+A data frame with columns based on the \href{https://en.wikipedia.org/wiki/Variant_Call_Format}{Variant Call Format (VCF) format} columns.
 It contains the following columns:
 \describe{
 \item{\code{cell}}{Barcodes of cells (\code{character}).}

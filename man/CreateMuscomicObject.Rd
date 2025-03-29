@@ -7,8 +7,8 @@
 CreateMuscomicObject(
   type = c("ATAC", "RNA"),
   mat_counts,
-  allele_counts = NULL,
   features,
+  allele_counts = NULL,
   label.omic = NULL,
   label.features = NULL
 )
@@ -21,14 +21,6 @@ CreateMuscomicObject(
 \code{dgCMatrix}). Rows are features (they must correspond to the id column of
 \code{features}), and columns are cells.}
 
-\item{allele_counts}{Data frame of allele counts at variant positions per
-cell (\code{data.frame}). Variant positions can be either common single
-nucleotide polymorphisms (SNPs) positions or individual-specific
-heterozygous positions retrieved by bulk sequencing. The data frame format
-is based on the Variant Calling Format (VCF), thereby it must contain the
-following columns : \code{cell}, \code{id}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}, \code{RD}, \code{AD},
-\code{DP}, \code{GT}. See \link{allele_counts} for details.}
-
 \item{features}{Data frame of features (peaks, genes...) coordinates on
 genome (\code{data.frame}). It should contain 4 columns:
 \describe{
@@ -39,6 +31,14 @@ genome (\code{data.frame}). It should contain 4 columns:
 CHROM_start_end "1_1600338_1600838" (\code{character}). It should match the
 feature identifiers as row names of \code{mat_counts}.}
 }}
+
+\item{allele_counts}{Data frame of allele counts at variant positions per
+cell (\code{data.frame}). Variant positions can be either common single
+nucleotide polymorphisms (SNPs) positions or individual-specific
+heterozygous positions retrieved by bulk sequencing. The data frame format
+is based on the Variant Calling Format (VCF), thereby it must contain the
+following columns : \code{cell}, \code{id}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}, \code{RD}, \code{AD},
+\code{DP}, \code{GT}. See \link{allele_counts} for details.}
 
 \item{label.omic}{Label for the single cell omic (\code{character} string). By
 default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"

@@ -91,13 +91,6 @@ methods::setClass(
 #' @param mat_counts Matrix of raw counts *features x cells* (`matrix` or
 #'   `dgCMatrix`). Rows are features (they must correspond to the id column of
 #'   `features`), and columns are cells.
-#' @param allele_counts Data frame of allele counts at variant positions per
-#'   cell (`data.frame`). Variant positions can be either common single
-#'   nucleotide polymorphisms (SNPs) positions or individual-specific
-#'   heterozygous positions retrieved by bulk sequencing. The data frame format
-#'   is based on the Variant Calling Format (VCF), thereby it must contain the
-#'   following columns : `cell`, `id`, `CHROM`, `POS`, `REF`, `ALT`, `RD`, `AD`,
-#'   `DP`, `GT`. See [allele_counts] for details.
 #' @param features Data frame of features (peaks, genes...) coordinates on
 #'   genome (`data.frame`). It should contain 4 columns:
 #'   \describe{
@@ -108,6 +101,13 @@ methods::setClass(
 #'   CHROM_start_end "1_1600338_1600838" (`character`). It should match the
 #'   feature identifiers as row names of `mat_counts`.}
 #' }
+#' @param allele_counts Data frame of allele counts at variant positions per
+#'   cell (`data.frame`). Variant positions can be either common single
+#'   nucleotide polymorphisms (SNPs) positions or individual-specific
+#'   heterozygous positions retrieved by bulk sequencing. The data frame format
+#'   is based on the Variant Calling Format (VCF), thereby it must contain the
+#'   following columns : `cell`, `id`, `CHROM`, `POS`, `REF`, `ALT`, `RD`, `AD`,
+#'   `DP`, `GT`. See [allele_counts] for details.
 #' @param label.omic Label for the single cell omic (`character` string). By
 #'   default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"
 #'   type.
@@ -173,8 +173,8 @@ methods::setClass(
 #'
 CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
                                  mat_counts,
-                                 allele_counts = NULL,
                                  features,
+                                 allele_counts = NULL,
                                  label.omic = NULL,
                                  label.features = NULL) {
   # Check for type of omic

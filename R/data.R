@@ -83,7 +83,7 @@
 #' @rdname allele_counts
 #'
 #' @format
-#' A data frame with columns based on the [variant calling format (VCF)
+#' A data frame with columns based on the [Variant Call Format (VCF)
 #' format](https://en.wikipedia.org/wiki/Variant_Call_Format) columns.
 #' It contains the following columns:
 #' \describe{
