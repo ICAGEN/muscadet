@@ -12,6 +12,7 @@ heatmapMuscadet(
   title = "",
   add_bulk_lrr = NULL,
   show_missing = TRUE,
+  row_annots = NULL,
   white_scale = c(0.3, 0.7),
   colors = NULL,
   png_res = 300,
@@ -49,6 +50,15 @@ available in the muscadet object.}
 \item{show_missing}{Logical value indicating whether to show missing cells
 (cells with missing data in at least one omic) in the heatmaps (\code{logical}).
 Default is \code{TRUE}.}
+
+\item{row_annots}{Optional. A list of \linkS4class{HeatmapAnnotation} objects from
+the \link{ComplexHeatmap} package, specifying row annotations to add on left
+part of the heatmap. Each element in the list must be of class
+(HeatmapAnnotation)\linkS4class{HeatmapAnnotation}, must be a row annotation
+(using \verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]} with
+\code{which = 'row'}), and must have a unique name (\code{name} argument in
+\verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]}). By default is \code{NULL}, no
+row annotations is added.}
 
 \item{white_scale}{Numeric vector of length 2 or a list of numeric vectors
 (\code{numeric} vector or \code{list}).
@@ -120,7 +130,6 @@ heatmapMuscadet(
     filename = file.path("heatmap_muscadet_k3.png"),
     title = title
 )
-
 heatmapMuscadet(
     muscadet_obj,
     k = 3,
@@ -149,5 +158,39 @@ for (k in names(muscadet_obj$clustering$clusters)) {
         title = title
     )
 }
+
+# Add row annotation
+
+# Define example annotation
+muscadet_cells <- sort(Reduce(union, Cells(muscadet_obj)))
+cells_origin <- setNames(c(
+    rep("sample1", ceiling(length(muscadet_cells) / 2)),
+    rep("sample2", floor(length(muscadet_cells) / 2))
+    ),
+    muscadet_cells
+)
+
+# Create row annotation
+ha <- rowAnnotation(
+    annot = anno_simple(
+        cells_origin,
+        col = c(
+            "sample1" = "cadetblue3",
+            "sample2" = "orchid3"
+        )
+    ),
+    name = "origin",
+    annotation_label = "origin",
+    annotation_name_gp = gpar(fontsize = 10)
+)
+
+# Generate heatmap with supplementary row annotation
+heatmapMuscadet(
+    muscadet_obj,
+    k = 3,
+    filename = file.path("heatmap_muscadet_k3.png"),
+    title = title,
+    row_annots = list(ha)
+)
 
 }

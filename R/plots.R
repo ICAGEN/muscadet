@@ -57,6 +57,14 @@
 #'   loss of coverage, and are represented as white on the heatmap. Default is
 #'   `c(0.3, 0.7)`.
 #'
+#' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
+#'   the [ComplexHeatmap] package, specifying row annotations to add on left
+#'   part of the heatmap. Each element in the list must be of class
+#'   (HeatmapAnnotation)[HeatmapAnnotation-class], must be a row annotation
+#'   (using `[rowAnnotation()]` or `[HeatmapAnnotation()]` with
+#'   `which = 'row'`), and must have a unique name (`name` argument in
+#'   `[rowAnnotation()]` or `[HeatmapAnnotation()]`). By default is `NULL`, no
+#'   row annotations is added.
 #'
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). Default is `NULL`, which uses predefined colors.
@@ -106,7 +114,6 @@
 #'     filename = file.path("heatmap_muscadet_k3.png"),
 #'     title = title
 #' )
-#'
 #' heatmapMuscadet(
 #'     muscadet_obj,
 #'     k = 3,
@@ -136,6 +143,40 @@
 #'     )
 #' }
 #'
+#' # Add row annotation
+#'
+#' # Define example annotation
+#' muscadet_cells <- sort(Reduce(union, Cells(muscadet_obj)))
+#' cells_origin <- setNames(c(
+#'     rep("sample1", ceiling(length(muscadet_cells) / 2)),
+#'     rep("sample2", floor(length(muscadet_cells) / 2))
+#'     ),
+#'     muscadet_cells
+#' )
+#'
+#' # Create row annotation
+#' ha <- rowAnnotation(
+#'     annot = anno_simple(
+#'         cells_origin,
+#'         col = c(
+#'             "sample1" = "cadetblue3",
+#'             "sample2" = "orchid3"
+#'         )
+#'     ),
+#'     name = "origin",
+#'     annotation_label = "origin",
+#'     annotation_name_gp = gpar(fontsize = 10)
+#' )
+#'
+#' # Generate heatmap with supplementary row annotation
+#' heatmapMuscadet(
+#'     muscadet_obj,
+#'     k = 3,
+#'     filename = file.path("heatmap_muscadet_k3.png"),
+#'     title = title,
+#'     row_annots = list(ha)
+#' )
+#'
 heatmapMuscadet <- function(x,
                             filename = NULL,
                             k = NULL,
@@ -143,6 +184,7 @@ heatmapMuscadet <- function(x,
                             title = "",
                             add_bulk_lrr = NULL,
                             show_missing = TRUE,
+                            row_annots = NULL,
                             white_scale = c(0.3, 0.7),
                             colors = NULL,
                             png_res = 300,
@@ -167,8 +209,7 @@ heatmapMuscadet <- function(x,
         show_missing <- FALSE
 
     # Validate k and clusters
-    stopifnot("Both `k` and `clusters` cannot be NULL." = !(is.null(k) &&
-                                                                is.null(clusters)))
+    stopifnot("Both `k` and `clusters` cannot be NULL." = !(is.null(k) && is.null(clusters)))
 
     # Validate k in clustering slot
     if (!is.null(k)) {
@@ -180,6 +221,26 @@ heatmapMuscadet <- function(x,
     # Default addition of bulk data
     if (is.null(add_bulk_lrr)) {
         add_bulk_lrr <- !is.null(x@bulk.data$log.ratio)
+    }
+
+    # Validate row_annots
+    if (!is.null(row_annots)) {
+
+        # Check that it is a list of HeatmapAnnotation objects
+        if (!is.list(row_annots) || !all(sapply(row_annots, function(x) inherits(x, "HeatmapAnnotation")))) {
+            stop("`row_annots` must be a list of HeatmapAnnotation objects.")
+        }
+
+        # Ensure all annotations are row annotations
+        if (!all(sapply(row_annots, function(x) x@anno_list[["annot"]]@fun@which == "row"))) {
+            stop("All elements in `row_annots` must be row annotations (use rowAnnotation() or HeatmapAnnotation(..., which = 'row').")
+        }
+
+        # Ensure annotation names are unique
+        annot_names <- sapply(row_annots, function(x) x@name)
+        if (length(annot_names) != length(unique(annot_names))) {
+            stop("All annotation names in `row_annots` must be unique (`name` argument in rowAnnotation() or HeatmapAnnotation()).")
+        }
     }
 
     # Validate white_scale
@@ -449,31 +510,88 @@ heatmapMuscadet <- function(x,
         }
         n_cells <- table(clusters)
 
+        # Add supplementary annotations
+        if (!is.null(row_annots)) {
+            # Filter cells to match cells in heatmap
+            row_annots <- lapply(row_annots, function(ha) {
+                ha_cells <- names(ha@anno_list[["annot"]]@fun@var_env[["value"]])
+                ha <- ha[which(ha_cells %in% all_cells)]
+                ha
+            })
+
+            ht_list <- Reduce("+", row_annots) + ht_list
+
+            ht_gap <- unit(c(rep(.3, length(row_annots)), .3, 1), "cm")
+
+            annotation_legend_list <- lapply(row_annots, function(ha) {
+                Legend(
+                    labels = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@levels,
+                    title = ha@anno_list[["annot"]]@label,
+                    legend_gp = gpar(fill = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@colors)
+                )
+            })
+
+        } else {
+            ht_gap <- unit(1, "cm")
+            annotation_legend_list <- list()
+        }
+
+        # Draw heatmap
         ht_all <- ComplexHeatmap::draw(
             ht_list,
             column_title = title,
-            ht_gap = unit(1, "cm"),
+            ht_gap = ht_gap,
             row_split = factor(clusters[all_cells], levels =
                                    sort(unique(clusters))),
             row_order = names(clusters),
             cluster_rows = F,
+            annotation_legend_list = annotation_legend_list,
             merge_legend = TRUE
         )
 
 
     } else if (show_missing == FALSE) {
+
+        # Add supplementary annotations
+        if (!is.null(row_annots)) {
+            # Filter cells to match cells in heatmap
+            row_annots <- lapply(row_annots, function(ha) {
+                ha_cells <- names(ha@anno_list[["annot"]]@fun@var_env[["value"]])
+                ha <- ha[which(ha_cells %in% common_cells)]
+                ha
+            })
+
+            ht_list <- Reduce("+", row_annots) + ht_list
+
+            ht_gap <- unit(c(rep(.3, length(row_annots)), .3, 1), "cm")
+
+            annotation_legend_list <- lapply(row_annots, function(ha) {
+                Legend(
+                    labels = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@levels,
+                    title = ha@anno_list[["annot"]]@label,
+                    legend_gp = gpar(fill = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@colors)
+                )
+            })
+
+        } else {
+            ht_gap <- unit(1, "cm")
+            annotation_legend_list <- list()
+        }
+
         if (is.null(clusters)) {
             # 2. Clustering hclust from the muscadet object clustering with common cells
             hc <- x@clustering$hclust # hclust object to print the dendrogram on the heatmap
             n_cells <- table(dendextend::cutree(hc, k, order_clusters_as_data = FALSE))
 
+            # Draw heatmap
             ht_all <- ComplexHeatmap::draw(
                 ht_list,
                 column_title = title,
-                ht_gap = unit(1, "cm"),
+                ht_gap = ht_gap,
                 cluster_rows = hc,
                 row_split = as.integer(k),
                 row_dend_reorder = FALSE,
+                annotation_legend_list = annotation_legend_list,
                 merge_legend = TRUE
             )
         } else {
@@ -482,13 +600,14 @@ heatmapMuscadet <- function(x,
             ht_all <- ComplexHeatmap::draw(
                 ht_list,
                 column_title = title,
-                ht_gap = unit(1, "cm"),
+                ht_gap = ht_gap,
                 row_split = factor(clusters[common_cells], levels =
                                        sort(unique(
                                            clusters
                                        ))),
                 row_order = names(clusters)[names(clusters) %in% common_cells],
                 cluster_rows = F,
+                annotation_legend_list = annotation_legend_list,
                 merge_legend = TRUE
             )
         }
@@ -536,7 +655,7 @@ heatmapMuscadet <- function(x,
     }
 
     # Add annotation: chromosome numbers
-    for (ht_name in names(ht_all@ht_list)[-1]) {
+    for (ht_name in unlist(lapply(list_ht, function(l) l@name))) {
         chrom_names <- unique(names(ht_all@ht_list[[ht_name]]@column_order_list))
         for (i in 1:length(chrom_names)) {
             ComplexHeatmap::decorate_annotation(paste0("chrom_", ht_name),
