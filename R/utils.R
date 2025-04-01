@@ -10,15 +10,21 @@
 #'   muscadet object (`integer`). If `k` is provided, the clustering result
 #'   stored in the object for that specific `k` is used
 #'   (`muscadet_obj$clustering$clusters[[as.character(k)]]`).
-#' @param clusters A custom named vector of cluster assignments (e.g., to
-#'   regroup some clusters) (`vector`). The vector must have the same length as
-#'   the number of cells in the muscadet object and names matching the cell
-#'   names.
+#' @param clusters A custom named vector of cluster assignments (`vector`). The
+#'   vector names must match cell names in the muscadet object `x`, at least
+#'   cluster assignments for all common cells must be provided if
+#'   `redo_imputation` is set to true, otherwise, all cells within the muscadet
+#'   object `x` must be provided.
 #' @param mapping Optional named vector specifying how to remap cluster values
 #'   (`vector`). The names of the vector correspond to the original cluster
 #'   values, and the values are the remapped cluster values. For example, `c("1"
 #'   = 1, "2" = 1, "3" = 2, "4" = 3)` would merge clusters 1 and 2 into 1,
 #'   cluster 3 into 2, and cluster 4 into 3.
+#' @param redo_imputation Logical. If `TRUE` (default), reruns the imputation
+#'   process to assign clusters to cells with missing data. This ensures that
+#'   imputed clusters are updated if the clustering has changed due to remapping
+#'   or to the use of custom clusters.
+#' @inheritParams imputeClusters
 #'
 #' @details
 #' - The clusters can be taken directly from the `muscadet` object clustering
@@ -45,11 +51,12 @@
 #' table(muscadet_obj$cnacalling$clusters)
 #'
 #' # Assign custom clusters
+#' set.seed(42)
 #' cell_names <- Reduce(union, SeuratObject::Cells(muscadet_obj))
 #' n1 <- sample(1:length(cell_names), 1)
 #' n2 <- length(cell_names) - n1
-#' custom_clusters <- c(rep.int(1, n1), rep.int(2, n2))
-#' names(custom_clusters) <- cell_names
+#' custom_clusters <- setNames(c(rep.int(1, n1), rep.int(2, n2)), cell_names)
+#' table(custom_clusters)
 #' muscadet_obj <- assignClusters(muscadet_obj, clusters = custom_clusters)
 #' table(muscadet_obj$cnacalling$clusters)
 #'
@@ -69,63 +76,122 @@
 #' table(clusters, muscadet_obj$cnacalling$clusters)
 #'
 #' # Visualize clusters on heatmap
-#' ht <- heatmapMuscadet(
+#' heatmapMuscadet(
 #'   muscadet_obj,
 #'   k = 3,
 #'   filename = file.path("heatmap_muscadet_k3.png"),
 #'   title = "Example sample | k=3"
 #' )
-#' ht <- heatmapMuscadet(
+#' heatmapMuscadet(
 #'   muscadet_obj,
 #'   clusters = muscadet_obj$cnacalling$clusters,
 #'   filename = file.path("heatmap_muscadet_customk3.png"),
 #'   title = "Example sample | rearranged clusters k=3"
 #' )
 #'
-assignClusters <- function(x, k = NULL, clusters = NULL, mapping = NULL) {
+assignClusters <- function(x,
+                           k = NULL,
+                           clusters = NULL,
+                           mapping = NULL,
+                           redo_imputation = TRUE,
+                           knn_imp = 10) {
 
     # Validate input: x must be a muscadet object
-    stopifnot("Input object 'x' must be of class 'muscadet'." = inherits(x, "muscadet"))
+    stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
     # Validate that either k or clusters is provided, but not both
     stopifnot(
-        "Either 'k' or 'clusters' must be provided, but not both." = xor(!is.null(k), !is.null(clusters))
+        "Either `k` or `clusters` must be provided, but not both." = xor(!is.null(k), !is.null(clusters))
     )
 
     # If k is provided, validate that clustering has been performed
     if (!is.null(k)) {
         stopifnot(
-            "Clustering results are not available in the muscadet object. Perform clustering first using 'clusterMuscadet()'." = !is.null(x@clustering),
-            "Clustering results for the chosen k are not available. Use 'clusterMuscadet()' with the 'k_range' argument containing k" = as.character(k) %in% names(x@clustering$clusters)
+            "Clustering results are not available in the muscadet object `x`. Perform clustering first using `clusterMuscadet()`." = !is.null(x@clustering),
+            "Clustering results for the chosen `k` are not available. Use `clusterMuscadet()` with the `k_range` argument containing `k`" = as.character(k) %in% names(x@clustering$clusters)
         )
     }
 
     # If clusters is provided, validate its format
     if (!is.null(clusters)) {
         stopifnot(
-            "'clusters' must be a named vector." = is.vector(clusters) && !is.null(names(clusters)),
-            "Length of 'clusters' must match the total number of cells in the muscadet object." = length(clusters) == length(Reduce(union, Cells(x))),
-            "Names of 'clusters' must match the cell names in the muscadet object." = all(names(clusters) %in% Reduce(union, Cells(x)))
+            "`clusters` must be a named vector." = is.vector(clusters) && !is.null(names(clusters))
         )
     }
 
     # Apply mapping if provided
     if (!is.null(mapping)) {
+        # Validate mapping
         stopifnot(
-            "Mapping must be a named vector." = is.vector(mapping) && !is.null(names(mapping)),
-            "All cluster values must have corresponding mappings." = all(as.character(unique(clusters)) %in% names(mapping))
+            "`mapping` must be a named vector." = is.vector(mapping) &&
+                !is.null(names(mapping)),
+            "All cluster values must have corresponding mappings in `mapping`." = all(as.character(unique(clusters)) %in% names(mapping))
         )
+
+        # Get clusters from k
         if (!is.null(k)) {
             clusters <- x@clustering$clusters[[as.character(k)]]
         }
-        remapped_clusters <- mapping[as.character(clusters)]
-        names(remapped_clusters) <- names(clusters)
+
+        # Remap clusters
+        remapped_clusters <- setNames(mapping[as.character(clusters)], names(clusters))
+
+        # Rerun cluster imputation (following remapping)
+        if (redo_imputation) {
+
+            mat_list <- lapply(muscadet::matLogRatio(x), t)
+            common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
+
+            # Validate clusters cells
+            stopifnot(
+                "`clusters` must contain at least all common cells when `redo_imputation = TRUE`." = common_cells %in% all(names(remapped_clusters))
+            )
+
+            # Remove cells missing data that needs to go through cluster imputation (cleaner)
+            remapped_clusters <- remapped_clusters[intersect(names(remapped_clusters), common_cells)]
+            # Impute clusters
+            remapped_clusters <- imputeClusters(mat_list, remapped_clusters, knn_imp = knn_imp)
+
+        } else {
+            # Validate clusters cells
+            stopifnot(
+                "`clusters` must contain all cell names within the muscadet object `x`." = all(names(remapped_clusters) %in% Reduce(union, Cells(x)))
+            )
+        }
+
+
         x@cnacalling[["clusters"]] <- remapped_clusters
+
     } else {
-        # Assign clusters without remapping
+        # Assign clusters without remapping - custom clusters
         if (!is.null(clusters)) {
+
+            # Rerun cluster imputation (in case custom clusters have been modified)
+            if (redo_imputation) {
+
+                mat_list <- lapply(muscadet::matLogRatio(x), t)
+                common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
+
+                # Validate clusters cells
+                stopifnot(
+                    "`clusters` must contain at least all common cells when `redo_imputation = TRUE`." = all(common_cells %in% names(clusters))
+                )
+
+                # Remove cells missing data that needs to go through cluster imputation (cleaner)
+                clusters <- clusters[intersect(names(clusters), common_cells)]
+                # Impute clusters
+                clusters <- imputeClusters(mat_list, clusters, knn_imp = knn_imp)
+
+            } else {
+                # Validate clusters cells
+                stopifnot(
+                    "`clusters` must contain all cell names within the muscadet object `x`." = all(names(clusters) %in% Reduce(union, Cells(x)))
+                )
+            }
             x@cnacalling[["clusters"]] <- clusters
+
         } else if (!is.null(k)) {
+            # Assign clusters without remapping - clusters from hclust k
             x@cnacalling[["clusters"]] <- x@clustering$clusters[[as.character(k)]]
         }
     }

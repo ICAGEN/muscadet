@@ -4,7 +4,14 @@
 \alias{assignClusters}
 \title{Assign a cluster assignment to a \code{muscadet} object}
 \usage{
-assignClusters(x, k = NULL, clusters = NULL, mapping = NULL)
+assignClusters(
+  x,
+  k = NULL,
+  clusters = NULL,
+  mapping = NULL,
+  redo_imputation = TRUE,
+  knn_imp = 10
+)
 }
 \arguments{
 \item{x}{A \code{\link{muscadet}} object (\code{muscadet}).}
@@ -14,15 +21,25 @@ muscadet object (\code{integer}). If \code{k} is provided, the clustering result
 stored in the object for that specific \code{k} is used
 (\code{muscadet_obj$clustering$clusters[[as.character(k)]]}).}
 
-\item{clusters}{A custom named vector of cluster assignments (e.g., to
-regroup some clusters) (\code{vector}). The vector must have the same length as
-the number of cells in the muscadet object and names matching the cell
-names.}
+\item{clusters}{A custom named vector of cluster assignments (\code{vector}). The
+vector names must match cell names in the muscadet object \code{x}, at least
+cluster assignments for all common cells must be provided if
+\code{redo_imputation} is set to true, otherwise, all cells within the muscadet
+object \code{x} must be provided.}
 
 \item{mapping}{Optional named vector specifying how to remap cluster values
 (\code{vector}). The names of the vector correspond to the original cluster
 values, and the values are the remapped cluster values. For example, \code{c("1" = 1, "2" = 1, "3" = 2, "4" = 3)} would merge clusters 1 and 2 into 1,
 cluster 3 into 2, and cluster 4 into 3.}
+
+\item{redo_imputation}{Logical. If \code{TRUE} (default), reruns the imputation
+process to assign clusters to cells with missing data. This ensures that
+imputed clusters are updated if the clustering has changed due to remapping
+or to the use of custom clusters.}
+
+\item{knn_imp}{Integer specifying the number of nearest neighbors cells to
+use for imputation (\code{integer}). Must be a positive integer. Default is
+\code{10}.}
 }
 \value{
 A \code{\link{muscadet}} object updated with the user chosen cluster
@@ -54,11 +71,12 @@ muscadet_obj <- assignClusters(muscadet_obj, k = 3)
 table(muscadet_obj$cnacalling$clusters)
 
 # Assign custom clusters
+set.seed(42)
 cell_names <- Reduce(union, SeuratObject::Cells(muscadet_obj))
 n1 <- sample(1:length(cell_names), 1)
 n2 <- length(cell_names) - n1
-custom_clusters <- c(rep.int(1, n1), rep.int(2, n2))
-names(custom_clusters) <- cell_names
+custom_clusters <- setNames(c(rep.int(1, n1), rep.int(2, n2)), cell_names)
+table(custom_clusters)
 muscadet_obj <- assignClusters(muscadet_obj, clusters = custom_clusters)
 table(muscadet_obj$cnacalling$clusters)
 
@@ -78,13 +96,13 @@ table(muscadet_obj$cnacalling$clusters)
 table(clusters, muscadet_obj$cnacalling$clusters)
 
 # Visualize clusters on heatmap
-ht <- heatmapMuscadet(
+heatmapMuscadet(
   muscadet_obj,
   k = 3,
   filename = file.path("heatmap_muscadet_k3.png"),
   title = "Example sample | k=3"
 )
-ht <- heatmapMuscadet(
+heatmapMuscadet(
   muscadet_obj,
   clusters = muscadet_obj$cnacalling$clusters,
   filename = file.path("heatmap_muscadet_customk3.png"),
