@@ -240,7 +240,9 @@ clusterMuscadet <- function(x, # muscadet object
 
     # Impute clusters assignments to missing cells based on nearest neighbors (if several omics)
     if (length(mat_list) > 1) {
-        clusters_imp <- imputeClusters(mat_list, clusters, knn_imp = knn_imp)
+        clusters_imp <- lapply(clusters, function(clus) {
+            imputeClusters(mat_list, clus, knn_imp = knn_imp)
+        })
         slot(x, "clustering")[["clusters"]] <- clusters_imp
     } else {
         slot(x, "clustering")[["clusters"]] <- clusters
@@ -515,20 +517,23 @@ weightedSNF <- function(
 
 #' Impute cluster assignments for missing cells by similarity
 #'
-#' @description
-#' This function imputes cluster assignments for cells missing in some omics
-#' by leveraging nearest neighbor cells in other omic matrices.
+#' @description This function imputes cluster assignments for cells missing in
+#' some omics by leveraging nearest neighbor cells in other omic matrices.
 #'
-#' @param mat_list A named list of log ratio *cells x features* matrices where each matrix
-#'   corresponds to a single omic dataset (`list`). Rows are cells, and columns are
-#'   features.
-#' @param clusters A named list for each `k` values (number of clusters) where
-#'   each element is a named vector of cluster assignments for cells (`list`).
+#' @param mat_list A named list of log ratio *cells x features* matrices where
+#'   each matrix corresponds to a single omic dataset (`list`). Rows are cells,
+#'   and columns are features.
+#' @param clusters A named vector of cluster assignments for cells (`numeric` or
+#'   `character` vector). The vector names must correspond to the names of the
+#'   common cells across omics (matching row names in `mat_list`). The clusters
+#'   names can be as integer, numeric or character values.
 #' @param knn_imp Integer specifying the number of nearest neighbors cells to
-#'   use for imputation (`integer`).
+#'   use for imputation (`integer`). Must be a positive integer. Default is
+#'   `10`.
 #'
-#' @return A named list for each `k` values (number of clusters) where each
-#' element is a named vector of imputed cluster assignments for cells.
+#' @return A named vector of combining the original clusters assignments for
+#'   common cells across omics (given by the `clusters` argument) and the
+#'   imputed cluster assignments for cells missing in at least one omic matrix.
 #'
 #' @importFrom RANN nn2
 #'
@@ -547,6 +552,7 @@ weightedSNF <- function(
 #'
 #' @examples
 #' # Create matrices with some cells missing in one or the other
+#' set.seed(42)
 #' mat1 <- matrix(runif(100), nrow = 20)
 #' mat2 <- matrix(runif(100), nrow = 20)
 #' rownames(mat1) <- paste0("Cell", 1:20)
@@ -554,14 +560,16 @@ weightedSNF <- function(
 #' mat_list <- list(ATAC = mat1, RNA = mat2)
 #'
 #' # Create cluster assignments for common cells
-#' clusters <- list(
-#'   `2` = setNames(sample(1:2, 15, replace = TRUE), intersect(rownames(mat1), rownames(mat2))),
-#'   `3` = setNames(sample(1:3, 15, replace = TRUE), intersect(rownames(mat1), rownames(mat2))),
-#'   `4` = setNames(sample(1:4, 15, replace = TRUE), intersect(rownames(mat1), rownames(mat2)))
-#' )
+#' common_cells <- intersect(rownames(mat1), rownames(mat2))
+#' clusters <- setNames(sample(1:4, length(common_cells), replace = TRUE), common_cells)
+#'
+#' # Check the inputs
+#' print(common_cells)
+#' print(rownames(mat_list$ATAC))
+#' print(rownames(mat_list$RNA))
 #'
 #' # Impute cluster assignments for missing cells
-#' imputed_clusters <- imputeClusters(mat_list, clusters, knn_imp = 5)
+#' imputed_clusters <- imputeClusters(mat_list, clusters, knn_imp = 3)
 #'
 #' # View the imputed cluster assignments
 #' print(imputed_clusters)
@@ -572,14 +580,49 @@ imputeClusters <- function(mat_list,
                            clusters,
                            knn_imp = 10) {
 
+    # Argument checks
+    if (!is.list(mat_list) || !all(sapply(mat_list, is.matrix))) {
+        stop("`mat_list` must be a named list of matrices.")
+    }
+
+    stopifnot("`mat_list` must have names corresponding to omic datasets." = !is.null(names(mat_list)))
+
+    stopifnot("`clusters` must be a named vector." = is.vector(clusters) & !is.null(names(clusters)))
+
+    if (!is.numeric(knn_imp) || length(knn_imp) != 1 || knn_imp <= 0 || knn_imp %% 1 != 0) {
+        stop("`knn_imp` must be a positive integer.")
+    }
+
     # Get cell barcodes
     all_cells <- sort(Reduce(union, lapply(mat_list, rownames))) # all cells across matrices
     common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames))) # cells common to all matrices
     cells_NA_all <- setdiff(all_cells, common_cells) # cells missing from at least one matrix
 
-    # Convert the list of number of clusters (k) to a named list of k values
-    k_list <- as.list(names(clusters))
-    k_list <- setNames(k_list, names(clusters))
+    # If no common cells in any matrix
+    stopifnot("No common cells found across matrices." = length(common_cells) > 0)
+
+    # If no cells are missing in any matrix, the function exits early
+    if (length(setdiff(all_cells, common_cells)) == 0) {
+        warning("No missing cells detected; returning original cluster assignments.")
+        return(clusters)
+    }
+
+    # Check cell names in clusters
+    stopifnot("The names of `clusters` must correspond to cell names provided as row names in `mat_list`."
+              = all(names(clusters) %in% all_cells))
+
+    # Filter common_cells in clusters if necessary
+    diff_cells <- length(setdiff(names(clusters), common_cells))
+
+    if (diff_cells > 0) {
+        warning(diff_cells, " cells in `clusters` are not common cells across omics and are removed.")
+        clusters <- clusters[names(clusters) %in% common_cells]
+    }
+
+    # Check that knn cells are not higher than common cells
+    stopifnot("`knn_imp` cannot be greater than the number of common cells." = knn_imp < length(common_cells))
+
+    # ---
 
     # Initialize the output list for imputed clusters
     out <- list()
@@ -634,74 +677,63 @@ imputeClusters <- function(mat_list,
                     )
                 )
                 knn <- rbind(knn, missing_knn)
-                knn <- knn[sort(rownames(knn)), ]
+                knn <- knn[sort(rownames(knn)), , drop = FALSE]
 
                 # Assign clusters for each k value using nearest neighbors
-                clusters_NA <- lapply(k_list, function(k) {
-                    cl <- matrix(
-                        clusters[[as.character(k)]][match(knn, names(clusters[[as.character(k)]]))],
-                        nrow = nrow(knn),
-                        ncol = ncol(knn),
-                        dimnames = list(rownames(knn))
-                    )
-                    return(cl)
-                })
+                clusters_NA <- matrix(
+                    clusters[match(knn, names(clusters))],
+                    nrow = nrow(knn),
+                    ncol = ncol(knn),
+                    dimnames = list(rownames(knn))
+                )
 
                 # Store the clusters for this matrix
                 knn_list[[names(other_mat[j])]] <- clusters_NA
             }
         }
 
-        # Combine cluster assignments from all other matrices for each k value
-        clusters_NA <- lapply(k_list, function(k) {
-            cl <- do.call(cbind, lapply(knn_list, function(x) {
-                x[[as.character(k)]]
-            }))
-        })
+        # Combine cluster assignments from all other matrices
+        clusters_NA <- do.call(cbind, knn_list)
 
+        # Store results
         out[[omic]] <- clusters_NA
         cells_missing[[omic]] <- setdiff(cells_NA_all, cells_NA_other)
     }
 
+    # Reduce the list of cells missing per omic to a vector for all omics
     cells_missing <- Reduce(c, cells_missing)
 
-    # Combine imputed clusters across all omics datasets for each k value
-    full_clusters <- lapply(k_list, function(k) {
-        cl <- do.call(cbind, lapply(out, function(x) x[[as.character(k)]]))
-        cl <- cl[cells_missing, ] # order per omic instead of alphabetically
+    # Combine imputed clusters across all omics datasets
+    clusters_table <- do.call(cbind, out)
+    clusters_table <- clusters_table[cells_missing, , drop = FALSE] # order per omic instead of alphabetically
 
-        # Assign final cluster to each cell based on the majority vote among neighbors
-        cl2 <- sapply(rownames(cl), function(p) {
-            clus_NA <- sort(summary(as.factor(
-                na.omit(cl[p, ])
-            )), decreasing = TRUE)
+    # Assign final cluster to each cell based on the majority vote among neighbors
+    clusters_imp <- sapply(rownames(clusters_table), function(p) {
+        clus_NA <- sort(summary(as.factor(na.omit(
+            clusters_table[p, ]
+        ))), decreasing = TRUE)
 
-            # Handle ties: pick the cluster of the first matching nearest neighbor
-            if (any(duplicated(clus_NA[which(clus_NA == max(clus_NA))]))) {
-                # if more than 1 major cluster exists (identical high number of knn cells assigned to two clusters)
-                final_cluster <- as.integer(cl[p, cl[p, ] %in% names(which(clus_NA == max(clus_NA)))][1])
-            } else {
-                # else take the cluster corresponding to the highest number of knn cells
-                final_cluster <- as.integer(names(clus_NA)[1])
-            }
+        # Handle ties: pick the cluster of the first matching nearest neighbor
+        if (any(duplicated(clus_NA[which(clus_NA == max(clus_NA))]))) {
+            # if more than 1 major cluster exists (identical high number of knn cells assigned to two clusters)
+            final_cluster <- clusters_table[p, clusters_table[p, ] %in% names(which(clus_NA == max(clus_NA)))][1]
+        } else {
+            # else take the cluster corresponding to the highest number of knn cells
+            final_cluster <- names(clus_NA)[1] # returns character
+        }
 
-            return(final_cluster)
-        })
+        # Make sure the format is kept
+        if(is.character(clusters)) final_cluster <- as.character(final_cluster)
+        if(is.integer(clusters)) final_cluster <- as.integer(final_cluster)
+        if(is.numeric(clusters)) final_cluster <- as.numeric(final_cluster)
 
-        return(cl2)
+        return(final_cluster)
     })
 
     # Combine original clusters with imputed clusters
-    clust_imp <- lapply(k_list, function(k) {
-        if (length(full_clusters[[as.character(k)]]) > 0) {
-            cl <- c(clusters[[as.character(k)]], full_clusters[[as.character(k)]])
-        } else {
-            cl <- clusters[[as.character(k)]]
-        }
-        return(cl)
-    })
+    clusters_complete <- c(clusters, clusters_imp)
 
-    return(clust_imp)
+    return(clusters_complete)
 }
 
 

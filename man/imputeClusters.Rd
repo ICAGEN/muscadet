@@ -7,23 +7,27 @@
 imputeClusters(mat_list, clusters, knn_imp = 10)
 }
 \arguments{
-\item{mat_list}{A named list of log ratio \emph{cells x features} matrices where each matrix
-corresponds to a single omic dataset (\code{list}). Rows are cells, and columns are
-features.}
+\item{mat_list}{A named list of log ratio \emph{cells x features} matrices where
+each matrix corresponds to a single omic dataset (\code{list}). Rows are cells,
+and columns are features.}
 
-\item{clusters}{A named list for each \code{k} values (number of clusters) where
-each element is a named vector of cluster assignments for cells (\code{list}).}
+\item{clusters}{A named vector of cluster assignments for cells (\code{numeric} or
+\code{character} vector). The vector names must correspond to the names of the
+common cells across omics (matching row names in \code{mat_list}). The clusters
+names can be as integer, numeric or character values.}
 
 \item{knn_imp}{Integer specifying the number of nearest neighbors cells to
-use for imputation (\code{integer}).}
+use for imputation (\code{integer}). Must be a positive integer. Default is
+\code{10}.}
 }
 \value{
-A named list for each \code{k} values (number of clusters) where each
-element is a named vector of imputed cluster assignments for cells.
+A named vector of combining the original clusters assignments for
+common cells across omics (given by the \code{clusters} argument) and the
+imputed cluster assignments for cells missing in at least one omic matrix.
 }
 \description{
-This function imputes cluster assignments for cells missing in some omics
-by leveraging nearest neighbor cells in other omic matrices.
+This function imputes cluster assignments for cells missing in
+some omics by leveraging nearest neighbor cells in other omic matrices.
 }
 \details{
 The function operates in the following steps:
@@ -42,6 +46,7 @@ are aggregated to provide final cluster assignments.
 }
 \examples{
 # Create matrices with some cells missing in one or the other
+set.seed(42)
 mat1 <- matrix(runif(100), nrow = 20)
 mat2 <- matrix(runif(100), nrow = 20)
 rownames(mat1) <- paste0("Cell", 1:20)
@@ -49,14 +54,16 @@ rownames(mat2) <- paste0("Cell", c(1:5, 11:25))
 mat_list <- list(ATAC = mat1, RNA = mat2)
 
 # Create cluster assignments for common cells
-clusters <- list(
-  `2` = setNames(sample(1:2, 15, replace = TRUE), intersect(rownames(mat1), rownames(mat2))),
-  `3` = setNames(sample(1:3, 15, replace = TRUE), intersect(rownames(mat1), rownames(mat2))),
-  `4` = setNames(sample(1:4, 15, replace = TRUE), intersect(rownames(mat1), rownames(mat2)))
-)
+common_cells <- intersect(rownames(mat1), rownames(mat2))
+clusters <- setNames(sample(1:4, length(common_cells), replace = TRUE), common_cells)
+
+# Check the inputs
+print(common_cells)
+print(rownames(mat_list$ATAC))
+print(rownames(mat_list$RNA))
 
 # Impute cluster assignments for missing cells
-imputed_clusters <- imputeClusters(mat_list, clusters, knn_imp = 5)
+imputed_clusters <- imputeClusters(mat_list, clusters, knn_imp = 3)
 
 # View the imputed cluster assignments
 print(imputed_clusters)
