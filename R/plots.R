@@ -36,6 +36,9 @@
 #' @param show_missing Logical. If `TRUE` (default), missing cells (i.e., cells
 #'   with missing data in at least one omic) are displayed in the heatmaps.
 #'
+#' @param averages Logical. If `TRUE`, plots the average log R ratio per
+#'   cluster. Default is `FALSE`.
+#'
 #' @param title Character string for the title of the heatmap (`character`
 #'   string). Default is an empty character string.
 #'
@@ -95,76 +98,49 @@
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
-#' # Perform clustering if not already done
-#' # Method "seurat"
-#' muscadet_obj <- clusterMuscadet(
-#'     x = muscadet_obj,
-#'     method = "seurat",
-#'     res_range = c(0.6, 0.8),
-#'     dims_list = list(1:10, 1:10),
-#'     knn_seurat = 10, # adapted for low number of cells in example data
-#'     knn_range_seurat = 30 # adapted for low number of cells in example data
-#' )
 #'
-#' # Plot log ratio heatmaps
+#' # --- Method "seurat" ---
+#'
+#' print(muscadet_obj$clustering$params$method)
+#'
+#' # Perform clustering if not already done
+#' # muscadet_obj <- clusterMuscadet(
+#' #     x = muscadet_obj,
+#' #     method = "seurat",
+#' #     res_range = c(0.6, 0.8),
+#' #     dims_list = list(1:10, 1:10),
+#' #     knn_seurat = 10, # adapted for low number of cells in example data
+#' #     knn_range_seurat = 30 # adapted for low number of cells in example data
+#' # )
+#'
+#' # Plot a single partition
 #' heatmapMuscadet(muscadet_obj,
-#'                 filename = file.path("heatmap_res0.8.png"),
-#'                 partition = 0.8,
+#'                 filename = file.path("heatmap_res0.6.png"),
+#'                 partition = 0.6,
 #'                 show_missing = FALSE)
 #'
 #' # Loop over partitions
 #' for (p in names(muscadet_obj$clustering$clusters)) {
-#'
 #'     filename <- paste0("heatmap_res", p, ".png")
 #'     title <- paste(
 #'         "Example |",
-#'         paste0("method=", muscadet_obj$clustering$params[["method"]]),
-#'         "|",
-#'         paste0("omics=", paste0(muscadet_obj$clustering$params[["omics"]], collapse = ",")),
-#'         "|",
-#'         paste0("dims=", "1:10,1:10"),
-#'         "|",
+#'         paste0("method=", muscadet_obj$clustering$params[["method"]]), "|",
+#'         paste0("omics=", paste0(muscadet_obj$clustering$params[["omics"]], collapse = ",")), "|",
+#'         paste0("dims=", "1:10,1:10"), "|",
 #'         paste0("res=", p)
 #'     )
-#'
 #'     heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
 #' }
 #'
-#' # Method "hclust"
-#' muscadet_obj <- clusterMuscadet(
-#'     x = muscadet_obj,
-#'     method = "hclust",
-#'     k_range = 3:5,
-#'     dist_method = "euclidean",
-#'     hclust_method = "ward.D"
-#' )
+#' # --- Plot Averages per Clusters ---
 #'
-#' # Plot log ratio heatmaps
 #' heatmapMuscadet(muscadet_obj,
-#'                 filename = file.path("heatmap_k3.png"),
-#'                 partition = 3,
-#'                 show_missing = FALSE)
+#'                 filename = file.path("heatmap_res0.6_averages.png"),
+#'                 partition = 0.6,
+#'                 averages = TRUE,
+#'                 add_bulk_lrr = FALSE)
 #'
-#' # Loop over partitions
-#' for (p in names(muscadet_obj$clustering$clusters)) {
-#'
-#'     filename <- paste0("heatmap_k", p, ".png")
-#'     title <- paste(
-#'         "Example |",
-#'         paste0("method=", muscadet_obj$clustering$params[["method"]]),
-#'         "|",
-#'         muscadet_obj$clustering$params[["dist_method"]],
-#'         muscadet_obj$clustering$params[["hclust_method"]],
-#'         "|",
-#'         paste0("weights=", paste0(muscadet_obj$clustering$params[["weights"]], collapse = ",")),
-#'         "|",
-#'         paste0("k=", p)
-#'     )
-#'
-#'     heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
-#' }
-#'
-#' # Add row annotation
+#' # --- Add Row Annotation ---
 #'
 #' library("ComplexHeatmap")
 #'
@@ -182,7 +158,7 @@
 #'     annot = anno_simple(
 #'         cells_origin[sort(names(cells_origin))],
 #'         # IMPORTANT: annotation names (cells) must be sorted to match heatmap
-#'         # matrices (sorted column names of log ratio matrix)
+#'         # matrices (column names of log ratio matrix are sorted in heatmapMuscadet())
 #'         col = c(
 #'             "sample1" = "cadetblue3",
 #'             "sample2" = "orchid3")
@@ -194,9 +170,47 @@
 #'
 #' # Plot heatmap with supplementary row annotation
 #' heatmapMuscadet(muscadet_obj,
+#'                 filename = file.path("heatmap_res0.6_annot.png"),
+#'                 partition = 0.6,
+#'                 row_annots = list(ha))
+#'
+#'
+#' # --- Method "hclust" ---
+#'
+#' # Perform clustering if not already done
+#' muscadet_obj2 <- clusterMuscadet(
+#'     x = muscadet_obj,
+#'     method = "hclust",
+#'     k_range = 3:5,
+#'     dist_method = "euclidean",
+#'     hclust_method = "ward.D"
+#' )
+#'
+#' print(muscadet_obj2$clustering$params$method)
+#'
+#' # Plot a single partition
+#' heatmapMuscadet(muscadet_obj2,
 #'                 filename = file.path("heatmap_k3.png"),
 #'                 partition = 3,
-#'                 row_annots = list(ha))
+#'                 show_missing = FALSE)
+#'
+#' # Loop over partitions
+#' for (p in names(muscadet_obj2$clustering$clusters)) {
+#'
+#'     filename <- paste0("heatmap_k", p, ".png")
+#'     title <- paste(
+#'         "Example |",
+#'         paste0("method=", muscadet_obj2$clustering$params[["method"]]), "|",
+#'         muscadet_obj2$clustering$params[["dist_method"]],
+#'         muscadet_obj2$clustering$params[["hclust_method"]], "|",
+#'         paste0("weights=",
+#'                paste0(muscadet_obj2$clustering$params[["weights"]], collapse = ",")),
+#'         "|",
+#'         paste0("k=", p)
+#'     )
+#'
+#'     heatmapMuscadet(muscadet_obj2, filename, partition = p, title = title)
+#' }
 #'
 #'
 heatmapMuscadet <- function(x,
@@ -205,6 +219,7 @@ heatmapMuscadet <- function(x,
                             clusters = NULL,
                             add_bulk_lrr = TRUE,
                             show_missing = TRUE,
+                            averages = FALSE,
                             title = "",
                             row_annots = NULL,
                             white_scale = c(0.3, 0.7),
@@ -365,37 +380,100 @@ heatmapMuscadet <- function(x,
         }
     }
 
-    if (quiet == FALSE) {
+    if (averages) {
+
+        # Modify matrix of log ratio into a matrix of average log ratio per cluster
+        for (omic in names(x@omics)) {
+
+            # Retrieve log ratio matrix
+            mat_lrr <- matLogRatio(x@omics[[omic]])
+
+            # retrieve clusters if `partition` is defined and not `clusters`
+            if (is.null(clusters)) {
+                clusters <- x@clustering$clusters[[as.character(partition)]]
+            }
+
+            # Order clusters in the same way as the matrix
+            clusters <- clusters[colnames(mat_lrr)]
+
+            # Compute matrix of averages per cluster
+            mat_lrr_av <- sapply(sort(unique(clusters)), function(cl) {
+                rowMeans(mat_lrr[, clusters == cl, drop = FALSE], na.rm = TRUE)
+            })
+
+            # Replace cell names by cluster names
+            colnames(mat_lrr_av) <- sort(unique(clusters))
+
+            # Replace log ratio matrix per cell by average matrix per cluster
+            x@omics[[omic]]@coverage[["log.ratio"]] <- mat_lrr_av
+        }
+
+        # Define new clusters
+        clusters <- setNames(sort(unique(clusters)), sort(unique(clusters)))
+
+        # Define new "cells" becoming clusters
+        common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames)))
+        all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), colnames)))
+
+    }
+
+    if (!quiet) {
         # Print information messages
         message("---- Heatmap Parameters ----")
         message("Omics in the muscadet object: ",
                 paste(sapply(slot(x, "omics"), function(n)
                     slot(n, "label.omic")), collapse = ", "))
-        omic_dims <- sapply(slot(x, "omics"), function(m) {
-            paste0(
-                m@label.omic,
-                ": ",
-                ncol(muscadet::matLogRatio(m)),
-                " cells x ",
-                nrow(muscadet::matLogRatio(m)),
-                " features"
+
+
+        if (!averages) {
+            omic_dims <- sapply(slot(x, "omics"), function(m) {
+                paste0(
+                    m@label.omic,
+                    ": ",
+                    ncol(muscadet::matLogRatio(m)),
+                    " cells x ",
+                    nrow(muscadet::matLogRatio(m)),
+                    " features"
+                )
+            })
+            message("Omics log R ratio data dimensions:\n  ",
+                    paste(omic_dims, collapse = "\n  "))
+
+            if (!is.null(partition))
+                message("Clustering partition: ", partition)
+            if (!is.null(clusters))
+                message("Custom clusters provided: ",
+                        length(unique(clusters)),
+                        " clusters.")
+
+            message(
+                "Number of cells: ",
+                length(all_cells),
+                " total (",
+                length(common_cells),
+                " common across all omics)."
             )
-        })
-        message("Omics log R ratio data dimensions:\n  ",
-                paste(omic_dims, collapse = "\n  "))
 
-        if (!is.null(partition)) message("Clustering partition: ", partition)
-        if (!is.null(clusters)) message("Custom clusters provided: ", length(unique(clusters)), " clusters.")
+            message("Show missing cells: ", show_missing)
 
-        message(
-            "Number of cells: ",
-            length(all_cells),
-            " total (",
-            length(common_cells),
-            " common across all omics)."
-        )
+        } else {
+            message("Average log ratio per cluster: ", averages)
 
-        message("Show missing cells: ", show_missing)
+            omic_dims <- sapply(slot(x, "omics"), function(m) {
+                paste0(
+                    m@label.omic,
+                    ": ",
+                    ncol(muscadet::matLogRatio(m)),
+                    " clusters x ",
+                    nrow(muscadet::matLogRatio(m)),
+                    " features"
+                )
+            })
+            message("Omics log R ratio data dimensions:\n  ",
+                    paste(omic_dims, collapse = "\n  "))
+
+        }
+
         message("Bulk LRR annotations: ",
                 ifelse(add_bulk_lrr, slot(x, "bulk.data")[["label"]], add_bulk_lrr))
         message("White scale quantiles: ", paste(white_scale, collapse = " - "))
@@ -677,12 +755,14 @@ heatmapMuscadet <- function(x,
                 gp = gpar(fill = colors[i], col = NA),
                 just = "right"
             )
-            grid.text(
-                n_cells[i],
-                x = 0.7,
-                just = "right",
-                gp = gpar(cex = 0.75)
-            )
+            if (!averages) {
+                grid.text(
+                    n_cells[i],
+                    x = 0.7,
+                    just = "right",
+                    gp = gpar(cex = 0.75)
+                )
+            }
         })
     }
 
