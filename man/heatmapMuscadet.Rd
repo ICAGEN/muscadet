@@ -7,7 +7,7 @@
 heatmapMuscadet(
   x,
   filename = NULL,
-  k = NULL,
+  partition = NULL,
   clusters = NULL,
   title = "",
   add_bulk_lrr = NULL,
@@ -28,16 +28,18 @@ heatmapMuscadet(
 the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
 .pdf) format (\code{character} string).}
 
-\item{k}{(Optional) Integer specifying the cluster number to plot
-(\code{integer}). It should be within the range of k used for clustering (with
-\code{\link[=clusterMuscadet]{clusterMuscadet()}}). Should be provided if \code{clusters} is \code{NULL}.}
+\item{partition}{(Optional) Value specifying the clustering partition to
+plot (\code{numeric} or \code{character}). It should be either the resolution or the
+k number of cluster (k) used for clustering depending on the clustering
+method (\code{res_range} or \code{k_range} with \code{\link[=clusterMuscadet]{clusterMuscadet()}}).
+Should be provided if \code{clusters} is \code{NULL}.}
 
 \item{clusters}{(Optional) A custom named vector of cluster assignments
 (\code{integer} named vector). Names must corresponds to cell names within the
 muscadet object \code{x}. If it contains less cells than the muscadet object
 \code{x}, the missing cells are filtered out and not displayed in the heatmap.
 If \code{show_missing = FALSE} only the provided cells with data in all omics
-will be displayed. Should be provided if \code{k} is \code{NULL}.}
+will be displayed. Should be provided if \code{partition} is \code{NULL}.}
 
 \item{title}{Character string for the title of the heatmap (\code{character}
 string). Default is an empty character string.}
@@ -52,11 +54,10 @@ available in the muscadet object.}
 Default is \code{TRUE}.}
 
 \item{row_annots}{Optional. A list of \linkS4class{HeatmapAnnotation} objects from
-the \link{ComplexHeatmap} package, specifying row annotations to add on left
-part of the heatmap. Each element in the list must be of class
+the \link{ComplexHeatmap-package} package, specifying row annotations to add on
+left part of the heatmap. Each element in the list must be of class
 (HeatmapAnnotation)\linkS4class{HeatmapAnnotation}, must be a row annotation
-(using \verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]} with
-\code{which = 'row'}), and must have a unique name (\code{name} argument in
+(using \verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]} with \code{which = 'row'}), and must have a unique name (\code{name} argument in
 \verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]}). By default is \code{NULL}, no
 row annotations is added.}
 
@@ -103,7 +104,7 @@ This function generates a heatmap to visualize log R ratio (LRR) data
 contained in \code{\link{muscadet}} objects. One heatmap is generated per
 omic, rows are cells and columns are chromosomes, for \code{muscadet} object
 containing multiple omics, the heatmaps are plotted horizontally aligned. The
-cells can be clustered for a specific k number of cluster following the
+cells can be clustered for a specific clustering partition following the
 clustering step of \code{muscadet} object, or custom cluster assignments can be
 used. Additionally, LRR values from bulk sequencing data can be plotted as an
 annotation under the heatmaps.
@@ -112,57 +113,81 @@ annotation under the heatmaps.
 # Load example muscadet object
 data(muscadet_obj)
 
-# Perform clustering (if not already done)
-muscadet_obj <- clusterMuscadet(muscadet_obj, k_range = 2:5)
-
-# Custom title with clustering parameters
-title <- paste("Example sample |",
-     slot(muscadet_obj, "clustering")[["params"]][["dist_method"]],
-     slot(muscadet_obj, "clustering")[["params"]][["hclust_method"]], "|",
-     "k=3", "|",
-     "Weights of omics:",
-     paste(slot(muscadet_obj, "clustering")[["params"]][["weights"]], collapse = ", "))
-
-# Generate heatmap
-heatmapMuscadet(
-    muscadet_obj,
-    k = 3,
-    filename = file.path("heatmap_muscadet_k3.png"),
-    title = title
-)
-heatmapMuscadet(
-    muscadet_obj,
-    k = 3,
-    filename = file.path("heatmap_muscadet_k3_commoncells.png"),
-    title = title,
-    show_missing = FALSE
+# Perform clustering if not already done
+# Method "seurat"
+muscadet_obj <- clusterMuscadet(
+    x = muscadet_obj,
+    method = "seurat",
+    res_range = c(0.6, 0.8),
+    dims_list = list(1:10, 1:10),
+    knn_seurat = 10, # adapted for low number of cells in example data
+    knn_range_seurat = 30 # adapted for low number of cells in example data
 )
 
-# Loop over k
-for (k in names(muscadet_obj$clustering$clusters)) {
-    filename <- paste0("heatmap_muscadet_k", k, ".png")
+# Plot log ratio heatmaps
+heatmapMuscadet(muscadet_obj,
+                filename = file.path("heatmap_res0.8.png"),
+                partition = 0.8,
+                show_missing = FALSE)
+
+# Loop over partitions
+for (p in names(muscadet_obj$clustering$clusters)) {
+
+    filename <- paste0("heatmap_res", p, ".png")
     title <- paste(
-        "Example sample |",
+        "Example |",
+        paste0("method=", muscadet_obj$clustering$params[["method"]]),
+        "|",
+        paste0("omics=", paste0(muscadet_obj$clustering$params[["omics"]], collapse = ",")),
+        "|",
+        paste0("dims=", "1:10,1:10"),
+        "|",
+        paste0("res=", p)
+    )
+
+    heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
+}
+
+# Method "hclust"
+muscadet_obj <- clusterMuscadet(
+    x = muscadet_obj,
+    method = "hclust",
+    k_range = 3:5,
+    dist_method = "euclidean",
+    hclust_method = "ward.D"
+)
+
+# Plot log ratio heatmaps
+heatmapMuscadet(muscadet_obj,
+                filename = file.path("heatmap_k3.png"),
+                partition = 3,
+                show_missing = FALSE)
+
+# Loop over partitions
+for (p in names(muscadet_obj$clustering$clusters)) {
+
+    filename <- paste0("heatmap_k", p, ".png")
+    title <- paste(
+        "Example |",
+        paste0("method=", muscadet_obj$clustering$params[["method"]]),
+        "|",
         muscadet_obj$clustering$params[["dist_method"]],
         muscadet_obj$clustering$params[["hclust_method"]],
         "|",
-        paste0("k=", k),
+        paste0("weights=", paste0(muscadet_obj$clustering$params[["weights"]], collapse = ",")),
         "|",
-        "Weights of omics:",
-        paste(muscadet_obj$clustering$params[["weights"]], collapse = ", ")
+        paste0("k=", p)
     )
-    heatmapMuscadet(
-        muscadet_obj,
-        k = as.integer(k),
-        filename = filename,
-        title = title
-    )
+
+    heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
 }
 
 # Add row annotation
 
+library("ComplexHeatmap")
+
 # Define example annotation
-muscadet_cells <- sort(Reduce(union, Cells(muscadet_obj)))
+muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
 cells_origin <- setNames(c(
     rep("sample1", ceiling(length(muscadet_cells) / 2)),
     rep("sample2", floor(length(muscadet_cells) / 2))
@@ -173,24 +198,23 @@ cells_origin <- setNames(c(
 # Create row annotation
 ha <- rowAnnotation(
     annot = anno_simple(
-        cells_origin,
+        cells_origin[sort(names(cells_origin))],
+        # IMPORTANT: annotation names (cells) must be sorted to match heatmap
+        # matrices (sorted column names of log ratio matrix)
         col = c(
             "sample1" = "cadetblue3",
-            "sample2" = "orchid3"
-        )
+            "sample2" = "orchid3")
     ),
-    name = "origin",
-    annotation_label = "origin",
-    annotation_name_gp = gpar(fontsize = 10)
+    name = "origin", # unique name
+    annotation_label = "origin", # label displayed on heatmap
+    annotation_name_gp = gpar(fontsize = 10) # change font size
 )
 
-# Generate heatmap with supplementary row annotation
-heatmapMuscadet(
-    muscadet_obj,
-    k = 3,
-    filename = file.path("heatmap_muscadet_k3.png"),
-    title = title,
-    row_annots = list(ha)
-)
+# Plot heatmap with supplementary row annotation
+heatmapMuscadet(muscadet_obj,
+                filename = file.path("heatmap_k3.png"),
+                partition = 3,
+                row_annots = list(ha))
+
 
 }

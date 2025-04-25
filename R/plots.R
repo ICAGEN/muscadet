@@ -4,7 +4,7 @@
 #' contained in \code{\link{muscadet}} objects. One heatmap is generated per
 #' omic, rows are cells and columns are chromosomes, for `muscadet` object
 #' containing multiple omics, the heatmaps are plotted horizontally aligned. The
-#' cells can be clustered for a specific k number of cluster following the
+#' cells can be clustered for a specific clustering partition following the
 #' clustering step of `muscadet` object, or custom cluster assignments can be
 #' used. Additionally, LRR values from bulk sequencing data can be plotted as an
 #' annotation under the heatmaps.
@@ -17,16 +17,18 @@
 #'   the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
 #'   .pdf) format (`character` string).
 #'
-#' @param k (Optional) Integer specifying the cluster number to plot
-#'   (`integer`). It should be within the range of k used for clustering (with
-#'   [muscadet::clusterMuscadet()]). Should be provided if `clusters` is `NULL`.
+#' @param partition (Optional) Value specifying the clustering partition to
+#'   plot (`numeric` or `character`). It should be either the resolution or the
+#'   k number of cluster (k) used for clustering depending on the clustering
+#'   method (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
+#'   Should be provided if `clusters` is `NULL`.
 #'
 #' @param clusters (Optional) A custom named vector of cluster assignments
 #'   (`integer` named vector). Names must corresponds to cell names within the
 #'   muscadet object `x`. If it contains less cells than the muscadet object
 #'   `x`, the missing cells are filtered out and not displayed in the heatmap.
 #'   If `show_missing = FALSE` only the provided cells with data in all omics
-#'   will be displayed. Should be provided if `k` is `NULL`.
+#'   will be displayed. Should be provided if `partition` is `NULL`.
 #'
 #' @param title Character string for the title of the heatmap (`character`
 #'   string). Default is an empty character string.
@@ -58,11 +60,11 @@
 #'   `c(0.3, 0.7)`.
 #'
 #' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
-#'   the [ComplexHeatmap] package, specifying row annotations to add on left
-#'   part of the heatmap. Each element in the list must be of class
+#'   the [ComplexHeatmap-package] package, specifying row annotations to add on
+#'   left part of the heatmap. Each element in the list must be of class
 #'   (HeatmapAnnotation)[HeatmapAnnotation-class], must be a row annotation
-#'   (using `[rowAnnotation()]` or `[HeatmapAnnotation()]` with
-#'   `which = 'row'`), and must have a unique name (`name` argument in
+#'   (using `[rowAnnotation()]` or `[HeatmapAnnotation()]` with `which =
+#'   'row'`), and must have a unique name (`name` argument in
 #'   `[rowAnnotation()]` or `[HeatmapAnnotation()]`). By default is `NULL`, no
 #'   row annotations is added.
 #'
@@ -96,57 +98,81 @@
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
-#' # Perform clustering (if not already done)
-#' muscadet_obj <- clusterMuscadet(muscadet_obj, k_range = 2:5)
-#'
-#' # Custom title with clustering parameters
-#' title <- paste("Example sample |",
-#'      slot(muscadet_obj, "clustering")[["params"]][["dist_method"]],
-#'      slot(muscadet_obj, "clustering")[["params"]][["hclust_method"]], "|",
-#'      "k=3", "|",
-#'      "Weights of omics:",
-#'      paste(slot(muscadet_obj, "clustering")[["params"]][["weights"]], collapse = ", "))
-#'
-#' # Generate heatmap
-#' heatmapMuscadet(
-#'     muscadet_obj,
-#'     k = 3,
-#'     filename = file.path("heatmap_muscadet_k3.png"),
-#'     title = title
-#' )
-#' heatmapMuscadet(
-#'     muscadet_obj,
-#'     k = 3,
-#'     filename = file.path("heatmap_muscadet_k3_commoncells.png"),
-#'     title = title,
-#'     show_missing = FALSE
+#' # Perform clustering if not already done
+#' # Method "seurat"
+#' muscadet_obj <- clusterMuscadet(
+#'     x = muscadet_obj,
+#'     method = "seurat",
+#'     res_range = c(0.6, 0.8),
+#'     dims_list = list(1:10, 1:10),
+#'     knn_seurat = 10, # adapted for low number of cells in example data
+#'     knn_range_seurat = 30 # adapted for low number of cells in example data
 #' )
 #'
-#' # Loop over k
-#' for (k in names(muscadet_obj$clustering$clusters)) {
-#'     filename <- paste0("heatmap_muscadet_k", k, ".png")
+#' # Plot log ratio heatmaps
+#' heatmapMuscadet(muscadet_obj,
+#'                 filename = file.path("heatmap_res0.8.png"),
+#'                 partition = 0.8,
+#'                 show_missing = FALSE)
+#'
+#' # Loop over partitions
+#' for (p in names(muscadet_obj$clustering$clusters)) {
+#'
+#'     filename <- paste0("heatmap_res", p, ".png")
 #'     title <- paste(
-#'         "Example sample |",
+#'         "Example |",
+#'         paste0("method=", muscadet_obj$clustering$params[["method"]]),
+#'         "|",
+#'         paste0("omics=", paste0(muscadet_obj$clustering$params[["omics"]], collapse = ",")),
+#'         "|",
+#'         paste0("dims=", "1:10,1:10"),
+#'         "|",
+#'         paste0("res=", p)
+#'     )
+#'
+#'     heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
+#' }
+#'
+#' # Method "hclust"
+#' muscadet_obj <- clusterMuscadet(
+#'     x = muscadet_obj,
+#'     method = "hclust",
+#'     k_range = 3:5,
+#'     dist_method = "euclidean",
+#'     hclust_method = "ward.D"
+#' )
+#'
+#' # Plot log ratio heatmaps
+#' heatmapMuscadet(muscadet_obj,
+#'                 filename = file.path("heatmap_k3.png"),
+#'                 partition = 3,
+#'                 show_missing = FALSE)
+#'
+#' # Loop over partitions
+#' for (p in names(muscadet_obj$clustering$clusters)) {
+#'
+#'     filename <- paste0("heatmap_k", p, ".png")
+#'     title <- paste(
+#'         "Example |",
+#'         paste0("method=", muscadet_obj$clustering$params[["method"]]),
+#'         "|",
 #'         muscadet_obj$clustering$params[["dist_method"]],
 #'         muscadet_obj$clustering$params[["hclust_method"]],
 #'         "|",
-#'         paste0("k=", k),
+#'         paste0("weights=", paste0(muscadet_obj$clustering$params[["weights"]], collapse = ",")),
 #'         "|",
-#'         "Weights of omics:",
-#'         paste(muscadet_obj$clustering$params[["weights"]], collapse = ", ")
+#'         paste0("k=", p)
 #'     )
-#'     heatmapMuscadet(
-#'         muscadet_obj,
-#'         k = as.integer(k),
-#'         filename = filename,
-#'         title = title
-#'     )
+#'
+#'     heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
 #' }
 #'
 #' # Add row annotation
 #'
+#' library("ComplexHeatmap")
+#'
 #' # Define example annotation
-#' muscadet_cells <- sort(Reduce(union, Cells(muscadet_obj)))
+#' muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
 #' cells_origin <- setNames(c(
 #'     rep("sample1", ceiling(length(muscadet_cells) / 2)),
 #'     rep("sample2", floor(length(muscadet_cells) / 2))
@@ -157,29 +183,28 @@
 #' # Create row annotation
 #' ha <- rowAnnotation(
 #'     annot = anno_simple(
-#'         cells_origin,
+#'         cells_origin[sort(names(cells_origin))],
+#'         # IMPORTANT: annotation names (cells) must be sorted to match heatmap
+#'         # matrices (sorted column names of log ratio matrix)
 #'         col = c(
 #'             "sample1" = "cadetblue3",
-#'             "sample2" = "orchid3"
-#'         )
+#'             "sample2" = "orchid3")
 #'     ),
-#'     name = "origin",
-#'     annotation_label = "origin",
-#'     annotation_name_gp = gpar(fontsize = 10)
+#'     name = "origin", # unique name
+#'     annotation_label = "origin", # label displayed on heatmap
+#'     annotation_name_gp = gpar(fontsize = 10) # change font size
 #' )
 #'
-#' # Generate heatmap with supplementary row annotation
-#' heatmapMuscadet(
-#'     muscadet_obj,
-#'     k = 3,
-#'     filename = file.path("heatmap_muscadet_k3.png"),
-#'     title = title,
-#'     row_annots = list(ha)
-#' )
+#' # Plot heatmap with supplementary row annotation
+#' heatmapMuscadet(muscadet_obj,
+#'                 filename = file.path("heatmap_k3.png"),
+#'                 partition = 3,
+#'                 row_annots = list(ha))
+#'
 #'
 heatmapMuscadet <- function(x,
                             filename = NULL,
-                            k = NULL,
+                            partition = NULL,
                             clusters = NULL,
                             title = "",
                             add_bulk_lrr = NULL,
@@ -192,30 +217,24 @@ heatmapMuscadet <- function(x,
     # Validate input: x must be a muscadet object
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
-    # Validate the muscadet object contains clustering results
+    # Validate the clustering result for the specified partition
     stopifnot(
-        "The muscadet object `x` does not contain clustering data (use `clusterMuscadet()` to perform clustering of log R ratio data)." =
-            !is.null(slot(x, "clustering"))
-    )
-
-    # Validate the clustering result for the specified k
-    stopifnot(
-        "The muscadet object `x` must contain clustering results for the specified `k`." =
-            as.character(k) %in% names(slot(x, "clustering")[["clusters"]])
+        "The muscadet object `x` must contain clustering results for the specified `partition`." =
+            as.character(partition) %in% names(x@clustering$clusters)
     )
 
     # Set to no missing cells if only one omic
     if (length(x@omics) == 1)
         show_missing <- FALSE
 
-    # Validate k and clusters
-    stopifnot("Both `k` and `clusters` cannot be NULL." = !(is.null(k) && is.null(clusters)))
+    # Validate partition and clusters
+    stopifnot("Both `partition` and `clusters` cannot be NULL." = !(is.null(partition) && is.null(clusters)))
 
-    # Validate k in clustering slot
-    if (!is.null(k)) {
+    # Validate partition in clustering slot
+    if (!is.null(partition)) {
         stopifnot(
-            "The muscadet object `x` must contain the clustering results for the `k` provided." = as.character(k) %in% names(slot(x, "clustering")[["clusters"]])
-        )
+            "The muscadet object `x` must contain the clustering results for the provided `partition`." =
+                as.character(partition) %in% names(x@clustering$clusters))
     }
 
     # Default addition of bulk data
@@ -368,7 +387,7 @@ heatmapMuscadet <- function(x,
         message("Omics log R ratio data dimensions:\n  ",
                 paste(omic_dims, collapse = "\n  "))
 
-        if (!is.null(k)) message("Number of clusters (k): ", k)
+        if (!is.null(partition)) message("Clustering partition: ", partition)
         if (!is.null(clusters)) message("Custom clusters provided: ", length(unique(clusters)), " clusters.")
 
         message(
@@ -463,19 +482,16 @@ heatmapMuscadet <- function(x,
         names(ht@top_annotation@anno_list)[1] <- paste0("chrom_", muscomic@label.omic)
 
         # Add bulk LRR data as annotation
-        if (add_bulk_lrr == TRUE) {
+        if (add_bulk_lrr) {
             # Retrieve bulk lrr values on features
             bulk_df <- muscadet::getLogRatioBulk(muscomic, x@bulk.data$log.ratio)
             # Define color scale
-            bulk_col <- list(circlize::colorRamp2(
-                c(
-                    min(bulk_df$bulk.lrr, na.rm = TRUE),
-                    median(bulk_df$bulk.lrr, na.rm = TRUE),
-                    max(bulk_df$bulk.lrr, na.rm = TRUE)
-                ),
-                c("#00008E", "white", "#630000")
-            ))
-            names(bulk_col) = paste0("bulk_", muscomic@label.omic)
+            bulk_col <- list(circlize::colorRamp2(c(
+                min(bulk_df$bulk.lrr, na.rm = TRUE),
+                median(bulk_df$bulk.lrr, na.rm = TRUE),
+                max(bulk_df$bulk.lrr, na.rm = TRUE)
+            ), c("#00008E", "white", "#630000")))
+            names(bulk_col) <- paste0("bulk_", muscomic@label.omic)
             # Create data frame for annotation
             bulk_df <- as.data.frame(bulk_df$bulk.lrr)
             colnames(bulk_df) <- paste0("bulk_", muscomic@label.omic)
@@ -506,7 +522,7 @@ heatmapMuscadet <- function(x,
     if (show_missing == TRUE) {
         if (is.null(clusters)) {
             # 1. Cluster assignments from the muscadet object clustering with all cells
-            clusters <- x@clustering$clusters[[as.character(k)]]
+            clusters <- x@clustering$clusters[[as.character(partition)]]
         }
         n_cells <- table(clusters)
 
@@ -579,21 +595,40 @@ heatmapMuscadet <- function(x,
         }
 
         if (is.null(clusters)) {
-            # 2. Clustering hclust from the muscadet object clustering with common cells
-            hc <- x@clustering$hclust # hclust object to print the dendrogram on the heatmap
-            n_cells <- table(dendextend::cutree(hc, k, order_clusters_as_data = FALSE))
 
-            # Draw heatmap
-            ht_all <- ComplexHeatmap::draw(
-                ht_list,
-                column_title = title,
-                ht_gap = ht_gap,
-                cluster_rows = hc,
-                row_split = as.integer(k),
-                row_dend_reorder = FALSE,
-                annotation_legend_list = annotation_legend_list,
-                merge_legend = TRUE
-            )
+            if (x@clustering$params$method == "seurat") {
+                # 2. Clustering seurat from the muscadet object clustering with common cells
+                clusters <- x@clustering$clusters[[as.character(partition)]]
+                n_cells <- table(clusters)
+                ht_all <- ComplexHeatmap::draw(
+                    ht_list,
+                    column_title = title,
+                    ht_gap = ht_gap,
+                    row_split = factor(clusters[common_cells], levels = sort(unique(clusters))),
+                    row_order = names(clusters)[names(clusters) %in% common_cells],
+                    cluster_rows = F,
+                    annotation_legend_list = annotation_legend_list,
+                    merge_legend = TRUE
+                )
+
+            } else if (x@clustering$params$method == "hclust") {
+                # 2. Clustering hclust from the muscadet object clustering with common cells
+                hc <- x@clustering$hclust # hclust object to print the dendrogram on the heatmap
+                n_cells <- table(x@clustering$clusters[[as.character(partition)]])
+
+                # Draw heatmap
+                ht_all <- ComplexHeatmap::draw(
+                    ht_list,
+                    column_title = title,
+                    ht_gap = ht_gap,
+                    cluster_rows = hc,
+                    row_split = as.integer(partition),
+                    row_dend_reorder = FALSE,
+                    annotation_legend_list = annotation_legend_list,
+                    merge_legend = TRUE
+                )
+            }
+
         } else {
             # 3. Custom cluster assignments vector
             n_cells <- table(clusters)
@@ -692,21 +727,25 @@ heatmapMuscadet <- function(x,
 
 #' Silhouette plot for `muscadet` object
 #'
-#' Generate a silhouette plot for a specified clustering result within a
+#' Generate a silhouette plot for a specified clustering partition within a
 #' `muscadet` object.
 #'
 #' @param x A \code{\link{muscadet}} object containing clustering data (using
 #'   [muscadet::clusterMuscadet()]).
 #'
-#' @param k Integer specifying the number of clusters to plot (`integer`).
-#'   It should be within the range of k used for clustering (with
-#'   [muscadet::clusterMuscadet()]).
+#' @param partition Value specifying the clustering partition to plot (`numeric`
+#'   or `character`). It should be either the resolution or the k number of
+#'   cluster (k) used for clustering depending on the clustering method
+#'   (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
 #'
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). Default is `NULL`, which uses predefined colors.
 #'
 #' @param title Character string for the title of the plot (`character`
 #'   string). If `NULL`, a default title is generated.
+#'
+#' @param annotations `TRUE` or `FALSE` (`logical`). Whether to add annotations
+#'   per clusters. By default: `TRUE`.
 #'
 #' @return A ggplot object representing the silhouette plot.
 #'
@@ -720,15 +759,19 @@ heatmapMuscadet <- function(x,
 #'
 #' # Load example muscadet object
 #' data(muscadet_obj)
-#' plotSil(muscadet_obj, k = 3)
+#' plotSil(muscadet_obj, partition = 0.6)
 #'
-#' # Loop over k
-#' for (k in names(muscadet_obj$clustering$clusters)) {
-#'     plot <- plotSil(muscadet_obj, k = as.integer(k))
-#'     ggsave(paste0("plot_silhouette_", k, ".png"), plot)
+#' # Loop over partitions
+#' for (p in names(muscadet_obj$clustering$clusters)) {
+#'     plot <- plotSil(muscadet_obj, p)
+#'     ggsave(paste0("plot_silhouette_", p, ".png"), plot)
 #' }
 #'
-plotSil <- function(x, k, colors = NULL, title = NULL) {
+plotSil <- function(x,
+                    partition,
+                    colors = NULL,
+                    title = NULL,
+                    annotations = TRUE) {
     # Validate input: x must be a muscadet object
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
@@ -738,11 +781,18 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
             !is.null(slot(x, "clustering"))
     )
 
-    # Validate the clustering result for the specified k
+    # Validate the clustering result for the specified partition
     stopifnot(
-        "The muscadet object `x` must contain clustering results for the specified `k`." =
-            as.character(k) %in% names(slot(x, "clustering")[["clusters"]])
+        "The muscadet object `x` must contain clustering results for the specified `partition`." =
+            as.character(partition) %in% names(x@clustering$clusters)
     )
+
+    # Validate partition with at least 2 clusters
+    stopifnot(
+        "The selected clustering `partition` contains only one cluster, silhouette scores cannot be computed." =
+            length(unique(x@clustering$clusters[[as.character(partition)]])) != 1
+    )
+
 
     # Set default color palette for clusters if not provided
     if (is.null(colors)) {
@@ -764,11 +814,15 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
 
     # Generate a default title if none is provided
     if (is.null(title)) {
-        title <- paste("Silhouette Plot (k =", as.character(k), ")")
+
+        if (x$clustering$params$method == "seurat") partition_name <- "res"
+        if (x$clustering$params$method == "hclust") partition_name <- "k"
+
+        title <- paste0("Silhouette Plot (", partition_name, " = ", as.character(partition), ")")
     }
 
-    # Extract silhouette data for the specified k
-    sil <- x@clustering[["silhouette"]][["sil.obj"]][[as.character(k)]]
+    # Extract silhouette data for the specified partition
+    sil <- x@clustering$silhouette$sil.obj[[as.character(partition)]]
     df <- as.data.frame(sil[, 1:3], stringsAsFactors = TRUE)
 
     # Order data for plotting
@@ -790,12 +844,11 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
     })
 
     # Create the ggplot object
-    p <- ggplot(df,
-                aes(
-                    x = .data$sil_width,
-                    y = .data$name,
-                    fill = .data$cluster
-                )) +
+    p <- ggplot(df, aes(
+        x = .data$sil_width,
+        y = .data$name,
+        fill = .data$cluster
+    )) +
         geom_bar(stat = "identity", width = 1) +
         scale_y_discrete(limits = rev) +
         theme_bw() +
@@ -811,37 +864,43 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
         ) +
         scale_fill_manual(values = colors) +
         labs(
-            x = "Silhouette Width",
-            y = "",
+            x = "Silhouette Widths",
+            y = "Cells",
             title = title,
-            subtitle = paste0(
-                "Average Silhouette Width = ",
-                round(mean(df$sil_width), 4),
-                "\n",
-                "Annotation: cluster | number of cells | average silhouette width"
-            )
+            subtitle = paste0("Average Silhouette Width = ", round(mean(df$sil_width), 4))
         ) +
-        ggplot2::xlim(c(min(df$sil_width), max(df$sil_width) + 0.25)) +
+        ggplot2::xlim(c(min(0, min(df$sil_width) - 0.01), max(df$sil_width) + 0.25)) +
         geom_vline(
             xintercept = mean(df$sil_width),
             linetype = "dashed",
             color = "red"
         )
 
-    # Add annotations for each cluster
-    for (i in seq_along(cluster_positions)) {
-        cluster <- unique(df$cluster)[i]
-        avg_width <- round(avg_sil_width$sil_width[avg_sil_width$cluster == cluster], 4)
-        count <- cluster_counts[i]
-        p <- p + geom_text(
-            label = paste(cluster, "|", count, "|", avg_width),
-            x = max(df$sil_width) + 0.05,
-            y = cluster_positions[i],
-            inherit.aes = FALSE,
-            hjust = 0,
-            vjust = -0.5,
-            check_overlap = TRUE
+    if (annotations) {
+        p <- p + labs(
+            subtitle = paste0(
+                "Average Silhouette Width = ",
+                round(mean(df$sil_width), 4),
+                "\n",
+                "Annotation: cluster | number of cells | average silhouette width"
+            )
         )
+
+        # Add annotations for each cluster
+        for (i in seq_along(cluster_positions)) {
+            cluster <- unique(df$cluster)[i]
+            avg_width <- round(avg_sil_width$sil_width[avg_sil_width$cluster == cluster], 4)
+            count <- cluster_counts[i]
+            p <- p + geom_text(
+                label = paste(cluster, "|", count, "|", avg_width),
+                x = max(df$sil_width) + 0.05,
+                y = cluster_positions[i],
+                inherit.aes = FALSE,
+                hjust = 0,
+                vjust = -0.5,
+                check_overlap = TRUE
+            )
+        }
     }
 
     return(p)
@@ -851,47 +910,53 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
 
 #' Plot clustering validation indexes for a `muscadet` object
 #'
-#' It generates a plot of clustering validation indexes for a clustering result
-#' within a `muscadet` object. The index values are computed only using
+#' It generates a plot of clustering validation indexes for a clustering
+#' partition within a `muscadet` object. The index values are computed only using
 #' distances between common cells across omics in the `muscadet` object.
 #'
 #' @param x A \code{\link{muscadet}} object containing clustering data
 #'   (generated using [muscadet::clusterMuscadet()]).
 #'
 #' @param index Character vector specifying one or more validation indexes to
-#'   plot among "silhouette", "dunn2", "davisbouldin", "pearsongamma", and "c".
-#'   If `NULL`, by default all available indexes are included. If multiple
-#'   indexes are selected, the values are normalized for comparability.
+#'   plot among `"silhouette"`, `"dunn2"`, `"daviesbouldin"`, `"pearsongamma"`,
+#'   and `"c"`. If `NULL`, by default all available indexes are included. If
+#'   multiple indexes are selected, the values are normalized for comparability.
 #'
 #' @param colors Vector of colors for each index in the plot (`character`
 #'   vector). Default is `NULL`, which uses predefined colors for the indexes.
 #'
-#' @param title Character string for the title of the plot (`character`
-#'   string). If `NULL`, a default title is generated.
+#' @param title Character string for the title of the plot (`character` string).
+#'   If `NULL`, a default title is generated.
 #'
 #' @return A ggplot object visualizing the clustering validation indexes across
-#'   different numbers of clusters (`k`).
+#'   different clustering partitions (`res` resolution or `k` number of clusters
+#'   depending on the used clustering method).
 #'
 #' @details The function computes several clustering validation indexes,
 #'   including:
 #'   \itemize{
 #'     \item \strong{Silhouette}: Measures how similar an object is to its own
-#'     cluster compared to others (see [cluster::silhouette]).
+#'     cluster compared to others (see [cluster::silhouette]). Average of
+#'     individual silhouette widths.
 #'     \item \strong{Dunn2}: The ratio of the smallest distance between
 #'     observations in different clusters to the largest within-cluster distance
-#'     (see [fpc::cluster.stats] `$dunn2`).
-#'     \item \strong{Davis-Bouldin}: Measures cluster compactness and separation
-#'     (see [clusterSim::index.DB]).
+#'     (see [fpc::cluster.stats] `$dunn2`). Minimum average dissimilarity
+#'     between two cluster / maximum average within cluster dissimilarity.
+#'     \item \strong{Davies-Bouldin}: Measures cluster compactness and
+#'     separation (see [clusterSim::index.DB]).
 #'     \item \strong{Pearson's Gamma}: Evaluates the goodness of clustering
 #'     based on correlation (see [fpc::cluster.stats] `$pearsongamma`).
-#'     \item \strong{C Index}: Measures the clustering quality compared to
-#'     random data (see [clusterSim::index.C]).
+#'     Correlation between distances and a 0-1-vector where 0 means same
+#'     cluster, 1 means different clusters. "Normalized gamma" in Halkidi et al.
+#'     (2001).
+#'     \item \strong{C Index} (Hubert & Levin C index): Measures the internal
+#'     cluster quality compared to random data (see [clusterSim::index.C]).
 #'   }
 #'
 #'   If multiple indexes are selected, the values are normalized to fall between
 #'   0 and 1. For indexes that are better when minimized ("pearsongamma" and
-#'   "c"), their values are reversed for easier comparison.
-#'   The k for which the mean of indexes is maximal is highlighted with a dot.
+#'   "c"), their values are reversed for easier comparison. The partition for
+#'   which the mean of indexes is maximal is highlighted with a dot.
 #'
 #' @import ggplot2
 #' @importFrom stats as.dist
@@ -899,6 +964,7 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
 #' @importFrom fpc cluster.stats
 #' @importFrom clusterSim index.DB index.C
 #' @importFrom tidyr pivot_longer
+#' @importFrom rlang .data
 #'
 #' @export
 #'
@@ -909,7 +975,7 @@ plotSil <- function(x, k, colors = NULL, title = NULL) {
 #' # Plot all indexes
 #' plotIndexes(muscadet_obj)
 #'
-#' # Plot specific indexes
+#' # Plot a specific index
 #' plotIndexes(muscadet_obj, index = "silhouette")
 #'
 plotIndexes <- function(x,
@@ -929,14 +995,14 @@ plotIndexes <- function(x,
     if (is.null(index)) {
         index <- c("silhouette",
                    "dunn2",
-                   "davisbouldin",
+                   "daviesbouldin",
                    "pearsongamma",
                    "c")
     }
     # Check for indexes correct names
     index <- match.arg(
         index,
-        c("silhouette", "dunn2", "davisbouldin", "pearsongamma", "c"),
+        c("silhouette", "dunn2", "daviesbouldin", "pearsongamma", "c"),
         several.ok = TRUE
     )
 
@@ -945,49 +1011,51 @@ plotIndexes <- function(x,
         colors <- c(
             "silhouette" = "brown",
             "dunn2" = "coral2",
-            "davisbouldin" = "tan2",
+            "daviesbouldin" = "tan2",
             "pearsongamma" = "turquoise4",
             "c" = "skyblue4"
         )
     }
 
-    # Generate a default title if none is provided
-    if (is.null(title)) {
-        title <- "Clustering Validation Indexes Across k"
-    }
-
     # Extract the clustering data
-    k_clusters <- as.integer(names(x@clustering$clusters))  # Number of clusters (k)
+    partitions <- as.numeric(names(x@clustering$clusters))  # Partitions (res or k)
     dist <- stats::as.dist(x@clustering$dist)  # Distance matrix to dist object
 
-    # Initialize a data frame to store index values
-    df_indexes <- data.frame(k = k_clusters)
+    # Remove partitions with only one cluster
+    n_clusters <- sapply(partitions, function(p) length(unique(x@clustering$clusters[[as.character(p)]])))
+    partitions <- partitions[n_clusters > 1]
 
-    # Compute selected indexes for each k
-    for (k in k_clusters) {
-        # Extract cluster assignments for the current k
-        clusters <- x@clustering$clusters[[as.character(k)]]
+    stopifnot("All clustering partitions contain only one cluster, indexes cannot be computed." =
+                  length(partitions) != 0)
+
+    # Initialize a data frame to store index values
+    df_indexes <- data.frame(partition = as.factor(partitions))
+
+    # Compute selected indexes for each partition
+    for (p in partitions) {
+        # Extract cluster assignments for the current partition
+        clusters <- x@clustering$clusters[[as.character(p)]]
         clusters <- clusters[names(dist)] # Restrict to common cells in dist
 
         # Compute each index if selected
         if ("silhouette" %in% index) {
-            df_indexes[df_indexes$k == k, "silhouette"] <-
+            df_indexes[df_indexes$partition == p, "silhouette"] <-
                 summary(cluster::silhouette(as.integer(clusters), dist))[["avg.width"]]
         }
         if ("dunn2" %in% index) {
-            df_indexes[df_indexes$k == k, "dunn2"] <-
+            df_indexes[df_indexes$partition == p, "dunn2"] <-
                 fpc::cluster.stats(dist, as.integer(clusters))$dunn2
         }
-        if ("davisbouldin" %in% index) {
-            df_indexes[df_indexes$k == k, "davisbouldin"] <-
+        if ("daviesbouldin" %in% index) {
+            df_indexes[df_indexes$partition == p, "daviesbouldin"] <-
                 clusterSim::index.DB(dist, as.integer(clusters))$DB
         }
         if ("pearsongamma" %in% index) {
-            df_indexes[df_indexes$k == k, "pearsongamma"] <-
+            df_indexes[df_indexes$partition == p, "pearsongamma"] <-
                 fpc::cluster.stats(dist, as.integer(clusters))$pearsongamma
         }
         if ("c" %in% index) {
-            df_indexes[df_indexes$k == k, "c"] <-
+            df_indexes[df_indexes$partition == p, "c"] <-
                 clusterSim::index.C(dist, as.integer(clusters))
         }
     }
@@ -1007,48 +1075,76 @@ plotIndexes <- function(x,
         }
     }
 
-    # Find optimal k based on selected indexes
+    # Find optimal partition based on selected indexes
     if (ncol(df_indexes) > 2) {
-        # Find the k with the maximum mean index value
-        opt_k <- df_indexes[which(rowMeans(df_indexes[, 2:ncol(df_indexes)]) == max(rowMeans(df_indexes[, 2:ncol(df_indexes)]))), "k"]
+        # Find the partition with the maximum mean index value
+        opt_p <- df_indexes[which(rowMeans(df_indexes[, 2:ncol(df_indexes)]) == max(rowMeans(df_indexes[, 2:ncol(df_indexes)]))), "partition"]
     } else {
         if (colnames(df_indexes)[2] %in% c("pearsongamma", "c")) {
-            # Find k with the minimal value for indexes to minimize
-            opt_k <- df_indexes[which(df_indexes[, 2] == min(df_indexes[, 2])), "k"]
+            # Find partition with the minimal value for indexes to minimize
+            opt_p <- df_indexes[which(df_indexes[, 2] == min(df_indexes[, 2])), "partition"]
         } else {
-            # Find k with the maximal value for indexes to maximize
-            opt_k <- df_indexes[which(df_indexes[, 2] == max(df_indexes[, 2])), "k"]
+            # Find partition with the maximal value for indexes to maximize
+            opt_p <- df_indexes[which(df_indexes[, 2] == max(df_indexes[, 2])), "partition"]
         }
     }
 
     # Transform the data frame for plotting
-    df_plot <- tidyr::pivot_longer(df_indexes, -k, names_to = "Index", values_to = "Value")
+    df_plot <- tidyr::pivot_longer(df_indexes, -.data$partition, names_to = "Index", values_to = "Value")
     df_plot$Index <- factor(df_plot$Index, levels = index) # Maintain order of indexes
+
+    # Labels
+    if (x@clustering$params$method == "seurat") x_lab <- "Clustering partition (resolution)"
+    if (x@clustering$params$method == "hclust") x_lab <- "Clustering partition (number of clusters)"
+    if (length(index) > 1) y_lab <- "Normalized Index Value"
+    if (length(index) == 1) {
+        if (index == "silhouette") y_lab <- "Average silhouette width"
+        if (index == "dunn2") y_lab <- "Dunn2 index"
+        if (index == "pearsongamma") y_lab <- "Pearson's Gamma index"
+        if (index == "daviesbouldin") y_lab <- "Davies-Bouldin index"
+        if (index == "c") y_lab <- "Hubert & Levin C index"
+    }
+    # Generate a default title if none is provided
+    if (is.null(title) & length(index) > 1) {
+        title <- "Clustering Validation Indexes Across Clustering Partitions"
+    }
+    if (is.null(title) & length(index) == 1) {
+        if (index == "silhouette") title <- "Silhouette Score Across Clustering Partitions"
+        if (index == "dunn2") y_lab <- "Dunn2 Index Across Clustering Partitions"
+        if (index == "pearsongamma") y_lab <- "Pearson's Gamma Index Across Clustering Partitions"
+        if (index == "daviesbouldin") y_lab <- "Davies-Bouldin Index Across Clustering Partitions"
+        if (index == "c") y_lab <- "C Index Across Clustering Partitions"
+    }
 
     # Generate the plot
     plot <- ggplot(df_plot,
                    aes(
-                       x = .data$k,
+                       x = .data$partition,
                        y = .data$Value,
                        color = .data$Index,
                        group = .data$Index
                    )) +
         geom_line(linewidth = 1) +
-        geom_point(data = df_plot[which(df_plot$k == opt_k), ]) +
-        labs(x = "Number of Clusters (k)", y = "Normalized Index Value", title = title) +
-        scale_x_continuous(breaks = unique(df_plot$k)) +
+        geom_point(data = df_plot[which(df_plot$partition == opt_p), ]) +
+        labs(x = x_lab, y = y_lab, title = title) +
+        scale_x_discrete(breaks = unique(df_plot$partition)) +
         scale_color_manual(
             values = colors,
             labels = c(
                 "silhouette" = "Silhouette",
                 "dunn2" = "Dunn2",
                 "pearsongamma" = "Pearson's Gamma",
-                "davisbouldin" = "Davis-Bouldin",
+                "daviesbouldin" = "Davies-Bouldin",
                 "c" = "C Index"
             )
         ) +
         theme_classic() +
-        theme(legend.position = "right")
+        theme(legend.position = "none")
+
+    if (length(index) > 1) {
+        plot <- plot +
+            theme(legend.position = "right")
+    }
 
     return(plot)
 }
@@ -1640,7 +1736,7 @@ plotCNA <- function(x,
 #'             title = "Example data - Step 01")
 #'
 #' # Plot heatmap and distribution of values for all steps
-#' for (step in names(obj_atac_all)[grep("step", names(obj_atac_all))]) {
+#' for (step in grep("step", names(obj_atac_all), value = TRUE)) {
 #'     heatmapStep(
 #'         obj_atac_all,
 #'         step,
@@ -1701,8 +1797,8 @@ heatmapStep <- function(obj,
     }
 
     # Extract the tumor and reference matrices
-    matTumor <- t(obj[[step]]$matTumor)
-    matRef <- t(obj[[step]]$matRef)
+    matTumor <- t(as.matrix(obj[[step]]$matTumor))
+    matRef <- t(as.matrix(obj[[step]]$matRef))
     name <- obj[[step]]$name
 
     # Generate title if NULL

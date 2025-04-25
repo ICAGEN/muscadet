@@ -2,148 +2,165 @@
 % Please edit documentation in R/clustering.R
 \name{clusterMuscadet}
 \alias{clusterMuscadet}
-\title{Perform clustering on a muscadet object}
+\title{Multi Omics Integration and Clustering on a \code{muscadet} Object}
 \usage{
 clusterMuscadet(
   x,
-  dist_method = "euclidean",
-  hclust_method = "ward.D",
-  knn_affinity = 40,
-  var_affinity = 1,
-  knn_SNF = 40,
-  iter_SNF = 50,
-  weights = rep(1, length(slot(x, "omics"))),
+  method = c("seurat", "hclust"),
+  omics = NULL,
   knn_imp = 10,
-  k_range = seq(2, 10, 1),
-  no_aff = FALSE
+  quiet = FALSE,
+  ...
 )
 }
 \arguments{
-\item{x}{A \code{muscadet} object containing omics data and previously calculated
+\item{x}{A \code{muscadet} object containing omics data and previously computed
 log R ratio matrices (\code{muscadet}).}
 
-\item{dist_method}{String specifying the distance method for
-\code{\link[Rfast:Dist]{Rfast::Dist()}} (\code{character} string). Default is \code{"euclidean"}.}
+\item{method}{The clustering method to apply (\code{character} string). One of
+\code{"seurat"} or \code{"hclust"}. For  medthod \code{"seurat"}, arguments for
+\code{\link[=cluster_seurat]{cluster_seurat()}} should be provided, and for method \code{"hclust"}, arguments
+for \code{\link[=cluster_hclust]{cluster_hclust()}} should be provided. Note: The \code{"seurat"} method can
+only be applied for a maximum of 2 omics. Default is \code{"seurat"}.}
 
-\item{hclust_method}{String specifying the hierarchical clustering method
-for \code{\link[fastcluster:hclust]{fastcluster::hclust()}} (\code{character} string). Default is \code{"ward.D"}.}
+\item{omics}{Optional character vector specifying omic names to use for
+clustering. Must match names of available omics in the \code{x} muscadet object.
+If \code{NULL} (default), all available omics are used.}
 
-\item{knn_affinity}{Integer specifying the number of nearest neighbors used
-in affinity matrix construction with \code{\link[SNFtool:affinityMatrix]{SNFtool::affinityMatrix()}}
-(\code{integer}). Default is \code{40}.}
+\item{knn_imp}{Number of k nearest neighbors to use for imputing cluster
+assignments of cells missing in one or more omics. Only relevant for more
+than one omic.}
 
-\item{var_affinity}{Numeric value for the variance parameter in affinity
-matrix construction with \code{\link[SNFtool:affinityMatrix]{SNFtool::affinityMatrix()}} (\code{numeric}). Default
-is \code{1}.}
+\item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
+default: \code{FALSE}.}
 
-\item{knn_SNF}{Integer specifying the number of nearest neighbors used for
-Similarity Network Fusion (SNF) with \code{\link[=weightedSNF]{weightedSNF()}} (\code{integer}).
-Default is \code{40}.}
-
-\item{iter_SNF}{Integer specifying the number of iterations for SNF with
-\code{\link[=weightedSNF]{weightedSNF()}} (\code{integer}). Default is \code{50}.}
-
-\item{weights}{Numeric vector of non-negative values of length equal to the
+\item{...}{
+  Arguments passed on to \code{\link[=cluster_seurat]{cluster_seurat}}, \code{\link[=cluster_hclust]{cluster_hclust}}
+  \describe{
+    \item{\code{res_range}}{A numeric non-negative vector specifying the resolution
+values to use for \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{numeric} vector). Default is
+\code{c(0.1, 0.2, 0.3, 0.4, 0.5)}.}
+    \item{\code{dims_list}}{A list of vectors of PC dimensions to use for each omic
+(\code{list}). Must match the length of \code{mat_list} (e.g., list(1:8) for 1 omic ;
+list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
+provided omic.}
+    \item{\code{algorithm}}{Integer specifying the algorithm for modularity optimization
+by \link[Seurat:FindClusters]{Seurat::FindClusters} (\code{1} = original Louvain algorithm; \code{2} = Louvain algorithm with multilevel
+refinement; \code{3} = SLM algorithm; \code{4} = Leiden algorithm). Leiden requires the
+leidenalg python. Default is \code{1}.}
+    \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
+graph construction with Seurat functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+(\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
+Default is \code{20}.}
+    \item{\code{knn_range_seurat}}{Integer specifying the approximate number of nearest
+neighbors to compute for \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{knn.range})
+(\code{integer}). Default is \code{200}.}
+    \item{\code{k_range}}{A numeric vector of integers (≥2) specifying the cluster
+numbers (k) to extract from hierarchical clustering (\code{numeric} vector).
+Default is from 2 to 10.}
+    \item{\code{dist_method}}{A string specifying the distance method for
+\code{\link[Rfast:Dist]{Rfast::Dist()}} (e.g., \code{"euclidean"}, \code{"manhattan"}, \code{"cosine"})
+(\code{character} string). Default is \code{"euclidean"}.}
+    \item{\code{hclust_method}}{A string specifying the hierarchical clustering linkage
+method for \code{\link[fastcluster:hclust]{fastcluster::hclust()}} (e.g., \code{"ward.D"}, \code{"average"})
+(\code{character} string). Default is \code{"ward.D"}.}
+    \item{\code{weights}}{A numeric vector of non-negative values of length equal to the
 number of omic (internally normalized to sum to 1) (\code{numeric} vector). It
 specifies the relatives weights of each omic for SNF with
 \code{\link[=weightedSNF]{weightedSNF()}}. Omics with a weight of 0 will not contribute to
-the clustering. Default assigns equal weights to all omics.}
-
-\item{knn_imp}{Integer specifying the number of nearest neighbors to use for
-imputation of missing clusters with \code{\link[=imputeClusters]{imputeClusters()}}
-(\code{integer}). Default is \code{10}.}
-
-\item{k_range}{Numeric vector specifying the range of clusters (k) to
-evaluate (\code{numeric} vector). Default is from 2 to 10.}
-
-\item{no_aff}{Logical, whether to not go through a distance-to-affinity
-matrix conversion step if only one omic has a non-zero weight. Default is
-\code{FALSE} (distance matrix converted to affinity matrix).}
+the clustering. If \code{NULL} (default), weights are uniform.}
+  }}
 }
 \value{
-A \code{\link{muscadet}} object with updated clustering results
-stored in the \code{clustering} slot, including:
+The input \code{\link{muscadet}} object with its \code{clustering} slot updated. This slot contains:
 \describe{
-\item{\code{params}}{Clustering parameters used (\code{list}).}
-\item{\code{SNF}}{Fused similarity matrix, result of Similarity Network Fusion
-(SNF) (\code{matrix}). If the muscadet object contains only one omic, it
-corresponds to the affinity matrix from this unique omic.}
-\item{\code{dist}}{Distance matrix, derived from the \code{SNF} matrix:
-\code{max(SNF) - SNF} (excluding the diagonal values) (\code{matrix}).}
-\item{\code{hclust}}{Hierarchical clustering object of class \code{\link{hclust}}, result of
-the clustering function \code{\link[fastcluster:hclust]{fastcluster::hclust()}} with the chosen hclust
-method used (\code{hclust}).}
-\item{\code{clusters}}{Cluster assignments as a list for each given \code{k} from the
-\code{k_range} argument (\code{list}). Each element of the list is a named vector of
-clusters per cell.
-Note: element names being integers (\code{k}) in the character format it should
-be called as followed: \code{muscadet_obj$clustering$clusters[["3"]]} or
-\code{muscadet_obj$clustering$clusters[[as.character(k)]]}}
-\item{\code{silhouette}}{List of silhouette objects (\code{sil.obj}), average
-silhouette widths (\code{sil.w.avg}), and clusters average silhouette widths
-(\code{sil.w.avg.clusters}), per each \code{k} partition (\code{list}).}
-\item{\code{k.opt}}{Optimal \code{k} number of clusters based on silhouette average
-widths (\code{integer}).}
+\item{params}{List of parameters used for clustering (\code{list}).}
+\item{...}{Output objects depending on the method.}
+\item{clusters}{A list of cluster assignments (imputed if needed) for each value in \code{k_range} or \code{res_range}.}
+\item{partition.opt}{Name of the optimal partition based on maximum average silhouette width.}
+\item{silhouette}{A list of silhouette objects and summary statistics.}
+}
+\itemize{
+\item \code{params}: List of parameters used for clustering (\code{list}).
+\item \code{...}: Output objects depending on the method (e.g. graph object for
+\code{"seurat"}; hclust object for \code{"hclust"})
+\item \code{clusters}: A named list of cluster partitions (named vectors of cluster
+labels) for all cells (imputed clusters assignments for non-common cells),
+for each value in \code{k_range} or \code{res_range} (\code{list}).
+\item \code{silhouette}: A list of silhouette objects and widths for each cluster partition.
+\item \code{partition.opt}: Name of the optimal cluster partition based on maximum average
+silhouette width.
 }
 }
 \description{
-This function performs clustering on the cells within a
-\code{\link{muscadet}} object using the log R ratio matrices. It calculates
-pairwise distances, constructs affinity matrices, applies Similarity Network
-Fusion (SNF) to integrate several omic, and assign clusters to cell. Clusters
-for missing cells are imputed by similarity using k nearest-neighbor method.
+Performs integration of multi omics and clustering of cells based on log
+ratio data contained in a \code{\link{muscadet}} object.
 }
 \details{
-The function calculates pairwise distances for cells within each omic dataset
-using the specified \code{dist_method}.
+Two methods are available for integration and clustering of common cells
+between omics:
+\itemize{
+\item Method \code{seurat} uses nearest neighbors for integration followed by
+graph-based clustering.
+\item Method \code{hclust} uses Similarity Network Fusion (SNF) for integration
+followed by hierarchical clustering.
+}
 
-It constructs affinity matrices based on these distances, applies SNF to
-generate a fused similarity matrix.
+Then, clusters are imputed for cells missing data in at least one omic, by
+similarity using nearest neighbor cells.
 
-Weights can be assigned to each omic dataset to prioritize certain data types
-over others, allowing users to tailor the analysis based on the
-characteristics and importance of each dataset.
-
-It then performs a hierarchical clustering using the specified
-\code{hclust_method} to assign clusters to each cell with data in all omics.
-
-Then, it imputes cluster assignments for missing cells based on their
-nearest neighbors.
-
-Finally, a default optimal number of cluster (\code{k}) is found based on average
-silhouette widths.
+Finally, silhouette widths are computed on the integrated distance matrix to
+help identify the optimal clustering partition.
 }
 \examples{
 # Load example muscadet object
 data(muscadet_obj)
 
-# Clustering on muscadet object
+# Perform clustering with "seurat" method
 muscadet_obj <- clusterMuscadet(
-  muscadet_obj,
-  dist_method = "euclidean",
-  hclust_method = "ward.D",
-  k_range = 2:5
+  x = muscadet_obj,
+  method = "seurat",
+  res_range = c(0.5, 0.8),
+  dims_list = list(1:8, 1:8),
+  knn_seurat = 10, # to adapt for low number of cells in example data
+  knn_range_seurat = 30 # to adapt for low number of cells in example data
 )
 
-# Cluster assignments (for k = 3)
-muscadet_obj$clustering$clusters[["3"]]
-table(muscadet_obj$clustering$clusters[["3"]])
+# Perform clustering with "hclust" method
+muscadet_obj <- clusterMuscadet(
+  x = muscadet_obj,
+  k_range = 2:4,
+  method = "hclust",
+  dist_method = "euclidean",
+  hclust_method = "ward.D",
+  weights = c(1, 1)
+)
 
-# Silhouette width per k
-unlist(muscadet_obj$clustering$silhouette[["sil.w.avg"]])
-
-# Optimal k according to silhouette width index
-muscadet_obj$clustering$k.opt
+# Retrieve cluster assignments
+clusters <- muscadet_obj$clustering$clusters
+lapply(clusters, table)
 
 }
 \seealso{
+Methodology and functionality:
 \itemize{
-\item \code{\link{muscadet-class}}
-\item Details on Similarity Network Fusion: \code{\link[=weightedSNF]{weightedSNF()}}
-\item Plot cluster result as heatmap with \code{\link[=heatmapMuscadet]{heatmapMuscadet()}}.
-\item Plot silhouette widths with \code{\link[=plotSil]{plotSil()}}.
-\item Plot several cluster validation indexes with \code{\link[=plotIndexes]{plotIndexes()}}.
-\item After cluster partition validation, assign final cluster assignments with
-\code{\link[=assignClusters]{assignClusters()}}.
+\item \linkS4class{muscadet}
+\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using Seurat.
+\item \code{\link[=cluster_hclust]{cluster_hclust()}} for hierarchical clustering of SNF-fused distances.
+\item \code{\link[=weightedSNF]{weightedSNF()}} for weighted Similarity Network Fusion (SNF).
+\item \code{\link[=imputeClusters]{imputeClusters()}} for imputing cluster labels across omics.
+}
+
+Visualization:
+\itemize{
+\item \code{\link[=heatmapMuscadet]{heatmapMuscadet()}} to plot clustering result as heatmap.
+\item \code{\link[=plotSil]{plotSil()}} to plot silhouette widths.
+\item \code{\link[=plotIndexes]{plotIndexes()}} to plot several normalized cluster validation indexes.
+}
+
+Select clusters to continue with CNA calling:
+\itemize{
+\item \code{\link[=assignClusters]{assignClusters()}} to assign final cluster assignments in the \code{muscadet}
+object after cluster partition validation.
 }
 }

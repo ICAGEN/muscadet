@@ -4,27 +4,31 @@
 \alias{plotSil}
 \title{Silhouette plot for \code{muscadet} object}
 \usage{
-plotSil(x, k, colors = NULL, title = NULL)
+plotSil(x, partition, colors = NULL, title = NULL, annotations = TRUE)
 }
 \arguments{
 \item{x}{A \code{\link{muscadet}} object containing clustering data (using
 \code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
 
-\item{k}{Integer specifying the number of clusters to plot (\code{integer}).
-It should be within the range of k used for clustering (with
-\code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
+\item{partition}{Value specifying the clustering partition to plot (\code{numeric}
+or \code{character}). It should be either the resolution or the k number of
+cluster (k) used for clustering depending on the clustering method
+(\code{res_range} or \code{k_range} with \code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
 
 \item{colors}{Vector of colors for the cluster annotation (\code{character}
 vector). Default is \code{NULL}, which uses predefined colors.}
 
 \item{title}{Character string for the title of the plot (\code{character}
 string). If \code{NULL}, a default title is generated.}
+
+\item{annotations}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to add annotations
+per clusters. By default: \code{TRUE}.}
 }
 \value{
 A ggplot object representing the silhouette plot.
 }
 \description{
-Generate a silhouette plot for a specified clustering result within a
+Generate a silhouette plot for a specified clustering partition within a
 \code{muscadet} object.
 }
 \examples{
@@ -32,12 +36,12 @@ library("ggplot2")
 
 # Load example muscadet object
 data(muscadet_obj)
-plotSil(muscadet_obj, k = 3)
+plotSil(muscadet_obj, partition = 0.6)
 
-# Loop over k
-for (k in names(muscadet_obj$clustering$clusters)) {
-    plot <- plotSil(muscadet_obj, k = as.integer(k))
-    ggsave(paste0("plot_silhouette_", k, ".png"), plot)
+# Loop over partitions
+for (p in names(muscadet_obj$clustering$clusters)) {
+    plot <- plotSil(muscadet_obj, p)
+    ggsave(paste0("plot_silhouette_", p, ".png"), plot)
 }
 
 }

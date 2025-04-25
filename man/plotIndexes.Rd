@@ -11,23 +11,24 @@ plotIndexes(x, index = NULL, colors = NULL, title = NULL)
 (generated using \code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
 
 \item{index}{Character vector specifying one or more validation indexes to
-plot among "silhouette", "dunn2", "davisbouldin", "pearsongamma", and "c".
-If \code{NULL}, by default all available indexes are included. If multiple
-indexes are selected, the values are normalized for comparability.}
+plot among \code{"silhouette"}, \code{"dunn2"}, \code{"daviesbouldin"}, \code{"pearsongamma"},
+and \code{"c"}. If \code{NULL}, by default all available indexes are included. If
+multiple indexes are selected, the values are normalized for comparability.}
 
 \item{colors}{Vector of colors for each index in the plot (\code{character}
 vector). Default is \code{NULL}, which uses predefined colors for the indexes.}
 
-\item{title}{Character string for the title of the plot (\code{character}
-string). If \code{NULL}, a default title is generated.}
+\item{title}{Character string for the title of the plot (\code{character} string).
+If \code{NULL}, a default title is generated.}
 }
 \value{
 A ggplot object visualizing the clustering validation indexes across
-different numbers of clusters (\code{k}).
+different clustering partitions (\code{res} resolution or \code{k} number of clusters
+depending on the used clustering method).
 }
 \description{
-It generates a plot of clustering validation indexes for a clustering result
-within a \code{muscadet} object. The index values are computed only using
+It generates a plot of clustering validation indexes for a clustering
+partition within a \code{muscadet} object. The index values are computed only using
 distances between common cells across omics in the \code{muscadet} object.
 }
 \details{
@@ -35,22 +36,27 @@ The function computes several clustering validation indexes,
 including:
 \itemize{
 \item \strong{Silhouette}: Measures how similar an object is to its own
-cluster compared to others (see \link[cluster:silhouette]{cluster::silhouette}).
+cluster compared to others (see \link[cluster:silhouette]{cluster::silhouette}). Average of
+individual silhouette widths.
 \item \strong{Dunn2}: The ratio of the smallest distance between
 observations in different clusters to the largest within-cluster distance
-(see \link[fpc:cluster.stats]{fpc::cluster.stats} \verb{$dunn2}).
-\item \strong{Davis-Bouldin}: Measures cluster compactness and separation
-(see \link[clusterSim:index.DB]{clusterSim::index.DB}).
+(see \link[fpc:cluster.stats]{fpc::cluster.stats} \verb{$dunn2}). Minimum average dissimilarity
+between two cluster / maximum average within cluster dissimilarity.
+\item \strong{Davies-Bouldin}: Measures cluster compactness and
+separation (see \link[clusterSim:index.DB]{clusterSim::index.DB}).
 \item \strong{Pearson's Gamma}: Evaluates the goodness of clustering
 based on correlation (see \link[fpc:cluster.stats]{fpc::cluster.stats} \verb{$pearsongamma}).
-\item \strong{C Index}: Measures the clustering quality compared to
-random data (see \link[clusterSim:index.C]{clusterSim::index.C}).
+Correlation between distances and a 0-1-vector where 0 means same
+cluster, 1 means different clusters. "Normalized gamma" in Halkidi et al.
+(2001).
+\item \strong{C Index} (Hubert & Levin C index): Measures the internal
+cluster quality compared to random data (see \link[clusterSim:index.C]{clusterSim::index.C}).
 }
 
 If multiple indexes are selected, the values are normalized to fall between
 0 and 1. For indexes that are better when minimized ("pearsongamma" and
-"c"), their values are reversed for easier comparison.
-The k for which the mean of indexes is maximal is highlighted with a dot.
+"c"), their values are reversed for easier comparison. The partition for
+which the mean of indexes is maximal is highlighted with a dot.
 }
 \examples{
 # Load example muscadet object
@@ -59,7 +65,7 @@ data(muscadet_obj)
 # Plot all indexes
 plotIndexes(muscadet_obj)
 
-# Plot specific indexes
+# Plot a specific index
 plotIndexes(muscadet_obj, index = "silhouette")
 
 }

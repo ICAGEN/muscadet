@@ -855,8 +855,8 @@ setMethod(
             "clustering:", ifelse(
                 length(object@clustering) == 0,
                 "None",
-                paste("k =", paste(names(object@clustering$clusters), collapse = ", "),
-                      "; optimal k =", object@clustering$k.opt)
+                paste("partitions =", paste(names(object@clustering$clusters), collapse = ", "),
+                      "; optimal partition =", object@clustering$partition.opt)
             ), "\n",
             "CNA calling:", ifelse(is.null(object@cnacalling$consensus.segs), "None", cnacall_txt), "\n",
             "genome:", object@genome, "\n"

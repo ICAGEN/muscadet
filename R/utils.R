@@ -6,30 +6,36 @@
 #' cluster assignments based on other data and methods.
 #'
 #' @param x A \code{\link{muscadet}} object (`muscadet`).
-#' @param k Integer specifying the number of clusters to choose from the
-#'   muscadet object (`integer`). If `k` is provided, the clustering result
-#'   stored in the object for that specific `k` is used
-#'   (`muscadet_obj$clustering$clusters[[as.character(k)]]`).
+#'
+#' @param partition Value specifying the clustering partition to choose from the
+#'   muscadet object (`numeric` or `character`). It should be either the resolution or the
+#'   k number of cluster (k) used for clustering depending on the clustering
+#'   method (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
+#'   Should be provided if `clusters` is `NULL`.
+#'
 #' @param clusters A custom named vector of cluster assignments (`vector`). The
 #'   vector names must match cell names in the muscadet object `x`, at least
 #'   cluster assignments for all common cells must be provided if
 #'   `redo_imputation` is set to true, otherwise, all cells within the muscadet
-#'   object `x` must be provided.
+#'   object `x` must be provided. Should be provided if `partition` is `NULL`.
+#'
 #' @param mapping Optional named vector specifying how to remap cluster values
 #'   (`vector`). The names of the vector correspond to the original cluster
 #'   values, and the values are the remapped cluster values. For example, `c("1"
 #'   = 1, "2" = 1, "3" = 2, "4" = 3)` would merge clusters 1 and 2 into 1,
 #'   cluster 3 into 2, and cluster 4 into 3.
+#'
 #' @param redo_imputation Logical. If `TRUE` (default), reruns the imputation
 #'   process to assign clusters to cells with missing data. This ensures that
 #'   imputed clusters are updated if the clustering has changed due to remapping
 #'   or to the use of custom clusters.
+#'
 #' @inheritParams imputeClusters
 #'
 #' @details
 #' - The clusters can be taken directly from the `muscadet` object clustering
-#' results with setting the `k` argument to the chosen partition (e.g.
-#' `muscadet_obj$clustering$clusters[["2"]]` for k=`2`).
+#' results with setting the `parition` argument (e.g.
+#' `muscadet_obj$clustering$clusters[["0.8"]]` for res=`0.8`).
 #' - A custom vector of cluster assignments
 #' can be attributed using the `clusters` argument.
 #' - Either way, the clusters assignments can be rearranged using the `mapping`
@@ -46,8 +52,8 @@
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
-#' # Select clustering result for k = 3
-#' muscadet_obj <- assignClusters(muscadet_obj, k = 3)
+#' # Select clustering result for partition = 0.6
+#' muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
 #' table(muscadet_obj$cnacalling$clusters)
 #'
 #' # Assign custom clusters
@@ -61,36 +67,39 @@
 #' table(muscadet_obj$cnacalling$clusters)
 #'
 #' # Assign clusters with remapping
-#' # example to remap from k=4 to k=3 by merging clusters 1 and 2
-#' clusters <- muscadet_obj$clustering$clusters[["4"]]
-#' mapping <- c("1" = 1, "2" = 1, "3" = 2, "4" = 3)
+#' # example to remap from partition=0.8 with merging of clusters 2 and 3
+#' clusters <- muscadet_obj$clustering$clusters[["0.8"]]
+#' table(clusters) # 3 clusters
+#' mapping <- c("1" = 1, "2" = 2, "3" = 2) # remap to 2 clusters
 #'
 #' muscadet_obj <- assignClusters(muscadet_obj, clusters = clusters, mapping = mapping)
 #' table(muscadet_obj$cnacalling$clusters)
 #' # check original and remapped clusters
 #' table(clusters, muscadet_obj$cnacalling$clusters)
 #'
-#' muscadet_obj <- assignClusters(muscadet_obj, k=4, mapping = mapping)
+#' muscadet_obj <- assignClusters(muscadet_obj, partition = 0.8, mapping = mapping)
 #' table(muscadet_obj$cnacalling$clusters)
 #' # check original and remapped clusters
-#' table(clusters, muscadet_obj$cnacalling$clusters)
+#' table(muscadet_obj$clustering$clusters[["0.8"]],
+#'       muscadet_obj$cnacalling$clusters)
 #'
 #' # Visualize clusters on heatmap
 #' heatmapMuscadet(
-#'   muscadet_obj,
-#'   k = 3,
-#'   filename = file.path("heatmap_muscadet_k3.png"),
-#'   title = "Example sample | k=3"
+#'     muscadet_obj,
+#'     partition = 0.8,
+#'     filename = file.path("heatmap_muscadet_res0.8.png"),
+#'     title = "Example sample | res=0.8"
 #' )
 #' heatmapMuscadet(
-#'   muscadet_obj,
-#'   clusters = muscadet_obj$cnacalling$clusters,
-#'   filename = file.path("heatmap_muscadet_customk3.png"),
-#'   title = "Example sample | rearranged clusters k=3"
+#'     muscadet_obj,
+#'     clusters = muscadet_obj$cnacalling$clusters,
+#'     filename = file.path("heatmap_muscadet_custom_res0.8.png"),
+#'     title = "Example sample | rearranged clusters from res=0.8"
 #' )
 #'
+#'
 assignClusters <- function(x,
-                           k = NULL,
+                           partition = NULL,
                            clusters = NULL,
                            mapping = NULL,
                            redo_imputation = TRUE,
@@ -99,16 +108,18 @@ assignClusters <- function(x,
     # Validate input: x must be a muscadet object
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
-    # Validate that either k or clusters is provided, but not both
+    # Validate that either partition or clusters is provided, but not both
     stopifnot(
-        "Either `k` or `clusters` must be provided, but not both." = xor(!is.null(k), !is.null(clusters))
+        "Either `partition` or `clusters` must be provided, but not both." = xor(!is.null(partition), !is.null(clusters))
     )
 
-    # If k is provided, validate that clustering has been performed
-    if (!is.null(k)) {
+    # If partition is provided, validate that clustering has been performed
+    if (!is.null(partition)) {
         stopifnot(
-            "Clustering results are not available in the muscadet object `x`. Perform clustering first using `clusterMuscadet()`." = !is.null(x@clustering),
-            "Clustering results for the chosen `k` are not available. Use `clusterMuscadet()` with the `k_range` argument containing `k`" = as.character(k) %in% names(x@clustering$clusters)
+            "Clustering results are not available in the muscadet object `x`. Perform clustering first using `clusterMuscadet()`."
+            = !is.null(x@clustering),
+            "Clustering results for the chosen `partition` are not available. Use `clusterMuscadet()` with the `res_range`/`k_range` argument to compute the partition."
+            = as.character(partition) %in% names(x@clustering$clusters)
         )
     }
 
@@ -128,9 +139,9 @@ assignClusters <- function(x,
             "All cluster values must have corresponding mappings in `mapping`." = all(as.character(unique(clusters)) %in% names(mapping))
         )
 
-        # Get clusters from k
-        if (!is.null(k)) {
-            clusters <- x@clustering$clusters[[as.character(k)]]
+        # Get clusters from partition
+        if (!is.null(partition)) {
+            clusters <- x@clustering$clusters[[as.character(partition)]]
         }
 
         # Remap clusters
@@ -144,7 +155,7 @@ assignClusters <- function(x,
 
             # Validate clusters cells
             stopifnot(
-                "`clusters` must contain at least all common cells when `redo_imputation = TRUE`." = common_cells %in% all(names(remapped_clusters))
+                "`clusters` must contain at least all common cells when `redo_imputation = TRUE`." = all(common_cells %in% names(remapped_clusters))
             )
 
             # Remove cells missing data that needs to go through cluster imputation (cleaner)
@@ -190,9 +201,9 @@ assignClusters <- function(x,
             }
             x@cnacalling[["clusters"]] <- clusters
 
-        } else if (!is.null(k)) {
-            # Assign clusters without remapping - clusters from hclust k
-            x@cnacalling[["clusters"]] <- x@clustering$clusters[[as.character(k)]]
+        } else if (!is.null(partition)) {
+            # Assign clusters without remapping - clusters from partition
+            x@cnacalling[["clusters"]] <- x@clustering$clusters[[as.character(partition)]]
         }
     }
 

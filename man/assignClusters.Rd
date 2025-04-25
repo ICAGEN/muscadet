@@ -6,7 +6,7 @@
 \usage{
 assignClusters(
   x,
-  k = NULL,
+  partition = NULL,
   clusters = NULL,
   mapping = NULL,
   redo_imputation = TRUE,
@@ -16,16 +16,17 @@ assignClusters(
 \arguments{
 \item{x}{A \code{\link{muscadet}} object (\code{muscadet}).}
 
-\item{k}{Integer specifying the number of clusters to choose from the
-muscadet object (\code{integer}). If \code{k} is provided, the clustering result
-stored in the object for that specific \code{k} is used
-(\code{muscadet_obj$clustering$clusters[[as.character(k)]]}).}
+\item{partition}{Value specifying the clustering partition to choose from the
+muscadet object (\code{numeric} or \code{character}). It should be either the resolution or the
+k number of cluster (k) used for clustering depending on the clustering
+method (\code{res_range} or \code{k_range} with \code{\link[=clusterMuscadet]{clusterMuscadet()}}).
+Should be provided if \code{clusters} is \code{NULL}.}
 
 \item{clusters}{A custom named vector of cluster assignments (\code{vector}). The
 vector names must match cell names in the muscadet object \code{x}, at least
 cluster assignments for all common cells must be provided if
 \code{redo_imputation} is set to true, otherwise, all cells within the muscadet
-object \code{x} must be provided.}
+object \code{x} must be provided. Should be provided if \code{partition} is \code{NULL}.}
 
 \item{mapping}{Optional named vector specifying how to remap cluster values
 (\code{vector}). The names of the vector correspond to the original cluster
@@ -54,8 +55,8 @@ cluster assignments based on other data and methods.
 \details{
 \itemize{
 \item The clusters can be taken directly from the \code{muscadet} object clustering
-results with setting the \code{k} argument to the chosen partition (e.g.
-\code{muscadet_obj$clustering$clusters[["2"]]} for k=\code{2}).
+results with setting the \code{parition} argument (e.g.
+\code{muscadet_obj$clustering$clusters[["0.8"]]} for res=\code{0.8}).
 \item A custom vector of cluster assignments
 can be attributed using the \code{clusters} argument.
 \item Either way, the clusters assignments can be rearranged using the \code{mapping}
@@ -66,8 +67,8 @@ argument.
 # Load example muscadet object
 data(muscadet_obj)
 
-# Select clustering result for k = 3
-muscadet_obj <- assignClusters(muscadet_obj, k = 3)
+# Select clustering result for partition = 0.6
+muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
 table(muscadet_obj$cnacalling$clusters)
 
 # Assign custom clusters
@@ -81,32 +82,35 @@ muscadet_obj <- assignClusters(muscadet_obj, clusters = custom_clusters)
 table(muscadet_obj$cnacalling$clusters)
 
 # Assign clusters with remapping
-# example to remap from k=4 to k=3 by merging clusters 1 and 2
-clusters <- muscadet_obj$clustering$clusters[["4"]]
-mapping <- c("1" = 1, "2" = 1, "3" = 2, "4" = 3)
+# example to remap from partition=0.8 with merging of clusters 2 and 3
+clusters <- muscadet_obj$clustering$clusters[["0.8"]]
+table(clusters) # 3 clusters
+mapping <- c("1" = 1, "2" = 2, "3" = 2) # remap to 2 clusters
 
 muscadet_obj <- assignClusters(muscadet_obj, clusters = clusters, mapping = mapping)
 table(muscadet_obj$cnacalling$clusters)
 # check original and remapped clusters
 table(clusters, muscadet_obj$cnacalling$clusters)
 
-muscadet_obj <- assignClusters(muscadet_obj, k=4, mapping = mapping)
+muscadet_obj <- assignClusters(muscadet_obj, partition = 0.8, mapping = mapping)
 table(muscadet_obj$cnacalling$clusters)
 # check original and remapped clusters
-table(clusters, muscadet_obj$cnacalling$clusters)
+table(muscadet_obj$clustering$clusters[["0.8"]],
+      muscadet_obj$cnacalling$clusters)
 
 # Visualize clusters on heatmap
 heatmapMuscadet(
-  muscadet_obj,
-  k = 3,
-  filename = file.path("heatmap_muscadet_k3.png"),
-  title = "Example sample | k=3"
+    muscadet_obj,
+    partition = 0.8,
+    filename = file.path("heatmap_muscadet_res0.8.png"),
+    title = "Example sample | res=0.8"
 )
 heatmapMuscadet(
-  muscadet_obj,
-  clusters = muscadet_obj$cnacalling$clusters,
-  filename = file.path("heatmap_muscadet_customk3.png"),
-  title = "Example sample | rearranged clusters k=3"
+    muscadet_obj,
+    clusters = muscadet_obj$cnacalling$clusters,
+    filename = file.path("heatmap_muscadet_custom_res0.8.png"),
+    title = "Example sample | rearranged clusters from res=0.8"
 )
+
 
 }

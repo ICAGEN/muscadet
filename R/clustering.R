@@ -1,164 +1,138 @@
-#' Perform clustering on a muscadet object
+#' Multi Omics Integration and Clustering on a `muscadet` Object
 #'
-#' This function performs clustering on the cells within a
-#' \code{\link{muscadet}} object using the log R ratio matrices. It calculates
-#' pairwise distances, constructs affinity matrices, applies Similarity Network
-#' Fusion (SNF) to integrate several omic, and assign clusters to cell. Clusters
-#' for missing cells are imputed by similarity using k nearest-neighbor method.
+#' Performs integration of multi omics and clustering of cells based on log
+#' ratio data contained in a [`muscadet`] object.
 #'
-#' @param x A `muscadet` object containing omics data and previously calculated
+#' Two methods are available for integration and clustering of common cells
+#' between omics:
+#' - Method `seurat` uses nearest neighbors for integration followed by
+#' graph-based clustering.
+#' - Method `hclust` uses Similarity Network Fusion (SNF) for integration
+#' followed by hierarchical clustering.
+#'
+#' Then, clusters are imputed for cells missing data in at least one omic, by
+#' similarity using nearest neighbor cells.
+#'
+#' Finally, silhouette widths are computed on the integrated distance matrix to
+#' help identify the optimal clustering partition.
+#'
+#' @param x A `muscadet` object containing omics data and previously computed
 #'   log R ratio matrices (`muscadet`).
-#' @param dist_method String specifying the distance method for
-#'   [Rfast::Dist()] (`character` string). Default is `"euclidean"`.
-#' @param hclust_method String specifying the hierarchical clustering method
-#'   for [fastcluster::hclust()] (`character` string). Default is `"ward.D"`.
-#' @param knn_affinity Integer specifying the number of nearest neighbors used
-#'   in affinity matrix construction with [SNFtool::affinityMatrix()]
-#'   (`integer`). Default is `40`.
-#' @param var_affinity Numeric value for the variance parameter in affinity
-#'   matrix construction with [SNFtool::affinityMatrix()] (`numeric`). Default
-#'   is `1`.
-#' @param knn_SNF Integer specifying the number of nearest neighbors used for
-#'   Similarity Network Fusion (SNF) with [muscadet::weightedSNF()] (`integer`).
-#'   Default is `40`.
-#' @param iter_SNF Integer specifying the number of iterations for SNF with
-#'   [muscadet::weightedSNF()] (`integer`). Default is `50`.
-#' @param weights Numeric vector of non-negative values of length equal to the
-#'   number of omic (internally normalized to sum to 1) (`numeric` vector). It
-#'   specifies the relatives weights of each omic for SNF with
-#'   [muscadet::weightedSNF()]. Omics with a weight of 0 will not contribute to
-#'   the clustering. Default assigns equal weights to all omics.
-#' @param knn_imp Integer specifying the number of nearest neighbors to use for
-#'   imputation of missing clusters with [muscadet::imputeClusters()]
-#'   (`integer`). Default is `10`.
-#' @param k_range Numeric vector specifying the range of clusters (k) to
-#'   evaluate (`numeric` vector). Default is from 2 to 10.
-#' @param no_aff Logical, whether to not go through a distance-to-affinity
-#'   matrix conversion step if only one omic has a non-zero weight. Default is
-#'   `FALSE` (distance matrix converted to affinity matrix).
+#' @param method The clustering method to apply (`character` string). One of
+#'   `"seurat"` or `"hclust"`. For  medthod `"seurat"`, arguments for
+#'   [cluster_seurat()] should be provided, and for method `"hclust"`, arguments
+#'   for [cluster_hclust()] should be provided. Note: The `"seurat"` method can
+#'   only be applied for a maximum of 2 omics. Default is `"seurat"`.
+#' @param omics Optional character vector specifying omic names to use for
+#'   clustering. Must match names of available omics in the `x` muscadet object.
+#'   If `NULL` (default), all available omics are used.
+#' @param knn_imp Number of k nearest neighbors to use for imputing cluster
+#'   assignments of cells missing in one or more omics. Only relevant for more
+#'   than one omic.
+#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
+#'   default: `FALSE`.
+#'
+#' @inheritDotParams cluster_seurat res_range dims_list algorithm knn_seurat knn_range_seurat
+#' @inheritDotParams cluster_hclust k_range dist_method hclust_method weights
 #'
 #'
-#' @return
-#' A \code{\link{muscadet}} object with updated clustering results
-#' stored in the `clustering` slot, including:
+#' @return The input [`muscadet`] object with its `clustering` slot updated. This slot contains:
 #' \describe{
-#'   \item{`params`}{Clustering parameters used (`list`).}
-#'   \item{`SNF`}{Fused similarity matrix, result of Similarity Network Fusion
-#'   (SNF) (`matrix`). If the muscadet object contains only one omic, it
-#'   corresponds to the affinity matrix from this unique omic.}
-#'   \item{`dist`}{Distance matrix, derived from the `SNF` matrix:
-#'   `max(SNF) - SNF` (excluding the diagonal values) (`matrix`).}
-#'   \item{`hclust`}{Hierarchical clustering object of class \code{\link{hclust}}, result of
-#'   the clustering function [fastcluster::hclust()] with the chosen hclust
-#'   method used (`hclust`).}
-#'   \item{`clusters`}{Cluster assignments as a list for each given `k` from the
-#'   `k_range` argument (`list`). Each element of the list is a named vector of
-#'   clusters per cell.
-#'   Note: element names being integers (`k`) in the character format it should
-#'   be called as followed: `muscadet_obj$clustering$clusters[["3"]]` or
-#'   `muscadet_obj$clustering$clusters[[as.character(k)]]`}
-#'   \item{`silhouette`}{List of silhouette objects (`sil.obj`), average
-#'   silhouette widths (`sil.w.avg`), and clusters average silhouette widths
-#'   (`sil.w.avg.clusters`), per each `k` partition (`list`).}
-#'   \item{`k.opt`}{Optimal `k` number of clusters based on silhouette average
-#'   widths (`integer`).}
+#'   \item{params}{List of parameters used for clustering (`list`).}
+#'   \item{...}{Output objects depending on the method.}
+#'   \item{clusters}{A list of cluster assignments (imputed if needed) for each value in `k_range` or `res_range`.}
+#'   \item{partition.opt}{Name of the optimal partition based on maximum average silhouette width.}
+#'   \item{silhouette}{A list of silhouette objects and summary statistics.}
 #' }
-#'
-#'
-#' @details
-#' The function calculates pairwise distances for cells within each omic dataset
-#' using the specified `dist_method`.
-#'
-#' It constructs affinity matrices based on these distances, applies SNF to
-#' generate a fused similarity matrix.
-#'
-#' Weights can be assigned to each omic dataset to prioritize certain data types
-#' over others, allowing users to tailor the analysis based on the
-#' characteristics and importance of each dataset.
-#'
-#' It then performs a hierarchical clustering using the specified
-#' `hclust_method` to assign clusters to each cell with data in all omics.
-#'
-#' Then, it imputes cluster assignments for missing cells based on their
-#' nearest neighbors.
-#'
-#' Finally, a default optimal number of cluster (`k`) is found based on average
-#' silhouette widths.
+#' - `params`: List of parameters used for clustering (`list`).
+#' - `...`: Output objects depending on the method (e.g. graph object for
+#'   `"seurat"`; hclust object for `"hclust"`)
+#' - `clusters`: A named list of cluster partitions (named vectors of cluster
+#'   labels) for all cells (imputed clusters assignments for non-common cells),
+#'   for each value in `k_range` or `res_range` (`list`).
+#' - `silhouette`: A list of silhouette objects and widths for each cluster partition.
+#' - `partition.opt`: Name of the optimal cluster partition based on maximum average
+#'    silhouette width.
 #'
 #' @seealso
-#' * \code{\link{muscadet-class}}
-#' * Details on Similarity Network Fusion: [muscadet::weightedSNF()]
-#' * Plot cluster result as heatmap with [muscadet::heatmapMuscadet()].
-#' * Plot silhouette widths with [muscadet::plotSil()].
-#' * Plot several cluster validation indexes with [muscadet::plotIndexes()].
-#' * After cluster partition validation, assign final cluster assignments with
-#' [muscadet::assignClusters()].
+#' Methodology and functionality:
 #'
-#' @importFrom Rfast Dist
-#' @importFrom SNFtool affinityMatrix
-#' @importFrom stats as.dist
-#' @importFrom fastcluster hclust
-#' @importFrom dendextend cutree
-#' @importFrom cluster silhouette
+#' - [muscadet-class]
+#' - [cluster_seurat()] for graph-based clustering using Seurat.
+#' - [cluster_hclust()] for hierarchical clustering of SNF-fused distances.
+#' - [weightedSNF()] for weighted Similarity Network Fusion (SNF).
+#' - [imputeClusters()] for imputing cluster labels across omics.
+#'
+#' Visualization:
+#' - [heatmapMuscadet()] to plot clustering result as heatmap.
+#' - [plotSil()] to plot silhouette widths.
+#' - [plotIndexes()] to plot several normalized cluster validation indexes.
+#'
+#' Select clusters to continue with CNA calling:
+#' - [assignClusters()] to assign final cluster assignments in the `muscadet`
+#' object after cluster partition validation.
+#'
 #' @importFrom methods slot slot<-
-#' @importFrom utils packageVersion
-#'
-#' @export
+#' @importFrom cluster silhouette
+#' @importFrom stats as.dist
 #'
 #' @examples
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
-#' # Clustering on muscadet object
+#' # Perform clustering with "seurat" method
 #' muscadet_obj <- clusterMuscadet(
-#'   muscadet_obj,
-#'   dist_method = "euclidean",
-#'   hclust_method = "ward.D",
-#'   k_range = 2:5
+#'   x = muscadet_obj,
+#'   method = "seurat",
+#'   res_range = c(0.5, 0.8),
+#'   dims_list = list(1:8, 1:8),
+#'   knn_seurat = 10, # to adapt for low number of cells in example data
+#'   knn_range_seurat = 30 # to adapt for low number of cells in example data
 #' )
 #'
-#' # Cluster assignments (for k = 3)
-#' muscadet_obj$clustering$clusters[["3"]]
-#' table(muscadet_obj$clustering$clusters[["3"]])
+#' # Perform clustering with "hclust" method
+#' muscadet_obj <- clusterMuscadet(
+#'   x = muscadet_obj,
+#'   k_range = 2:4,
+#'   method = "hclust",
+#'   dist_method = "euclidean",
+#'   hclust_method = "ward.D",
+#'   weights = c(1, 1)
+#' )
 #'
-#' # Silhouette width per k
-#' unlist(muscadet_obj$clustering$silhouette[["sil.w.avg"]])
+#' # Retrieve cluster assignments
+#' clusters <- muscadet_obj$clustering$clusters
+#' lapply(clusters, table)
 #'
-#' # Optimal k according to silhouette width index
-#' muscadet_obj$clustering$k.opt
-#'
-clusterMuscadet <- function(x, # muscadet object
-                            dist_method = "euclidean",
-                            hclust_method = "ward.D",
-                            knn_affinity = 40,
-                            var_affinity = 1,
-                            knn_SNF = 40,
-                            iter_SNF = 50,
-                            weights = rep(1, length(slot(x, "omics"))),
+#' @export
+clusterMuscadet <- function(x,
+                            method = c("seurat", "hclust"),
+                            omics = NULL,
                             knn_imp = 10,
-                            k_range = seq(2, 10, 1),
-                            no_aff = FALSE) {
+                            quiet = FALSE,
+                            ...) {
 
-    # Validate input: x must be a muscadet object
-    stopifnot("Input object 'x' must be of class 'muscadet'." = inherits(x, "muscadet"))
+    # Validate inputs
+    stopifnot("Input object `x` must be of class 'muscadet'." = inherits(x, "muscadet"))
+    method <- match.arg(method)
 
-    # Add clustering parameters to the muscadet object
-    slot(x, "clustering")[["params"]] <- list(
-        dist_method = dist_method,
-        hclust_method = hclust_method,
-        knn_affinity = knn_affinity,
-        var_affinity = var_affinity,
-        knn_SNF = knn_SNF,
-        iter_SNF = iter_SNF,
-        weights = weights,
-        knn_imp = knn_imp
-    )
+    if (is.null(omics)) {
+        omics <- names(x$omics)
+    } else {
+        stopifnot(
+            "Some specified `omics` are not present in the muscadet object `x`." =
+                all(omics %in% names(x$omics))
+        )
+    }
 
-    # Prepare a named list of k
-    k_list <- as.list(k_range)
-    k_list <- setNames(k_list, k_range)
-
-    # Compute distance and affinity matrices -----------------------------------
+    # Empty clustering slot
+    if(length(slot(x, "clustering")) > 0) {
+        slot(x, "clustering") <- list()
+    }
+    # Empty cna calling slot to avoid inconsistent results
+    if(length(slot(x, "cnacalling")) > 0) {
+        slot(x, "cnacalling") <- list()
+    }
 
     # Check that log ratio matrices exists
     stopifnot(
@@ -170,73 +144,43 @@ clusterMuscadet <- function(x, # muscadet object
     # Extract and transpose log ratio matrices for each omic
     mat_list <- lapply(muscadet::matLogRatio(x), t)
 
-    # Get common cell barcodes across all omics
-    common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
+    # Clustering ---------------------------------------------------------------
 
-    # Compute pairwise distances for each omic
-    dist_list <- lapply(
-      mat_list,
-      function(mat) {
-        mat <- mat[common_cells, ]
-        dist <- Rfast::Dist(mat, method = dist_method)
-        # for version <=2.1, Rfast returns a similarity matrix for cosine with 0
-        # values in diagonal. The result should be converted into distance.
-        # See https://github.com/RfastOfficial/Rfast/issues/119 for more info
-        if(dist_method == "cosine" & utils::packageVersion("Rfast") <= "2.1.0") {
-            diag(dist) <- 1
-            dist <- 1-dist
+    # Method 1: Using Seurat functions (1 or 2 omics only)
+    if(method == "seurat") {
+
+        if (!quiet) {
+            message("Clustering method: 'seurat'")
         }
-        dimnames(dist) <- list(rownames(mat), rownames(mat))
-        return(dist)
-      }
-    )
 
-    omic_index <- which(weights != 0)
-
-    if (no_aff == FALSE) {
-        # Compute affinity matrices for each omic
-        aff_list <- lapply(dist_list, function(dist) {
-            aff <- SNFtool::affinityMatrix(dist, K = knn_affinity, sigma = var_affinity)
-            aff <- aff[sort(rownames(aff)), sort(colnames(aff))]
-            return(aff)
-        })
-
-        # Similarity Network Fusion (SNF) -------------------------------------------
-
-        # Apply Similarity Network Fusion (SNF)
-        matSNF <- weightedSNF(aff_list,
-                              K = knn_SNF,
-                              t = iter_SNF,
-                              weights = weights)
-        slot(x, "clustering")[["SNF"]] <- matSNF
-
-        # Convert the fused affinity matrix to a distance matrix
-        tmp <- matSNF
-        diag(tmp) <- 0
-        dist <- stats::as.dist(max(tmp) - matSNF)
-        slot(x, "clustering")[["dist"]] <- as.matrix(dist)
-
-    } else if (no_aff == TRUE & length(omic_index) == 1) {
-
-        dist <- as.dist(dist_list[[omic_index]])
-
-        slot(x, "clustering")[["SNF"]] <- NULL
-        slot(x, "clustering")[["dist"]] <- as.matrix(dist)
+        # Clustering
+        res_clust <- cluster_seurat(mat_list[omics], ...)
     }
 
-    # Clustering ----------------------------------------------------------------
+    # Method 2: Using hclust
+    if(method == "hclust") {
 
-    # Perform hierarchical clustering
-    hc <- fastcluster::hclust(dist, hclust_method)
-    slot(x, "clustering")[["hclust"]] <- hc
+        if (!quiet) {
+            message("Clustering method: 'hclust'")
+        }
 
-    # Cut the dendrogram to generate clusters for the specified k range
-    clusters <- lapply(k_list, function(k) {
-        cl <- dendextend::cutree(hc, k, order_clusters_as_data = FALSE)
-        return(cl)
-    })
+        # Clustering
+        res_clust <- cluster_hclust(mat_list[omics], ...)
+    }
+
+    slot(x, "clustering") <- res_clust
+
+    params <- c(list(omics = omics), res_clust$params, list(knn_imp = knn_imp))
+    slot(x, "clustering")[["params"]] <- params
 
     # Clusters imputation ------------------------------------------------------
+
+    # Retrieve list of clusters
+    clusters <- res_clust$clusters
+
+    if (!quiet) {
+        message("Imputing clusters...")
+    }
 
     # Impute clusters assignments to missing cells based on nearest neighbors (if several omics)
     if (length(mat_list) > 1) {
@@ -248,27 +192,559 @@ clusterMuscadet <- function(x, # muscadet object
         slot(x, "clustering")[["clusters"]] <- clusters
     }
 
-    # Find optimal k number of clusters  ---------------------------------------
-    sil <- lapply(k_list, function(k) {
-        cluster::silhouette(as.vector(clusters[[as.character(k)]]), dist)
+    # Find optimal partition ---------------------------------------------------
+
+    if (!quiet) {
+        message("Computing Silhouette scores...")
+    }
+
+    # Retrieve (integrated) distance matrix
+    dist <- stats::as.dist(res_clust$dist)
+
+    # Compute Silhouette
+    partitions_list <- setNames(as.list(names(clusters)), names(clusters))
+    sil <- lapply(partitions_list, function(partition) {
+        cl <- as.vector(clusters[[as.character(partition)]])
+        if (length(unique(cl)) > 1) {
+            cluster::silhouette(as.vector(clusters[[as.character(partition)]]), dist)
+        }
     })
 
-    sil_widths <- lapply(sil, function(x) summary(x)$avg.width)
-    sil_widths_cl <- lapply(sil, function(x) summary(x)$clus.avg.widths)
+    # Extract Silhouette widths
+    sil_widths <- lapply(sil, function(x)
+        if (!is.null(x)) {
+            summary(x)$avg.width
+        })
+    sil_widths_cl <- lapply(sil, function(x)
+        if (!is.null(x)) {
+            summary(x)$clus.avg.widths
+        })
 
+    # Find optimal partition based on Silhouette
     sil_widths_vec <- unlist(sil_widths)
-    k_opt <- names(sil_widths_vec[sil_widths_vec == max(sil_widths_vec)])
+    if (!is.null(sil_widths_vec)) {
+        partition_opt <- names(sil_widths_vec[sil_widths_vec == max(sil_widths_vec)])
+    } else {
+        partition_opt <- NULL
+    }
 
     slot(x, "clustering")[["silhouette"]] <- list(sil.obj = sil,
                                                   sil.w.avg = sil_widths,
                                                   sil.w.avg.clusters = sil_widths_cl)
 
-    slot(x, "clustering")[["k.opt"]] <- k_opt
+    slot(x, "clustering")[["partition.opt"]] <- partition_opt
+
+    if (!quiet) {
+        message("Done.")
+    }
 
     # Return the updated muscadet object
     return(x)
 }
 
+#' Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering
+#'
+#' Performs graph-based clustering of cells using Seurat, based on one or two
+#' log R ratio matrices (`mat_list`), including shared nearest neighbors (SNN)
+#' graph construction on selected dimensions from PCA (`dims_list`), to identify
+#' clusters of cells for each specified resolution (`res_range`).
+#'
+#' - For two omics: multimodal integration is performed using
+#' [Seurat::FindMultiModalNeighbors()] (weighted shared nearest neighbors graph).
+#' Only common cells between omics are used.
+#' - For a single omic: [Seurat::FindNeighbors()] (shared nearest neighbors
+#' graph) is used.
+#'
+#' @param mat_list A named list of log R ratio matrices (cells x features), one
+#'   per omic layer (`list`).
+#' @param res_range A numeric non-negative vector specifying the resolution
+#'   values to use for [Seurat::FindClusters()] (`numeric` vector). Default is
+#'   `c(0.1, 0.2, 0.3, 0.4, 0.5)`.
+#' @param dims_list A list of vectors of PC dimensions to use for each omic
+#'   (`list`). Must match the length of `mat_list` (e.g., list(1:8) for 1 omic ;
+#'   list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
+#'   provided omic.
+#' @param algorithm Integer specifying the algorithm for modularity optimization
+#'   by [Seurat::FindClusters] (`1` = original Louvain algorithm; `2` = Louvain algorithm with multilevel
+#'   refinement; `3` = SLM algorithm; `4` = Leiden algorithm). Leiden requires the
+#'   leidenalg python. Default is `1`.
+#' @param knn_seurat Integer specifying the number of nearest neighbors used for
+#'   graph construction with Seurat functions [Seurat::FindNeighbors()]
+#'   (`k.param`) or [Seurat::FindMultiModalNeighbors()] (`k.nn`) (`integer`).
+#'   Default is `20`.
+#' @param knn_range_seurat Integer specifying the approximate number of nearest
+#'   neighbors to compute for [Seurat::FindMultiModalNeighbors()] (`knn.range`)
+#'   (`integer`). Default is `200`.
+#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
+#'   default: `FALSE`.
+#'
+#' @return A list containing:
+#' - `params`: List of parameters used for clustering (`list`).
+#' - `nn`: Nearest neighbors object (`Neighbor` [SeuratObject::Neighbor-class]).
+#' - `graph`: Shared nearest neighbors graph (`Graph` [SeuratObject::Graph-class]).
+#'
+#' \describe{
+#'   \item{params}{List of parameters used for clustering (`list`).}
+#'   \item{nn}{Nearest neighbors object (`Neighbor` [SeuratObject::Neighbor-class]).}
+#'   \item{graph}{Shared nearest neighbors graph (`Graph` [SeuratObject::Graph-class]).}
+#'   \item{dist}{Distance matrix derived from the graph (`matrix`).}
+#'   \item{umap}{UMAP coordinates (`matrix`).}
+#'   \item{clusters}{A named list of clustering results (vectors of cluster
+#'   labels) for each value in `res_range` (`list`).}
+#' }
+#'
+#'
+#' @seealso
+#' [Weighted Nearest Neighbor Analysis Vignette from Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
+#'
+#' @examples
+#' data("muscadet_obj", package = "muscadet")
+#' mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+#' result <- cluster_seurat(mat_list, res_range = seq(0.2, 0.4, 0.1))
+#'
+#' #' @examples
+#' # Load example muscadet object
+#' data(muscadet_obj)
+#'
+#' # Format input
+#' # transpose matrices to: cells x features matrices
+#' mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+#'
+#' # Run integration & clustering
+#' result <- cluster_seurat(mat_list, res_range = c(0.1, 0.3, 0.5))
+#'
+#' # View results
+#' lapply(result$clusters, table)
+#'
+#' @importFrom SeuratObject CreateAssay5Object as.sparse
+#' @importFrom Seurat CreateSeuratObject FindMultiModalNeighbors FindNeighbors RunUMAP FindClusters
+#' @importFrom stats prcomp
+#' @export
+cluster_seurat <- function(mat_list,
+                           res_range = seq(0.1, 0.5, 0.1),
+                           dims_list = rep(list(1:8), length(mat_list)),
+                           algorithm = 1,
+                           knn_seurat = 20,
+                           knn_range_seurat = 200,
+                           quiet = FALSE
+) {
+    # Arguments validations
+    stopifnot(is.list(mat_list), all(sapply(mat_list, is.matrix)))
+
+    stopifnot(
+        "This method is not applicable for more than 2 omics. `mat_list` can contain either 1 or 2 matrices." = length(mat_list) <= 2
+    )
+
+    if (!is.numeric(res_range) || any(res_range <= 0)) {
+        stop("`res_range` must contain only positive numeric values.")
+    }
+
+    stopifnot("Length of `dims_list` must match the number of omics in `mat_list`." = length(mat_list) == length(dims_list))
+
+    if (!is.numeric(knn_seurat) || knn_seurat < 2 || knn_seurat != as.integer(knn_seurat)) {
+        stop("`knn_seurat` must be an integer >= 2.")
+    }
+    if (!is.numeric(knn_range_seurat) || knn_range_seurat < 2 || knn_range_seurat != as.integer(knn_range_seurat)) {
+        stop("`knn_range_seurat` must be an integer >= 2.")
+    }
+
+    # Initialize output
+    out <- list()
+
+    # Store clustering parameters
+    out[["params"]] <- list(
+        method = "seurat",
+        res_range = res_range,
+        dims_list = dims_list,
+        knn_seurat = knn_seurat,
+        knn_range_seurat = knn_range_seurat
+    )
+
+    # Get common cell barcodes across all omics
+    common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
+
+    # Check that number of neighbors does not exceed number of cells
+    if (knn_seurat >= length(common_cells)) {
+        knn_seurat <- length(common_cells) - 1
+        warning(
+            paste0(
+                "`knn_seurat` exceeds the number of cells (",
+                length(common_cells),
+                ") and is therefore set to ",
+                knn_seurat,
+                "."
+            )
+        )
+    }
+    if (knn_range_seurat >= length(common_cells)) {
+        knn_range_seurat <- length(common_cells) - 1
+        warning(
+            paste0(
+                "`knn_range_seurat` exceeds the number of cells (",
+                length(common_cells),
+                ") and is therefore set to ",
+                knn_range_seurat,
+                "."
+            )
+        )
+    }
+
+    # Filter matrices on common cells
+    mat_list <- lapply(mat_list, function(mat) {
+        mat[common_cells, ]
+    })
+
+    # Create assay objects for each modality, use only common cells
+    assay_list <- lapply(mat_list, function(mat) {
+        SeuratObject::CreateAssay5Object(SeuratObject::as.sparse(t(mat)),
+                                         # rows = features x columns = cells
+                                         min.cells = 0,
+                                         min.features = 0)
+    })
+
+    # Join assays into a Seurat object
+    seurat <- Seurat::CreateSeuratObject(assay_list[[1]], assay = names(assay_list)[1])
+    for (i in seq_along(assay_list)[-1]) {
+        seurat[[names(assay_list[i])]] <- assay_list[[i]]
+    }
+
+    # Perform PCA individually on log ratio (common cells only)
+    if (!quiet) {
+        message("Performing PCA...")
+    }
+    pcs_list <- lapply(mat_list, function(mat) {
+        prcomp(x = mat) # rows = cells x columns = features
+    })
+
+    # Create DimReducObject for Seurat and add to seuratobj
+    pca_list <- lapply(setNames(as.list(names(pcs_list)), names(pcs_list)), function(omic) {
+        SeuratObject::CreateDimReducObject(
+            embeddings = pcs_list[[omic]]$x, # cells × PCs
+            loadings = pcs_list[[omic]]$rotation, # features × PCs
+            stdev = pcs_list[[omic]]$sdev,
+            key = "PC_",
+            assay = omic
+        )
+    })
+
+    # Add reductions to Seurat object
+    for (omic in names(pca_list)) {
+        seurat@reductions[[paste0("PCA_", omic)]] <- pca_list[[omic]]
+    }
+
+    # Find nearest neighbors & run UMAP
+
+    # Case for 2 omics: find multi modal neighbors
+    if (length(seurat@reductions) > 1) {
+        # Generate SNN graph for UMAP and clustering
+        if (!quiet) {
+            message("Finding neighbors and constructing graph...")
+        }
+        suppressWarnings(seurat <- Seurat::FindMultiModalNeighbors(
+            seurat,
+            reduction.list = as.list(names(seurat@reductions)),
+            dims.list = dims_list,
+            k.nn = knn_seurat,
+            knn.range = knn_range_seurat,  # must be lower than the number of cells
+            verbose = FALSE
+        ))
+
+        # Run UMAP on the nearest neighbor graph
+        if (!quiet) {
+            message("Computing UMAP...")
+        }
+        seurat <- Seurat::RunUMAP(
+            seurat,
+            nn.name = "weighted.nn",
+            reduction.name = "nn.umap",
+            reduction.key = "nnUMAP_",
+            verbose = FALSE
+        )
+        # Case for 1 omic: find neighbors
+    } else {
+        # Generate SNN graph for UMAP and clustering
+        if (!quiet) {
+            message("Finding neighbors and constructing graph...")
+        }
+        seurat <- Seurat::FindNeighbors(
+            seurat,
+            reduction = grep("PCA", names(seurat@reductions), value = TRUE),
+            dims = unlist(dims_list),
+            k.param = knn_seurat,
+            compute.SNN = TRUE,
+            graph.name = c("nn", "snn"), # compute graph
+            verbose = FALSE
+        )
+        seurat <- Seurat::FindNeighbors(
+            seurat,
+            reduction = grep("PCA", names(seurat@reductions), value = TRUE),
+            dims = unlist(dims_list),
+            k.param = knn_seurat,
+            return.neighbor = TRUE, # compute neighbors
+            verbose = FALSE
+        )
+
+        # Run UMAP on the nearest neighbor graph
+        if (!quiet) {
+            message("Computing UMAP...")
+        }
+        seurat <- Seurat::RunUMAP(
+            seurat,
+            nn.name = names(seurat@neighbors),
+            reduction.name = "nn.umap",
+            reduction.key = "nnUMAP_",
+            verbose = FALSE
+        )
+    }
+
+    out[["nn"]] <- seurat@neighbors[[names(seurat@neighbors)]]
+
+    # Convert graph into distance
+    graph <- seurat@graphs[[grep("snn", names(seurat@graphs))]]
+    tmp <- as.matrix(graph)
+    diag(tmp) <- 0
+    dist <- max(tmp) - as.matrix(graph)
+
+    out[["graph"]] <- graph
+    out[["dist"]] <- dist
+
+    dim_reduc <- seurat@reductions[[grep("umap", names(seurat@reductions))]]
+    umap <- dim_reduc@cell.embeddings
+    colnames(umap) <- c("UMAP_1", "UMAP_2")
+    out[["umap"]] <- umap
+
+    # Clustering using the graph with different resolution
+    if (!quiet) {
+        message("Finding clusters...")
+    }
+    res_list <- setNames(as.list(res_range), res_range)
+    clusters <- lapply(res_list, function(res) {
+        seurat <- Seurat::FindClusters(
+            seurat,
+            algorithm = algorithm,
+            resolution = res,
+            graph.name = grep("snn", names(seurat@graphs), value = TRUE),
+            verbose = FALSE
+        )
+        cl <- seurat@meta.data$seurat_clusters
+        levels(cl) <- seq(1, length(levels(cl)), by = 1)
+        cl <- setNames(as.integer(cl), Cells(seurat))
+    })
+
+    out[["clusters"]] <- clusters
+
+    return(out)
+}
+
+#' Multi Omics Clustering with SNF integration and Hierarchical Clustering
+#'
+#' Performs the integration of log R ratio matrices (`mat_list`) using
+#' Similarity Network Fusion (SNF) followed by hierarchical clustering, on the
+#' integrated SNF matrix, to identify clusters of cells for each specified k
+#' number of cluster (`k_range`). For more than 1 omic, the integration and
+#' clustering are performed only on common cells between omics.
+#'
+#' @param mat_list A named list of log R ratio matrices (cells x features), one
+#'   per omic layer (`list`).
+#' @param k_range A numeric vector of integers (≥2) specifying the cluster
+#'   numbers (k) to extract from hierarchical clustering (`numeric` vector).
+#'   Default is from 2 to 10.
+#' @param dist_method A string specifying the distance method for
+#'   [Rfast::Dist()] (e.g., `"euclidean"`, `"manhattan"`, `"cosine"`)
+#'   (`character` string). Default is `"euclidean"`.
+#' @param hclust_method A string specifying the hierarchical clustering linkage
+#'   method for [fastcluster::hclust()] (e.g., `"ward.D"`, `"average"`)
+#'   (`character` string). Default is `"ward.D"`.
+#' @param weights A numeric vector of non-negative values of length equal to the
+#'   number of omic (internally normalized to sum to 1) (`numeric` vector). It
+#'   specifies the relatives weights of each omic for SNF with
+#'   [muscadet::weightedSNF()]. Omics with a weight of 0 will not contribute to
+#'   the clustering. If `NULL` (default), weights are uniform.
+#' @param knn_affinity Integer specifying the number of nearest neighbors used
+#'   when building affinity matrices with [SNFtool::affinityMatrix()]
+#'   (`integer`). Default is `40`.
+#' @param var_affinity Numeric value for the variance parameter (Gaussian kernel
+#'   width `sigma`) when building affinity matrix with
+#'   [SNFtool::affinityMatrix()] (`numeric`). Default is `1`.
+#' @param knn_SNF Integer specifying the number of nearest neighbors used during
+#'   the Similarity Network Fusion (SNF) with [muscadet::weightedSNF()]
+#'   (`integer`). Default is `40`.
+#' @param iter_SNF Integer specifying the number of iterations for SNF with
+#'   [muscadet::weightedSNF()] (`integer`). Default is `50`.
+#' @param knn_umap Integer specifying the number of nearest neighbors used for
+#'   manifold approximation (UMAP) (see [uwot::umap()]). Default is `20`.
+#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
+#'   default: `FALSE`.
+#'
+#' @return A list containing:
+#' \describe{
+#'   \item{params}{List of parameters used for clustering (`list`).}
+#'   \item{SNF}{Fused similarity matrix computed with SNF (`matrix`).}
+#'   \item{dist}{Distance matrix derived from the SNF similarity (`matrix`).}
+#'   \item{hclust}{Hierarchical clustering object from [fastcluster::hclust()] (`hclust`).}
+#'   \item{umap}{UMAP coordinates (`matrix`).}
+#'   \item{clusters}{A named list of clustering results (vectors of cluster
+#'   labels) for each value in `k_range` (`list`).}
+#' }
+#'
+#' @details
+#' The function calculates pairwise distances between cells within each omic dataset
+#' using the specified `dist_method` (using only common cells between omics).
+#'
+#' It constructs affinity matrices based on these distances, applies SNF to
+#' generate a fused similarity matrix.
+#'
+#' `weights` can be assigned to each omic dataset to prioritize certain data types
+#' over others, allowing users to tailor the analysis based on the
+#' characteristics and importance of each dataset.
+#'
+#' It then performs a hierarchical clustering using the specified
+#' `hclust_method` to assign clusters to each common cells.
+#'
+#' Results are given as cluster assignments for each number of cluster specified
+#' by `k_range`.
+#'
+#' @seealso
+#' Similarity Network Fusion: [weightedSNF()].
+#'
+#' @examples
+#' # Load example muscadet object
+#' data(muscadet_obj)
+#'
+#' # Format input
+#' # transpose matrices to: cells x features matrices
+#' mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+#'
+#' # Run integration & clustering
+#' result <- cluster_hclust(mat_list, k_range = 2:4)
+#'
+#' # View results
+#' lapply(result$clusters, table)
+#'
+#' @importFrom Rfast Dist
+#' @importFrom SNFtool affinityMatrix
+#' @importFrom fastcluster hclust
+#' @importFrom stats as.dist
+#' @importFrom dendextend cutree
+#' @importFrom utils packageVersion
+#' @importFrom uwot umap
+#'
+#' @export
+cluster_hclust <- function(mat_list,
+                           k_range = seq(2, 10, 1),
+                           dist_method = "euclidean",
+                           hclust_method = "ward.D",
+                           weights = rep(1, length(mat_list)),
+                           knn_affinity = 40,
+                           var_affinity = 1,
+                           knn_SNF = 40,
+                           iter_SNF = 50,
+                           knn_umap = 20,
+                           quiet = FALSE) {
+
+    # Arguments validations
+    stopifnot("`mat_list` must be a list of matrices." = is.list(mat_list) & all(sapply(mat_list, is.matrix)))
+    stopifnot("Length of `weights` must match the number of omics in `mat_list`." = length(weights) == length(mat_list))
+    if (!is.numeric(k_range) || any(k_range < 1) || any(k_range != as.integer(k_range))) {
+        stop("`k_range` must be a numeric vector of integers greater than or equal to 2.")
+    }
+
+    # Initialize output
+    out <- list()
+
+    # Store clustering parameters
+    out[["params"]] <- list(
+        method = "hclust",
+        k_range = k_range,
+        dist_method = dist_method,
+        hclust_method = hclust_method,
+        weights = weights,
+        knn_affinity = knn_affinity,
+        var_affinity = var_affinity,
+        knn_SNF = knn_SNF,
+        iter_SNF = iter_SNF
+    )
+
+    # Get common cell barcodes across all omics
+    common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
+
+    # Compute pairwise distances for each omic
+    if (!quiet) {
+        message("Computing distance matrices...")
+    }
+    dist_list <- lapply(mat_list, function(mat) {
+        mat <- mat[common_cells, ]
+        dist <- Rfast::Dist(mat, method = dist_method)
+        # for version <=2.1, Rfast returns a similarity matrix for cosine with 0
+        # values in diagonal. The result should be converted into distance.
+        # See https://github.com/RfastOfficial/Rfast/issues/119 for more info
+        if (dist_method == "cosine" &
+            utils::packageVersion("Rfast") <= "2.1.0") {
+            diag(dist) <- 1
+            dist <- 1 - dist
+        }
+        dimnames(dist) <- list(rownames(mat), rownames(mat))
+        return(dist)
+    })
+
+    # Compute affinity matrices for each omic
+    if (!quiet) {
+        message("Computing affinity matrices...")
+    }
+    aff_list <- lapply(dist_list, function(dist) {
+        aff <- SNFtool::affinityMatrix(dist, K = knn_affinity, sigma = var_affinity)
+        aff <- aff[sort(rownames(aff)), sort(colnames(aff))]
+        return(aff)
+    })
+
+    # Perform Similarity Network Fusion (SNF)
+    if (!quiet) {
+        message("Performing SNF integration...")
+    }
+    matSNF <- weightedSNF(aff_list,
+                          K = knn_SNF,
+                          t = iter_SNF,
+                          weights = weights)
+    out[["SNF"]] <- matSNF
+
+    # Convert the fused affinity matrix to a distance matrix
+    tmp <- matSNF
+    diag(tmp) <- 0
+    dist <- max(tmp) - matSNF
+    out[["dist"]] <- dist
+
+    # Compute UMAP
+    if (!quiet) {
+        message("Computing UMAP...")
+    }
+
+    umap <- uwot::umap(
+        X = matSNF,
+        n_neighbors = knn_umap,
+        metric = dist_method,
+        verbose = FALSE
+    )
+    rownames(umap) <- rownames(matSNF)
+    colnames(umap) <- c("UMAP_1", "UMAP_2")
+    out[["umap"]] <- umap
+
+    # Perform hierarchical clustering
+    if (!quiet) {
+        message("Performing hierarchical clustering...")
+    }
+    hc <- fastcluster::hclust(stats::as.dist(dist), hclust_method)
+    out[["hclust"]] <- hc
+
+    # Cut the dendrogram to generate clusters for the specified k range
+    k_list <- setNames(as.list(k_range), k_range)
+    clusters <- lapply(k_list, function(k) {
+        dendextend::cutree(hc, k, order_clusters_as_data = FALSE)
+    })
+
+    out[["clusters"]] <- clusters
+
+    return(out)
+}
 
 
 #' Weighted Similarity Network Fusion

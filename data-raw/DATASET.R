@@ -299,13 +299,15 @@ muscadet <- computeLogRatio(
 # clustering
 muscadet <- clusterMuscadet(
     muscadet,
-    dist_method = "euclidean",
-    hclust_method = "ward.D",
-    k_range = 2:5
+    method = "seurat",
+    res_range = c(0.6, 0.8, 1),
+    dims_list = list(1:10, 1:10),
+    knn_seurat = 10,
+    knn_range_seurat = 30
 )
 
-# assign clusters for k=3
-muscadet <- assignClusters(muscadet, k = 3)
+# assign clusters for partition res=0.6
+muscadet <- assignClusters(muscadet, partition = 0.6)
 
 # merge counts
 muscadet <- mergeCounts(muscadet, muscadet_ref)

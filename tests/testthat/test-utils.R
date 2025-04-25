@@ -6,13 +6,13 @@ test_that("assignClusters() returns an updated muscadet object", {
     # remove cna calling result
     muscadet_obj@cnacalling <- list()
 
-    # Select clustering result for k = 4
-    obj1 <- assignClusters(muscadet_obj, k = 4)
+    # Select clustering result for partition 0.6
+    obj1 <- assignClusters(muscadet_obj, partition = 0.6)
 
     expect_true(length(obj1@cnacalling) != 0)
-    expect_identical(length(table(obj1@cnacalling$clusters)), as.integer(4)) # k=4
+    expect_identical(length(table(obj1@cnacalling$clusters)), as.integer(2)) # 2 clusters
 
-    # Assign custom clusters (k=2)
+    # Assign custom clusters
     cell_names <- Reduce(union, SeuratObject::Cells(muscadet_obj))
     n1 <- sample(1:length(cell_names), 1)
     n2 <- length(cell_names) - n1
@@ -22,22 +22,22 @@ test_that("assignClusters() returns an updated muscadet object", {
     obj2 <- assignClusters(muscadet_obj, clusters = custom_clusters)
 
     expect_true(length(obj2@cnacalling) != 0)
-    expect_identical(length(table(obj2@cnacalling$clusters)), as.integer(2)) # k=2
+    expect_identical(length(table(obj2@cnacalling$clusters)), as.integer(2)) # 2 clusters
 
     # Assign clusters with remapping
-    # example to remap from k=4 to k=3 by merging clusters 1 and 2
-    clusters <- muscadet_obj$clustering$clusters[["4"]]
-    mapping <- c("1" = 1, "2" = 1, "3" = 2, "4" = 3)
+    # example to remap from 5 clusters to 4 by merging clusters 1 and 2
+    clusters <- muscadet_obj$clustering$clusters[["1"]] # res = 1
+    mapping <- c("1" = 1, "2" = 1, "3" = 2, "4" = 3, "5" = 4)
 
     obj3 <- assignClusters(muscadet_obj, clusters = clusters, mapping = mapping)
 
     expect_true(length(obj3@cnacalling) != 0)
-    expect_identical(length(table(obj3@cnacalling$clusters)), as.integer(3)) # k=3
+    expect_identical(length(table(obj3@cnacalling$clusters)), as.integer(4)) # 4 clusters
 
-    obj4 <- assignClusters(muscadet_obj, k=4, mapping = mapping)
+    obj4 <- assignClusters(muscadet_obj, partition = 1, mapping = mapping)
 
     expect_true(length(obj4@cnacalling) != 0)
-    expect_identical(length(table(obj4@cnacalling$clusters)), as.integer(3))  # k=3
+    expect_identical(length(table(obj4@cnacalling$clusters)), as.integer(4)) # 4 clusters
 })
 
 
@@ -143,9 +143,9 @@ test_that("mergeCounts() returns an updated muscadet object with data frames in 
     data(muscadet_obj)
     data(muscadet_obj_ref)
 
-    # remove cna calling result but
+    # remove cna calling result
     muscadet_obj@cnacalling <- list()
-    muscadet_obj <- assignClusters(muscadet_obj, k = 3)
+    muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
 
     # Merge counts from all omics from both sample and reference
     obj <- mergeCounts(muscadet_obj, muscadet_obj_ref)
