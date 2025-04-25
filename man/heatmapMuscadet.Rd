@@ -9,9 +9,9 @@ heatmapMuscadet(
   filename = NULL,
   partition = NULL,
   clusters = NULL,
-  title = "",
-  add_bulk_lrr = NULL,
+  add_bulk_lrr = TRUE,
   show_missing = TRUE,
+  title = "",
   row_annots = NULL,
   white_scale = c(0.3, 0.7),
   colors = NULL,
@@ -30,7 +30,7 @@ the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
 
 \item{partition}{(Optional) Value specifying the clustering partition to
 plot (\code{numeric} or \code{character}). It should be either the resolution or the
-k number of cluster (k) used for clustering depending on the clustering
+number of cluster (k) used for clustering depending on the clustering
 method (\code{res_range} or \code{k_range} with \code{\link[=clusterMuscadet]{clusterMuscadet()}}).
 Should be provided if \code{clusters} is \code{NULL}.}
 
@@ -41,17 +41,14 @@ muscadet object \code{x}. If it contains less cells than the muscadet object
 If \code{show_missing = FALSE} only the provided cells with data in all omics
 will be displayed. Should be provided if \code{partition} is \code{NULL}.}
 
+\item{add_bulk_lrr}{Logical. If \code{TRUE} (default), adds bulk log R ratio (LRR) data as
+annotation if available in the muscadet object.}
+
+\item{show_missing}{Logical. If \code{TRUE} (default), missing cells (i.e., cells
+with missing data in at least one omic) are displayed in the heatmaps.}
+
 \item{title}{Character string for the title of the heatmap (\code{character}
 string). Default is an empty character string.}
-
-\item{add_bulk_lrr}{Logical value indicating whether to add bulk LRR data as
-annotations if present in the muscadet object (\code{logical}). By default, it
-is set to \code{NULL}, which will automatically include bulk LRR data if it is
-available in the muscadet object.}
-
-\item{show_missing}{Logical value indicating whether to show missing cells
-(cells with missing data in at least one omic) in the heatmaps (\code{logical}).
-Default is \code{TRUE}.}
 
 \item{row_annots}{Optional. A list of \linkS4class{HeatmapAnnotation} objects from
 the \link{ComplexHeatmap-package} package, specifying row annotations to add on
@@ -80,13 +77,13 @@ loss of coverage, and are represented as white on the heatmap. Default is
 }}
 
 \item{colors}{Vector of colors for the cluster annotation (\code{character}
-vector). Default is \code{NULL}, which uses predefined colors.}
+vector). If \code{NULL} (default), it uses predefined colors.}
 
 \item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
 with the .png extension (\code{numeric}). Default is \code{300}.}
 
-\item{quiet}{Logical value indicating whether to suppress messages. Default
-is \code{FALSE}.}
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 }
 \value{
 A list containing:

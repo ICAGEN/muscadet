@@ -41,8 +41,8 @@ Default is \code{20}.}
 neighbors to compute for \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{knn.range})
 (\code{integer}). Default is \code{200}.}
 
-\item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
-default: \code{FALSE}.}
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 }
 \value{
 A list containing:

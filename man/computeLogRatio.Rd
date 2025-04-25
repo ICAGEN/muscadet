@@ -29,9 +29,10 @@ Supported methods are "ATAC" and "RNA":
 \itemize{
 \item "ATAC" method calls for \code{\link[=computeLogRatioATAC]{computeLogRatioATAC()}} function
 \item "RNA" method calls for \code{\link[=computeLogRatioRNA]{computeLogRatioRNA()}} function
+}
+
 If \code{NULL} and if the omic type is either "ATAC" or "RNA", the corresponding
-method will be applied.
-}}
+method will be applied.}
 
 \item{new.label.features}{New label for features (\code{character} string). If
 \code{NULL}, the label remains unchanged when using the "RNA" method and becomes
@@ -41,8 +42,8 @@ method will be applied.
 matrices. \code{TRUE} by default to reduce object size. Setting it to \code{FALSE}
 will keep raw count matrices within the object.}
 
-\item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
-default: \code{FALSE}.}
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 
 \item{all_steps}{Logical value to indicate whether matrices at each step of
 the log ratio computation are kept and returned (\code{logical}). IMPORTANT: if

@@ -31,7 +31,8 @@ cnaCalling(
   min.nhet = 5,
   clonal.thresh = 0.9,
   dist.breakpoints = 1e+06,
-  ploidy = "auto"
+  ploidy = "auto",
+  quiet = FALSE
 )
 }
 \arguments{
@@ -91,6 +92,9 @@ distinct segments (default: 1e6).}
 
 \item{ploidy}{Specifies ploidy assumption: \code{"auto"}, \code{"median"}, or numeric
 value (default: \code{"auto"}).}
+
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 }
 \value{
 A modified \code{\link{muscadet}} object with added CNA analysis results in

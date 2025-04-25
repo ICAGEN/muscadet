@@ -42,6 +42,8 @@
 #'   distinct segments (default: 1e6).
 #' @param ploidy Specifies ploidy assumption: `"auto"`, `"median"`, or numeric
 #'   value (default: `"auto"`).
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #' @return
 #' A modified \code{\link{muscadet}} object with added CNA analysis results in
@@ -171,11 +173,12 @@ cnaCalling <- function(
         min.nhet = 5,
         clonal.thresh = 0.9,
         dist.breakpoints = 1e6,
-        ploidy = "auto"
+        ploidy = "auto",
+        quiet = FALSE
 ) {
 
     # Argument validation
-    stopifnot("Input object 'x' must be of class 'muscadet'." = inherits(x, "muscadet"))
+    stopifnot("Input object `x` must be of class 'muscadet'." = inherits(x, "muscadet"))
     stopifnot(
         is.numeric(depthmin.a.clusters),
         is.numeric(depthmin.c.clusters),
@@ -192,7 +195,7 @@ cnaCalling <- function(
         is.numeric(dist.breakpoints)
     )
     stopifnot(
-        "The 'ploidy' argument must be either numeric or 'median' or 'auto'." =
+        "The `ploidy` argument must be either numeric or 'median' or 'auto'." =
             is.character(ploidy) && ploidy %in% c("auto", "median") || is.numeric(ploidy)
     )
 
@@ -203,19 +206,26 @@ cnaCalling <- function(
     emcncf <- utils::getFromNamespace("emcncf", "facets")
     procSnps <- utils::getFromNamespace("procSnps", "facets")
 
+    requireNamespace("pctGCdata", quietly = TRUE)
+
     # Extract and validate required slots
     gbuild <- x$genome
     rcmat <- x@cnacalling$combined.counts
     clusters <- x@cnacalling$clusters
 
     if (is.null(rcmat) || is.null(clusters)) {
-        stop("The input muscadet object must contain valid 'combined.counts' and 'clusters'.")
+        stop("The input muscadet object `x` must contain valid 'x@cnacalling$clusters' and 'x@cnacalling$combined.counts'.")
     }
 
     # Filter coverage data based on selected omics
     if(!is.null(omics.coverage)) {
+
+        if (!quiet) {
+            message("Selecting coverage data from omic(s): ", omics.coverage)
+        }
+
         stopifnot(
-            "The omics.coverage argument must match one or more omic name (unique(x@cnacalling$combined.counts$omic))" =
+            "The `omics.coverage` argument must match one or more omic name (unique(x@cnacalling$combined.counts$omic))" =
                 omics.coverage %in% unique(rcmat$omic)
         )
         rcmat <- rcmat[sort(c(
@@ -237,6 +247,10 @@ cnaCalling <- function(
 
     # FILTER POSITIONS ---------------------------------------------------------
 
+    if (!quiet) {
+        message("Filtering positions per clusters based on provided filters...")
+    }
+
     # Filter positions based on counts per clusters
     rcmat_filtered <- subset(
         rcmat,
@@ -251,6 +265,10 @@ cnaCalling <- function(
 
 
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
+
+    if (!quiet) {
+        message("Performing segmentation per cluster...")
+    }
 
     oo_list <- list()
     for(i in as.integer(sort(unique(rcmat_filtered$cluster)))){
@@ -317,11 +335,23 @@ cnaCalling <- function(
 
     # FIND DIPLOID Log ratio ---------------------------------------------------
 
+    if (!quiet) {
+        message("Finding diploid log R ratio on clusters...")
+    }
+
     oo_full <- findDiploidLogR(outclust_full, jseg_full$cnlr)
     dipLogR <- oo_full$dipLogR
 
+    if (!quiet) {
+        message("Diploid log R ratio = ", dipLogR)
+    }
+
 
     # COMPUTE CF, TCN, LCN -----------------------------------------------------
+
+    if (!quiet) {
+        message("Computing cell fractions and copy numbers on clusters...")
+    }
 
     # Compute CF Cell fraction and CN Copy Number (L for lower, T for total)
     outclust_full <- fitcncf(outclust_full, dipLogR, nX)
@@ -385,6 +415,10 @@ cnaCalling <- function(
 
     # FILTER POSITIONS ---------------------------------------------------------
 
+    if (!quiet) {
+        message("Filtering positions on all cells based on provided filters...")
+    }
+
     # Filter positions based on counts for all cells
     rcmat_allcells_filtered <- subset(
         rcmat_allcells,
@@ -400,6 +434,10 @@ cnaCalling <- function(
 
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
 
+    if (!quiet) {
+        message("Performing segmentation on all cells...")
+    }
+
     xx_allcells <- preProcSample2(
         rcmat_allcells_filtered,
         cval = cval1,
@@ -412,8 +450,11 @@ cnaCalling <- function(
                                       min.nhet = min.nhet,
                                       dipLogR = NULL)
 
-
     # COMPUTE CF, TCN, LCN -----------------------------------------------------
+
+    if (!quiet) {
+        message("Computing cell fractions and copy numbers on all cells...")
+    }
 
     # Compute CF Cell fraction and CN Copy Number with EM algorithm
     fit_allcells <- emcncf(oo_allcells, min.nhet=min.nhet)
@@ -488,6 +529,10 @@ cnaCalling <- function(
 
 
     # 3. GET CONSENSUS SEGMENTS ------------------------------------------------
+
+    if (!quiet) {
+        message("Finding consensus segments between clusters...")
+    }
 
     consensus_segs <- getSegConsensus(out_full,
                                       ncells = ncells,

@@ -19,7 +19,7 @@
 #'
 #' @param partition (Optional) Value specifying the clustering partition to
 #'   plot (`numeric` or `character`). It should be either the resolution or the
-#'   k number of cluster (k) used for clustering depending on the clustering
+#'   number of cluster (k) used for clustering depending on the clustering
 #'   method (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
 #'   Should be provided if `clusters` is `NULL`.
 #'
@@ -30,17 +30,23 @@
 #'   If `show_missing = FALSE` only the provided cells with data in all omics
 #'   will be displayed. Should be provided if `partition` is `NULL`.
 #'
+#' @param add_bulk_lrr Logical. If `TRUE` (default), adds bulk log R ratio (LRR) data as
+#'   annotation if available in the muscadet object.
+#'
+#' @param show_missing Logical. If `TRUE` (default), missing cells (i.e., cells
+#'   with missing data in at least one omic) are displayed in the heatmaps.
+#'
 #' @param title Character string for the title of the heatmap (`character`
 #'   string). Default is an empty character string.
 #'
-#' @param add_bulk_lrr Logical value indicating whether to add bulk LRR data as
-#'   annotations if present in the muscadet object (`logical`). By default, it
-#'   is set to `NULL`, which will automatically include bulk LRR data if it is
-#'   available in the muscadet object.
-#'
-#' @param show_missing Logical value indicating whether to show missing cells
-#'   (cells with missing data in at least one omic) in the heatmaps (`logical`).
-#'   Default is `TRUE`.
+#' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
+#'   the [ComplexHeatmap-package] package, specifying row annotations to add on
+#'   left part of the heatmap. Each element in the list must be of class
+#'   (HeatmapAnnotation)[HeatmapAnnotation-class], must be a row annotation
+#'   (using `[rowAnnotation()]` or `[HeatmapAnnotation()]` with `which =
+#'   'row'`), and must have a unique name (`name` argument in
+#'   `[rowAnnotation()]` or `[HeatmapAnnotation()]`). By default is `NULL`, no
+#'   row annotations is added.
 #'
 #' @param white_scale Numeric vector of length 2 or a list of numeric vectors
 #'   (`numeric` vector or `list`).
@@ -59,23 +65,14 @@
 #'   loss of coverage, and are represented as white on the heatmap. Default is
 #'   `c(0.3, 0.7)`.
 #'
-#' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
-#'   the [ComplexHeatmap-package] package, specifying row annotations to add on
-#'   left part of the heatmap. Each element in the list must be of class
-#'   (HeatmapAnnotation)[HeatmapAnnotation-class], must be a row annotation
-#'   (using `[rowAnnotation()]` or `[HeatmapAnnotation()]` with `which =
-#'   'row'`), and must have a unique name (`name` argument in
-#'   `[rowAnnotation()]` or `[HeatmapAnnotation()]`). By default is `NULL`, no
-#'   row annotations is added.
-#'
 #' @param colors Vector of colors for the cluster annotation (`character`
-#'   vector). Default is `NULL`, which uses predefined colors.
+#'   vector). If `NULL` (default), it uses predefined colors.
 #'
 #' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
 #'   with the .png extension (`numeric`). Default is `300`.
 #'
-#' @param quiet Logical value indicating whether to suppress messages. Default
-#'   is `FALSE`.
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #' @return A list containing:
 #' - `plot`: A \code{\link{gTree}} object created with [grid::grid.grab()] (\code{\link{gTree}}).
@@ -206,9 +203,9 @@ heatmapMuscadet <- function(x,
                             filename = NULL,
                             partition = NULL,
                             clusters = NULL,
-                            title = "",
-                            add_bulk_lrr = NULL,
+                            add_bulk_lrr = TRUE,
                             show_missing = TRUE,
+                            title = "",
                             row_annots = NULL,
                             white_scale = c(0.3, 0.7),
                             colors = NULL,
@@ -238,7 +235,7 @@ heatmapMuscadet <- function(x,
     }
 
     # Default addition of bulk data
-    if (is.null(add_bulk_lrr)) {
+    if (add_bulk_lrr) {
         add_bulk_lrr <- !is.null(x@bulk.data$log.ratio)
     }
 

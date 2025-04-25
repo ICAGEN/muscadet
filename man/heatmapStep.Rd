@@ -112,7 +112,7 @@ heatmapStep(obj = obj_atac_all,
             title = "Example data - Step 01")
 
 # Plot heatmap and distribution of values for all steps
-for (step in names(obj_atac_all)[grep("step", names(obj_atac_all))]) {
+for (step in grep("step", names(obj_atac_all), value = TRUE)) {
     heatmapStep(
         obj_atac_all,
         step,

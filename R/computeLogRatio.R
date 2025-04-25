@@ -13,8 +13,9 @@
 #' @param omic Name of the omic to apply this function (`character` string).
 #' @param method Method to apply to the selected omic (`character` string).
 #'   Supported methods are "ATAC" and "RNA":
-#'   * "ATAC" method calls for [computeLogRatioATAC()] function
-#'   * "RNA" method calls for [computeLogRatioRNA()] function
+#'   - "ATAC" method calls for [computeLogRatioATAC()] function
+#'   - "RNA" method calls for [computeLogRatioRNA()] function
+#'
 #'   If `NULL` and if the omic type is either "ATAC" or "RNA", the corresponding
 #'   method will be applied.
 #' @param new.label.features New label for features (`character` string). If
@@ -28,9 +29,8 @@
 #'   `TRUE`, the function does not return an updated `muscadet` object but a
 #'   list with matrices at each step of the log ratio computation (see Value
 #'   section). Default is `FALSE`.
-#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
-#'   default: `FALSE`.
-#'
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #' @inheritDotParams computeLogRatioATAC windowSize slidingSize minReads minPeaks
 #' @inheritDotParams computeLogRatioRNA genesPerWindow refReads refMeanReads thresh_capping
@@ -291,8 +291,8 @@ computeLogRatio <- function(x,
 #'   (`numeric` value). By default: `3`.
 #' @param all_steps `TRUE` or `FALSE` (`logical`). Whether to keep intermediate
 #'   result from every step in the final object. By default: `FALSE`.
-#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
-#'   default: `FALSE`.
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #'
 #' @return

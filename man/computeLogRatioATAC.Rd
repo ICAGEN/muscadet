@@ -50,8 +50,8 @@ default: \code{100}.}
 \item{all_steps}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to keep intermediate
 result from every step in the final object. By default: \code{FALSE}.}
 
-\item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
-default: \code{FALSE}.}
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 }
 \value{
 If \code{all_steps} is set to \code{FALSE}, a list containing:

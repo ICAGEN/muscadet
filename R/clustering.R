@@ -29,8 +29,8 @@
 #' @param knn_imp Number of k nearest neighbors to use for imputing cluster
 #'   assignments of cells missing in one or more omics. Only relevant for more
 #'   than one omic.
-#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
-#'   default: `FALSE`.
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #' @inheritDotParams cluster_seurat res_range dims_list algorithm knn_seurat knn_range_seurat
 #' @inheritDotParams cluster_hclust k_range dist_method hclust_method weights
@@ -275,8 +275,8 @@ clusterMuscadet <- function(x,
 #' @param knn_range_seurat Integer specifying the approximate number of nearest
 #'   neighbors to compute for [Seurat::FindMultiModalNeighbors()] (`knn.range`)
 #'   (`integer`). Default is `200`.
-#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
-#'   default: `FALSE`.
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #' @return A list containing:
 #' - `params`: List of parameters used for clustering (`list`).
@@ -573,8 +573,8 @@ cluster_seurat <- function(mat_list,
 #'   [muscadet::weightedSNF()] (`integer`). Default is `50`.
 #' @param knn_umap Integer specifying the number of nearest neighbors used for
 #'   manifold approximation (UMAP) (see [uwot::umap()]). Default is `20`.
-#' @param quiet `TRUE` or `FALSE` (`logical`). Whether to turn off messages. By
-#'   default: `FALSE`.
+#' @param quiet Logical. If `TRUE`, suppresses informative messages during
+#'   execution. Default is `FALSE`.
 #'
 #' @return A list containing:
 #' \describe{

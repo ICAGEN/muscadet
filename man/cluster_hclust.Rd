@@ -58,8 +58,8 @@ the Similarity Network Fusion (SNF) with \code{\link[=weightedSNF]{weightedSNF()
 \item{knn_umap}{Integer specifying the number of nearest neighbors used for
 manifold approximation (UMAP) (see \code{\link[uwot:umap]{uwot::umap()}}). Default is \code{20}.}
 
-\item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
-default: \code{FALSE}.}
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 }
 \value{
 A list containing:

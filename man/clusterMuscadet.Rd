@@ -31,8 +31,8 @@ If \code{NULL} (default), all available omics are used.}
 assignments of cells missing in one or more omics. Only relevant for more
 than one omic.}
 
-\item{quiet}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to turn off messages. By
-default: \code{FALSE}.}
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 
 \item{...}{
   Arguments passed on to \code{\link[=cluster_seurat]{cluster_seurat}}, \code{\link[=cluster_hclust]{cluster_hclust}}
