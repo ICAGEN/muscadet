@@ -45,11 +45,11 @@ values to use for \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\co
 list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 provided omic.}
     \item{\code{algorithm}}{Integer specifying the algorithm for modularity optimization
-by \link[Seurat:FindClusters]{Seurat::FindClusters} (\code{1} = original Louvain algorithm; \code{2} = Louvain algorithm with multilevel
-refinement; \code{3} = SLM algorithm; \code{4} = Leiden algorithm). Leiden requires the
-leidenalg python. Default is \code{1}.}
+by \link[Seurat:FindClusters]{Seurat::FindClusters} (\code{1} = original Louvain algorithm; \code{2} = Louvain
+algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leiden
+algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
-graph construction with Seurat functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+graph construction with \link{Seurat-package} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
 Default is \code{20}.}
     \item{\code{knn_range_seurat}}{Integer specifying the approximate number of nearest
@@ -75,21 +75,13 @@ the clustering. If \code{NULL} (default), weights are uniform.}
 The input \code{\link{muscadet}} object with its \code{clustering} slot updated. This slot contains:
 \describe{
 \item{params}{List of parameters used for clustering (\code{list}).}
-\item{...}{Output objects depending on the method.}
-\item{clusters}{A list of cluster assignments (imputed if needed) for each value in \code{k_range} or \code{res_range}.}
-\item{partition.opt}{Name of the optimal partition based on maximum average silhouette width.}
-\item{silhouette}{A list of silhouette objects and summary statistics.}
-}
-\itemize{
-\item \code{params}: List of parameters used for clustering (\code{list}).
-\item \code{...}: Output objects depending on the method (e.g. graph object for
-\code{"seurat"}; hclust object for \code{"hclust"})
-\item \code{clusters}: A named list of cluster partitions (named vectors of cluster
+\item{...}{Output objects depending on the method. See \code{\link[=cluster_seurat]{cluster_seurat()}} or \code{\link[=cluster_hclust]{cluster_hclust()}}.}
+\item{clusters}{A named list of cluster partitions (named vectors of cluster
 labels) for all cells (imputed clusters assignments for non-common cells),
-for each value in \code{k_range} or \code{res_range} (\code{list}).
-\item \code{silhouette}: A list of silhouette objects and widths for each cluster partition.
-\item \code{partition.opt}: Name of the optimal cluster partition based on maximum average
-silhouette width.
+for each value in \code{k_range} or \code{res_range} (\code{list}).}
+\item{silhouette}{A list of silhouette objects and widths for each cluster partition (\code{list}).}
+\item{partition.opt}{Name of the optimal cluster partition based on maximum
+average silhouette width.}
 }
 }
 \description{
@@ -145,7 +137,7 @@ lapply(clusters, table)
 Methodology and functionality:
 \itemize{
 \item \linkS4class{muscadet}
-\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using Seurat.
+\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using \link{Seurat-package}.
 \item \code{\link[=cluster_hclust]{cluster_hclust()}} for hierarchical clustering of SNF-fused distances.
 \item \code{\link[=weightedSNF]{weightedSNF()}} for weighted Similarity Network Fusion (SNF).
 \item \code{\link[=imputeClusters]{imputeClusters()}} for imputing cluster labels across omics.

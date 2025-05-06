@@ -11,6 +11,7 @@ cluster_seurat(
   algorithm = 1,
   knn_seurat = 20,
   knn_range_seurat = 200,
+  max_dim = 200,
   quiet = FALSE
 )
 }
@@ -28,12 +29,12 @@ list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 provided omic.}
 
 \item{algorithm}{Integer specifying the algorithm for modularity optimization
-by \link[Seurat:FindClusters]{Seurat::FindClusters} (\code{1} = original Louvain algorithm; \code{2} = Louvain algorithm with multilevel
-refinement; \code{3} = SLM algorithm; \code{4} = Leiden algorithm). Leiden requires the
-leidenalg python. Default is \code{1}.}
+by \link[Seurat:FindClusters]{Seurat::FindClusters} (\code{1} = original Louvain algorithm; \code{2} = Louvain
+algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leiden
+algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
 
 \item{knn_seurat}{Integer specifying the number of nearest neighbors used for
-graph construction with Seurat functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+graph construction with \link{Seurat-package} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
 Default is \code{20}.}
 
@@ -41,19 +42,18 @@ Default is \code{20}.}
 neighbors to compute for \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{knn.range})
 (\code{integer}). Default is \code{200}.}
 
+\item{max_dim}{Integer specifying the maximum number of principal components
+to be used for PCA computation with \code{\link[stats:prcomp]{stats::prcomp()}} (\code{integer}). Default
+is \code{200}.}
+
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
 }
 \value{
 A list containing:
-\itemize{
-\item \code{params}: List of parameters used for clustering (\code{list}).
-\item \code{nn}: Nearest neighbors object (\code{Neighbor} \link[SeuratObject:Neighbor-class]{SeuratObject::Neighbor}).
-\item \code{graph}: Shared nearest neighbors graph (\code{Graph} \link[SeuratObject:Graph-class]{SeuratObject::Graph}).
-}
-
 \describe{
 \item{params}{List of parameters used for clustering (\code{list}).}
+\item{pcs}{List of principal components summaries for each omic (\code{list} of \code{summary.prcomp} \link[stats:prcomp]{stats::prcomp}).}
 \item{nn}{Nearest neighbors object (\code{Neighbor} \link[SeuratObject:Neighbor-class]{SeuratObject::Neighbor}).}
 \item{graph}{Shared nearest neighbors graph (\code{Graph} \link[SeuratObject:Graph-class]{SeuratObject::Graph}).}
 \item{dist}{Distance matrix derived from the graph (\code{matrix}).}
@@ -63,7 +63,7 @@ labels) for each value in \code{res_range} (\code{list}).}
 }
 }
 \description{
-Performs graph-based clustering of cells using Seurat, based on one or two
+Performs graph-based clustering of cells using \link{Seurat-package}, based on one or two
 log R ratio matrices (\code{mat_list}), including shared nearest neighbors (SNN)
 graph construction on selected dimensions from PCA (\code{dims_list}), to identify
 clusters of cells for each specified resolution (\code{res_range}).

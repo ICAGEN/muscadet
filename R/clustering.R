@@ -39,26 +39,20 @@
 #' @return The input [`muscadet`] object with its `clustering` slot updated. This slot contains:
 #' \describe{
 #'   \item{params}{List of parameters used for clustering (`list`).}
-#'   \item{...}{Output objects depending on the method.}
-#'   \item{clusters}{A list of cluster assignments (imputed if needed) for each value in `k_range` or `res_range`.}
-#'   \item{partition.opt}{Name of the optimal partition based on maximum average silhouette width.}
-#'   \item{silhouette}{A list of silhouette objects and summary statistics.}
-#' }
-#' - `params`: List of parameters used for clustering (`list`).
-#' - `...`: Output objects depending on the method (e.g. graph object for
-#'   `"seurat"`; hclust object for `"hclust"`)
-#' - `clusters`: A named list of cluster partitions (named vectors of cluster
+#'   \item{...}{Output objects depending on the method. See [cluster_seurat()] or [cluster_hclust()].}
+#'   \item{clusters}{A named list of cluster partitions (named vectors of cluster
 #'   labels) for all cells (imputed clusters assignments for non-common cells),
-#'   for each value in `k_range` or `res_range` (`list`).
-#' - `silhouette`: A list of silhouette objects and widths for each cluster partition.
-#' - `partition.opt`: Name of the optimal cluster partition based on maximum average
-#'    silhouette width.
+#'   for each value in `k_range` or `res_range` (`list`).}
+#'   \item{silhouette}{A list of silhouette objects and widths for each cluster partition (`list`).}
+#'   \item{partition.opt}{Name of the optimal cluster partition based on maximum
+#'   average silhouette width.}
+#' }
 #'
 #' @seealso
 #' Methodology and functionality:
 #'
 #' - [muscadet-class]
-#' - [cluster_seurat()] for graph-based clustering using Seurat.
+#' - [cluster_seurat()] for graph-based clustering using [Seurat-package].
 #' - [cluster_hclust()] for hierarchical clustering of SNF-fused distances.
 #' - [weightedSNF()] for weighted Similarity Network Fusion (SNF).
 #' - [imputeClusters()] for imputing cluster labels across omics.
@@ -244,7 +238,7 @@ clusterMuscadet <- function(x,
 
 #' Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering
 #'
-#' Performs graph-based clustering of cells using Seurat, based on one or two
+#' Performs graph-based clustering of cells using [Seurat-package], based on one or two
 #' log R ratio matrices (`mat_list`), including shared nearest neighbors (SNN)
 #' graph construction on selected dimensions from PCA (`dims_list`), to identify
 #' clusters of cells for each specified resolution (`res_range`).
@@ -265,26 +259,26 @@ clusterMuscadet <- function(x,
 #'   list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 #'   provided omic.
 #' @param algorithm Integer specifying the algorithm for modularity optimization
-#'   by [Seurat::FindClusters] (`1` = original Louvain algorithm; `2` = Louvain algorithm with multilevel
-#'   refinement; `3` = SLM algorithm; `4` = Leiden algorithm). Leiden requires the
-#'   leidenalg python. Default is `1`.
+#'   by [Seurat::FindClusters] (`1` = original Louvain algorithm; `2` = Louvain
+#'   algorithm with multilevel refinement; `3` = SLM algorithm; `4` = Leiden
+#'   algorithm). Leiden requires the leidenalg python. Default is `1`.
 #' @param knn_seurat Integer specifying the number of nearest neighbors used for
-#'   graph construction with Seurat functions [Seurat::FindNeighbors()]
+#'   graph construction with [Seurat-package] functions [Seurat::FindNeighbors()]
 #'   (`k.param`) or [Seurat::FindMultiModalNeighbors()] (`k.nn`) (`integer`).
 #'   Default is `20`.
 #' @param knn_range_seurat Integer specifying the approximate number of nearest
 #'   neighbors to compute for [Seurat::FindMultiModalNeighbors()] (`knn.range`)
 #'   (`integer`). Default is `200`.
+#' @param max_dim Integer specifying the maximum number of principal components
+#'   to be used for PCA computation with [stats::prcomp()] (`integer`). Default
+#'   is `200`.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
 #' @return A list containing:
-#' - `params`: List of parameters used for clustering (`list`).
-#' - `nn`: Nearest neighbors object (`Neighbor` [SeuratObject::Neighbor-class]).
-#' - `graph`: Shared nearest neighbors graph (`Graph` [SeuratObject::Graph-class]).
-#'
 #' \describe{
 #'   \item{params}{List of parameters used for clustering (`list`).}
+#'   \item{pcs}{List of principal components summaries for each omic (`list` of `summary.prcomp` [stats::prcomp]).}
 #'   \item{nn}{Nearest neighbors object (`Neighbor` [SeuratObject::Neighbor-class]).}
 #'   \item{graph}{Shared nearest neighbors graph (`Graph` [SeuratObject::Graph-class]).}
 #'   \item{dist}{Distance matrix derived from the graph (`matrix`).}
@@ -326,6 +320,7 @@ cluster_seurat <- function(mat_list,
                            algorithm = 1,
                            knn_seurat = 20,
                            knn_range_seurat = 200,
+                           max_dim = 200,
                            quiet = FALSE
 ) {
     # Arguments validations
@@ -413,8 +408,11 @@ cluster_seurat <- function(mat_list,
         message("Performing PCA...")
     }
     pcs_list <- lapply(mat_list, function(mat) {
-        prcomp(x = mat) # rows = cells x columns = features
+        prcomp(x = mat, rank. = max_dim, center = TRUE, scale. = FALSE) # rows = cells x columns = features
     })
+    pcs_list_sum <- lapply(pcs_list, summary)
+
+    out[["pcs"]] <- pcs_list_sum
 
     # Create DimReducObject for Seurat and add to seuratobj
     pca_list <- lapply(setNames(as.list(names(pcs_list)), names(pcs_list)), function(omic) {
