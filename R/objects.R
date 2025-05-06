@@ -830,9 +830,8 @@ setMethod(
 
         if (!is.null(object@cnacalling$consensus.segs)) {
             cnacall_txt <- paste(
-                "k =",
                 length(unique(object@cnacalling$clusters)),
-                ";",
+                "clusters ;",
                 nrow(object@cnacalling$consensus.segs),
                 "consensus segments including",
                 sum(object@cnacalling$consensus.segs$cna, na.rm = TRUE),
