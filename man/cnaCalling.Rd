@@ -4,7 +4,7 @@
 \alias{cnaCalling}
 \title{Copy Number Alteration (CNA) Calling from muscadet object}
 \source{
-This function uses several functions from the \link{facets} package,
+This function uses several functions from the \link{facets-package} package,
 including: \code{\link[facets:facets-internal]{facets::clustersegs()}}, \code{\link[facets:emcncf]{facets::emcncf()}},
 \code{\link[facets:facets-internal]{facets::findDiploidLogR()}}, \code{\link[facets:fitcncf]{facets::fitcncf()}}, \code{\link[facets:procSample]{facets::procSample()}},
 \code{\link[facets:facets-internal]{facets::procSnps()}}, and adapted function \code{\link[=preProcSample2]{preProcSample2()}}.

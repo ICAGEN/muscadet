@@ -147,7 +147,7 @@
 #'
 #' @references
 #' \describe{
-#'   \item{[facets] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
+#'   \item{[facets-package] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
 #'   clonal heterogeneity analysis tool for high-throughput DNA sequencing.
 #'   Nucleic Acids Res. 2016 Sep 19;44(16):e131.
 #'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520).

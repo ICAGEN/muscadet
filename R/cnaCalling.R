@@ -126,7 +126,7 @@
 #' [muscadet::preProcSample2()]
 #'
 #'
-#' @source This function uses several functions from the [facets] package,
+#' @source This function uses several functions from the [facets-package] package,
 #'   including: [facets::clustersegs()], [facets::emcncf()],
 #'   [facets::findDiploidLogR()], [facets::fitcncf()], [facets::procSample()],
 #'   [facets::procSnps()], and adapted function [muscadet::preProcSample2()].
@@ -693,9 +693,14 @@ cnaCalling <- function(
 #' Seshan VE, Shen R (2021). _facets: Cellular Fraction and Copy Numbers from Tumor Sequencing_.
 #' R package version 0.6.2, [https://github.com/mskcc/facets](https://github.com/mskcc/facets).
 #'
-#' @references Shen R, Seshan VE. FACETS: allele-specific copy number and clonal
-#' heterogeneity analysis tool for high-throughput DNA sequencing. Nucleic Acids
-#' Res. 2016 Sep 19;44(16):e131. doi: [10.1093/nar/gkw520](http://doi.org/10.1093/nar/gkw520).
+#' @references
+#' \describe{
+#'   \item{[facets-package] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
+#'   clonal heterogeneity analysis tool for high-throughput DNA sequencing.
+#'   Nucleic Acids Res. 2016 Sep 19;44(16):e131.
+#'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520).
+#'   PMID: 27270079; PMCID: PMC5027494.}
+#' }
 #'
 #' @import dplyr
 #' @import facets

@@ -93,9 +93,13 @@ result <- preProcSample2(counts_clus)
 
 }
 \references{
-Shen R, Seshan VE. FACETS: allele-specific copy number and clonal
-heterogeneity analysis tool for high-throughput DNA sequencing. Nucleic Acids
-Res. 2016 Sep 19;44(16):e131. doi: \href{http://doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}.
+\describe{
+\item{\link{facets-package} package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
+clonal heterogeneity analysis tool for high-throughput DNA sequencing.
+Nucleic Acids Res. 2016 Sep 19;44(16):e131.
+doi: \href{https://www.doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}.
+PMID: 27270079; PMCID: PMC5027494.}
+}
 }
 \seealso{
 \code{\link[facets]{preProcSample}}, \code{\link[facets]{procSnps}},

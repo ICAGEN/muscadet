@@ -29,7 +29,7 @@ Tumor Sequencing" version \verb{0.6.2}: \verb{$cncf} data frame columns \code{ch
 }
 \references{
 \describe{
-\item{\link{facets} package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
+\item{\link{facets-package} package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
 clonal heterogeneity analysis tool for high-throughput DNA sequencing.
 Nucleic Acids Res. 2016 Sep 19;44(16):e131.
 doi: \href{https://www.doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}.
