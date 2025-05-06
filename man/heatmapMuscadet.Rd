@@ -33,14 +33,18 @@ the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
 plot (\code{numeric} or \code{character}). It should be either the resolution or the
 number of cluster (k) used for clustering depending on the clustering
 method (\code{res_range} or \code{k_range} with \code{\link[=clusterMuscadet]{clusterMuscadet()}}).
-Should be provided if \code{clusters} is \code{NULL}.}
+If both \code{partition} and \code{clusters} arguments are \code{NULL} (default), the
+assigned clusters for CNA calling (\code{x@cnacalling$cluster}) are used if
+available in \code{x} (see \code{\link[=assignClusters]{assignClusters()}}).}
 
 \item{clusters}{(Optional) A custom named vector of cluster assignments
 (\code{integer} named vector). Names must corresponds to cell names within the
 muscadet object \code{x}. If it contains less cells than the muscadet object
 \code{x}, the missing cells are filtered out and not displayed in the heatmap.
 If \code{show_missing = FALSE} only the provided cells with data in all omics
-will be displayed. Should be provided if \code{partition} is \code{NULL}.}
+will be displayed. If both \code{partition} and \code{clusters} arguments are \code{NULL}
+(default), the assigned clusters for CNA calling (\code{x@cnacalling$cluster})
+are used if available in \code{x} (see \code{\link[=assignClusters]{assignClusters()}}).}
 
 \item{add_bulk_lrr}{Logical. If \code{TRUE} (default), adds bulk log R ratio (LRR) data as
 annotation if available in the muscadet object.}
@@ -57,10 +61,12 @@ string). Default is an empty character string.}
 \item{row_annots}{Optional. A list of \linkS4class{HeatmapAnnotation} objects from
 the \link{ComplexHeatmap-package} package, specifying row annotations to add on
 left part of the heatmap. Each element in the list must be of class
-(HeatmapAnnotation)\linkS4class{HeatmapAnnotation}, must be a row annotation
-(using \verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]} with \code{which = 'row'}), and must have a unique name (\code{name} argument in
-\verb{[rowAnnotation()]} or \verb{[HeatmapAnnotation()]}). By default is \code{NULL}, no
-row annotations is added.}
+\linkS4class{HeatmapAnnotation}, must be a row annotation (using
+\code{\link[=rowAnnotation]{rowAnnotation()}} or \code{\link[=HeatmapAnnotation]{HeatmapAnnotation()}} with \code{which = 'row'}), and must
+have a unique name (\code{name} argument in \code{\link[=rowAnnotation]{rowAnnotation()}} or
+\code{\link[=HeatmapAnnotation]{HeatmapAnnotation()}}). If \code{averages = FALSE}, annotations must concern
+cells, while if \code{averages = TRUE} they must concern clusters. Default is
+\code{NULL}, no row annotations is added.}
 
 \item{white_scale}{Numeric vector of length 2 or a list of numeric vectors
 (\code{numeric} vector or \code{list}).
@@ -160,7 +166,7 @@ heatmapMuscadet(muscadet_obj,
 
 library("ComplexHeatmap")
 
-# Define example annotation
+# Define example cell annotation
 muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
 cells_origin <- setNames(c(
     rep("sample1", ceiling(length(muscadet_cells) / 2)),
@@ -168,17 +174,15 @@ cells_origin <- setNames(c(
     ),
     muscadet_cells
 )
+cells_origin <- cells_origin[sort(names(cells_origin))]
+# IMPORTANT: annotation names (cells) must be sorted to match heatmap
+# matrices (column names of log ratio matrix are sorted in heatmapMuscadet())
 
 # Create row annotation
 ha <- rowAnnotation(
     annot = anno_simple(
         cells_origin[sort(names(cells_origin))],
-        # IMPORTANT: annotation names (cells) must be sorted to match heatmap
-        # matrices (column names of log ratio matrix are sorted in heatmapMuscadet())
-        col = c(
-            "sample1" = "cadetblue3",
-            "sample2" = "orchid3")
-    ),
+        col = c("sample1" = "cadetblue3", "sample2" = "orchid3")),
     name = "origin", # unique name
     annotation_label = "origin", # label displayed on heatmap
     annotation_name_gp = gpar(fontsize = 10) # change font size
@@ -189,6 +193,30 @@ heatmapMuscadet(muscadet_obj,
                 filename = file.path("heatmap_res0.6_annot.png"),
                 partition = 0.6,
                 row_annots = list(ha))
+
+# --- Add Row Annotation for averages ---
+
+library("ComplexHeatmap")
+
+# Define example cluster annotation
+clus <- setNames(c("annot1", "annot2"), c(1, 2)) # 2 clusters for partition 0.6
+clus <- clus[order(names(clus))]
+# IMPORTANT: annotation names (clusters) must be sorted to match heatmap
+# matrices (column names of log ratio averages matrix are sorted in heatmapMuscadet())
+
+
+# Create row annotation
+ha2 <- rowAnnotation(
+    annot = anno_simple(clus, col = c("annot1" = "tomato", "annot2" = "gold2")),
+    name = "annot", # unique name
+    annotation_label = "annot", # label displayed on heatmap
+    annotation_name_gp = gpar(fontsize = 10) # change font size
+)
+heatmapMuscadet(muscadet_obj,
+                averages = TRUE,
+                filename = file.path("heatmap_res0.6_annot_averages.png"),
+                partition = 0.6,
+                row_annots = list(ha2))
 
 
 # --- Method "hclust" ---

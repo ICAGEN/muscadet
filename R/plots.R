@@ -21,14 +21,18 @@
 #'   plot (`numeric` or `character`). It should be either the resolution or the
 #'   number of cluster (k) used for clustering depending on the clustering
 #'   method (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
-#'   Should be provided if `clusters` is `NULL`.
+#'   If both `partition` and `clusters` arguments are `NULL` (default), the
+#'   assigned clusters for CNA calling (`x@cnacalling$cluster`) are used if
+#'   available in `x` (see [assignClusters()]).
 #'
 #' @param clusters (Optional) A custom named vector of cluster assignments
 #'   (`integer` named vector). Names must corresponds to cell names within the
 #'   muscadet object `x`. If it contains less cells than the muscadet object
 #'   `x`, the missing cells are filtered out and not displayed in the heatmap.
 #'   If `show_missing = FALSE` only the provided cells with data in all omics
-#'   will be displayed. Should be provided if `partition` is `NULL`.
+#'   will be displayed. If both `partition` and `clusters` arguments are `NULL`
+#'   (default), the assigned clusters for CNA calling (`x@cnacalling$cluster`)
+#'   are used if available in `x` (see [assignClusters()]).
 #'
 #' @param add_bulk_lrr Logical. If `TRUE` (default), adds bulk log R ratio (LRR) data as
 #'   annotation if available in the muscadet object.
@@ -45,11 +49,12 @@
 #' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
 #'   the [ComplexHeatmap-package] package, specifying row annotations to add on
 #'   left part of the heatmap. Each element in the list must be of class
-#'   (HeatmapAnnotation)[HeatmapAnnotation-class], must be a row annotation
-#'   (using `[rowAnnotation()]` or `[HeatmapAnnotation()]` with `which =
-#'   'row'`), and must have a unique name (`name` argument in
-#'   `[rowAnnotation()]` or `[HeatmapAnnotation()]`). By default is `NULL`, no
-#'   row annotations is added.
+#'   [HeatmapAnnotation-class], must be a row annotation (using
+#'   [rowAnnotation()] or [HeatmapAnnotation()] with `which = 'row'`), and must
+#'   have a unique name (`name` argument in [rowAnnotation()] or
+#'   [HeatmapAnnotation()]). If `averages = FALSE`, annotations must concern
+#'   cells, while if `averages = TRUE` they must concern clusters. Default is
+#'   `NULL`, no row annotations is added.
 #'
 #' @param white_scale Numeric vector of length 2 or a list of numeric vectors
 #'   (`numeric` vector or `list`).
@@ -144,7 +149,7 @@
 #'
 #' library("ComplexHeatmap")
 #'
-#' # Define example annotation
+#' # Define example cell annotation
 #' muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
 #' cells_origin <- setNames(c(
 #'     rep("sample1", ceiling(length(muscadet_cells) / 2)),
@@ -152,17 +157,15 @@
 #'     ),
 #'     muscadet_cells
 #' )
+#' cells_origin <- cells_origin[sort(names(cells_origin))]
+#' # IMPORTANT: annotation names (cells) must be sorted to match heatmap
+#' # matrices (column names of log ratio matrix are sorted in heatmapMuscadet())
 #'
 #' # Create row annotation
 #' ha <- rowAnnotation(
 #'     annot = anno_simple(
 #'         cells_origin[sort(names(cells_origin))],
-#'         # IMPORTANT: annotation names (cells) must be sorted to match heatmap
-#'         # matrices (column names of log ratio matrix are sorted in heatmapMuscadet())
-#'         col = c(
-#'             "sample1" = "cadetblue3",
-#'             "sample2" = "orchid3")
-#'     ),
+#'         col = c("sample1" = "cadetblue3", "sample2" = "orchid3")),
 #'     name = "origin", # unique name
 #'     annotation_label = "origin", # label displayed on heatmap
 #'     annotation_name_gp = gpar(fontsize = 10) # change font size
@@ -173,6 +176,30 @@
 #'                 filename = file.path("heatmap_res0.6_annot.png"),
 #'                 partition = 0.6,
 #'                 row_annots = list(ha))
+#'
+#' # --- Add Row Annotation for averages ---
+#'
+#' library("ComplexHeatmap")
+#'
+#' # Define example cluster annotation
+#' clus <- setNames(c("annot1", "annot2"), c(1, 2)) # 2 clusters for partition 0.6
+#' clus <- clus[order(names(clus))]
+#' # IMPORTANT: annotation names (clusters) must be sorted to match heatmap
+#' # matrices (column names of log ratio averages matrix are sorted in heatmapMuscadet())
+#'
+#'
+#' # Create row annotation
+#' ha2 <- rowAnnotation(
+#'     annot = anno_simple(clus, col = c("annot1" = "tomato", "annot2" = "gold2")),
+#'     name = "annot", # unique name
+#'     annotation_label = "annot", # label displayed on heatmap
+#'     annotation_name_gp = gpar(fontsize = 10) # change font size
+#' )
+#' heatmapMuscadet(muscadet_obj,
+#'                 averages = TRUE,
+#'                 filename = file.path("heatmap_res0.6_annot_averages.png"),
+#'                 partition = 0.6,
+#'                 row_annots = list(ha2))
 #'
 #'
 #' # --- Method "hclust" ---
@@ -226,35 +253,84 @@ heatmapMuscadet <- function(x,
                             colors = NULL,
                             png_res = 300,
                             quiet = FALSE) {
+
+    ## x ------
     # Validate input: x must be a muscadet object
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
-    # Validate the clustering result for the specified partition
-    stopifnot(
-        "The muscadet object `x` must contain clustering results for the specified `partition`." =
-            as.character(partition) %in% names(x@clustering$clusters)
-    )
+    # Validate log ratio present in the muscadet object
+    stopifnot("Input object `x` must contain log ratio data (use computeLogRatio())." =
+                  !is.null(matLogRatio(x)))
 
+    ## filename ------
+    # Check if output directory exists
+    if (!is.null(filename))
+        stopifnot("`filename`: the directory doesn't exist" = file.exists(dirname(filename)))
+
+    if (!is.null(filename) & !grepl(".(png|pdf)$", filename)) {
+        stop("The `filename` argument must end with either .png or .pdf.")
+    }
+
+    ## Validate clusters & partition ------
+    # Get common and all cells
+    common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames)))
+    all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), colnames)))
+
+    # Filter cells based on provided `clusters` argument
+    if (!is.null(clusters)) {
+
+        # Check `clusters` cells
+        stopifnot("The `clusters` argument must have names, corresponding to cell names within the muscadet object `x`." = !is.null(names(clusters)))
+
+        stopifnot(
+            "Names of `clusters` don't match cell names within the muscadet object `x`." = length(setdiff(names(clusters), all_cells)) == 0
+        )
+
+        # cells not in `clusters`
+        cells_filtered <- setdiff(all_cells, names(clusters))
+
+        if (length(cells_filtered) > 0) {
+            warning(
+                paste(
+                    "The `clusters` argument does not contain cluster assignments for all cells.",
+                    length(cells_filtered),
+                    "cells in the muscadet object `x` are filtered out."
+                )
+            )
+            # filter cells based on `clusters` cells
+            common_cells <- common_cells[common_cells %in% names(clusters)]
+            all_cells <- all_cells[all_cells %in% names(clusters)]
+        }
+
+    } else if (!is.null(partition)) {
+        stopifnot(
+            "The muscadet object `x` must contain the clustering results for the provided `partition`." =
+                as.character(partition) %in% names(x@clustering$clusters)
+        )
+
+    } else if (is.null(partition) && is.null(clusters)) {
+
+        stopifnot(
+            "The muscadet object `x` must contain the assigned clusters (x@cnacalling$clusters) (use assignClusters())
+            if `partition` and `clusters` arguments are NULL." =
+                !is.null(x@cnacalling$clusters)
+        )
+    }
+
+    ## Validate show_missing ------
+    stopifnot("`show_missing` must be a single TRUE/FALSE value." =
+                  is.logical(show_missing) && length(show_missing) == 1 && !is.na(show_missing))
     # Set to no missing cells if only one omic
     if (length(x@omics) == 1)
         show_missing <- FALSE
 
-    # Validate partition and clusters
-    stopifnot("Both `partition` and `clusters` cannot be NULL." = !(is.null(partition) && is.null(clusters)))
-
-    # Validate partition in clustering slot
-    if (!is.null(partition)) {
-        stopifnot(
-            "The muscadet object `x` must contain the clustering results for the provided `partition`." =
-                as.character(partition) %in% names(x@clustering$clusters))
-    }
-
-    # Default addition of bulk data
-    if (add_bulk_lrr) {
+    ## Validate add_bulk_lrr ------
+    # Default addition of bulk data depending on its presence in muscadet object
+    if (add_bulk_lrr | !is.logical(show_missing)) {
         add_bulk_lrr <- !is.null(x@bulk.data$log.ratio)
     }
 
-    # Validate row_annots
+    ## Validate row_annots ------
     if (!is.null(row_annots)) {
 
         # Check that it is a list of HeatmapAnnotation objects
@@ -274,7 +350,7 @@ heatmapMuscadet <- function(x,
         }
     }
 
-    # Validate white_scale
+    ## Validate white_scale ------
     if (is.numeric(white_scale) && length(white_scale) == 2) {
         stopifnot("`white_scale` must be a numeric vector of length 2." = length(white_scale) == 2)
         stopifnot(
@@ -321,7 +397,6 @@ heatmapMuscadet <- function(x,
         )
     }
 
-
     # Set default color palette for clusters if not provided
     if (is.null(colors)) {
         colors <- c(
@@ -342,43 +417,6 @@ heatmapMuscadet <- function(x,
     # Set palette
     palette(colors)
 
-    # Check if output directory exists
-    if (!is.null(filename))
-        stopifnot("`filename`: the directory doesn't exist" = file.exists(dirname(filename)))
-
-    if (!is.null(filename) & !grepl(".(png|pdf)$", filename)) {
-        stop("The `filename` argument must end with either .png or .pdf.")
-    }
-
-    # Get common and all cells in clustering order
-    common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames)))
-    all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), colnames)))
-
-    # Filter cells based on provided `clusters` argument
-    if (!is.null(clusters)) {
-
-        # Check `clusters` cells
-        stopifnot("The `clusters` argument must have names, corresponding to cell names within the muscadet object `x`." = !is.null(names(clusters)))
-
-        stopifnot(
-            "Names of `clusters` don't match cell names within the muscadet object `x`." = length(setdiff(names(clusters), all_cells)) == 0
-        )
-
-        # filter cells not in `clusters`
-        cells_filtered <- setdiff(all_cells, names(clusters))
-
-        if (length(cells_filtered) > 0) {
-            warning(
-                paste(
-                    "The `clusters` argument does not contain cluster assignments for all cells.",
-                    length(cells_filtered),
-                    "cells in the muscadet object `x` are filtered out."
-                )
-            )
-            common_cells <- common_cells[common_cells %in% names(clusters)]
-            all_cells <- all_cells[all_cells %in% names(clusters)]
-        }
-    }
 
     if (averages) {
 
@@ -444,6 +482,10 @@ heatmapMuscadet <- function(x,
             if (!is.null(clusters))
                 message("Custom clusters provided: ",
                         length(unique(clusters)),
+                        " clusters.")
+            if (is.null(partition) && is.null(clusters))
+                message("Assigned clusters: ",
+                        length(unique(x@cnacalling$clusters)),
                         " clusters.")
 
             message(
@@ -595,9 +637,11 @@ heatmapMuscadet <- function(x,
     # Create layout for the list of heatmaps
     pdf(file = NULL)
     if (show_missing == TRUE) {
-        if (is.null(clusters)) {
+        if (is.null(clusters) & !is.null(partition)) {
             # 1. Cluster assignments from the muscadet object clustering with all cells
             clusters <- x@clustering$clusters[[as.character(partition)]]
+        } else if (is.null(clusters) & is.null(partition)) {
+            clusters <- x@cnacalling$clusters
         }
         n_cells <- table(clusters)
 
@@ -669,19 +713,21 @@ heatmapMuscadet <- function(x,
             annotation_legend_list <- list()
         }
 
-        if (is.null(clusters)) {
+        if (is.null(clusters) & !is.null(partition)) {
 
             if (x@clustering$params$method == "seurat") {
                 # 2. Clustering seurat from the muscadet object clustering with common cells
                 clusters <- x@clustering$clusters[[as.character(partition)]]
-                n_cells <- table(clusters)
+                n_cells <- table(clusters[common_cells])
+
+                # Draw heatmap
                 ht_all <- ComplexHeatmap::draw(
                     ht_list,
                     column_title = title,
                     ht_gap = ht_gap,
                     row_split = factor(clusters[common_cells], levels = sort(unique(clusters))),
                     row_order = names(clusters)[names(clusters) %in% common_cells],
-                    cluster_rows = F,
+                    cluster_rows = FALSE,
                     annotation_legend_list = annotation_legend_list,
                     merge_legend = TRUE
                 )
@@ -689,7 +735,8 @@ heatmapMuscadet <- function(x,
             } else if (x@clustering$params$method == "hclust") {
                 # 2. Clustering hclust from the muscadet object clustering with common cells
                 hc <- x@clustering$hclust # hclust object to print the dendrogram on the heatmap
-                n_cells <- table(x@clustering$clusters[[as.character(partition)]])
+                clusters <- x@clustering$clusters[[as.character(partition)]]
+                n_cells <- table(clusters[common_cells])
 
                 # Draw heatmap
                 ht_all <- ComplexHeatmap::draw(
@@ -705,8 +752,13 @@ heatmapMuscadet <- function(x,
             }
 
         } else {
-            # 3. Custom cluster assignments vector
-            n_cells <- table(clusters)
+            # 3. Custom/Assigned cluster assignments vector
+            if (is.null(clusters) & is.null(partition)) {
+                clusters <- x@cnacalling$clusters
+            }
+            n_cells <- table(clusters[common_cells])
+
+            # Draw heatmap
             ht_all <- ComplexHeatmap::draw(
                 ht_list,
                 column_title = title,
@@ -716,7 +768,7 @@ heatmapMuscadet <- function(x,
                                            clusters
                                        ))),
                 row_order = names(clusters)[names(clusters) %in% common_cells],
-                cluster_rows = F,
+                cluster_rows = FALSE,
                 annotation_legend_list = annotation_legend_list,
                 merge_legend = TRUE
             )
@@ -2085,4 +2137,8 @@ heatmapStep <- function(obj,
         dev.off()
     }
 }
+
+
+
+
 
