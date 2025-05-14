@@ -66,6 +66,7 @@ values, log odds ratio (or variant allele frequency), copy numbers and cell
 fractions.
 }
 \examples{
+\dontrun{
 # Load example muscadet object
 data(muscadet_obj)
 
@@ -73,5 +74,6 @@ data(muscadet_obj)
 pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
 plotProfile(muscadet_obj, data = "allcells", title = "Example data - all cells")
 dev.off()
+}
 
 }

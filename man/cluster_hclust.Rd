@@ -98,6 +98,7 @@ Results are given as cluster assignments for each number of cluster specified
 by \code{k_range}.
 }
 \examples{
+\dontrun{
 # Load example muscadet object
 data(muscadet_obj)
 
@@ -110,6 +111,7 @@ result <- cluster_hclust(mat_list, k_range = 2:4)
 
 # View results
 lapply(result$clusters, table)
+}
 
 }
 \seealso{

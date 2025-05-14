@@ -32,6 +32,7 @@ Generate a silhouette plot for a specified clustering partition within a
 \code{muscadet} object.
 }
 \examples{
+\dontrun{
 library("ggplot2")
 
 # Load example muscadet object
@@ -42,6 +43,7 @@ plotSil(muscadet_obj, partition = 0.6)
 for (p in names(muscadet_obj$clustering$clusters)) {
     plot <- plotSil(muscadet_obj, p)
     ggsave(paste0("plot_silhouette_", p, ".png"), plot)
+}
 }
 
 }

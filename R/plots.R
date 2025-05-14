@@ -100,6 +100,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
@@ -238,7 +239,7 @@
 #'
 #'     heatmapMuscadet(muscadet_obj2, filename, partition = p, title = title)
 #' }
-#'
+#' }
 #'
 heatmapMuscadet <- function(x,
                             filename = NULL,
@@ -884,6 +885,7 @@ heatmapMuscadet <- function(x,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library("ggplot2")
 #'
 #' # Load example muscadet object
@@ -894,6 +896,7 @@ heatmapMuscadet <- function(x,
 #' for (p in names(muscadet_obj$clustering$clusters)) {
 #'     plot <- plotSil(muscadet_obj, p)
 #'     ggsave(paste0("plot_silhouette_", p, ".png"), plot)
+#' }
 #' }
 #'
 plotSil <- function(x,
@@ -1098,14 +1101,20 @@ plotSil <- function(x,
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' library(ggplot2)
+#'
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
 #' # Plot all indexes
 #' plotIndexes(muscadet_obj)
+#' ggsave("plot_indexes.png", width = 8, height = 4)
 #'
 #' # Plot a specific index
 #' plotIndexes(muscadet_obj, index = "silhouette")
+#' ggsave("plot_indexes_sil.png", width = 7, height = 4)
+#' }
 #'
 plotIndexes <- function(x,
                         index = NULL,
@@ -1322,6 +1331,7 @@ plotIndexes <- function(x,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
@@ -1329,6 +1339,7 @@ plotIndexes <- function(x,
 #' pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
 #' plotProfile(muscadet_obj, data = "allcells", title = "Example data - all cells")
 #' dev.off()
+#' }
 #'
 plotProfile <- function(x,
                         data,
@@ -1611,6 +1622,7 @@ plotProfile <- function(x,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library("ggplot2")
 #'
 #' # Load example muscadet object
@@ -1619,6 +1631,15 @@ plotProfile <- function(x,
 #' # Plot CNA segments
 #' plot <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
 #' print(plot)
+#' ggsave(
+#'     filename = file.path("CNAplot.png"),
+#'     plot = plot,
+#'     width = 3000,
+#'     height = 800,
+#'     units = "px"
+#' )
+#' }
+#'
 plotCNA <- function(x,
                     title = NULL,
                     cna.colors = c(
@@ -1797,7 +1818,8 @@ plotCNA <- function(x,
 #'   heatmap (`character` vector). Default is `c("#00008E", "white", "white",
 #'   "#630000")`.
 #'
-#' @return The function does not return any value but saves a heatmaps-histograms plot to the specified file.
+#' @return The function does not return any value but saves a
+#'   heatmaps-histograms plot to the specified file.
 #'
 #' @import ggplot2
 #' @importFrom rlang .data
@@ -1806,8 +1828,10 @@ plotCNA <- function(x,
 #' @importFrom grid unit grid.grab
 #' @importFrom patchwork wrap_plots plot_layout plot_annotation
 #'
-#' @examples
+#' @export
 #'
+#' @examples
+#' \dontrun{
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'     type = "ATAC",
@@ -1873,8 +1897,7 @@ plotCNA <- function(x,
 #'         title = paste("ATAC -", step)
 #'     )
 #' }
-#'
-#' @export
+#' }
 #'
 heatmapStep <- function(obj,
                         step,

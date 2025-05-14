@@ -49,6 +49,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
@@ -96,7 +97,7 @@
 #'     filename = file.path("heatmap_muscadet_custom_res0.8.png"),
 #'     title = "Example sample | rearranged clusters from res=0.8"
 #' )
-#'
+#' }
 #'
 assignClusters <- function(x,
                            partition = NULL,

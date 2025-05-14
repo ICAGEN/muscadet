@@ -292,11 +292,7 @@ clusterMuscadet <- function(x,
 #' [Weighted Nearest Neighbor Analysis Vignette from Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
 #'
 #' @examples
-#' data("muscadet_obj", package = "muscadet")
-#' mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
-#' result <- cluster_seurat(mat_list, res_range = seq(0.2, 0.4, 0.1))
-#'
-#' #' @examples
+#' \dontrun{
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
@@ -309,6 +305,7 @@ clusterMuscadet <- function(x,
 #'
 #' # View results
 #' lapply(result$clusters, table)
+#' }
 #'
 #' @importFrom SeuratObject CreateAssay5Object as.sparse
 #' @importFrom Seurat CreateSeuratObject FindMultiModalNeighbors FindNeighbors RunUMAP FindClusters
@@ -606,6 +603,7 @@ cluster_seurat <- function(mat_list,
 #' Similarity Network Fusion: [weightedSNF()].
 #'
 #' @examples
+#' \dontrun{
 #' # Load example muscadet object
 #' data(muscadet_obj)
 #'
@@ -618,6 +616,7 @@ cluster_seurat <- function(mat_list,
 #'
 #' # View results
 #' lapply(result$clusters, table)
+#' }
 #'
 #' @importFrom Rfast Dist
 #' @importFrom SNFtool affinityMatrix

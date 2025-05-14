@@ -82,10 +82,13 @@
 #' @name allele_counts
 #' @rdname allele_counts
 #'
+#' @seealso
+#' - [process_allele()]
+#'
 #' @format
-#' A data frame with columns based on the [Variant Call Format (VCF)
-#' format](https://en.wikipedia.org/wiki/Variant_Call_Format) columns.
-#' It contains the following columns:
+#' A data frame with columns based on the [Variant Call Format
+#' (VCF)](https://en.wikipedia.org/wiki/Variant_Call_Format) columns. It
+#' contains the following columns:
 #' \describe{
 #'   \item{`cell`}{Barcodes of cells (`character`).}
 #'   \item{`id`}{Variant unique identifier defined as
@@ -98,7 +101,7 @@
 #'   \item{`RD`}{Reference allele depth/count (`integer`).}
 #'   \item{`AD`}{Alternative allele depth/count (`integer`).}
 #'   \item{`DP`}{Total depth/count (`integer`).}
-#'   \item{`GT`}{Genotype: "0/1" or "1/0" if unphased; "0|1" or "1|0" if phased.) (`character`).}
+#'   \item{`GT`}{Genotype: "0/1" or "1/0" if unphased; "0|1" or "1|0" if phased. (`character`).}
 #' }
 #'
 "allele_counts_atac_tumor"
