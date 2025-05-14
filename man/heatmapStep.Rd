@@ -45,7 +45,8 @@ Default is \code{NULL}.}
 heatmap (\code{character} vector). Default is \code{c("#00008E", "white", "white", "#630000")}.}
 }
 \value{
-The function does not return any value but saves a heatmaps-histograms plot to the specified file.
+The function does not return any value but saves a
+heatmaps-histograms plot to the specified file.
 }
 \description{
 This function generates heatmap and distribution plots for tumor and
@@ -54,7 +55,7 @@ input object corresponds to the output of \code{\link[=computeLogRatioATAC]{comp
 \code{\link[=computeLogRatioRNA]{computeLogRatioRNA()}} with the argument \code{all_steps = TRUE}.
 }
 \examples{
-
+\dontrun{
 # Create muscomic objects
 atac <- CreateMuscomicObject(
     type = "ATAC",
@@ -119,6 +120,7 @@ for (step in grep("step", names(obj_atac_all), value = TRUE)) {
         filename = file.path(tempdir(), paste0("ATAC_", step, ".pdf")),
         title = paste("ATAC -", step)
     )
+}
 }
 
 }

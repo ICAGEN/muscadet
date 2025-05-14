@@ -30,6 +30,7 @@ CNAs for each clusters and scales the y-axis based on the proportion of cells
 in each cluster.
 }
 \examples{
+\dontrun{
 library("ggplot2")
 
 # Load example muscadet object
@@ -38,4 +39,13 @@ data(muscadet_obj)
 # Plot CNA segments
 plot <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
 print(plot)
+ggsave(
+    filename = file.path("CNAplot.png"),
+    plot = plot,
+    width = 3000,
+    height = 800,
+    units = "px"
+)
+}
+
 }

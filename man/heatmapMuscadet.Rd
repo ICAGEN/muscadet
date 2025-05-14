@@ -117,6 +117,7 @@ used. Additionally, LRR values from bulk sequencing data can be plotted as an
 annotation under the heatmaps.
 }
 \examples{
+\dontrun{
 # Load example muscadet object
 data(muscadet_obj)
 
@@ -255,6 +256,6 @@ for (p in names(muscadet_obj2$clustering$clusters)) {
 
     heatmapMuscadet(muscadet_obj2, filename, partition = p, title = title)
 }
-
+}
 
 }

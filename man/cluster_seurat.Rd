@@ -78,11 +78,7 @@ graph) is used.
 }
 }
 \examples{
-data("muscadet_obj", package = "muscadet")
-mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
-result <- cluster_seurat(mat_list, res_range = seq(0.2, 0.4, 0.1))
-
-#' @examples
+\dontrun{
 # Load example muscadet object
 data(muscadet_obj)
 
@@ -95,6 +91,7 @@ result <- cluster_seurat(mat_list, res_range = c(0.1, 0.3, 0.5))
 
 # View results
 lapply(result$clusters, table)
+}
 
 }
 \seealso{

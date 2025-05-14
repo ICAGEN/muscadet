@@ -9,8 +9,8 @@
 \alias{allele_counts_rna_ref}
 \title{Example data: Allele counts at variation positions}
 \format{
-A data frame with columns based on the \href{https://en.wikipedia.org/wiki/Variant_Call_Format}{Variant Call Format (VCF) format} columns.
-It contains the following columns:
+A data frame with columns based on the \href{https://en.wikipedia.org/wiki/Variant_Call_Format}{Variant Call Format (VCF)} columns. It
+contains the following columns:
 \describe{
 \item{\code{cell}}{Barcodes of cells (\code{character}).}
 \item{\code{id}}{Variant unique identifier defined as
@@ -23,7 +23,7 @@ are not included) (\code{integer}).}
 \item{\code{RD}}{Reference allele depth/count (\code{integer}).}
 \item{\code{AD}}{Alternative allele depth/count (\code{integer}).}
 \item{\code{DP}}{Total depth/count (\code{integer}).}
-\item{\code{GT}}{Genotype: "0/1" or "1/0" if unphased; "0|1" or "1|0" if phased.) (\code{character}).}
+\item{\code{GT}}{Genotype: "0/1" or "1/0" if unphased; "0|1" or "1|0" if phased. (\code{character}).}
 }
 }
 \usage{
@@ -39,5 +39,10 @@ allele_counts_rna_ref
 Data frames of allele counts at variant positions per cell. Variant positions
 can be either common single nucleotide polymorphisms (SNPs) positions or
 individual-specific heterozygous positions retrieved by bulk sequencing.
+}
+\seealso{
+\itemize{
+\item \code{\link[=process_allele]{process_allele()}}
+}
 }
 \keyword{datasets}
