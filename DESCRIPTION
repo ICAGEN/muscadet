@@ -55,6 +55,7 @@ Imports:
     tidyr,
     uwot
 Suggests: 
+    Rsamtools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
