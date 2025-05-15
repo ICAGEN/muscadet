@@ -28,7 +28,7 @@ Imports:
     ComplexHeatmap,
     dendextend,
     dplyr,
-    facets,
+    facets (>= 0.6.2),
     fastcluster,
     fpc,
     GenomeInfoDb,
@@ -41,7 +41,7 @@ Imports:
     matrixStats,
     methods,
     patchwork,
-    pctGCdata,
+    pctGCdata (>= 0.3.0),
     RANN,
     Rfast,
     rlang,
@@ -69,3 +69,6 @@ Collate:
     'objects.R'
     'plots.R'
     'utils.R'
+Remotes:  
+    mskcc/facets,
+    veseshan/pctGCdata
