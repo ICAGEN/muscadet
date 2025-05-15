@@ -11,7 +11,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-6369-2839"))
            )
 Description: Identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.
-URL: https://github.com/ICAGEN/muscadet
+URL: https://github.com/ICAGEN/muscadet, https://icagen.github.io/muscadet/
 BugReports: https://github.com/ICAGEN/muscadet/issues
 License: GPL-3
 Encoding: UTF-8
