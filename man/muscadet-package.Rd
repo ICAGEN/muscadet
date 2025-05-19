@@ -13,17 +13,26 @@ Identification of copy number alterations (CNAs) in cancer cells from single-cel
 Useful links:
 \itemize{
   \item \url{https://github.com/ICAGEN/muscadet}
+  \item \url{https://icagen.github.io/muscadet/}
   \item Report bugs at \url{https://github.com/ICAGEN/muscadet/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Marie Denoulet \email{marie.denoulet@inserm.fr} (\href{https://orcid.org/0000-0002-9668-0439}{ORCID})
+\strong{Maintainer}: Marie Denoulet \email{marie.denoulet@univ-nantes.fr} (\href{https://orcid.org/0000-0002-9668-0439}{ORCID})
 
 Authors:
 \itemize{
+  \item Nils Giordano \email{nils.giordano@univ-nantes.fr} (\href{https://orcid.org/0000-0003-2549-6631}{ORCID})
+  \item Eric Letouzé \email{eric.letouze@gmail.com} (\href{https://orcid.org/0000-0002-6369-2839}{ORCID})
   \item Céline Vallot \email{celine.vallot@curie.fr} (\href{https://orcid.org/0000-0003-1601-2359}{ORCID})
-  \item Eric Letouzé \email{eric.letouze@inserm.fr} (\href{https://orcid.org/0000-0002-6369-2839}{ORCID})
+  \item Stéphane Minvielle \email{stephane.minvielle@univ-nantes.fr} (\href{https://orcid.org/0000-0003-1389-312X}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Mia Cherkaoui \email{mia.cherkaoui@univ-nantes.fr} (\href{https://orcid.org/0000-0001-5488-2238}{ORCID}) [contributor]
+  \item Florence Magrangeas \email{florence.magrangeas@chu-nantes.fr} (\href{https://orcid.org/0000-0002-5031-3748}{ORCID}) [contributor]
 }
 
 }

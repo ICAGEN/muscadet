@@ -3,13 +3,21 @@ Type: Package
 Title: Multiomics Single-cell Copy number Alterations Detection
 Version: 0.1.0
 Authors@R: c(
-    person("Marie", "Denoulet", , "marie.denoulet@inserm.fr", role = c("aut", "cre"),
+    person("Marie", "Denoulet", , "marie.denoulet@univ-nantes.fr", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-9668-0439")),
+    person("Nils", "Giordano", , "nils.giordano@univ-nantes.fr", role = "aut",
+           comment = c(ORCID = "0000-0003-2549-6631")),
+    person("Eric", "Letouzé", , "eric.letouze@gmail.com", role = "aut",
+           comment = c(ORCID = "0000-0002-6369-2839")),
     person("Céline", "Vallot", , "celine.vallot@curie.fr", role = "aut",
            comment = c(ORCID = "0000-0003-1601-2359")),
-    person("Eric", "Letouzé", , "eric.letouze@inserm.fr", role = "aut",
-           comment = c(ORCID = "0000-0002-6369-2839"))
-           )
+    person("Stéphane", "Minvielle", , "stephane.minvielle@univ-nantes.fr", role = "aut",
+           comment = c(ORCID = "0000-0003-1389-312X")),
+    person("Mia", "Cherkaoui", , "mia.cherkaoui@univ-nantes.fr", role = "ctb",
+           comment = c(ORCID = "0000-0001-5488-2238")),
+    person("Florence", "Magrangeas", , "florence.magrangeas@chu-nantes.fr", role = "ctb",
+           comment = c(ORCID = "0000-0002-5031-3748"))
+    )
 Description: Identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.
 URL: https://github.com/ICAGEN/muscadet, https://icagen.github.io/muscadet/
 BugReports: https://github.com/ICAGEN/muscadet/issues
@@ -55,6 +63,8 @@ Imports:
     tidyr,
     uwot
 Suggests: 
+    knitr,
+    quarto,
     Rsamtools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -69,6 +79,7 @@ Collate:
     'objects.R'
     'plots.R'
     'utils.R'
-Remotes:  
+Remotes: 
     mskcc/facets,
     veseshan/pctGCdata
+VignetteBuilder: quarto

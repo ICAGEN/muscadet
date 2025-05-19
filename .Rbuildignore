@@ -5,3 +5,5 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^vignettes/\.quarto$
+^vignettes/*_files$
