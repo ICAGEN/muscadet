@@ -25,7 +25,7 @@ R ratio matrices.}
 string). It must match one of the names in \code{obj}.}
 
 \item{filename}{File path to save the output plot (\code{character} string). The
-file format is inferred from the extension (".png" or ".pdf").}
+file format is inferred from the extension (".png", ".pdf" or ".svg").}
 
 \item{title}{Title of the plot (\code{character} string). If \code{NULL}, the title is
 automatically generated using the provided step argument and its

@@ -26,8 +26,8 @@ heatmapMuscadet(
 \code{\link[=clusterMuscadet]{clusterMuscadet()}}) (\code{muscadet}).}
 
 \item{filename}{(Optional) Character string specifying the file path to save
-the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
-.pdf) format (\code{character} string).}
+the heatmap image in the PNG (if it ends by .png), PDF (if it ends by
+.pdf) or SVG (if it ends by .svg) format (\code{character} string).}
 
 \item{partition}{(Optional) Value specifying the clustering partition to
 plot (\code{numeric} or \code{character}). It should be either the resolution or the

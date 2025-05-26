@@ -14,8 +14,8 @@
 #'   [muscadet::clusterMuscadet()]) (`muscadet`).
 #'
 #' @param filename (Optional) Character string specifying the file path to save
-#'   the heatmap image in the PNG (if it ends by .png) or PDF (if it ends by
-#'   .pdf) format (`character` string).
+#'   the heatmap image in the PNG (if it ends by .png), PDF (if it ends by
+#'   .pdf) or SVG (if it ends by .svg) format (`character` string).
 #'
 #' @param partition (Optional) Value specifying the clustering partition to
 #'   plot (`numeric` or `character`). It should be either the resolution or the
@@ -94,7 +94,8 @@
 #' @importFrom circlize colorRamp2
 #' @importFrom methods slot
 #' @importFrom stats median
-#' @importFrom grDevices pdf png palette dev.off
+#' @importFrom gtools mixedsort
+#' @importFrom grDevices pdf png svg palette dev.off
 #' @importFrom grid gpar unit grid.rect grid.text grid.grab
 #'
 #' @export
@@ -268,8 +269,8 @@ heatmapMuscadet <- function(x,
     if (!is.null(filename))
         stopifnot("`filename`: the directory doesn't exist" = file.exists(dirname(filename)))
 
-    if (!is.null(filename) & !grepl(".(png|pdf)$", filename)) {
-        stop("The `filename` argument must end with either .png or .pdf.")
+    if (!is.null(filename) & !grepl(".(png|pdf|svg)$", filename)) {
+        stop("The `filename` argument must end with either .png, .pdf or svg.")
     }
 
     ## Validate clusters & partition ------
@@ -418,42 +419,49 @@ heatmapMuscadet <- function(x,
     # Set palette
     palette(colors)
 
-
+    # Averages ------
     if (averages) {
+
+        # retrieve clusters if `partition` is defined and not `clusters`
+        if (is.null(clusters)) {
+            clusters <- x@clustering$clusters[[as.character(partition)]]
+        }
+
+        # Order clusters in the same way as the matrix
+        clusters <- setNames(as.vector(clusters), names(clusters))
+        clusters_order <- unique(clusters) # save original order
 
         # Modify matrix of log ratio into a matrix of average log ratio per cluster
         for (omic in names(x@omics)) {
 
             # Retrieve log ratio matrix
             mat_lrr <- matLogRatio(x@omics[[omic]])
+            mat_lrr <- mat_lrr[, colnames(mat_lrr) %in% names(clusters)]
 
-            # retrieve clusters if `partition` is defined and not `clusters`
-            if (is.null(clusters)) {
-                clusters <- x@clustering$clusters[[as.character(partition)]]
-            }
-
-            # Order clusters in the same way as the matrix
-            clusters <- clusters[colnames(mat_lrr)]
+            clusters_mat <- clusters[colnames(mat_lrr)]
 
             # Compute matrix of averages per cluster
-            mat_lrr_av <- sapply(sort(unique(clusters)), function(cl) {
-                rowMeans(mat_lrr[, clusters == cl, drop = FALSE], na.rm = TRUE)
+            mat_lrr_av <- sapply(unique(clusters_mat), function(cl) {
+                rowMeans(mat_lrr[, clusters_mat == cl, drop = FALSE], na.rm = TRUE)
             })
 
             # Replace cell names by cluster names
-            colnames(mat_lrr_av) <- sort(unique(clusters))
+            colnames(mat_lrr_av) <- unique(clusters_mat)
+            mat_lrr_av <- mat_lrr_av[, gtools::mixedsort(colnames(mat_lrr_av))]
 
             # Replace log ratio matrix per cell by average matrix per cluster
             x@omics[[omic]]@coverage[["log.ratio"]] <- mat_lrr_av
         }
 
-        # Define new clusters
-        clusters <- setNames(sort(unique(clusters)), sort(unique(clusters)))
+        # Define new clusters in correct order
+        clusters <- setNames(clusters_order, clusters_order)
 
         # Define new "cells" becoming clusters
-        common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames)))
-        all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), colnames)))
+        common_cells <- Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames))
+        all_cells <- Reduce(union, lapply(muscadet::matLogRatio(x), colnames))
 
+        common_cells <- common_cells[order(match(common_cells, clusters))]
+        all_cells <- all_cells[order(match(all_cells, clusters))]
     }
 
     if (!quiet) {
@@ -644,7 +652,7 @@ heatmapMuscadet <- function(x,
         } else if (is.null(clusters) & is.null(partition)) {
             clusters <- x@cnacalling$clusters
         }
-        n_cells <- table(clusters)
+        n_cells <- table(clusters)[unique(clusters)]
 
         # Add supplementary annotations
         if (!is.null(row_annots)) {
@@ -677,8 +685,7 @@ heatmapMuscadet <- function(x,
             ht_list,
             column_title = title,
             ht_gap = ht_gap,
-            row_split = factor(clusters[all_cells], levels =
-                                   sort(unique(clusters))),
+            row_split = factor(clusters[all_cells], levels = unique(clusters)),
             row_order = names(clusters),
             cluster_rows = F,
             annotation_legend_list = annotation_legend_list,
@@ -719,14 +726,14 @@ heatmapMuscadet <- function(x,
             if (x@clustering$params$method == "seurat") {
                 # 2. Clustering seurat from the muscadet object clustering with common cells
                 clusters <- x@clustering$clusters[[as.character(partition)]]
-                n_cells <- table(clusters[common_cells])
+                n_cells <- table(clusters[common_cells])[unique(clusters[common_cells])]
 
                 # Draw heatmap
                 ht_all <- ComplexHeatmap::draw(
                     ht_list,
                     column_title = title,
                     ht_gap = ht_gap,
-                    row_split = factor(clusters[common_cells], levels = sort(unique(clusters))),
+                    row_split = factor(clusters[common_cells], levels = unique(clusters)),
                     row_order = names(clusters)[names(clusters) %in% common_cells],
                     cluster_rows = FALSE,
                     annotation_legend_list = annotation_legend_list,
@@ -737,7 +744,7 @@ heatmapMuscadet <- function(x,
                 # 2. Clustering hclust from the muscadet object clustering with common cells
                 hc <- x@clustering$hclust # hclust object to print the dendrogram on the heatmap
                 clusters <- x@clustering$clusters[[as.character(partition)]]
-                n_cells <- table(clusters[common_cells])
+                n_cells <- table(clusters[common_cells])[unique(clusters[common_cells])]
 
                 # Draw heatmap
                 ht_all <- ComplexHeatmap::draw(
@@ -764,10 +771,7 @@ heatmapMuscadet <- function(x,
                 ht_list,
                 column_title = title,
                 ht_gap = ht_gap,
-                row_split = factor(clusters[common_cells], levels =
-                                       sort(unique(
-                                           clusters
-                                       ))),
+                row_split = factor(clusters[common_cells], levels = unique(clusters)),
                 row_order = names(clusters)[names(clusters) %in% common_cells],
                 cluster_rows = FALSE,
                 annotation_legend_list = annotation_legend_list,
@@ -777,9 +781,9 @@ heatmapMuscadet <- function(x,
     }
     dev.off()
 
-    # Save complete plot of heatmaps as PNG or PDF
+    # Save complete plot of heatmaps as PNG PDF or SVG
     if (!is.null(filename) & grepl(".png", basename(filename))) {
-        png(
+        grDevices::png(
             filename = filename,
             width = ht_all@ht_list_param[["width"]],
             height = ht_all@ht_list_param[["height"]],
@@ -787,8 +791,14 @@ heatmapMuscadet <- function(x,
             res = png_res
         )
     } else if (!is.null(filename) & grepl(".pdf", basename(filename))) {
-        pdf(
+        grDevices::pdf(
             file = filename,
+            width = (ht_all@ht_list_param[["width"]]) / 25.4, # from mm to inches
+            height = (ht_all@ht_list_param[["height"]]) / 25.4 # from mm to inches
+        )
+    } else if (!is.null(filename) & grepl(".svg", basename(filename))) {
+        grDevices::svg(
+            filename = filename,
             width = (ht_all@ht_list_param[["width"]]) / 25.4, # from mm to inches
             height = (ht_all@ht_list_param[["height"]]) / 25.4 # from mm to inches
         )
@@ -1802,7 +1812,7 @@ plotCNA <- function(x,
 #' @param step The step within the `obj` list to use for plotting (`character`
 #'   string). It must match one of the names in `obj`.
 #' @param filename File path to save the output plot (`character` string). The
-#'   file format is inferred from the extension (".png" or ".pdf").
+#'   file format is inferred from the extension (".png", ".pdf" or ".svg").
 #' @param title Title of the plot (`character` string). If `NULL`, the title is
 #'   automatically generated using the provided step argument and its
 #'   corresponding value name (`obj[[step]]$name`).
@@ -1827,6 +1837,7 @@ plotCNA <- function(x,
 #' @importFrom circlize colorRamp2
 #' @importFrom grid unit grid.grab
 #' @importFrom patchwork wrap_plots plot_layout plot_annotation
+#' @importFrom grDevices png pdf svg
 #'
 #' @export
 #'
@@ -1922,7 +1933,7 @@ heatmapStep <- function(obj,
     }
 
     # filename extension
-    stopifnot("The `filename` argument must end with either .png or .pdf." = grepl(".(png|pdf)$", filename))
+    stopifnot("The `filename` argument must end with either .png, .pdf or .svg." = grepl(".(png|pdf|svg)$", filename))
 
     # col_quantiles and col_breaks
     stopifnot("Either `col_quantiles` or `col_breaks` must be provided." =
@@ -2140,7 +2151,7 @@ heatmapStep <- function(obj,
 
     # Output to file
     if (grepl(".png", basename(filename))) {
-        png(
+        grDevices::png(
             filename = filename,
             width = ht_Tum_2@ht_list_param[["width"]] * 1.75,
             height = ht_Tum_2@ht_list_param[["height"]] * 2.1,
@@ -2151,8 +2162,17 @@ heatmapStep <- function(obj,
         dev.off()
 
     } else if (grepl(".pdf", basename(filename))) {
-        pdf(
+        grDevices::pdf(
             file = filename,
+            width = (ht_Tum_2@ht_list_param[["width"]] * 1.75) / 25.4, # in inches
+            height = (ht_Tum_2@ht_list_param[["height"]] * 2.1) / 25.4  # in inches
+        )
+        print(final_plot)
+        dev.off()
+
+    } else if (grepl(".svg", basename(filename))) {
+        grDevices::svg(
+            filename = filename,
             width = (ht_Tum_2@ht_list_param[["width"]] * 1.75) / 25.4, # in inches
             height = (ht_Tum_2@ht_list_param[["height"]] * 2.1) / 25.4  # in inches
         )
