@@ -126,9 +126,11 @@ assignClusters <- function(x,
 
     # If clusters is provided, validate its format
     if (!is.null(clusters)) {
-        stopifnot(
-            "`clusters` must be a named vector." = is.vector(clusters) && !is.null(names(clusters))
-        )
+        if (is.factor(clusters) && !is.null(names(clusters))) {
+            clusters <- stats::setNames(as.vector(clusters), names(clusters))
+        } else {
+            stopifnot("`clusters` must be a named vector or factor." = is.vector(clusters) && !is.null(names(clusters)))
+        }
     }
 
     # Apply mapping if provided
