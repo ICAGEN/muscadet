@@ -1662,6 +1662,32 @@ plotCNA <- function(x,
     # Argument checks
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
+    # Extract data table
+    data <- x@cnacalling$table
+
+    # Extract number of cells per cluster
+    ncells <- x@cnacalling$ncells
+
+    # Keep only autosomes to display
+    data <- data[!data$chrom %in% c("X", "Y", "M"), ]
+
+    # Check for colors
+    cna_states <- c("gain", "loss", "cnloh")
+    if(!is.null(names(cna.colors))) {
+        if(!all(cna_states %in% names(cna.colors))) {
+            cna.colors <- cna.colors[1:3]
+            names(cna.colors) <- cna_states
+        }
+    }
+    if (is.null(names(cna.colors)) & length(cna.colors) <= 3) {
+        names(cna.colors) <- cna_states[1:length(cna.colors)]
+    } else if (length(cna.colors) > 3) {
+        cna.colors <- cna.colors[1:3]
+        if (is.null(names(cna.colors))) {
+            names(cna.colors) <- cna_states
+        }
+    }
+
     # Extract genome
     if (x@genome == "hg38") {
         genome_chrom <- hg38_chrom
@@ -1690,14 +1716,6 @@ plotCNA <- function(x,
     chromNames <- factor(unique(chromSizes$seqnames),
                          levels = unique(chromSizes$seqnames))
 
-    # Extract data table
-    data <- x@cnacalling$table
-
-    # Extract number of cells per cluster
-    ncells <- x@cnacalling$ncells
-
-    # Keep only autosomes to display
-    data <- data[!data$chrom %in% c("X", "Y", "M"), ]
 
     # Add chromosomes start and end coordinates on x axis
     df <- dplyr::left_join(data, chromStarts, by = "chrom") %>%
@@ -1723,7 +1741,7 @@ plotCNA <- function(x,
         dplyr::mutate(start.y = prop_starts[as.character(.data$cluster)], end.y = prop_ends[as.character(.data$cluster)])
 
     # Ordered levels for CNA states
-    df$cna_state <- factor(df$cna_state, levels = c("gain", "loss", "cnloh"))
+    df$cna_state <- factor(df$cna_state, levels = cna_states[cna_states %in% unique(na.omit(data$cna_state))])
 
     # Construct plot
     cna_plot <- ggplot2::ggplot(
@@ -1797,6 +1815,312 @@ plotCNA <- function(x,
 
     return(cna_plot)
 }
+
+
+#' Plot UMAP Coordinates from a muscadet Object
+#'
+#' Visualize UMAP (Uniform Manifold Approximation and Projection) coordinates
+#' stored in a `muscadet` object. The function allows coloring by clusters and
+#' optionally adding cluster labels.
+#'
+#' @param x A \code{\link{muscadet}} object containing clustering data (using
+#'   [muscadet::clusterMuscadet()]).
+#'
+#' @inheritParams heatmapMuscadet
+#'
+#' @param lab.x Label for the x-axis (`character` string). Default is "UMAP 1".
+#' @param lab.y Label for the y-axis (`character` string). Default is "UMAP 2".
+#'
+#' @param add_clusters_labels Logical. If `TRUE`, adds the cluster names as
+#'   text or boxed labels using [add_labels()]. Default is `FALSE`.
+#'
+#' @param point.size Numeric. Size of the points in the UMAP plot passed to [ggplot2::geom_point()]. Default is `0.5`.
+#' @param legend.point.size Numeric. Size of the points in the legend of the UMAP plot. Default is `3`.
+#' @param ... Additional arguments passed to [add_labels()] providing an
+#'   underlying geom for label names ([geom_text()], [geom_label()],
+#'   [geom_text_repel()], or [geom_label_repel()]).
+#'
+#' @return A `ggplot` object.
+#'
+#' @import ggplot2
+#' @importFrom SeuratObject Cells
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   p <- plotUMAP(muscadet_obj,
+#'                 partition = 0.6,
+#'                 title = "UMAP copy-number clusters")
+#'   print(p)
+#' }
+plotUMAP <- function(x,
+                     partition = NULL,
+                     clusters = NULL,
+                     colors = NULL,
+                     title = "",
+                     lab.x = "UMAP 1",
+                     lab.y = "UMAP 2",
+                     add_clusters_labels = FALSE,
+                     point.size = 0.5,
+                     legend.point.size = 3,
+                     ...) {
+
+    # Validate input: x must be a muscadet object
+    stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
+
+    # Validate clustering results present in the muscadet object
+    stopifnot("Input object `x` must contain clustering umap data (x@clustering$umap)." = !is.null(x@clustering$umap))
+
+    # Set default color palette for clusters if not provided
+    if (is.null(colors)) {
+        colors <- c(
+            "#FABC2A",
+            "#7FC97F",
+            "#EE6C4D",
+            "#39ADBD",
+            "#BEAED4",
+            "#FEE672",
+            "#F76F8E",
+            "#487BEA",
+            "#B67BE6",
+            "#F38D68",
+            "#7FD8BE",
+            "#F2AFC0"
+        )
+    }
+
+    # Get common cells
+    common_cells <- sort(Reduce(intersect, SeuratObject::Cells(x)))
+
+    # Filter cells based on provided `clusters` argument
+    if (!is.null(clusters)) {
+        # Check `clusters` cells
+        stopifnot(
+            "The `clusters` argument must have names, corresponding to cell names within the muscadet object `x`." = !is.null(names(clusters))
+        )
+
+        stopifnot(
+            "Names of `clusters` don't match cell names within the muscadet object `x`." = length(intersect(names(clusters), common_cells)) > 0
+        )
+
+        # cells not in `clusters`
+        cells_filtered <- setdiff(common_cells, names(clusters))
+
+        if (length(cells_filtered) > 0) {
+            warning(
+                paste(
+                    "The `clusters` argument does not contain cluster assignments for all common cells.",
+                    length(cells_filtered),
+                    "cells in the muscadet object `x` are filtered out."
+                )
+            )
+            # filter cells based on `clusters` cells
+            common_cells <- common_cells[common_cells %in% names(clusters)]
+        }
+
+    } else if (!is.null(partition)) {
+        stopifnot(
+            "The muscadet object `x` must contain the clustering results for the provided `partition`." =
+                as.character(partition) %in% names(x@clustering$clusters)
+        )
+
+        clusters <- x@clustering$clusters[[as.character(partition)]]
+
+    } else if (is.null(partition) && is.null(clusters)) {
+
+        stopifnot(
+            "The muscadet object `x` must contain the assigned clusters (x@cnacalling$clusters) (use assignClusters())
+            if `partition` and `clusters` arguments are NULL." =
+                !is.null(x@cnacalling$clusters)
+        )
+
+        clusters <- x@cnacalling$clusters
+    }
+
+
+    # Combine clusters and umap data
+    df <- as.data.frame(x@clustering$umap)[common_cells, ]
+    df$cluster <- as.factor(clusters[common_cells])
+
+    p <- ggplot(df, aes(x = UMAP_1 , y = UMAP_2, color = cluster)) +
+        geom_point(size = point.size) +
+        scale_color_manual(name = "Clusters", values = colors) +
+        labs(title = title, x = lab.x, y = lab.y) +
+        coord_fixed() +
+        guides(colour = guide_legend(override.aes = list(size = legend.point.size))) +
+        theme_bw() +
+        theme(
+            plot.title = element_text(hjust = 0.5),
+            panel.grid = element_blank(),
+            panel.border = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            legend.text = element_text(size = 12),
+            legend.title = element_text(size = 12)
+        )
+
+    if (add_clusters_labels) {
+        p <- add_labels(p, labels = cluster, ...)
+    }
+
+    return(p)
+}
+
+
+
+
+#' Add Labels to a ggplot Object
+#'
+#' This function adds labels at the median position of each group to a ggplot
+#' object. Labels can be added either as plain text or as label boxes, with
+#' optional repelling to avoid overlaps (using the `ggrepel` package if
+#' installed).
+#'
+#' @param p A ggplot object with mapping and data (`ggplot`).
+#' @param labels Column name (unquoted) indicating the group label to display.
+#' @param color Color of the label text (`character`). Default is `"black"`.
+#' @param repel Logical. If `TRUE`(default), overlapping labels are repelled
+#'   using the [ggrepel] package.
+#' @param label.box Logical. If `TRUE` it uses a boxed label (`geom_label`)
+#'   instead of plain text (`geom_text`). Default is `FALSE`.
+#' @param size Size of the label text (`numeric`). Default is `2`.
+#'
+#' @param ... Additional arguments passed to the corresponding underlying geom:
+#' - [geom_text()] (`repel`= `FALSE` and `label.box` = `FALSE`)
+#' - [geom_label()] (`repel`= `FALSE` and `label.box` = `TRUE`)
+#' - [geom_text_repel()] (`repel`= `TRUE` and `label.box` = `FALSE`)
+#' - [geom_label_repel()] (`repel`= `TRUE` and `label.box` = `TRUE`)
+#'
+#' @return A ggplot2 layer ([geom_text()], [geom_label()], [geom_text_repel()],
+#'   or [geom_label_repel()]).
+#'
+#' @details The function summarizes the data by computing the median x and y
+#' positions for each label group.
+#' If \code{repel = TRUE}, it uses \code{ggrepel::geom_text_repel()}
+#' (\code{label.box = FALSE}) or \code{ggrepel::geom_label_repel()}
+#' (\code{label.box = TRUE}).
+#' If \code{repel = FALSE}, it uses \code{ggplot2::geom_text()} (\code{label.box
+#' = FALSE}) or \code{ggplot2::geom_label()} (\code{label.box = TRUE}).
+#' If \code{repel = TRUE}, the `ggrepel` package must be installed.
+#'
+#' @importFrom rlang enquo as_label
+#' @import dplyr
+#' @import ggplot2
+#' @import ggrepel
+#'
+#' @examples
+#' \dontrun{
+#' library(ggplot2)
+#' library(ggrepel)
+#'
+#' p <- ggplot(mtcars, aes(x = wt, y = mpg, color = as.factor(cyl))) +
+#'   geom_point()
+#'
+#' p2 <- add_labels(
+#'   p,
+#'   labels = cyl,
+#'   repel = TRUE,
+#'   label.box = FALSE,
+#'   size = 5,
+#'   min.segment.length = 0
+#' )
+#' p2
+#'
+#' p3 <- add_labels(
+#'     p,
+#'     labels = cyl,
+#'     repel = TRUE,
+#'     label.box = TRUE,
+#'     size = 3,
+#'     box.padding = 1
+#' )
+#' p3
+#'
+#' p4 <- add_labels(
+#'     p,
+#'     labels = cyl,
+#'     repel = FALSE,
+#'     label.box = TRUE,
+#'     size = 4,
+#' )
+#' p4
+#' }
+#'
+#' @export
+#'
+add_labels <- function(
+        p,
+        labels,
+        color = "black",
+        repel = TRUE,
+        label.box = FALSE,
+        size = 3,
+        ...
+) {
+    labels <- rlang::enquo(labels)
+    mapping <- p$mapping
+    data <- p$data
+
+    # Check for ggrepel if repel is TRUE
+    if (repel && !requireNamespace("ggrepel", quietly = TRUE)) {
+        warning("Package 'ggrepel' is required for `repel` = TRUE. Please install it with install.packages('ggrepel').")
+        repel <- FALSE
+    }
+
+    # Extract x and y from mapping
+    x_col <- rlang::as_label(mapping$x)
+    y_col <- rlang::as_label(mapping$y)
+
+    # Summarize data
+    summarized_data <- data %>%
+        dplyr::group_by(.data[[labels]]) %>%
+        dplyr::summarize(
+            med_x = median(.data[[x_col]], na.rm = TRUE),
+            med_y = median(.data[[y_col]], na.rm = TRUE),
+            .groups = "drop"
+        )
+
+    # Choose appropriate geom
+    if (repel) {
+        geom_fun <- if (label.box) ggrepel::geom_label_repel else ggrepel::geom_text_repel
+
+        # Build layer
+        ggobj <- geom_fun(
+            data = summarized_data,
+            mapping = aes(
+                x = med_x,
+                y = med_y,
+                label = !!labels
+            ),
+            color = color,
+            size = size,
+            inherit.aes = FALSE,
+            show.legend = FALSE,
+            ...
+        )
+
+    } else {
+        geom_fun <- if (label.box) ggplot2::geom_label else ggplot2::geom_text
+
+        # Build layer
+        ggobj <- geom_fun(
+            data = summarized_data,
+            mapping = aes(
+                x = med_x,
+                y = med_y,
+                label = !!labels
+            ),
+            color = color,
+            size = size,
+            inherit.aes = FALSE,
+            show.legend = FALSE,
+            ...
+        )
+    }
+
+    p + ggobj
+}
+
 
 
 #' Create heatmap and distribution plots of the different steps of computing log

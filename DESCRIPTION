@@ -42,6 +42,7 @@ Imports:
     GenomeInfoDb,
     GenomicRanges,
     ggplot2,
+    ggrepel,
     grDevices,
     grid,
     gtools,
