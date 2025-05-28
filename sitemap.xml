@@ -7,6 +7,7 @@
 <url><loc>https://icagen.github.io/muscadet/reference/CreateMuscadetObject.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/CreateMuscomicObject.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/addAlleleCounts.html</loc></url>
+<url><loc>https://icagen.github.io/muscadet/reference/add_labels.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/allele_counts.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/assignClusters.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/bulk_lrr.html</loc></url>
@@ -38,6 +39,7 @@
 <url><loc>https://icagen.github.io/muscadet/reference/plotIndexes.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/plotProfile.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/plotSil.html</loc></url>
+<url><loc>https://icagen.github.io/muscadet/reference/plotUMAP.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/preProcSample2.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/process_allele.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/save_as_vcf.html</loc></url>

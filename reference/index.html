@@ -31,9 +31,15 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="object-creation-and-manipulation">Object creation and manipulation<a class="anchor" aria-label="anchor" href="#object-creation-and-manipulation"></a></h2>
 
 
+
+
+    </div><div class="section level2">
+
+      <h3 id="objects-classes-and-methods">Objects, classes and methods<a class="anchor" aria-label="anchor" href="#objects-classes-and-methods"></a></h3>
+      <div class="section-desc"><p>Classes and functions to create muscomic/muscadet objects and data access</p></div>
 
 
     </div><div class="section level2">
@@ -43,17 +49,58 @@
 
       <dl><dt>
 
+          <code><a href="CreateMuscomicObject.html">CreateMuscomicObject()</a></code>
+
+        </dt>
+        <dd>Create a muscomic object</dd>
+      </dl><dl><dt>
+
+          <code><a href="muscomic-class.html">muscomic-class</a></code> <code><a href="muscomic-class.html">muscomic</a></code>
+
+        </dt>
+        <dd>The muscomic class</dd>
+      </dl><dl><dt>
+
           <code><a href="CreateMuscadetObject.html">CreateMuscadetObject()</a></code>
 
         </dt>
         <dd>Create a muscadet object</dd>
       </dl><dl><dt>
 
-          <code><a href="CreateMuscomicObject.html">CreateMuscomicObject()</a></code>
+          <code><a href="muscadet-class.html">muscadet-class</a></code> <code><a href="muscadet-class.html">muscadet</a></code>
 
         </dt>
-        <dd>Create a muscomic object</dd>
+        <dd>The muscadet class</dd>
       </dl><dl><dt>
+
+          <code><a href="muscadet-methods.html">coordFeatures()</a></code> <code><a href="muscadet-methods.html">matCounts()</a></code> <code><a href="muscadet-methods.html">matLogRatio()</a></code> <code><a href="muscadet-methods.html">Cells(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="muscadet-methods.html">Cells(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="muscadet-methods.html">Features(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="muscadet-methods.html">Features(<i>&lt;muscadet&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Methods for <code>muscomic</code> and <code>muscadet</code> objects</dd>
+      </dl><dl><dt>
+
+          <code><a href="musc-access.html">`[`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`[`(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="musc-access.html">`$`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`$`(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="musc-access.html">`[&lt;-`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`[&lt;-`(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="musc-access.html">`$&lt;-`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`$&lt;-`(<i>&lt;muscomic&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Access and assignment methods for <code>muscadet</code> objects</dd>
+      </dl><dl><dt>
+
+          <code><a href="musc-auto.html">.DollarNames(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-auto.html">.DollarNames(<i>&lt;muscomic&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Autocompletion for <code>$</code> access on <code>muscadet</code> or <code>muscomic</code> objects</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="object-incremental-additions">Object incremental additions<a class="anchor" aria-label="anchor" href="#object-incremental-additions"></a></h3>
+      <div class="section-desc"><p>Functions for incremental additions to muscadet objects during analysis</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="addAlleleCounts.html">addAlleleCounts()</a></code>
 
@@ -61,47 +108,22 @@
         <dd>Add allele counts to a <code>muscadet</code> object</dd>
       </dl><dl><dt>
 
-          <code><a href="allele_counts.html">allele_counts_atac_tumor</a></code> <code><a href="allele_counts.html">allele_counts_atac_ref</a></code> <code><a href="allele_counts.html">allele_counts_rna_tumor</a></code> <code><a href="allele_counts.html">allele_counts_rna_ref</a></code>
-
-        </dt>
-        <dd>Example data: Allele counts at variation positions</dd>
-      </dl><dl><dt>
-
           <code><a href="assignClusters.html">assignClusters()</a></code>
 
         </dt>
         <dd>Assign a cluster assignment to a <code>muscadet</code> object</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="log-ratio-computation">Log-ratio computation<a class="anchor" aria-label="anchor" href="#log-ratio-computation"></a></h2>
 
-          <code><a href="bulk_lrr.html">bulk_lrr</a></code>
+      <div class="section-desc"><p>Functions to compute log R ratios from the count matrices (coverage information)</p></div>
 
-        </dt>
-        <dd>Example data: Log R ratio from bulk sequencing data</dd>
-      </dl><dl><dt>
 
-          <code><a href="clusterMuscadet.html">clusterMuscadet()</a></code>
+    </div><div class="section level2">
 
-        </dt>
-        <dd>Multi Omics Integration and Clustering on a <code>muscadet</code> Object</dd>
-      </dl><dl><dt>
 
-          <code><a href="cluster_hclust.html">cluster_hclust()</a></code>
 
-        </dt>
-        <dd>Multi Omics Clustering with SNF integration and Hierarchical Clustering</dd>
-      </dl><dl><dt>
 
-          <code><a href="cluster_seurat.html">cluster_seurat()</a></code>
-
-        </dt>
-        <dd>Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering</dd>
-      </dl><dl><dt>
-
-          <code><a href="cnaCalling.html">cnaCalling()</a></code>
-
-        </dt>
-        <dd>Copy Number Alteration (CNA) Calling from muscadet object</dd>
-      </dl><dl><dt>
+      <dl><dt>
 
           <code><a href="computeLogRatio.html">computeLogRatio()</a></code>
 
@@ -121,22 +143,68 @@
         <dd>Compute log R ratios for scRNA-seq data</dd>
       </dl><dl><dt>
 
-          <code><a href="features.html">genes</a></code> <code><a href="features.html">peaks</a></code>
-
-        </dt>
-        <dd>Example data: Feature coordinates</dd>
-      </dl><dl><dt>
-
           <code><a href="getLogRatioBulk.html">getLogRatioBulk()</a></code>
 
         </dt>
         <dd>Retrieve log R ratio from Bulk data on single-cell features (internal)</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="integration-and-clustering">Integration and clustering<a class="anchor" aria-label="anchor" href="#integration-and-clustering"></a></h2>
 
-          <code><a href="getSegConsensus.html">getSegConsensus()</a></code>
+      <div class="section-desc"><p>Functions to integrate log-ratios of omics and cluster cells</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="clusterMuscadet.html">clusterMuscadet()</a></code>
 
         </dt>
-        <dd>Get consensus segments across clusters</dd>
+        <dd>Multi Omics Integration and Clustering on a <code>muscadet</code> Object</dd>
+      </dl><dl><dt>
+
+          <code><a href="cluster_seurat.html">cluster_seurat()</a></code>
+
+        </dt>
+        <dd>Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering</dd>
+      </dl><dl><dt>
+
+          <code><a href="cluster_hclust.html">cluster_hclust()</a></code>
+
+        </dt>
+        <dd>Multi Omics Clustering with SNF integration and Hierarchical Clustering</dd>
+      </dl><dl><dt>
+
+          <code><a href="weightedSNF.html">weightedSNF()</a></code>
+
+        </dt>
+        <dd>Weighted Similarity Network Fusion</dd>
+      </dl><dl><dt>
+
+          <code><a href="imputeClusters.html">imputeClusters()</a></code>
+
+        </dt>
+        <dd>Impute cluster assignments for missing cells by similarity</dd>
+      </dl></div><div class="section level2">
+      <h2 id="visualization-log-ratios-and-clusters">Visualization - log-ratios and clusters<a class="anchor" aria-label="anchor" href="#visualization-log-ratios-and-clusters"></a></h2>
+
+      <div class="section-desc"><p>Functions to visualize log-ratios data on chromosomes, clusters of cells, and usefull for clustering validation</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="heatmapStep.html">heatmapStep()</a></code>
+
+        </dt>
+        <dd>Create heatmap and distribution plots of the different steps of computing log R ratios</dd>
       </dl><dl><dt>
 
           <code><a href="heatmapMuscadet.html">heatmapMuscadet()</a></code>
@@ -145,70 +213,10 @@
         <dd>Heatmap plot for <code>muscadet</code> object</dd>
       </dl><dl><dt>
 
-          <code><a href="heatmapStep.html">heatmapStep()</a></code>
+          <code><a href="plotSil.html">plotSil()</a></code>
 
         </dt>
-        <dd>Create heatmap and distribution plots of the different steps of computing log R ratios</dd>
-      </dl><dl><dt>
-
-          <code><a href="imputeClusters.html">imputeClusters()</a></code>
-
-        </dt>
-        <dd>Impute cluster assignments for missing cells by similarity</dd>
-      </dl><dl><dt>
-
-          <code><a href="mat_counts.html">mat_counts_atac_tumor</a></code> <code><a href="mat_counts.html">mat_counts_atac_ref</a></code> <code><a href="mat_counts.html">mat_counts_rna_tumor</a></code> <code><a href="mat_counts.html">mat_counts_rna_ref</a></code>
-
-        </dt>
-        <dd>Example data: Matrices of raw counts</dd>
-      </dl><dl><dt>
-
-          <code><a href="mergeCounts.html">mergeCounts()</a></code>
-
-        </dt>
-        <dd>Merge counts for <code>muscadet</code> objects</dd>
-      </dl><dl><dt>
-
-          <code><a href="musc-access.html">`[`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`[`(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="musc-access.html">`$`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`$`(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="musc-access.html">`[&lt;-`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`[&lt;-`(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="musc-access.html">`$&lt;-`(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-access.html">`$&lt;-`(<i>&lt;muscomic&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Access and assignment methods for <code>muscadet</code> objects</dd>
-      </dl><dl><dt>
-
-          <code><a href="musc-auto.html">.DollarNames(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="musc-auto.html">.DollarNames(<i>&lt;muscomic&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Autocompletion for <code>$</code> access on <code>muscadet</code> or <code>muscomic</code> objects</dd>
-      </dl><dl><dt>
-
-          <code><a href="muscadet-class.html">muscadet-class</a></code> <code><a href="muscadet-class.html">muscadet</a></code>
-
-        </dt>
-        <dd>The muscadet class</dd>
-      </dl><dl><dt>
-
-          <code><a href="muscadet-methods.html">coordFeatures()</a></code> <code><a href="muscadet-methods.html">matCounts()</a></code> <code><a href="muscadet-methods.html">matLogRatio()</a></code> <code><a href="muscadet-methods.html">Cells(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="muscadet-methods.html">Cells(<i>&lt;muscadet&gt;</i>)</a></code> <code><a href="muscadet-methods.html">Features(<i>&lt;muscomic&gt;</i>)</a></code> <code><a href="muscadet-methods.html">Features(<i>&lt;muscadet&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Methods for <code>muscomic</code> and <code>muscadet</code> objects</dd>
-      </dl><dl><dt>
-
-          <code><a href="muscadet_obj.html">muscadet_obj</a></code> <code><a href="muscadet_obj.html">muscadet_obj_ref</a></code>
-
-        </dt>
-        <dd>Example data: muscadet objects</dd>
-      </dl><dl><dt>
-
-          <code><a href="muscomic-class.html">muscomic-class</a></code> <code><a href="muscomic-class.html">muscomic</a></code>
-
-        </dt>
-        <dd>The muscomic class</dd>
-      </dl><dl><dt>
-
-          <code><a href="plotCNA.html">plotCNA()</a></code>
-
-        </dt>
-        <dd>Plot CNA segments across clusters from a muscadet object</dd>
+        <dd>Silhouette plot for <code>muscadet</code> object</dd>
       </dl><dl><dt>
 
           <code><a href="plotIndexes.html">plotIndexes()</a></code>
@@ -217,16 +225,39 @@
         <dd>Plot clustering validation indexes for a <code>muscadet</code> object</dd>
       </dl><dl><dt>
 
-          <code><a href="plotProfile.html">plotProfile()</a></code>
+          <code><a href="plotUMAP.html">plotUMAP()</a></code>
 
         </dt>
-        <dd>Plot CNA profiles from muscadet object</dd>
+        <dd>Plot UMAP Coordinates from a muscadet Object</dd>
       </dl><dl><dt>
 
-          <code><a href="plotSil.html">plotSil()</a></code>
+          <code><a href="add_labels.html">add_labels()</a></code>
 
         </dt>
-        <dd>Silhouette plot for <code>muscadet</code> object</dd>
+        <dd>Add Labels to a ggplot Object</dd>
+      </dl></div><div class="section level2">
+      <h2 id="calling-of-copy-number-alterations">Calling of Copy Number Alterations<a class="anchor" aria-label="anchor" href="#calling-of-copy-number-alterations"></a></h2>
+
+      <div class="section-desc"><p>Functions to identify Copy Number Alterations</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="mergeCounts.html">mergeCounts()</a></code>
+
+        </dt>
+        <dd>Merge counts for <code>muscadet</code> objects</dd>
+      </dl><dl><dt>
+
+          <code><a href="cnaCalling.html">cnaCalling()</a></code>
+
+        </dt>
+        <dd>Copy Number Alteration (CNA) Calling from muscadet object</dd>
       </dl><dl><dt>
 
           <code><a href="preProcSample2.html">preProcSample2()</a></code>
@@ -234,6 +265,46 @@
         </dt>
         <dd>Process read count matrix and segmentation</dd>
       </dl><dl><dt>
+
+          <code><a href="getSegConsensus.html">getSegConsensus()</a></code>
+
+        </dt>
+        <dd>Get consensus segments across clusters</dd>
+      </dl></div><div class="section level2">
+      <h2 id="visualization-copy-number-alterations-profiles">Visualization - Copy Number Alterations profiles<a class="anchor" aria-label="anchor" href="#visualization-copy-number-alterations-profiles"></a></h2>
+
+      <div class="section-desc"><p>Functions to visualize Copy Number Alterations profiles at clone-level and sample-level</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="plotProfile.html">plotProfile()</a></code>
+
+        </dt>
+        <dd>Plot CNA profiles from muscadet object</dd>
+      </dl><dl><dt>
+
+          <code><a href="plotCNA.html">plotCNA()</a></code>
+
+        </dt>
+        <dd>Plot CNA segments across clusters from a muscadet object</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-preparation">Data preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a></h2>
+
+      <div class="section-desc"><p>Functions facilitating allelic data preparation</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="process_allele.html">process_allele()</a></code>
 
@@ -245,14 +316,67 @@
 
         </dt>
         <dd>Save a data frame as a VCF File</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a></h2>
 
-          <code><a href="weightedSNF.html">weightedSNF()</a></code>
+      <div class="section-desc"><p>Example data used for examples and practicing functions</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="muscadet_obj.html">muscadet_obj</a></code> <code><a href="muscadet_obj.html">muscadet_obj_ref</a></code>
 
         </dt>
-        <dd>Weighted Similarity Network Fusion</dd>
+        <dd>Example data: muscadet objects</dd>
+      </dl><dl><dt>
+
+          <code><a href="mat_counts.html">mat_counts_atac_tumor</a></code> <code><a href="mat_counts.html">mat_counts_atac_ref</a></code> <code><a href="mat_counts.html">mat_counts_rna_tumor</a></code> <code><a href="mat_counts.html">mat_counts_rna_ref</a></code>
+
+        </dt>
+        <dd>Example data: Matrices of raw counts</dd>
+      </dl><dl><dt>
+
+          <code><a href="allele_counts.html">allele_counts_atac_tumor</a></code> <code><a href="allele_counts.html">allele_counts_atac_ref</a></code> <code><a href="allele_counts.html">allele_counts_rna_tumor</a></code> <code><a href="allele_counts.html">allele_counts_rna_ref</a></code>
+
+        </dt>
+        <dd>Example data: Allele counts at variation positions</dd>
+      </dl><dl><dt>
+
+          <code><a href="features.html">genes</a></code> <code><a href="features.html">peaks</a></code>
+
+        </dt>
+        <dd>Example data: Feature coordinates</dd>
+      </dl><dl><dt>
+
+          <code><a href="bulk_lrr.html">bulk_lrr</a></code>
+
+        </dt>
+        <dd>Example data: Log R ratio from bulk sequencing data</dd>
+      </dl></div><div class="section level2">
+      <h2 id="misc">Misc<a class="anchor" aria-label="anchor" href="#misc"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="genome_chrom.html">genome_chrom</a></code> <code><a href="genome_chrom.html">hg38_chrom</a></code> <code><a href="genome_chrom.html">hg19_chrom</a></code> <code><a href="genome_chrom.html">mm10_chrom</a></code>
+
+        </dt>
+        <dd>Genome chromosome sizes (internal data)</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
