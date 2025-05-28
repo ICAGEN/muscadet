@@ -55,7 +55,7 @@ with missing data in at least one omic) are displayed in the heatmaps.}
 \item{averages}{Logical. If \code{TRUE}, plots the average log R ratio per
 cluster. Default is \code{FALSE}.}
 
-\item{title}{Character string for the title of the heatmap (\code{character}
+\item{title}{Character string for the title of the plot (\code{character}
 string). Default is an empty character string.}
 
 \item{row_annots}{Optional. A list of \linkS4class{HeatmapAnnotation} objects from

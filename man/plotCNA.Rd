@@ -37,11 +37,11 @@ library("ggplot2")
 data(muscadet_obj)
 
 # Plot CNA segments
-plot <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
-print(plot)
+p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
+p
 ggsave(
     filename = file.path("CNAplot.png"),
-    plot = plot,
+    plot = p,
     width = 3000,
     height = 800,
     units = "px"

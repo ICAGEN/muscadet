@@ -2,6 +2,7 @@
 % Please edit documentation in R/objects.R
 \name{.DollarNames.muscadet}
 \alias{.DollarNames.muscadet}
+\alias{muscadet-auto}
 \alias{.DollarNames.muscomic}
 \title{Autocompletion for \code{$} access on \code{muscadet} or \code{muscomic} objects}
 \usage{

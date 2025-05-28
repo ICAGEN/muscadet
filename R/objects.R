@@ -221,8 +221,7 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
   # Ordered chromosomes
   features$CHROM <- ordered(features$CHROM, levels = gtools::mixedsort(unique(features$CHROM)))
   # Reorder data
-  features <- features[order(features[, "start"]), ]
-  features <- features[order(features[, "CHROM"]), ]
+  features <- features[order(features$CHROM, features$start), ]
 
   # Check row names of matrix matching features id
   stopifnot("Row names of count matrix `mat_counts` must not be NULL and must match `features` id column." =
@@ -253,8 +252,7 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
   # Ordered chromosomes
   table_counts$CHROM <- ordered(table_counts$CHROM, levels = gtools::mixedsort(unique(table_counts$CHROM)))
   # Reorder data
-  table_counts <- table_counts[order(table_counts[, "POS"]), ]
-  table_counts <- table_counts[order(table_counts[, "CHROM"]), ]
+  table_counts <- table_counts[order(table_counts$CHROM, table_counts$POS), ]
 
   # Coverage data
   coverage <- list(
@@ -272,8 +270,7 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
       # Ordered chromosomes
       allele_counts$CHROM <- ordered(allele_counts$CHROM, levels = gtools::mixedsort(unique(allele_counts$CHROM)))
       # Reorder data
-      allele_counts <- allele_counts[order(allele_counts[, "POS"]), ]
-      allele_counts <- allele_counts[order(allele_counts[, "CHROM"]), ]
+      allele_counts <- allele_counts[order(allele_counts$CHROM, allele_counts$POS), ]
 
       allelic <- list(table.counts = data.frame(omic = type.omic, allele_counts))
 
@@ -453,6 +450,7 @@ CreateMuscadetObject <- function(omics,
 #'   or \code{\link{muscomic}} objects. For `muscadet` objects, it also lists
 #'   omic datasets contained inside the `omics` slot.
 #'
+#' @aliases muscadet-auto
 #' @rdname musc-auto
 #'
 #' @inheritParams utils::.DollarNames

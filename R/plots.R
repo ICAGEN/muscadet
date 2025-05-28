@@ -43,7 +43,7 @@
 #' @param averages Logical. If `TRUE`, plots the average log R ratio per
 #'   cluster. Default is `FALSE`.
 #'
-#' @param title Character string for the title of the heatmap (`character`
+#' @param title Character string for the title of the plot (`character`
 #'   string). Default is an empty character string.
 #'
 #' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
@@ -423,8 +423,10 @@ heatmapMuscadet <- function(x,
     if (averages) {
 
         # retrieve clusters if `partition` is defined and not `clusters`
-        if (is.null(clusters)) {
+        if (is.null(clusters) & !is.null(partition)) {
             clusters <- x@clustering$clusters[[as.character(partition)]]
+        } else if (is.null(clusters) & is.null(partition)) {
+            clusters <- x@cnacalling$clusters
         }
 
         # Order clusters in the same way as the matrix
@@ -1639,11 +1641,11 @@ plotProfile <- function(x,
 #' data(muscadet_obj)
 #'
 #' # Plot CNA segments
-#' plot <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
-#' print(plot)
+#' p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
+#' p
 #' ggsave(
 #'     filename = file.path("CNAplot.png"),
-#'     plot = plot,
+#'     plot = p,
 #'     width = 3000,
 #'     height = 800,
 #'     units = "px"
