@@ -387,6 +387,7 @@ cluster_seurat <- function(mat_list,
     })
 
     # Create assay objects for each modality, use only common cells
+    # We transpose the matrix since Seurat assays expect features x cells matrices
     assay_list <- lapply(mat_list, function(mat) {
         SeuratObject::CreateAssay5Object(SeuratObject::as.sparse(t(mat)),
                                          # rows = features x columns = cells
@@ -423,6 +424,8 @@ cluster_seurat <- function(mat_list,
     })
 
     # Add reductions to Seurat object
+    # Warning: since Seurat v5 the way to add reductions has changed, see:
+    # https://github.com/satijalab/seurat/discussions/8726#discussioncomment-10330615
     for (omic in names(pca_list)) {
         seurat@reductions[[paste0("PCA_", omic)]] <- pca_list[[omic]]
     }
