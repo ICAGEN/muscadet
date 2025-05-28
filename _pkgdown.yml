@@ -1,5 +1,90 @@
 url: https://icagen.github.io/muscadet/
 template:
   bootstrap: 5
+  params:
+    bootswatch: simplex
 favicon: false
+
+reference:
+- title: "Object creation and manipulation"
+- subtitle: "Objects, classes and methods"
+  desc: >
+    Classes and functions to create muscomic/muscadet objects and data access
+  contents:
+  - CreateMuscomicObject
+  - muscomic-class
+  - CreateMuscadetObject
+  - muscadet-class
+  - muscadet-methods
+  - ends_with("access")
+  - ends_with("auto")
+- subtitle: "Object incremental additions"
+  desc: >
+    Functions for incremental additions to muscadet objects during analysis
+  contents:
+  - addAlleleCounts
+  - assignClusters
+- title: "Log-ratio computation"
+  desc: >
+    Functions to compute log R ratios from the count matrices (coverage
+    information)
+  contents:
+  - computeLogRatio
+  - computeLogRatioATAC
+  - computeLogRatioRNA
+  - getLogRatioBulk
+- title: "Integration and clustering"
+  desc: >
+    Functions to integrate log-ratios of omics and cluster cells
+  contents:
+  - clusterMuscadet
+  - cluster_seurat
+  - cluster_hclust
+  - weightedSNF
+  - imputeClusters
+- title: "Visualization - log-ratios and clusters"
+  desc: >
+    Functions to visualize log-ratios data on chromosomes, clusters of cells,
+    and usefull for clustering validation
+  contents:
+  - heatmapStep
+  - heatmapMuscadet
+  - plotSil
+  - plotIndexes
+  - plotUMAP
+  - add_labels
+- title: "Calling of Copy Number Alterations"
+  desc: >
+    Functions to identify Copy Number Alterations
+  contents:
+  - mergeCounts
+  - cnaCalling
+  - preProcSample2
+  - getSegConsensus
+- title: "Visualization - Copy Number Alterations profiles"
+  desc: >
+    Functions to visualize Copy Number Alterations profiles at clone-level and sample-level
+  contents:
+  - plotProfile
+  - plotCNA
+- title: "Data preparation"
+  desc: >
+    Functions facilitating allelic data preparation
+  contents:
+  - process_allele
+  - save_as_vcf
+- title: "Example data"
+  desc: >
+    Example data used for examples and practicing functions
+  contents:
+  - muscadet_obj
+  - mat_counts
+  - allele_counts
+  - features
+  - bulk_lrr
+- title: "Misc"
+  contents:
+  - genome_chrom
+
+
 
