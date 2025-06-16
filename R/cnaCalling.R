@@ -21,8 +21,8 @@
 #'   (default: 30).
 #' @param depthmin.c.allcells Minimum coverage depth for all tumor cells
 #'   (default: 50).
-#' @param depthmin.nor Minimum coverage depth for normal sample (default: 0).
-#' @param depthmax.nor Maximum coverage depth for normal sample (default: 1000).
+#' @param depthmin.c.nor Minimum coverage depth for normal sample (default: 1000).
+#' @param depthmax.nor Optional. Maximum depth for normal sample (default: `NULL`).
 #' @param het.thresh VAF (Variant Allele Frequency) threshold to call variant
 #'   positions heterozygous for [preProcSample2()] (default: 0.25).
 #' @param snp.nbhd Window size for selecting SNP loci to reduce serial
@@ -38,10 +38,17 @@
 #'   [facets::procSample()] and [facets::emcncf()] (default: 5).
 #' @param clonal.thresh Threshold of minimum cell proportion to label a
 #'   segment as clonal (default: 0.9).
+#' @param cf.thresh Numeric threshold to set the minimum cell fraction (CF) allowed. CNA segments
+#'   with a CF below this value are considered neutral (i.e., 2:1). The default
+#'   is `0.5`. Can be set to `0` or `NULL` to disable this threshold and retain all segments
+#'   regardless of CF.
 #' @param dist.breakpoints Minimum distance between breakpoints to define
 #'   distinct segments (default: 1e6).
 #' @param ploidy Specifies ploidy assumption: `"auto"`, `"median"`, or numeric
 #'   value (default: `"auto"`).
+#' @param dipLogR Optional. Numeric value specifying an expected log ratio for
+#'   diploid regions to use for the analysis. If `NULL`, by default, the diploid
+#'   log ratio is estimated automatically from the data.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
@@ -107,12 +114,13 @@
 #'   `cna_clonal_state` (state of clonal CNA segments).
 #'
 #'   \item \code{ncells}: Vector of number of cells per cluster.
-#'   \item \code{dipLogR.clusters}: Diploid log R ratio from the per cluster analysis.
-#'   \item \code{dipLogR.allcells}: Diploid log R ratio from the all cells analysis.
-#'   \item \code{purity.clusters}: Purity from the per cluster analysis.
-#'   \item \code{purity.allcells}: Purity from the all cells analysis.
-#'   \item \code{ploidy.clusters}: Ploidy from the per cluster analysis.
-#'   \item \code{ploidy.allcells}: Ploidy from the all cells analysis.
+#'   \item \code{dipLogR.clusters}: Diploid log R ratio estimated during the per cluster analysis.
+#'   \item \code{dipLogR.allcells}: Diploid log R ratio estimated during the all cells analysis.
+#'   \item \code{purity.clusters}: Purity estimated during the per cluster analysis.
+#'   \item \code{purity.allcells}: Purity estimated during the all cells analysis.
+#'   \item \code{ploidy.clusters}: Ploidy estimated during the per cluster analysis.
+#'   \item \code{ploidy.allcells}: Ploidy estimated during the all cells analysis.
+#'   \item \code{ploidy}: Ploidy used for the CNA analysis.
 #' }
 #'
 #' @import dplyr
@@ -154,7 +162,7 @@
 #'                            depthmin.c.clusters = 5,
 #'                            depthmin.a.allcells = 3,
 #'                            depthmin.c.allcells = 5,
-#'                            depthmin.nor = 0)
+#'                            depthmin.c.nor = 0)
 #'
 cnaCalling <- function(
         x,
@@ -163,8 +171,8 @@ cnaCalling <- function(
         depthmin.c.clusters = 50,
         depthmin.a.allcells = 30,
         depthmin.c.allcells = 50,
-        depthmin.nor = 5,
-        depthmax.nor = 1000,
+        depthmin.c.nor = 1000,
+        depthmax.nor = NULL,
         het.thresh = 0.25,
         snp.nbhd = 250,
         hetscale = TRUE,
@@ -172,10 +180,15 @@ cnaCalling <- function(
         cval2 = 150,
         min.nhet = 5,
         clonal.thresh = 0.9,
+        cf.thresh = 0.5,
         dist.breakpoints = 1e6,
         ploidy = "auto",
+        dipLogR = NULL,
         quiet = FALSE
 ) {
+
+    # Condition messages if quiet = FALSE
+    msg <- function(...) if (!quiet) message(...)
 
     # Argument validation
     stopifnot("Input object `x` must be of class 'muscadet'." = inherits(x, "muscadet"))
@@ -184,8 +197,7 @@ cnaCalling <- function(
         is.numeric(depthmin.c.clusters),
         is.numeric(depthmin.a.allcells),
         is.numeric(depthmin.c.allcells),
-        is.numeric(depthmin.nor),
-        is.numeric(depthmax.nor),
+        is.numeric(depthmin.c.nor),
         is.numeric(het.thresh),
         is.numeric(snp.nbhd),
         is.numeric(min.nhet),
@@ -206,8 +218,6 @@ cnaCalling <- function(
     emcncf <- utils::getFromNamespace("emcncf", "facets")
     procSnps <- utils::getFromNamespace("procSnps", "facets")
 
-    requireNamespace("pctGCdata", quietly = TRUE)
-
     # Extract and validate required slots
     gbuild <- x$genome
     rcmat <- x@cnacalling$combined.counts
@@ -220,18 +230,14 @@ cnaCalling <- function(
     # Filter coverage data based on selected omics
     if(!is.null(omics.coverage)) {
 
-        if (!quiet) {
-            message("Selecting coverage data from omic(s): ", omics.coverage)
-        }
+        msg("Selecting coverage data from omic(s): ", omics.coverage)
 
         stopifnot(
             "The `omics.coverage` argument must match one or more omic name (unique(x@cnacalling$combined.counts$omic))" =
                 omics.coverage %in% unique(rcmat$omic)
         )
-        rcmat <- rcmat[sort(c(
-            which(rcmat$signal == "coverage" & rcmat$omic %in% omics.coverage),
-            which(rcmat$signal == "allelic")
-        )), ]
+
+        rcmat <- rcmat[!(rcmat$signal == "coverage" & !(rcmat$omic %in% omics.coverage)), ]
     }
     # Remove unnecessary columns 'omic' and 'id'
     rcmat <- rcmat[, 1:8]
@@ -247,9 +253,9 @@ cnaCalling <- function(
 
     # FILTER POSITIONS ---------------------------------------------------------
 
-    if (!quiet) {
-        message("Filtering positions per clusters based on provided filters...")
-    }
+    msg("Filtering positions per clusters based on provided filters...")
+
+    if (is.null(depthmax.nor)) depthmax.nor <- max(rcmat$NOR.DP) + 1
 
     # Filter positions based on counts per clusters
     rcmat_filtered <- subset(
@@ -258,30 +264,32 @@ cnaCalling <- function(
              rcmat$TUM.DP >= depthmin.a.clusters) |
             (rcmat$signal == "coverage" &
                  rcmat$TUM.DP >= depthmin.c.clusters &
-                 rcmat$NOR.DP >= depthmin.nor)
+                 rcmat$NOR.DP >= depthmin.c.nor)
     )
+    msg("Filtering allelic positions: tumor depth >= ", depthmin.a.clusters, " reads")
+    msg("Filtering coverage positions: tumor depth >= ", depthmin.c.clusters, " reads")
+    msg("Filtering coverage positions: normal depth >= ", depthmin.c.nor, " reads")
+    msg("From ", nrow(rcmat), " positions to ", nrow(rcmat_filtered), " positions")
 
     x@cnacalling[["combined.counts.filtered"]] <- rcmat_filtered
 
 
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
 
-    if (!quiet) {
-        message("Performing segmentation per cluster...")
-    }
+    msg("Performing segmentation per cluster...")
 
     oo_list <- list()
     for(i in as.integer(sort(unique(rcmat_filtered$cluster)))){
-        rcmat_clus <- filter(rcmat_filtered, .data$cluster==i)
+        rcmat_clus <- dplyr::filter(rcmat_filtered, .data$cluster==i)
         if(length(unique(rcmat_clus$signal))==2) {
             xx <- preProcSample2(rcmat_clus,
                                  het.thresh = het.thresh,
                                  cval = cval1,
                                  snp.nbhd = snp.nbhd,
                                  gbuild = gbuild,
-                                 ndepth = depthmin.nor,
+                                 ndepth = 0,
                                  ndepthmax = depthmax.nor)
-            oo <- facets::procSample(xx, cval = cval2, min.nhet = min.nhet, dipLogR = NULL)
+            oo <- facets::procSample(xx, cval = cval2, min.nhet = min.nhet, dipLogR = dipLogR)
             oo[["clusters"]] <- i
             oo_list[[i]] <- oo
         }
@@ -297,8 +305,6 @@ cnaCalling <- function(
         x$out[,c(1:6,13)]
     })
     out_full <- do.call(rbind, out_full)
-    out_full <- out_full[order(out_full[, "seg"]), ]
-    out_full <- out_full[order(out_full[, "chrom"]), ]
     # Rename segments with unique number
     out_full$seg_ori <- out_full$seg
     out_full$seg <- 1:nrow(out_full)
@@ -308,11 +314,10 @@ cnaCalling <- function(
         x$jointseg[, 1:17]
     })
     jseg_full <- do.call(rbind, jseg_full)
-    jseg_full <- jseg_full[order(jseg_full[, "maploc"]), ]
-    jseg_full <- jseg_full[order(jseg_full[, "chrom"]), ]
     # Add the new unique segment number
     jseg_full$seg_ori <- jseg_full$seg
-    jseg_full <- dplyr::left_join(dplyr::select(jseg_full, colnames(jseg_full)[colnames(jseg_full) != "seg"]),
+    jseg_full <- dplyr::select(jseg_full, colnames(jseg_full)[colnames(jseg_full) != "seg"])
+    jseg_full <- dplyr::left_join(jseg_full,
                                   out_full[, c("seg", "cluster", "seg_ori")],
                                   by =c("cluster", "seg_ori"))
 
@@ -335,23 +340,20 @@ cnaCalling <- function(
 
     # FIND DIPLOID Log ratio ---------------------------------------------------
 
-    if (!quiet) {
-        message("Finding diploid log R ratio on clusters...")
-    }
-
     oo_full <- findDiploidLogR(outclust_full, jseg_full$cnlr)
-    dipLogR <- oo_full$dipLogR
 
-    if (!quiet) {
-        message("Diploid log R ratio = ", dipLogR)
+    if (is.null(dipLogR)) {
+        msg("Finding diploid log R ratio on clusters...")
+
+        dipLogR <- oo_full$dipLogR
+
     }
+    msg("Diploid log R ratio = ", dipLogR)
 
 
     # COMPUTE CF, TCN, LCN -----------------------------------------------------
 
-    if (!quiet) {
-        message("Computing cell fractions and copy numbers on clusters...")
-    }
+    msg("Computing cell fractions and copy numbers on clusters...")
 
     # Compute CF Cell fraction and CN Copy Number (L for lower, T for total)
     outclust_full <- fitcncf(outclust_full, dipLogR, nX)
@@ -379,24 +381,25 @@ cnaCalling <- function(
     jseg_full <- jseg_full[, colnames(jseg_full) != "vafT.median"]
     out_full <- out_full[, colnames(out_full)[c(1:6, 20, 7:19)]]
 
+    # Reorder
+    jseg_full <- jseg_full[order(jseg_full$chrom, jseg_full$maploc), ]
+    out_full <- out_full[order(out_full$chrom, out_full$start), ]
+
     # Rename chr X instead of 23
     out_full$chrom[out_full$chrom == 23] <- "X"
     jseg_full$chrom[jseg_full$chrom == 23] <- "X"
 
 
-    # CF CORRECTION ------------------------------------------------------------
+    # CF THRESHOLD -------------------------------------------------------------
 
-    # Get maximum CF that is not 1
-    max.cf <- max(out_full$cf.em[out_full$cf.em < 1], na.rm = T)
-    # Correct CN depending on CF
-    out_full <- mutate(
-        out_full,
-        cf.em = case_when(.data$cf.em < 1 ~ .data$cf.em / max.cf, .default = .data$cf.em),
-        tcn.em = case_when(!is.na(.data$cf.em) ~ .data$tcn.em * .data$cf.em + 2 * (1 - .data$cf.em), .default = .data$tcn.em),
-        lcn.em = case_when(!is.na(.data$cf.em) ~ .data$lcn.em * .data$cf.em + (1 - .data$cf.em), .default = .data$lcn.em)
-    )
-
-
+    if (!is.null(cf.thresh)) {
+        # Correct CN to diploid / neutral is CF below threshold
+        out_full <- dplyr::mutate(
+            out_full,
+            tcn.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 2, .default = .data$tcn.em),
+            lcn.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 1, .default = .data$lcn.em),
+            cf.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 1, .default = .data$cf.em))
+    }
 
     # 2. ON ALL CELLS ----------------------------------------------------------
 
@@ -415,9 +418,7 @@ cnaCalling <- function(
 
     # FILTER POSITIONS ---------------------------------------------------------
 
-    if (!quiet) {
-        message("Filtering positions on all cells based on provided filters...")
-    }
+    msg("Filtering positions on all cells based on provided filters...")
 
     # Filter positions based on counts for all cells
     rcmat_allcells_filtered <- subset(
@@ -426,24 +427,27 @@ cnaCalling <- function(
              rcmat_allcells$TUM.DP >= depthmin.a.allcells) |
             (rcmat_allcells$signal == "coverage" &
                  rcmat_allcells$TUM.DP >= depthmin.c.allcells &
-                 rcmat_allcells$NOR.DP >= depthmin.nor)
+                 rcmat_allcells$NOR.DP >= depthmin.c.nor)
     )
+
+    msg("Filtering allelic positions: tumor depth >= ", depthmin.a.allcells, " reads")
+    msg("Filtering coverage positions: tumor depth >= ", depthmin.c.allcells, " reads")
+    msg("Filtering coverage positions: normal depth >= ", depthmin.c.nor, " reads")
+    msg("From ", nrow(rcmat_allcells), " positions to ", nrow(rcmat_allcells_filtered), " positions")
 
     x@cnacalling[["combined.counts.allcells.filtered"]] <- rcmat_allcells_filtered
 
 
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
 
-    if (!quiet) {
-        message("Performing segmentation on all cells...")
-    }
+    msg("Performing segmentation on all cells...")
 
     xx_allcells <- preProcSample2(
         rcmat_allcells_filtered,
         cval = cval1,
         snp.nbhd = snp.nbhd,
         gbuild = gbuild,
-        ndepth = depthmin.nor,
+        ndepth = 0,
         ndepthmax = depthmax.nor)
     oo_allcells <- facets::procSample(xx_allcells,
                                       cval = cval2,
@@ -452,9 +456,7 @@ cnaCalling <- function(
 
     # COMPUTE CF, TCN, LCN -----------------------------------------------------
 
-    if (!quiet) {
-        message("Computing cell fractions and copy numbers on all cells...")
-    }
+    msg("Computing cell fractions and copy numbers on all cells...")
 
     # Compute CF Cell fraction and CN Copy Number with EM algorithm
     fit_allcells <- emcncf(oo_allcells, min.nhet=min.nhet)
@@ -471,23 +473,20 @@ cnaCalling <- function(
     jseg_allcells <- jseg_allcells[, colnames(jseg_allcells) != "vafT.median"]
     out_allcells <- out_allcells[, colnames(out_allcells)[c(1:6, 18, 7:17)]]
 
-
     # Rename chr X instead of 23
     out_allcells$chrom[out_allcells$chrom == 23] <- "X"
     jseg_allcells$chrom[jseg_allcells$chrom == 23] <- "X"
 
-    # CF CORRECTION ------------------------------------------------------------
+    # CF THRESHOLD -------------------------------------------------------------
 
-    # Get maximum CF that is not 1
-    max.cf <- max(out_allcells$cf.em[out_allcells$cf.em < 1], na.rm = T)
-    # Correct CN depending on CF
-    out_allcells <- mutate(
-        out_allcells,
-        cf.em = case_when(.data$cf.em < 1 ~ .data$cf.em / max.cf, .default = .data$cf.em),
-        tcn.em = case_when(!is.na(.data$cf.em) ~ .data$tcn.em * .data$cf.em + 2 * (1 - .data$cf.em), .default = .data$tcn.em),
-        lcn.em = case_when(!is.na(.data$cf.em) ~ .data$lcn.em * .data$cf.em + (1 - .data$cf.em), .default = .data$lcn.em)
-    )
-
+    if (!is.null(cf.thresh)) {
+        # Correct CN to diploid / neutral is CF below threshold
+        out_allcells <- dplyr::mutate(
+            out_allcells,
+            tcn.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 2, .default = .data$tcn.em),
+            lcn.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 1, .default = .data$lcn.em),
+            cf.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 1, .default = .data$cf.em))
+    }
 
     # GET VARIANT ALLELE FREQUENCIES -------------------------------------------
 
@@ -496,7 +495,7 @@ cnaCalling <- function(
         rcmat_allcells_filtered,
         snp.nbhd = snp.nbhd,
         nX = nX,
-        ndepth = depthmin.nor,
+        ndepth = 0,
         ndepthmax = depthmax.nor)
     colnames(pmat_allcells_filtered)[7:8] <- c("cluster", "signal")  # Rename columns
 
@@ -530,9 +529,7 @@ cnaCalling <- function(
 
     # 3. GET CONSENSUS SEGMENTS ------------------------------------------------
 
-    if (!quiet) {
-        message("Finding consensus segments between clusters...")
-    }
+    msg("Finding consensus segments between clusters...")
 
     consensus_segs <- getSegConsensus(out_full,
                                       ncells = ncells,
@@ -560,9 +557,11 @@ cnaCalling <- function(
             clusGR,
             minoverlap = dist.breakpoints,
             select = "first")
+        valid_idx <- !is.na(idx_segs)
 
-        cbind(cbind(consensus_segs, data.frame(id = row_number(consensus_segs))),
-              as.data.frame(clusGR)[idx_segs, -c(1:5)])
+        cbind(consensus_segs[valid_idx, ],
+              data.frame(id = which(valid_idx)),
+              as.data.frame(clusGR)[idx_segs[valid_idx], -c(1:5)])
     },
     unique(out_full$cluster)
     )
@@ -585,10 +584,10 @@ cnaCalling <- function(
         state = dplyr::case_when(
             .data$gnl == 1 ~ "gain",
             .data$gnl == -1 ~ "loss",
-            .data$gnl == 0 & .data$lcn.em == 0 ~ "cnloh",
-            .data$gnl == 0 & .data$lcn.em != 0 ~ "neu"
+            .data$gnl == 0 & .data$loh == TRUE ~ "cnloh",
+            .data$gnl == 0 & .data$loh == FALSE ~ "neu"
         ),
-        cna = dplyr::case_when(.data$gnl == 0 & .data$lcn.em != 0 ~ F, .data$gnl != 0 | .data$lcn.em == 0 ~ T),
+        cna = dplyr::case_when(.data$gnl == 0 & .data$loh == FALSE ~ F, .data$gnl != 0 | .data$loh == TRUE ~ T),
         cna_state = dplyr::case_when(.data$cna == T ~ .data$state, .data$cna == F ~ NA)
     )
 
@@ -632,6 +631,7 @@ cnaCalling <- function(
     x@cnacalling[["purity.allcells"]] <- fit_allcells$purity
     x@cnacalling[["ploidy.clusters"]] <- fit_full$ploidy
     x@cnacalling[["ploidy.allcells"]] <- fit_allcells$ploidy
+    x@cnacalling[["ploidy"]] <- ploidy
 
     return(x)
 }

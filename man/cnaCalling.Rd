@@ -21,8 +21,8 @@ cnaCalling(
   depthmin.c.clusters = 50,
   depthmin.a.allcells = 30,
   depthmin.c.allcells = 50,
-  depthmin.nor = 5,
-  depthmax.nor = 1000,
+  depthmin.c.nor = 1000,
+  depthmax.nor = NULL,
   het.thresh = 0.25,
   snp.nbhd = 250,
   hetscale = TRUE,
@@ -32,6 +32,8 @@ cnaCalling(
   clonal.thresh = 0.9,
   dist.breakpoints = 1e+06,
   ploidy = "auto",
+  dipLogR = NULL,
+  correct.cf = FALSE,
   quiet = FALSE
 )
 }
@@ -61,9 +63,9 @@ default, \code{NULL} selects all available data.}
 \item{depthmin.c.allcells}{Minimum coverage depth for all tumor cells
 (default: 50).}
 
-\item{depthmin.nor}{Minimum coverage depth for normal sample (default: 0).}
+\item{depthmin.c.nor}{Minimum coverage depth for normal sample (default: 1000).}
 
-\item{depthmax.nor}{Maximum coverage depth for normal sample (default: 1000).}
+\item{depthmax.nor}{Optional. Maximum depth for normal sample (default: \code{NULL}).}
 
 \item{het.thresh}{VAF (Variant Allele Frequency) threshold to call variant
 positions heterozygous for \code{\link[=preProcSample2]{preProcSample2()}} (default: 0.25).}
@@ -92,6 +94,17 @@ distinct segments (default: 1e6).}
 
 \item{ploidy}{Specifies ploidy assumption: \code{"auto"}, \code{"median"}, or numeric
 value (default: \code{"auto"}).}
+
+\item{dipLogR}{Optional. Numeric value specifying an expected log ratio for
+diploid regions to use for the analysis. If \code{NULL}, by default, the diploid
+log ratio is estimated automatically from the data.}
+
+\item{correct.cf}{Logical. If \code{TRUE}, normalizes the cell fraction (\code{cf.em})
+estimates so that the maximum value (excluding 1) becomes 1, and adjusts
+the total copy number (\code{tcn.em}) and lesser copy number (\code{lcn.em})
+accordingly. This correction accounts for partial subclonality in regions
+with lower-than-expected cell fractions, ensuring consistency in copy
+number calls. If \code{FALSE}, by default, no correction is applied.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
@@ -183,7 +196,7 @@ muscadet_obj <- cnaCalling(muscadet_obj,
                            depthmin.c.clusters = 5,
                            depthmin.a.allcells = 3,
                            depthmin.c.allcells = 5,
-                           depthmin.nor = 0)
+                           depthmin.c.nor = 0)
 
 }
 \references{
