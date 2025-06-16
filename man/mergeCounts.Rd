@@ -4,7 +4,7 @@
 \alias{mergeCounts}
 \title{Merge counts for \code{muscadet} objects}
 \usage{
-mergeCounts(x, reference, nor.het = TRUE)
+mergeCounts(x, reference, nor.het = TRUE, quiet = FALSE)
 }
 \arguments{
 \item{x}{A \code{\link{muscadet}} object containing sample data (\code{muscadet}).
@@ -20,6 +20,9 @@ positions to be heterozygous in the normal reference in allelic data (e.g.
 when heterozygous positions are retrieve based on matched bulk sequencing
 data, and are thereby assumed to be heterozygous) before combining coverage
 and allelic data. Default is \code{TRUE}.}
+
+\item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
+execution. Default is \code{FALSE}.}
 }
 \value{
 A modified \code{\link{muscadet}} object corresponding to the \code{x} muscadet object,

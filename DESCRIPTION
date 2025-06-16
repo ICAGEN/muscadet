@@ -34,6 +34,7 @@ Imports:
     cluster,
     clusterSim,
     ComplexHeatmap,
+    data.table,
     dendextend,
     dplyr,
     facets (>= 0.6.2),
@@ -70,7 +71,7 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 Collate: 
     'clustering.R'
     'cnaCalling.R'
