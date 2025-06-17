@@ -735,6 +735,19 @@ preProcSample2 <- function(
 
     gbuild <- match.arg(gbuild, c("hg19", "hg38", "mm10"))
 
+    # Export gbuild CG data from pctGC data correctly
+    # NOTE:
+    # The function pctGCdata::getGCpct() attempts to retrieve the GC content data
+    # using `get(gbuild, pos = "package:pctGCdata")`:
+    # https://github.com/veseshan/pctGCdata/blob/d2d4fafd10595750977f9bf5ebfeaed6e78da781/R/getGCpct.R#L5
+    # This approach requires the 'pctGCdata' package to be attached (via library(pctGCdata)),
+    # which is not standard practice and can cause errors when the package is only loaded via namespace.
+    # To work around this, we manually retrieve the GC data object and pass it directly to `facets::counts2logROR()`
+    # via the `ugcpct` argument while setting `gbuild = "udef"`.
+    # This bypasses the environment-dependent `get()` call and avoids requiring
+    # the 'pctGCdata' package to be attached globally.
+    gbuild_obj <- getExportedValue("pctGCdata", gbuild)
+
     # Determine chromosome number for X based on genome build
     nX <- switch(
         gbuild,
@@ -774,7 +787,7 @@ preProcSample2 <- function(
 
     # Step 3: Compute logR and logOR with GC correction for logR
     counts2logROR <- utils::getFromNamespace("counts2logROR", "facets")
-    dmat <- counts2logROR(pmat[pmat$rCountT > 0, ], gbuild, unmatched = FALSE)
+    dmat <- counts2logROR(pmat[pmat$rCountT > 0, ], gbuild = "udef", ugcpct = gbuild_obj, unmatched = FALSE)
 
     # Step 4: Exclude log ratios for allelic data, replace by mean of neighbors
     dmat <- dmat %>%
