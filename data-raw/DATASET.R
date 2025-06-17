@@ -320,7 +320,7 @@ muscadet <- cnaCalling(
     depthmin.c.clusters = 5,
     depthmin.a.allcells = 3,
     depthmin.c.allcells = 5,
-    depthmin.nor = 0
+    depthmin.c.nor = 0
 )
 
 
