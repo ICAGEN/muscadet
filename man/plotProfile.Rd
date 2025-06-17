@@ -12,8 +12,9 @@ plotProfile(
   point.size = 2,
   chrom.colors = c("slategrey", "skyblue"),
   lor.colors = c("peachpuff2", "paleturquoise3"),
-  cn.colors = c("black", "brown2"),
-  cf.colors = c("white", "steelblue", "bisque2"),
+  cn.colors = c("grey20", "brown2"),
+  cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF"),
+  cf.colors = c("white", "grey20", "bisque2"),
   dipLogR.color = c("magenta4"),
   seg.color = c("brown2")
 )
@@ -44,6 +45,10 @@ is \code{c("peachpuff2", "paleturquoise3")}.}
 
 \item{cn.colors}{A character vector of length 2 for total copy number and
 minor allele copy number segment colors. Default is \code{c("black", "brown2")}.}
+
+\item{cna.colors}{A vector of 3 colors for CNA states: gain, loss, and cnloh
+(or named vector where names are "gain", "loss", and "cnloh" and the values
+are their respective colors). Default is \code{c("gain" = "#EF6F6AFF", "loss" = "#6699CCFF", "cnloh" = "#44AA99FF")}.}
 
 \item{cf.colors}{A character vector of length 3 for cellular fraction
 gradient (of 10 values): start color of the gradient, end color of the

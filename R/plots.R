@@ -1326,6 +1326,10 @@ plotIndexes <- function(x,
 #'   is `c("peachpuff2", "paleturquoise3")`.
 #' @param cn.colors A character vector of length 2 for total copy number and
 #'   minor allele copy number segment colors. Default is `c("black", "brown2")`.
+#' @param cna.colors A vector of 3 colors for CNA states: gain, loss, and cnloh
+#'   (or named vector where names are "gain", "loss", and "cnloh" and the values
+#'   are their respective colors). Default is `c("gain" = "#EF6F6AFF", "loss" =
+#'   "#6699CCFF", "cnloh" = "#44AA99FF")`.
 #' @param cf.colors A character vector of length 3 for cellular fraction
 #'   gradient (of 10 values): start color of the gradient, end color of the
 #'   gradient, and color for normal diploid (depending on the ploidy). Default
@@ -1360,8 +1364,13 @@ plotProfile <- function(x,
                         point.size = 2,
                         chrom.colors = c("slategrey", "skyblue"),
                         lor.colors = c("peachpuff2", "paleturquoise3"),
-                        cn.colors = c("black", "brown2"),
-                        cf.colors = c("white", "steelblue", "bisque2"),
+                        cn.colors = c("grey20", "brown2"),
+                        cna.colors = c(
+                            "gain" = "#EF6F6AFF",
+                            "loss" = "#6699CCFF",
+                            "cnloh" = "#44AA99FF"
+                        ),
+                        cf.colors = c("white", "grey20", "bisque2"),
                         dipLogR.color = c("magenta4"),
                         seg.color = c("brown2")) {
     # Argument checks
@@ -1389,12 +1398,12 @@ plotProfile <- function(x,
     if (data == "allcells") {
         pos <- x@cnacalling$positions.allcells
         segs <- x@cnacalling$segments.allcells
-        ploidy <- x@cnacalling$ploidy.allcells
+        ploidy <- x@cnacalling$ploidy
         dipLogR <- x@cnacalling$dipLogR.allcells
     } else {
         pos <- x@cnacalling$positions
         segs <- x@cnacalling$segments
-        ploidy <- x@cnacalling$ploidy.clusters
+        ploidy <- x@cnacalling$ploidy
         dipLogR <- x@cnacalling$dipLogR.clusters
     }
     stopifnot(
@@ -1415,6 +1424,24 @@ plotProfile <- function(x,
     pos$chrom <- as.numeric(pos$chrom)
     segs$chrom <- as.numeric(segs$chrom)
 
+    segs <- dplyr::mutate(
+        segs,
+        gnl = dplyr::case_when(
+            round(.data$tcn.em) - ploidy > 0 ~ 1,
+            round(.data$tcn.em) - ploidy < 0 ~ -1,
+            round(.data$tcn.em) - ploidy == 0 ~ 0
+        ),
+        loh = dplyr::case_when(round(.data$lcn.em) == 0 ~ T, round(.data$lcn.em) > 0 ~ F),
+        state = dplyr::case_when(
+            .data$gnl == 1 ~ "gain",
+            .data$gnl == -1 ~ "loss",
+            .data$gnl == 0 & .data$loh == TRUE ~ "cnloh",
+            .data$gnl == 0 & .data$loh == FALSE ~ "neu"
+        ),
+        cna = dplyr::case_when(.data$gnl == 0 & .data$loh == FALSE ~ F, .data$gnl != 0 | .data$loh == TRUE ~ T),
+        cna_state = dplyr::case_when(.data$cna == T ~ .data$state, .data$cna == F ~ NA)
+    )
+
     # Chromosome alternating dual colors
     chrcol <- 1 + rep(segs$chrom - 2 * floor(segs$chrom / 2), segs$num.mark)
 
@@ -1429,11 +1456,11 @@ plotProfile <- function(x,
 
     # Layout params ------------------------------------------------------------
     def.par <- par(no.readonly = TRUE)
-    layout(matrix(rep(1:4, c(9, 9, 6, 1)), ncol = 1))
+    layout(matrix(rep(1:5, c(9, 9, 6, 1, 1)), ncol = 1))
     par(
         mar = c(0.25, 3, 0.25, 1),
         mgp = c(1.75, 0.6, 0),
-        oma = c(3, 1, 1.5, 0)
+        oma = c(3, 1.5, 1.5, 0)
     )
 
     # 1- Plot the LRR data -----------------------------------------------------
@@ -1551,6 +1578,27 @@ plotProfile <- function(x,
              segs$tcn.em,
              lwd = 1.75,
              col = cn.colors[1])
+
+    # Add gnl status
+    plot(
+        c(0, nrow(pos)),
+        0:1,
+        type = "n",
+        ylab = "",
+        xaxt = "n",
+        yaxt = "n"
+    )
+    mtext(
+        "status",
+        side = 2,
+        at = 0.5,
+        line = 1,
+        las = 2,
+        cex = 0.8
+    )
+    cnacol <- cna.colors[segs$cna_state]
+    rect(segstart, 0, segend, 1, col = cnacol, border = NA)
+
     # Add cf
     plot(
         c(0, nrow(pos)),
@@ -1566,13 +1614,13 @@ plotProfile <- function(x,
         at = 0.5,
         line = 1,
         las = 2,
-        cex = 1
+        cex = 0.8
     )
 
     cfpalette <- colorRampPalette(c(cf.colors[1], cf.colors[2]))(10)
     cfcol <- cfpalette[round(10 * segs$cf.em)]
-    cfcol[segs$tcn.em == ploidy &
-              segs$lcn.em == ploidy / 2] <- cf.colors[3]
+    # cfcol[segs$tcn.em == ploidy &
+    #           segs$lcn.em == ploidy / 2] <- cf.colors[3]
     rect(segstart, 0, segend, 1, col = cfcol, border = NA)
 
     # Add chromosome ticks on x-axis -------------------------------------------
