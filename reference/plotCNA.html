@@ -50,7 +50,8 @@ in each cluster.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotCNA</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cna.colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>gain <span class="op">=</span> <span class="st">"#EF6F6AFF"</span>, loss <span class="op">=</span> <span class="st">"#6699CCFF"</span>, cnloh <span class="op">=</span> <span class="st">"#44AA99FF"</span><span class="op">)</span></span>
+<span>  cna.colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>gain <span class="op">=</span> <span class="st">"#EF6F6AFF"</span>, loss <span class="op">=</span> <span class="st">"#6699CCFF"</span>, cnloh <span class="op">=</span> <span class="st">"#44AA99FF"</span><span class="op">)</span>,</span>
+<span>  cf.gradient <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -71,6 +72,11 @@ visualized (generated using <code><a href="cnaCalling.html">cnaCalling()</a></co
 <dd><p>A vector of 3 colors for CNA states: gain, loss, and cnloh
 (or named vector where names are "gain", "loss", and "cnloh" and the values
 are their respective colors). Default is <code>c("gain" = "#EF6F6AFF", "loss" = "#6699CCFF", "cnloh" = "#44AA99FF")</code>.</p></dd>
+
+
+<dt id="arg-cf-gradient">cf.gradient<a class="anchor" aria-label="anchor" href="#arg-cf-gradient"></a></dt>
+<dd><p>Logical. If <code>TRUE</code> adds a alpha transparency gradient on
+CNA color block based on the cell fraction. Default is <code>TRUE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

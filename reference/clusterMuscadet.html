@@ -99,7 +99,7 @@ provided omic.</p></dd>
 
     <dt><code>algorithm</code></dt>
 <dd><p>Integer specifying the algorithm for modularity optimization
-by <a href="https://satijalab.org/seurat/reference/FindClusters.html" class="external-link">Seurat::FindClusters</a> (<code>1</code> = original Louvain algorithm; <code>2</code> = Louvain
+by <code><a href="https://satijalab.org/seurat/reference/FindClusters.html" class="external-link">Seurat::FindClusters()</a></code> (<code>1</code> = original Louvain algorithm; <code>2</code> = Louvain
 algorithm with multilevel refinement; <code>3</code> = SLM algorithm; <code>4</code> = Leiden
 algorithm). Leiden requires the leidenalg python. Default is <code>1</code>.</p></dd>
 
@@ -207,9 +207,6 @@ object after cluster partition validation.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing PCA...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding neighbors and constructing graph...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing UMAP...</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> This message will be shown once per session</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding clusters...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing clusters...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing Silhouette scores...</span>

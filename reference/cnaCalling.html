@@ -51,8 +51,8 @@ evaluating cell fractions and copy numbers.</p>
 <span>  depthmin.c.clusters <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  depthmin.a.allcells <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  depthmin.c.allcells <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>  depthmin.nor <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  depthmax.nor <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  depthmin.c.nor <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  depthmax.nor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  het.thresh <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  snp.nbhd <span class="op">=</span> <span class="fl">250</span>,</span>
 <span>  hetscale <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -60,8 +60,10 @@ evaluating cell fractions and copy numbers.</p>
 <span>  cval2 <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  min.nhet <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  clonal.thresh <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>  cf.thresh <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  dist.breakpoints <span class="op">=</span> <span class="fl">1e+06</span>,</span>
 <span>  ploidy <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  dipLogR <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -115,12 +117,12 @@ default, <code>NULL</code> selects all available data.</p></dd>
 (default: 50).</p></dd>
 
 
-<dt id="arg-depthmin-nor">depthmin.nor<a class="anchor" aria-label="anchor" href="#arg-depthmin-nor"></a></dt>
-<dd><p>Minimum coverage depth for normal sample (default: 0).</p></dd>
+<dt id="arg-depthmin-c-nor">depthmin.c.nor<a class="anchor" aria-label="anchor" href="#arg-depthmin-c-nor"></a></dt>
+<dd><p>Minimum coverage depth for normal sample (default: 1000).</p></dd>
 
 
 <dt id="arg-depthmax-nor">depthmax.nor<a class="anchor" aria-label="anchor" href="#arg-depthmax-nor"></a></dt>
-<dd><p>Maximum coverage depth for normal sample (default: 1000).</p></dd>
+<dd><p>Optional. Maximum depth for normal sample (default: <code>NULL</code>).</p></dd>
 
 
 <dt id="arg-het-thresh">het.thresh<a class="anchor" aria-label="anchor" href="#arg-het-thresh"></a></dt>
@@ -159,6 +161,13 @@ segmentation and clustering <code><a href="preProcSample2.html">preProcSample2()
 segment as clonal (default: 0.9).</p></dd>
 
 
+<dt id="arg-cf-thresh">cf.thresh<a class="anchor" aria-label="anchor" href="#arg-cf-thresh"></a></dt>
+<dd><p>Numeric threshold to set the minimum cell fraction (CF) allowed. CNA segments
+with a CF below this value are considered neutral (i.e., 2:1). The default
+is <code>0.5</code>. Can be set to <code>0</code> or <code>NULL</code> to disable this threshold and retain all segments
+regardless of CF.</p></dd>
+
+
 <dt id="arg-dist-breakpoints">dist.breakpoints<a class="anchor" aria-label="anchor" href="#arg-dist-breakpoints"></a></dt>
 <dd><p>Minimum distance between breakpoints to define
 distinct segments (default: 1e6).</p></dd>
@@ -167,6 +176,12 @@ distinct segments (default: 1e6).</p></dd>
 <dt id="arg-ploidy">ploidy<a class="anchor" aria-label="anchor" href="#arg-ploidy"></a></dt>
 <dd><p>Specifies ploidy assumption: <code>"auto"</code>, <code>"median"</code>, or numeric
 value (default: <code>"auto"</code>).</p></dd>
+
+
+<dt id="arg-diplogr">dipLogR<a class="anchor" aria-label="anchor" href="#arg-diplogr"></a></dt>
+<dd><p>Optional. Numeric value specifying an expected log ratio for
+diploid regions to use for the analysis. If <code>NULL</code>, by default, the diploid
+log ratio is estimated automatically from the data.</p></dd>
 
 
 <dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
@@ -228,12 +243,13 @@ computed with EM algorithm), <code>ncells</code> (number of cells in cluster),
 <code>clonal.thresh</code>), <code>cna_clonal</code> (whether the segment is a clonal CNA),
 <code>cna_clonal_state</code> (state of clonal CNA segments).</p></li>
 <li><p><code>ncells</code>: Vector of number of cells per cluster.</p></li>
-<li><p><code>dipLogR.clusters</code>: Diploid log R ratio from the per cluster analysis.</p></li>
-<li><p><code>dipLogR.allcells</code>: Diploid log R ratio from the all cells analysis.</p></li>
-<li><p><code>purity.clusters</code>: Purity from the per cluster analysis.</p></li>
-<li><p><code>purity.allcells</code>: Purity from the all cells analysis.</p></li>
-<li><p><code>ploidy.clusters</code>: Ploidy from the per cluster analysis.</p></li>
-<li><p><code>ploidy.allcells</code>: Ploidy from the all cells analysis.</p></li>
+<li><p><code>dipLogR.clusters</code>: Diploid log R ratio estimated during the per cluster analysis.</p></li>
+<li><p><code>dipLogR.allcells</code>: Diploid log R ratio estimated during the all cells analysis.</p></li>
+<li><p><code>purity.clusters</code>: Purity estimated during the per cluster analysis.</p></li>
+<li><p><code>purity.allcells</code>: Purity estimated during the all cells analysis.</p></li>
+<li><p><code>ploidy.clusters</code>: Ploidy estimated during the per cluster analysis.</p></li>
+<li><p><code>ploidy.allcells</code>: Ploidy estimated during the all cells analysis.</p></li>
+<li><p><code>ploidy</code>: Ploidy used for the CNA analysis.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -262,14 +278,23 @@ Acids Res. 2016 Sep 19;44(16):e131. doi:
 <span class="r-in"><span>                           depthmin.c.clusters <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>                           depthmin.a.allcells <span class="op">=</span> <span class="fl">3</span>,</span></span>
 <span class="r-in"><span>                           depthmin.c.allcells <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>                           depthmin.nor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                           depthmin.c.nor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting coverage data from omic(s): ATAC</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering positions per clusters based on provided filters...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering allelic positions: tumor depth &gt;= 3 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: tumor depth &gt;= 5 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: normal depth &gt;= 0 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> From 1733 positions to 404 positions</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing segmentation per cluster...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding diploid log R ratio on clusters...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Diploid log R ratio = -0.566520511224907</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Diploid log R ratio = -0.27827549623585</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing cell fractions and copy numbers on clusters...</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering positions on all cells based on provided filters...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering allelic positions: tumor depth &gt;= 3 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: tumor depth &gt;= 5 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: normal depth &gt;= 0 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> From 1270 positions to 392 positions</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing segmentation on all cells...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing cell fractions and copy numbers on all cells...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding consensus segments between clusters...</span>
