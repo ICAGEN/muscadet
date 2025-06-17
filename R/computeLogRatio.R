@@ -429,289 +429,281 @@ computeLogRatioATAC <- function(matTumor,
                                 thresh_capping = 3,
                                 all_steps = FALSE,
                                 quiet = FALSE) {
-  params <- list(
-    windowSize = windowSize,
-    slidingSize = slidingSize,
-    minReads = minReads,
-    minPeaks = minPeaks,
-    thresh_capping = thresh_capping
-  )
 
-  # Sort cells (column names of matrices)
-  matTumor <- matTumor[, sort(colnames(matTumor))]
-  matRef <- matRef[, sort(colnames(matRef))]
+    # Condition messages if quiet = FALSE
+    msg <- function(...) if (!quiet) message(...)
 
-  ## Step 01: Group peaks in windows -------------------------------------------
-  if (quiet == FALSE) {
-    message(
-      "Step 01 - Group peaks in windows: window size set at ",
-      windowSize / 1000000,
-      " Mb, sliding by ",
-      slidingSize / 1000000,
-      " Mb"
+    # Check arguments
+    if (!inherits(matTumor, c("matrix", "dgCMatrix")))
+        stop("`matTumor` must be a matrix or dgCMatrix.")
+
+    if (!inherits(matRef, c("matrix", "dgCMatrix")))
+        stop("`matRef` must be a matrix or dgCMatrix.")
+
+    stopifnot(
+        "`matTumor` and `matRef` must have the same number of rows (peaks)." = nrow(matTumor) == nrow(matRef)
     )
-  }
-
-  # Select genome
-  if (genome == "hg38") {
-    genome_chrom <- hg38_chrom
-  }
-  if (genome == "hg19") {
-    genome_chrom <- hg19_chrom
-  }
-  if (genome == "mm10") {
-    genome_chrom <- mm10_chrom
-  }
-
-  # Create windows
-  windowsGR <- GenomicRanges::slidingWindows(
-    x = genome_chrom,
-    width = windowSize,
-    step = slidingSize
-  ) %>%
-    unlist()
-  # Keep windows at the end of chr that are at least 1/10 of window width
-  windowsGR <- windowsGR[which(BiocGenerics::width(windowsGR) >= windowSize / 10), ]
-
-  # Match peaks and windows
-  peaksCoord <- GenomicRanges::GRanges(peaksCoord)
-  ovlaps <- as.data.frame(GenomicRanges::findOverlaps(windowsGR, peaksCoord, ignore.strand = TRUE))
-
-  # Get the sum of read counts per window
-  window_index <- unique(ovlaps[, 1])
-  matTumor <- t(sapply(window_index, function(i) {
-    peak_index <- ovlaps[ovlaps[, 1] == i, 2]
-    mat <- matTumor[peak_index, ]
-    if (is.vector(mat)) {
-      mat <- t(as.matrix(mat))
-    } # case with only 1 peak in windows (vector instead of matrix)
-    Matrix::colSums(mat)
-  }))
-  rownames(matTumor) <- window_index
-
-  matRef <- t(sapply(window_index, function(i) {
-    peak_index <- ovlaps[ovlaps[, 1] == i, 2]
-    mat <- matRef[peak_index, ]
-    if (is.vector(mat)) {
-      mat <- t(as.matrix(mat))
-    } # case with only 1 peak in windows (vector instead of matrix)
-    Matrix::colSums(mat)
-  }))
-  rownames(matRef) <- window_index
-
-  obj <- list()
-
-  if (all_steps == T) {
-    obj$step01 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Counts per windows"
+    stopifnot(
+        "`peaksCoord` must have the same number of rows as `matTumor` and `matRef`." = nrow(peaksCoord) == nrow(matTumor)
     )
-  }
 
-  ## Step 02: Filtering on coverage --------------------------------------------
-  if (quiet == FALSE) {
-    message(
-      "Step 02 - Filtering windows: Minimum of ",
-      minPeaks,
-      " peaks per window with a minimum average of ",
-      minReads,
-      " read(s)"
+    stopifnot("`windowSize` must not be smaller than `slidingSize`." = windowSize >= slidingSize)
+
+    genome <- match.arg(genome, choices = c("hg38", "hg19", "mm10"))
+
+    params <- list(
+        windowSize = windowSize,
+        slidingSize = slidingSize,
+        minReads = minReads,
+        minPeaks = minPeaks,
+        thresh_capping = thresh_capping
     )
-  }
 
-  # Initialize window coordinates data frame
-  windowsDF <- as.data.frame(windowsGR)
-  colnames(windowsDF)[1] <- "CHROM"
-  windowsDF[, "strand"] <- NULL
+    # Sort cells (column names of matrices)
+    matTumor <- matTumor[, sort(colnames(matTumor))]
+    matRef <- matRef[, sort(colnames(matRef))]
 
-  # Add data to window coordinates data frame
-  win <- 1:nrow(windowsDF) %in% window_index
-  windowsDF$id <- 1:nrow(windowsDF)
-  windowsDF$nPeaks[win] <- table(ovlaps[1])
-  windowsDF$nPeaks[!win] <- 0
-  windowsDF$sumReads.tum[win] <- Matrix::rowSums(matTumor, na.rm = TRUE)
-  windowsDF$meanReads.tum[win] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
-  windowsDF$sdReads.tum[win] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
-  windowsDF$sumReads.ref[win] <- Matrix::rowSums(matRef, na.rm = TRUE)
-  windowsDF$meanReads.ref[win] <- Matrix::rowMeans(matRef, na.rm = TRUE)
-  windowsDF$sdReads.ref[win] <- matrixStats::rowSds(matRef, na.rm = TRUE)
-
-  # Add filtering information 'keep' in window coordinates data frame
-  windowsDF <- dplyr::mutate(windowsDF, keep = windowsDF$meanReads.ref >= minReads &
-    windowsDF$nPeaks >= minPeaks)
-
-  stopifnot("No windows passing filters (`minReads` and `minPeaks` arguments)" = any(windowsDF$keep))
-
-  # Filter matrices
-  matTumor <- matTumor[windowsDF$keep[window_index], ]
-  matRef <- matRef[windowsDF$keep[window_index], ]
-
-  if (all_steps == TRUE) {
-    obj$step02 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Counts per windows (filtered)"
+    ## Step 01: Group peaks in windows -------------------------------------------
+    msg(
+        "Step 01 - Group peaks in windows: window size set at ",
+        windowSize / 1000000,
+        " Mb, sliding by ",
+        slidingSize / 1000000,
+        " Mb"
     )
-  }
 
-  ## Step 03: Normalization for sequencing depth -------------------------------
-  if (quiet == FALSE) {
-    message("Step 03 - Normalization for sequencing depth: Normalized counts per million")
-  }
+    # Select genome
+    if (genome == "hg38") {
+        genome_chrom <- hg38_chrom
+    }
+    if (genome == "hg19") {
+        genome_chrom <- hg19_chrom
+    }
+    if (genome == "mm10") {
+        genome_chrom <- mm10_chrom
+    }
 
-  # Normalization and transformation in counts per million
-  matTumor <- apply(matTumor, 2, function(x) {
-    (x / sum(x, na.rm = TRUE)) * 1e6
-  })
-  matRef <- apply(matRef, 2, function(x) {
-    (x / sum(x, na.rm = TRUE)) * 1e6
-  })
+    # Create windows
+    windowsGR <- GenomicRanges::slidingWindows(
+        x = genome_chrom,
+        width = windowSize,
+        step = slidingSize
+    ) %>%
+        unlist()
+    # Keep windows at the end of chr that are at least 1/10 of window width
+    windowsGR <- windowsGR[which(BiocGenerics::width(windowsGR) >= windowSize / 10), ]
 
-  if (all_steps == TRUE) {
-    obj$step03 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Normalized counts per million"
+    # Match peaks and windows
+    peaksCoord <- GenomicRanges::GRanges(peaksCoord)
+    hits <- GenomicRanges::findOverlaps(windowsGR, peaksCoord, ignore.strand = TRUE)
+    ovlaps <- data.frame(
+        queryHits = as.vector(S4Vectors::queryHits(hits)),
+        subjectHits = as.vector(S4Vectors::subjectHits(hits))
     )
-  }
 
-  windowsDF$meanReads.norm.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
-  windowsDF$sdReads.norm.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
-  windowsDF$meanReads.norm.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
-  windowsDF$sdReads.norm.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
-
-  ## Step 04: Log transformation and normalization by reference data: log R ratio ----------
-  if (quiet == FALSE) {
-    message("Step 04 - Log transformation and normalization by reference data: log R ratio")
-  }
-
-  # Log transformation
-  matTumor <- apply(matTumor, 2, function(x) {
-    log2(1 + x)
-  })
-  matRef <- apply(matRef, 2, function(x) {
-    log2(1 + x)
-  })
-
-  # Ratio versus the mean of reference cells
-  matTumor <- apply(matTumor, 2, "-", Matrix::rowMeans(matRef, na.rm = TRUE))
-  matRef <- apply(matRef, 2, "-", Matrix::rowMeans(matRef, na.rm = TRUE))
-
-  if (all_steps == TRUE) {
-    obj$step04 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Log R ratio"
+    # Extract names of overlapping windows
+    window_names <- unique(ovlaps[, 1])
+    # Create sparse mapping matrix: rows = windows, columns = peaks
+    # Sparse matrix: (window i, peak j) = 1 if peak j in window i
+    M <- Matrix::sparseMatrix(
+        i = match(ovlaps[,1], window_names), # windows indexes
+        j = ovlaps[,2], # peak indexes
+        x = 1,
+        dims = c(length(window_names), max(ovlaps[,2]))
     )
-  }
+    rownames(M) <- window_names
 
-  windowsDF$meanLRR.raw.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
-  windowsDF$sdLRR.raw.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
-  windowsDF$meanLRR.raw.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
-  windowsDF$sdLRR.raw.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+    # Compute summed counts per window with matrix multiplication
+    matTumor <- M %*% matTumor  # window x cell matrix
+    matRef <- M %*% matRef
 
+    obj <- list()
 
-  ## Step 05: Capping the range of values --------------------------------------
-  if (quiet == FALSE) {
-    message("Step 05 - Capping the range of values: threshold = ", thresh_capping)
-  }
+    if (all_steps == T) {
+        obj$step01 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Counts per windows"
+        )
+    }
 
-  # Max and min thresholds of log R ratios
-  matTumor[matTumor > thresh_capping] <- thresh_capping
-  matTumor[matTumor < (-1 * thresh_capping)] <- -1 * thresh_capping
-  matRef[matRef > thresh_capping] <- thresh_capping
-  matRef[matRef < (-1 * thresh_capping)] <- -1 * thresh_capping
-
-  if (all_steps == TRUE) {
-    obj$step05 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Log R ratio capped"
+    ## Step 02: Filtering on coverage --------------------------------------------
+    msg(
+        "Step 02 - Filtering windows: Minimum of ",
+        minPeaks,
+        " peaks per window with a minimum average of ",
+        minReads,
+        " read(s)"
     )
-  }
 
-  windowsDF$meanLRR.cap.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
-  windowsDF$sdLRR.cap.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
-  windowsDF$meanLRR.cap.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
-  windowsDF$sdLRR.cap.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+    # Initialize window coordinates data frame
+    windowsDF <- as.data.frame(windowsGR)
+    colnames(windowsDF)[1] <- "CHROM"
+    windowsDF[, "strand"] <- NULL
 
-  ## Step 06 - [No step 06 for scATAC-seq] -------------------------------------
-  if (quiet == FALSE) {
-    message("Step 06 - [No step 06 for scATAC-seq]")
-  }
+    # Add data to window coordinates data frame
+    win <- 1:nrow(windowsDF) %in% window_names
+    windowsDF$id <- 1:nrow(windowsDF)
+    windowsDF$nPeaks[win] <- table(ovlaps[1])
+    windowsDF$nPeaks[!win] <- 0
+    windowsDF$sumReads.tum[win] <- Matrix::rowSums(matTumor, na.rm = TRUE)
+    windowsDF$meanReads.tum[win] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
+    windowsDF$sdReads.tum[win] <- matrixStats::rowSds(as.matrix(matTumor), na.rm = TRUE)
+    windowsDF$sumReads.ref[win] <- Matrix::rowSums(matRef, na.rm = TRUE)
+    windowsDF$meanReads.ref[win] <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    windowsDF$sdReads.ref[win] <- matrixStats::rowSds(as.matrix(matRef), na.rm = TRUE)
 
-  ## Step 07: Centering of cells -----------------------------------------------
-  if (quiet == FALSE) {
-    message("Step 07 - Centering of cells")
-  }
+    # Add filtering information 'keep' in window coordinates data frame
+    windowsDF <- dplyr::mutate(windowsDF, keep = windowsDF$meanReads.ref >= minReads &
+                                   windowsDF$nPeaks >= minPeaks)
 
-  # Center cells
-  meansTumor <- apply(matTumor, 2, function(x) {
-    mean(x, na.rm = TRUE)
-  })
-  matTumor <- t(apply(matTumor, 1, "-", meansTumor))
+    stopifnot("No windows passing filters (`minReads` and `minPeaks` arguments)" = any(windowsDF$keep))
 
-  meansRef <- apply(matRef, 2, function(x) {
-    mean(x, na.rm = TRUE)
-  })
-  matRef <- t(apply(matRef, 1, "-", meansRef))
+    # Filter matrices
+    matTumor <- matTumor[windowsDF$keep[window_names], ]
+    matRef <- matRef[windowsDF$keep[window_names], ]
 
-  if (all_steps == TRUE) {
-    obj$step07 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Log R ratio centered"
-    )
-  }
+    if (all_steps == TRUE) {
+        obj$step02 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Counts per windows (filtered)"
+        )
+    }
 
-  windowsDF$meanLRR.cent.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
-  windowsDF$sdLRR.cent.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
-  windowsDF$meanLRR.cent.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
-  windowsDF$sdLRR.cent.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+    ## Step 03: Normalization for sequencing depth -------------------------------
+    msg("Step 03 - Normalization for sequencing depth: Normalized counts per million")
+
+    # Normalization and transformation in counts per million
+    matTumor <- as.matrix(sweep(matTumor, 2, Matrix::colSums(matTumor, na.rm = TRUE), FUN = "/") * 1e6)
+    matRef <- as.matrix(sweep(matRef, 2, Matrix::colSums(matRef, na.rm = TRUE), FUN = "/") * 1e6)
+
+    if (all_steps == TRUE) {
+        obj$step03 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Normalized counts per million"
+        )
+    }
+
+    windowsDF$meanReads.norm.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
+    windowsDF$sdReads.norm.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
+    windowsDF$meanReads.norm.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    windowsDF$sdReads.norm.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+
+    ## Step 04: Log transformation and normalization by reference data: log R ratio ----------
+    msg("Step 04 - Log transformation and normalization by reference data: log R ratio")
+
+    # Log transformation
+    matTumor <- log2(1 + matTumor)
+    matRef <- log2(1 + matRef)
+
+    # Ratio versus the mean of reference cells
+    mean_ref <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    matTumor <- sweep(matTumor, 1, mean_ref, FUN = "-")
+    matRef <- sweep(matRef, 1, mean_ref, FUN = "-")
+
+    if (all_steps == TRUE) {
+        obj$step04 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Log R ratio"
+        )
+    }
+
+    windowsDF$meanLRR.raw.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.raw.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
+    windowsDF$meanLRR.raw.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.raw.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
 
 
-  ## Step 08: Correcting by reference variability ------------------------------
-  if (quiet == FALSE) {
-    message("Step 08 - Correcting by reference variability")
-  }
+    ## Step 05: Capping the range of values --------------------------------------
+    msg("Step 05 - Capping the range of values: threshold = ", thresh_capping)
 
-  sd.ref <- apply(matRef, 1, function(x) sd(x, na.rm = TRUE))
-  mean.ref <- apply(matRef, 1, function(x) mean(x, na.rm = TRUE))
+    # Max and min thresholds of log R ratios
+    matTumor[matTumor > thresh_capping] <- thresh_capping
+    matTumor[matTumor < (-1 * thresh_capping)] <- -1 * thresh_capping
+    matRef[matRef > thresh_capping] <- thresh_capping
+    matRef[matRef < (-1 * thresh_capping)] <- -1 * thresh_capping
 
-  matTumor <- apply(matTumor, 2, function(x) {
-    (x - mean.ref) / sd.ref
-  })
-  matRef <- apply(matRef, 2, function(x) {
-    (x - mean.ref) / sd.ref
-  })
+    if (all_steps == TRUE) {
+        obj$step05 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Log R ratio capped"
+        )
+    }
 
-  if (all_steps == TRUE) {
-    obj$step08 <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      name = "Log R ratio corrected by ref variablity"
-    )
-  }
+    windowsDF$meanLRR.cap.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.cap.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
+    windowsDF$meanLRR.cap.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.cap.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
 
-  windowsDF$meanLRR.corr.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
-  windowsDF$sdLRR.corr.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
-  windowsDF$meanLRR.corr.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
-  windowsDF$sdLRR.corr.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+    ## Step 06 - [No step 06 for scATAC-seq] -------------------------------------
+    msg("Step 06 - [No step 06 for scATAC-seq]")
 
-  if (all_steps == TRUE) {
-    obj$params <- params
-    obj$coord <- windowsDF
-    return(obj)
-  } else {
-    obj_min <- list(
-      matTumor = matTumor,
-      matRef = matRef,
-      params = params,
-      coord = windowsDF
-    )
-    return(obj_min)
-  }
+    ## Step 07: Centering of cells -----------------------------------------------
+    msg("Step 07 - Centering of cells")
+
+    # Center cells
+    meansTumor <- Matrix::colMeans(matTumor, na.rm = TRUE)
+    matTumor <- sweep(matTumor, 2, meansTumor, FUN = "-")
+
+    meansRef <- Matrix::colMeans(matRef, na.rm = TRUE)
+    matRef <- sweep(matRef, 2, meansRef, FUN = "-")
+
+    if (all_steps == TRUE) {
+        obj$step07 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Log R ratio centered"
+        )
+    }
+
+    windowsDF$meanLRR.cent.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.cent.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
+    windowsDF$meanLRR.cent.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.cent.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+
+
+    ## Step 08: Correcting by reference variability ------------------------------
+    msg("Step 08 - Correcting by reference variability")
+
+    sd.ref <- matrixStats::rowSds(matRef, na.rm = TRUE)
+    mean.ref <- Matrix::rowMeans(matRef, na.rm = TRUE)
+
+    matTumor <- sweep(matTumor, 1, mean.ref, FUN = "-")
+    matTumor <- sweep(matTumor, 1, sd.ref, FUN = "/")
+
+    matRef <- sweep(matRef, 1, mean.ref, FUN = "-")
+    matRef <- sweep(matRef, 1, sd.ref, FUN = "/")
+
+    if (all_steps == TRUE) {
+        obj$step08 <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            name = "Log R ratio corrected by ref variablity"
+        )
+    }
+
+    windowsDF$meanLRR.corr.tum[windowsDF$keep] <- Matrix::rowMeans(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.corr.tum[windowsDF$keep] <- matrixStats::rowSds(matTumor, na.rm = TRUE)
+    windowsDF$meanLRR.corr.ref[windowsDF$keep] <- Matrix::rowMeans(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.corr.ref[windowsDF$keep] <- matrixStats::rowSds(matRef, na.rm = TRUE)
+
+    if (all_steps == TRUE) {
+        obj$params <- params
+        obj$coord <- windowsDF
+        return(obj)
+    } else {
+        obj_min <- list(
+            matTumor = matTumor,
+            matRef = matRef,
+            params = params,
+            coord = windowsDF
+        )
+        return(obj_min)
+    }
 }
 
 
@@ -866,21 +858,32 @@ computeLogRatioRNA <- function(matTumor,
                                thresh_capping = 3,
                                all_steps = FALSE,
                                quiet = FALSE) {
-  params <- list(
-    genesPerWindow = genesPerWindow,
-    refReads = refReads,
-    refMeanReads = refMeanReads,
-    thresh_capping = thresh_capping
-  )
+
+    # Condition messages if quiet = FALSE
+    msg <- function(...) if (!quiet) message(...)
+
+    # Check arguments
+    if (!inherits(matTumor, c("matrix", "dgCMatrix")))
+        stop("`matTumor` must be a matrix or dgCMatrix.")
+
+    if (!inherits(matRef, c("matrix", "dgCMatrix")))
+        stop("`matRef` must be a matrix or dgCMatrix.")
+
+    genome <- match.arg(genome, choices = c("hg38", "hg19", "mm10"))
+
+    params <- list(
+        genesPerWindow = genesPerWindow,
+        refReads = refReads,
+        refMeanReads = refMeanReads,
+        thresh_capping = thresh_capping
+    )
 
   # Sort cells (column names of matrices)
   matTumor <- matTumor[, sort(colnames(matTumor))]
   matRef <- matRef[, sort(colnames(matRef))]
 
   ## Step 01: Match genes in count matrix with coordinates ---------------------
-  if (quiet == FALSE) {
-    message("Step 01 - Match genes in count matrix with coordinates")
-  }
+  msg("Step 01 - Match genes in count matrix with coordinates")
 
   # Initialize gene coordinates data frame
   genesDF <- as.data.frame(genesCoord)
@@ -905,7 +908,6 @@ computeLogRatioRNA <- function(matTumor,
   matTumor <- matTumor[genesDF[, "id"], ]
   matRef <- matRef[genesDF[, "id"], ]
 
-
   obj <- list()
 
   if (all_steps == TRUE) {
@@ -917,9 +919,13 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   ## Step 02: Filtering on coverage --------------------------------------------
-  if (quiet == FALSE) {
-    message("Step 02 - Filtering genes: Minimum of ", refReads, " read(s) in reference cells and minimum of ", refMeanReads, " read(s) in average per reference cell")
-  }
+  msg(
+      "Step 02 - Filtering genes: Minimum of ",
+      refReads,
+      " read(s) in reference cells and minimum of ",
+      refMeanReads,
+      " read(s) in average per reference cell"
+  )
 
   # Add data to gene coordinates data frame
   genesDF$sumReads.tum <- Matrix::rowSums(matTumor, na.rm = TRUE)
@@ -947,17 +953,11 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   ## Step 03: Normalization for sequencing depth -------------------------------
-  if (quiet == FALSE) {
-    message("Step 03 - Normalization for sequencing depth: Normalized counts per million")
-  }
+  msg("Step 03 - Normalization for sequencing depth: Normalized counts per million")
 
   # Normalization and transformation in counts per million
-  matTumor <- Matrix(apply(matTumor, 2, function(x) {
-    (x / sum(x, na.rm = TRUE)) * 1e6
-  }), sparse = TRUE)
-  matRef <- Matrix(apply(matRef, 2, function(x) {
-    (x / sum(x, na.rm = TRUE)) * 1e6
-  }), sparse = TRUE)
+  matTumor <- sweep(matTumor, 2, Matrix::colSums(matTumor, na.rm = TRUE), FUN = "/") * 1e6
+  matRef <- sweep(matRef, 2, Matrix::colSums(matRef, na.rm = TRUE), FUN = "/") * 1e6
 
   if (all_steps == TRUE) {
     obj$step03 <- list(
@@ -974,21 +974,16 @@ computeLogRatioRNA <- function(matTumor,
 
 
   ## Step 04: Log transformation and normalization by reference data: log R ratio ----------
-  if (quiet == FALSE) {
-    message("Step 04 - Log transformation and normalization by reference data: log R ratio")
-  }
+  msg("Step 04 - Log transformation and normalization by reference data: log R ratio")
 
   # Log transformation
-  matTumor <- Matrix(apply(matTumor, 2, function(x) {
-    log2(1 + x)
-  }), sparse = TRUE)
-  matRef <- Matrix(apply(matRef, 2, function(x) {
-    log2(1 + x)
-  }), sparse = TRUE)
+  matTumor <- log2(1 + matTumor)
+  matRef <- log2(1 + matRef)
 
   # Ratio versus the mean of reference cells
-  matTumor <- apply(matTumor, 2, "-", Matrix::rowMeans(matRef, na.rm = TRUE))
-  matRef <- apply(matRef, 2, "-", Matrix::rowMeans(matRef, na.rm = TRUE))
+  mean_ref <- Matrix::rowMeans(matRef, na.rm = TRUE)
+  matTumor <- as.matrix(sweep(matTumor, 1, mean_ref, FUN = "-"))
+  matRef <- as.matrix(sweep(matRef, 1, mean_ref, FUN = "-"))
 
   if (all_steps == TRUE) {
     obj$step04 <- list(
@@ -1005,9 +1000,7 @@ computeLogRatioRNA <- function(matTumor,
 
 
   ## Step 05: Capping the range of values --------------------------------------
-  if (quiet == FALSE) {
-    message("Step 05 - Capping the range of values: threshold = ", thresh_capping)
-  }
+  msg("Step 05 - Capping the range of values: threshold = ", thresh_capping)
 
   # Max and min thresholds of log R ratios
   matTumor[matTumor > thresh_capping] <- thresh_capping
@@ -1030,45 +1023,34 @@ computeLogRatioRNA <- function(matTumor,
 
 
   ## Step 06: Smoothing on genes windows ---------------------------------------
-  if (quiet == FALSE) {
-    message("Step 06 - Smoothing values on gene windows: ", genesPerWindow, " genes per window")
+  msg("Step 06 - Smoothing values on gene windows: ", genesPerWindow, " genes per window")
+
+  smooth_by_chromosome <- function(mat, genesDF, genesPerWindow) {
+      chromosomes <- unique(genesDF[, 1])
+
+      smoothed_list <- lapply(chromosomes, function(chr) {
+          # Genes to keep for this chromosome
+          keep_genes <- genesDF$keep & genesDF[, 1] == chr
+          gene_ids <- genesDF[keep_genes, 4]
+
+          # Subset the matrix
+          submat <- mat[gene_ids, , drop = FALSE]
+          if (nrow(submat) == 0) return(NULL)
+
+          # Apply smoothing (preserve dimnames)
+          k <- min(nrow(submat), genesPerWindow)
+          smoothed <- caTools::runmean(submat, k = k, align = "center")
+          dimnames(smoothed) <- dimnames(submat)
+
+          smoothed
+      })
+
+      # Combine all chromosomes
+      do.call(rbind, smoothed_list)
   }
 
-  matTumor <- do.call(rbind, sapply(unique(genesDF[, 1]), function(i) {
-    # Subset matrix per chromosomes
-    mat <- matTumor[genesDF[genesDF[, 1] == i & genesDF$keep == TRUE, 4], ]
-    if (nrow(mat) != 0) {
-      row_names <- rownames(mat)
-      col_names <- colnames(mat)
-      # If the number of genes per window is higher than the number of genes on chromosome
-      if (nrow(mat) < genesPerWindow) genesPerWindow <- nrow(mat)
-      # Get moving window means
-      mat_mean <- caTools::runmean(mat, k = genesPerWindow, align = "center")
-      rownames(mat_mean) <- row_names
-      colnames(mat_mean) <- col_names
-      return(mat_mean)
-    } else {
-      return(NULL)
-    }
-  }))
-
-  matRef <- do.call(rbind, sapply(unique(genesDF[, 1]), function(i) {
-    # Subset matrix per chromosomes
-    mat <- matRef[genesDF[genesDF[, 1] == i & genesDF$keep == TRUE, 4], ]
-    if (nrow(mat) != 0) {
-      row_names <- rownames(mat)
-      col_names <- colnames(mat)
-      # If the number of genes per window is higher than the number of genes on chromosome
-      if (nrow(mat) < genesPerWindow) genesPerWindow <- nrow(mat)
-      # Get moving window means
-      mat_mean <- caTools::runmean(mat, k = genesPerWindow, align = "center")
-      rownames(mat_mean) <- row_names
-      colnames(mat_mean) <- col_names
-      return(mat_mean)
-    } else {
-      return(NULL)
-    }
-  }))
+  matTumor <- smooth_by_chromosome(matTumor, genesDF, genesPerWindow)
+  matRef <- smooth_by_chromosome(matRef, genesDF, genesPerWindow)
 
   if (all_steps == TRUE) {
     obj$step06 <- list(
@@ -1085,20 +1067,14 @@ computeLogRatioRNA <- function(matTumor,
 
 
   ## Step 07: Centering of cells ------------------------------
-  if (quiet == FALSE) {
-    message("Step 07 - Centering of cells")
-  }
+  msg("Step 07 - Centering of cells")
 
   # Center cells
-  meansTumor <- apply(matTumor, 2, function(x) {
-    mean(x, na.rm = TRUE)
-  })
-  matTumor <- t(apply(matTumor, 1, "-", meansTumor))
+  meansTumor <- Matrix::colMeans(matTumor, na.rm = TRUE)
+  matTumor <- sweep(matTumor, 2, meansTumor, FUN = "-")
 
-  meansRef <- apply(matRef, 2, function(x) {
-    mean(x, na.rm = TRUE)
-  })
-  matRef <- t(apply(matRef, 1, "-", meansRef))
+  meansRef <- Matrix::colMeans(matRef, na.rm = TRUE)
+  matRef <- sweep(matRef, 2, meansRef, FUN = "-")
 
   if (all_steps == TRUE) {
     obj$step07 <- list(
@@ -1115,19 +1091,16 @@ computeLogRatioRNA <- function(matTumor,
 
 
   ## Step 08: Correcting by reference variability ------------------------------
-  if (quiet == FALSE) {
-    message("Step 08 - Correcting by reference variability")
-  }
+  msg("Step 08 - Correcting by reference variability")
 
-  sd.ref <- apply(matRef, 1, function(x) sd(x, na.rm = TRUE))
-  mean.ref <- apply(matRef, 1, function(x) mean(x, na.rm = TRUE))
+  sd.ref <- matrixStats::rowSds(matRef, na.rm = TRUE)
+  mean.ref <- Matrix::rowMeans(matRef, na.rm = TRUE)
 
-  matTumor <- apply(matTumor, 2, function(x) {
-    (x - mean.ref) / sd.ref
-  })
-  matRef <- apply(matRef, 2, function(x) {
-    (x - mean.ref) / sd.ref
-  })
+  matTumor <- sweep(matTumor, 1, mean.ref, FUN = "-")
+  matTumor <- sweep(matTumor, 1, sd.ref, FUN = "/")
+
+  matRef <- sweep(matRef, 1, mean.ref, FUN = "-")
+  matRef <- sweep(matRef, 1, sd.ref, FUN = "/")
 
   if (all_steps == TRUE) {
     obj$step08 <- list(
