@@ -431,11 +431,13 @@ mergeCounts <- function(x,
         ) %>%
         dplyr::mutate(AF.all = round(.data$AD.all / .data$DP.all, 2))
     # Join data
-    allele_sample_full <- allele_sample %>%
-        dplyr::select(!c("cell", "RD", "AD", "DP")) %>%
-        dplyr::left_join(.data, summed_sample_omic, by = c("cluster", "id", "omic")) %>%
-        dplyr::left_join(.data, summed_sample_all, by = c("cluster", "id")) %>%
-        subset(.data, !duplicated(.data))
+    allele_sample_full <- {
+        allele_sample %>%
+            dplyr::select(!dplyr::any_of(c("cell", "RD", "AD", "DP"))) %>%
+            dplyr::left_join(summed_sample_omic, by = c("cluster", "id", "omic")) %>%
+            dplyr::left_join(summed_sample_all, by = c("cluster", "id")) %>%
+            dplyr::distinct()
+    }
 
     # Compute per-omic and total counts for the reference
     # Compute per-omi counts
@@ -459,11 +461,13 @@ mergeCounts <- function(x,
         ) %>%
         dplyr::mutate(AF.all = round(.data$AD.all / .data$DP.all, 2))
     # Join data
-    allele_ref_full <- allele_ref %>%
-        dplyr::select(!c("cell", "RD", "AD", "DP")) %>%
-        dplyr::left_join(.data, summed_ref_omic, by = c("id", "omic")) %>%
-        dplyr::left_join(.data, summed_ref_all, by = c("id")) %>%
-        subset(.data, !duplicated(.data))
+    allele_ref_full <- {
+        allele_ref %>%
+            dplyr::select(!dplyr::any_of(c("cell", "RD", "AD", "DP"))) %>%
+            dplyr::left_join(summed_ref_omic, by = c("id", "omic")) %>%
+            dplyr::left_join(summed_ref_all, by = "id") %>%
+            dplyr::distinct()
+    }
 
     # Merge sample and reference allelic data
     var <- dplyr::left_join(
@@ -505,20 +509,25 @@ mergeCounts <- function(x,
         dplyr::group_by(.data$cluster, .data$id) %>%
         dplyr::summarise(DP = sum(.data$DP),
                          .groups = "drop")
-    coverage_sample_full <- coverage_sample %>%
-        dplyr::select(!c("cell", "cluster", "DP")) %>%
-        dplyr::left_join(.data, summed_sample, by = "id") %>%
-        subset(.data, !duplicated(.data))
+    coverage_sample_full <- {
+        coverage_sample %>%
+            dplyr::select(!dplyr::any_of(c("cell", "DP"))) %>%
+            dplyr::left_join(summed_sample, by = c("cluster", "id")) %>%
+            dplyr::distinct()
+    }
+
 
     # Compute total counts for the reference
     summed_ref <- coverage_ref %>%
         dplyr::group_by(.data$id) %>%
         dplyr::summarise(DP = sum(.data$DP),
                          .groups = "drop")
-    coverage_ref_full <- coverage_ref %>%
-        dplyr::select(!c("cell", "DP")) %>%
-        dplyr::left_join(.data, summed_ref, by = "id") %>%
-        subset(.data, !duplicated(.data))
+    coverage_ref_full <- {
+        coverage_ref %>%
+            dplyr::select(!dplyr::any_of(c("cell", "DP"))) %>%
+            dplyr::left_join(summed_ref, by = "id") %>%
+            dplyr::distinct()
+    }
 
     # Merge sample and reference coverage data
     cov <- dplyr::left_join(

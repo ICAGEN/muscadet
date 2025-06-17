@@ -1240,7 +1240,7 @@ plotIndexes <- function(x,
     }
 
     # Transform the data frame for plotting
-    df_plot <- tidyr::pivot_longer(df_indexes, -.data$partition, names_to = "Index", values_to = "Value")
+    df_plot <- tidyr::pivot_longer(df_indexes, -"partition", names_to = "Index", values_to = "Value")
     df_plot$Index <- factor(df_plot$Index, levels = index) # Maintain order of indexes
 
     # Labels
@@ -1996,7 +1996,7 @@ plotUMAP <- function(x,
     df <- as.data.frame(x@clustering$umap)[common_cells, ]
     df$cluster <- as.factor(clusters[common_cells])
 
-    p <- ggplot(df, aes(x = UMAP_1 , y = UMAP_2, color = cluster)) +
+    p <- ggplot(df, aes(x = .data$UMAP_1 , y = .data$UMAP_2, color = .data$cluster)) +
         geom_point(size = point.size) +
         scale_color_manual(name = "Clusters", values = colors) +
         labs(title = title, x = lab.x, y = lab.y) +
@@ -2014,7 +2014,7 @@ plotUMAP <- function(x,
         )
 
     if (add_clusters_labels) {
-        p <- add_labels(p, labels = cluster, ...)
+        p <- add_labels(p, labels = "cluster", ...)
     }
 
     return(p)
@@ -2142,8 +2142,8 @@ add_labels <- function(
         ggobj <- geom_fun(
             data = summarized_data,
             mapping = aes(
-                x = med_x,
-                y = med_y,
+                x = .data$med_x,
+                y = .data$med_y,
                 label = !!labels
             ),
             color = color,
@@ -2160,8 +2160,8 @@ add_labels <- function(
         ggobj <- geom_fun(
             data = summarized_data,
             mapping = aes(
-                x = med_x,
-                y = med_y,
+                x = .data$med_x,
+                y = .data$med_y,
                 label = !!labels
             ),
             color = color,

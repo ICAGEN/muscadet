@@ -944,7 +944,7 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
         dplyr::mutate(ngroupperchr = length(unique(.data$group))) %>%
         dplyr::ungroup() %>%
         dplyr::group_by(.data$seqnames, .data$start) %>%
-        dplyr::mutate(group = case_when(
+        dplyr::mutate(group = dplyr::case_when(
             .data$ngroupperchr == 1 ~ max(breakpoints$group) + cur_group_id(),
             .default = .data$group
         )) %>%
@@ -954,7 +954,7 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
     # compute median to get a unique breakpoint
     breakpoints <- breakpoints %>%
         dplyr::group_by(.data$group, .data$cluster) %>%
-        dplyr::mutate(start = median(.data$start), end = median(.data$end)) %>%
+        dplyr::mutate(start = round(median(.data$start)), end = round(median(.data$end))) %>%
         dplyr::ungroup() %>%
         unique()
 
@@ -963,7 +963,7 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
         dplyr::group_by(.data$group) %>%
         dplyr::mutate(start = .data$start[.data$cluster == max(.data$cluster)],
                       end = .data$end[.data$cluster == max(.data$cluster)]) %>%
-        dplyr::select(-.data$cluster, -.data$ngroupperchr) %>%
+        dplyr::select(-"cluster", -"ngroupperchr") %>%
         unique()
 
     # Transform breakpoints back into segments
@@ -979,7 +979,7 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
         } else {
             c(.data$end[2:length(.data$end)], NA) # Multiple breakpoints: create segments
         }) %>%
-        dplyr::select(-.data$group, -.data$width, -.data$strand) %>%
+        dplyr::select(-"group", -"width", -"strand") %>%
         dplyr::filter(!is.na(.data$start) & !is.na(.data$end)) # Remove rows with NA start or end
 
     return(as.data.frame(consensus_segs))

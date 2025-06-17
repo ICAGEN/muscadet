@@ -45,7 +45,7 @@ values to use for \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\co
 list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 provided omic.}
     \item{\code{algorithm}}{Integer specifying the algorithm for modularity optimization
-by \link[Seurat:FindClusters]{Seurat::FindClusters} (\code{1} = original Louvain algorithm; \code{2} = Louvain
+by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} = Louvain
 algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leiden
 algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for

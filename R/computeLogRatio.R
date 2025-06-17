@@ -1202,8 +1202,12 @@ getLogRatioBulk <- function(x, bulk.lrr) {
     features_gr$bulk.lrr <- df$lrr
 
     # Convert the GRanges object back to a data frame for output with relevant columns
-    out <- as.data.frame(features_gr)[, c("seqnames", "start", "end", "bulk.lrr")]
-    colnames(out)[1] <- "CHROM"
+    out <- data.frame(
+        CHROM = as.character(GenomicRanges::seqnames(features_gr)),
+        start = GenomicRanges::start(features_gr),
+        end = GenomicRanges::end(features_gr),
+        bulk.lrr = features_gr$bulk.lrr
+    )
 
     return(out) # Return the data frame with assigned bulk LRR values
 }

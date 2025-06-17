@@ -259,7 +259,7 @@ clusterMuscadet <- function(x,
 #'   list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 #'   provided omic.
 #' @param algorithm Integer specifying the algorithm for modularity optimization
-#'   by [Seurat::FindClusters] (`1` = original Louvain algorithm; `2` = Louvain
+#'   by [Seurat::FindClusters()] (`1` = original Louvain algorithm; `2` = Louvain
 #'   algorithm with multilevel refinement; `3` = SLM algorithm; `4` = Leiden
 #'   algorithm). Leiden requires the leidenalg python. Default is `1`.
 #' @param knn_seurat Integer specifying the number of nearest neighbors used for
@@ -451,6 +451,7 @@ cluster_seurat <- function(mat_list,
         if (!quiet) {
             message("Computing UMAP...")
         }
+        options(Seurat.warn.umap.uwot = FALSE)
         seurat <- Seurat::RunUMAP(
             seurat,
             nn.name = "weighted.nn",
