@@ -30,10 +30,10 @@ cnaCalling(
   cval2 = 150,
   min.nhet = 5,
   clonal.thresh = 0.9,
+  cf.thresh = 0.5,
   dist.breakpoints = 1e+06,
   ploidy = "auto",
   dipLogR = NULL,
-  correct.cf = FALSE,
   quiet = FALSE
 )
 }
@@ -89,6 +89,11 @@ segmentation and clustering \code{\link[=preProcSample2]{preProcSample2()}}. (de
 \item{clonal.thresh}{Threshold of minimum cell proportion to label a
 segment as clonal (default: 0.9).}
 
+\item{cf.thresh}{Numeric threshold to set the minimum cell fraction (CF) allowed. CNA segments
+with a CF below this value are considered neutral (i.e., 2:1). The default
+is \code{0.5}. Can be set to \code{0} or \code{NULL} to disable this threshold and retain all segments
+regardless of CF.}
+
 \item{dist.breakpoints}{Minimum distance between breakpoints to define
 distinct segments (default: 1e6).}
 
@@ -98,13 +103,6 @@ value (default: \code{"auto"}).}
 \item{dipLogR}{Optional. Numeric value specifying an expected log ratio for
 diploid regions to use for the analysis. If \code{NULL}, by default, the diploid
 log ratio is estimated automatically from the data.}
-
-\item{correct.cf}{Logical. If \code{TRUE}, normalizes the cell fraction (\code{cf.em})
-estimates so that the maximum value (excluding 1) becomes 1, and adjusts
-the total copy number (\code{tcn.em}) and lesser copy number (\code{lcn.em})
-accordingly. This correction accounts for partial subclonality in regions
-with lower-than-expected cell fractions, ensuring consistency in copy
-number calls. If \code{FALSE}, by default, no correction is applied.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
@@ -171,12 +169,13 @@ computed with EM algorithm), \code{ncells} (number of cells in cluster),
 \code{cna_clonal_state} (state of clonal CNA segments).
 
 \item \code{ncells}: Vector of number of cells per cluster.
-\item \code{dipLogR.clusters}: Diploid log R ratio from the per cluster analysis.
-\item \code{dipLogR.allcells}: Diploid log R ratio from the all cells analysis.
-\item \code{purity.clusters}: Purity from the per cluster analysis.
-\item \code{purity.allcells}: Purity from the all cells analysis.
-\item \code{ploidy.clusters}: Ploidy from the per cluster analysis.
-\item \code{ploidy.allcells}: Ploidy from the all cells analysis.
+\item \code{dipLogR.clusters}: Diploid log R ratio estimated during the per cluster analysis.
+\item \code{dipLogR.allcells}: Diploid log R ratio estimated during the all cells analysis.
+\item \code{purity.clusters}: Purity estimated during the per cluster analysis.
+\item \code{purity.allcells}: Purity estimated during the all cells analysis.
+\item \code{ploidy.clusters}: Ploidy estimated during the per cluster analysis.
+\item \code{ploidy.allcells}: Ploidy estimated during the all cells analysis.
+\item \code{ploidy}: Ploidy used for the CNA analysis.
 }
 }
 \description{
