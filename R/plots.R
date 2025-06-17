@@ -1670,6 +1670,8 @@ plotProfile <- function(x,
 #'   (or named vector where names are "gain", "loss", and "cnloh" and the values
 #'   are their respective colors). Default is `c("gain" = "#EF6F6AFF", "loss" =
 #'   "#6699CCFF", "cnloh" = "#44AA99FF")`.
+#' @param cf.gradient Logical. If `TRUE` adds a alpha transparency gradient on
+#'   CNA color block based on the cell fraction. Default is `TRUE`.
 #'
 #' @return A ggplot object representing the CNA segments plot.
 #'
@@ -1706,7 +1708,9 @@ plotCNA <- function(x,
                         "gain" = "#EF6F6AFF",
                         "loss" = "#6699CCFF",
                         "cnloh" = "#44AA99FF"
-                    )) {
+                    ),
+                    cf.gradient = TRUE
+                    ) {
     # Argument checks
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
 
@@ -1800,7 +1804,7 @@ plotCNA <- function(x,
             ymin = .data$start.y,
             ymax = .data$end.y,
             fill = .data$cna_state,
-            alpha = .data$cf.em
+            alpha = if(cf.gradient) .data$cf.em else NULL
         )
     ) +
         geom_rect() +
@@ -1831,23 +1835,13 @@ plotCNA <- function(x,
             labels = paste0("cluster ", unique(df$cluster), "\n", ncells, " cells")
         ) +
         # set colors for the calls and remove the name
-        {
-            if (length(cna.colors) > 0)
-                scale_fill_manual(
-                    name = "",
-                    values = cna.colors,
-                    na.value = "white",
-                    na.translate = FALSE,
-                    drop = FALSE
-                )
-        } +
-        scale_alpha_continuous(
-            name = "cell fraction",
-            range = c(0, 1),
-            limits = c(0, 1),
-            breaks = c(0.2, 0.4, 0.6, 0.8, 1)
+        scale_fill_manual(
+            name = "",
+            values = cna.colors,
+            na.value = "white",
+            na.translate = FALSE,
+            drop = FALSE
         ) +
-        guides(fill = guide_legend(order = 1), alpha = guide_legend(order = 2)) +
         ## Set axis labels
         labs(title = title) +
         theme_bw() +
@@ -1861,6 +1855,18 @@ plotCNA <- function(x,
             legend.position = "top"
         )
 
+    # Add optional layers
+    if (cf.gradient) {
+        cna_plot <- cna_plot +
+            scale_alpha_continuous(
+                name = "cell fraction",
+                range = c(0, 1),
+                limits = c(0, 1),
+                breaks = c(0.2, 0.4, 0.6, 0.8, 1)
+            ) +
+            guides(fill = guide_legend(order = 1), alpha = guide_legend(order = 2))
+
+    }
     return(cna_plot)
 }
 

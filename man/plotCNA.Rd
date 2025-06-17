@@ -7,7 +7,8 @@
 plotCNA(
   x,
   title = NULL,
-  cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF")
+  cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF"),
+  cf.gradient = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,9 @@ visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
 \item{cna.colors}{A vector of 3 colors for CNA states: gain, loss, and cnloh
 (or named vector where names are "gain", "loss", and "cnloh" and the values
 are their respective colors). Default is \code{c("gain" = "#EF6F6AFF", "loss" = "#6699CCFF", "cnloh" = "#44AA99FF")}.}
+
+\item{cf.gradient}{Logical. If \code{TRUE} adds a alpha transparency gradient on
+CNA color block based on the cell fraction. Default is \code{TRUE}.}
 }
 \value{
 A ggplot object representing the CNA segments plot.
