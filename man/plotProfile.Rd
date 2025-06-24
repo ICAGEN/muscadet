@@ -9,7 +9,7 @@ plotProfile(
   data,
   title = NULL,
   allelic.type = "lor",
-  point.size = 2,
+  point.cex = c(0.4, 0.5),
   chrom.colors = c("slategrey", "skyblue"),
   lor.colors = c("peachpuff2", "paleturquoise3"),
   cn.colors = c("grey20", "brown2"),
@@ -32,8 +32,9 @@ visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
 "lor" for log odds ratio or "vaf" for variant allele frequency. Default is
 "lor".}
 
-\item{point.size}{Numeric value specifying the size of points in the plot in
-pixel (with pch = "."). Default is \code{2}.}
+\item{point.cex}{Numeric vector of length 1 or 2 specifying the size of
+points in the plots. If a single value is provided, it will be replicated
+for both plots. Default is \code{c(0.4, 0.5)}.}
 
 \item{chrom.colors}{A character vector of length 2 defining alternating
 chromosome colors. Default is \code{c("slategrey", "skyblue")}.}
@@ -67,8 +68,8 @@ A multi-panel plot of CNA profiles is produced.
 \description{
 This function generates a multi-panel plot of copy number alteration (CNA)
 profiles from a \code{\link{muscadet}} object, including: log R ratios
-values, log odds ratio (or variant allele frequency), copy numbers and cell
-fractions.
+values, log odds ratio (or variant allele frequency), copy numbers, CNA
+status and cell fractions.
 }
 \examples{
 \dontrun{

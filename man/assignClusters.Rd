@@ -55,7 +55,7 @@ cluster assignments based on other data and methods.
 \details{
 \itemize{
 \item The clusters can be taken directly from the \code{muscadet} object clustering
-results with setting the \code{parition} argument (e.g.
+results with setting the \code{partition} argument (e.g.
 \code{muscadet_obj$clustering$clusters[["0.8"]]} for res=\code{0.8}).
 \item A custom vector of cluster assignments
 can be attributed using the \code{clusters} argument.

@@ -28,6 +28,15 @@ of copy number alterations (CNAs) (\code{list}).}
 \item{\code{genome}}{Reference genome name among: "hg38", "hg19" and "mm10" (\code{character}).}
 }}
 
+\examples{
+data(muscadet_obj)
+
+muscadet_obj
+
+str(muscadet_obj, max.level = 2)
+
+
+}
 \seealso{
 Functions related to \code{muscadet} objects:
 \itemize{

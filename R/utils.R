@@ -34,7 +34,7 @@
 #'
 #' @details
 #' - The clusters can be taken directly from the `muscadet` object clustering
-#' results with setting the `parition` argument (e.g.
+#' results with setting the `partition` argument (e.g.
 #' `muscadet_obj$clustering$clusters[["0.8"]]` for res=`0.8`).
 #' - A custom vector of cluster assignments
 #' can be attributed using the `clusters` argument.
@@ -295,8 +295,7 @@ addAlleleCounts <- function(x, allele_counts) {
         # Ordered chromosomes
         allele_df$CHROM <- ordered(allele_df$CHROM, levels = gtools::mixedsort(unique(allele_df$CHROM)))
         # Reorder data
-        allele_df <- allele_df[order(allele_df[, "POS"]), ]
-        allele_df <- allele_df[order(allele_df[, "CHROM"]), ]
+        allele_df <- allele_df[order(allele_df$CHROM, allele_df$POS), ]
         return(allele_df)
 
     })

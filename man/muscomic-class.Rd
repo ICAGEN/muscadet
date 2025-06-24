@@ -23,6 +23,15 @@ single-cell omic dataset used as primary input for muscadet analysis.
 individual-specific heterozygous positions) (\code{list}).}
 }}
 
+\examples{
+data(muscadet_obj)
+
+muscadet_obj$ATAC
+muscadet_obj$RNA
+
+str(muscadet_obj$ATAC, max.level = 2)
+
+}
 \seealso{
 Functions related to \code{muscomic} objects:
 \itemize{

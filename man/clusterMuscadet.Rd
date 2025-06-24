@@ -114,8 +114,8 @@ muscadet_obj <- clusterMuscadet(
   method = "seurat",
   res_range = c(0.5, 0.8),
   dims_list = list(1:8, 1:8),
-  knn_seurat = 10, # to adapt for low number of cells in example data
-  knn_range_seurat = 30 # to adapt for low number of cells in example data
+  knn_seurat = 10, # adapted to low number of cells in example data
+  knn_range_seurat = 30 # adapted to low number of cells in example data
 )
 
 # Perform clustering with "hclust" method

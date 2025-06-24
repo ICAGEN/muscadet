@@ -27,6 +27,14 @@
 #' @importFrom methods setClass
 #' @exportClass muscomic
 #'
+#' @examples
+#' data(muscadet_obj)
+#'
+#' muscadet_obj$ATAC
+#' muscadet_obj$RNA
+#'
+#' str(muscadet_obj$ATAC, max.level = 2)
+#'
 methods::setClass(
   "muscomic",
   slots = c(
@@ -66,6 +74,14 @@ methods::setClass(
 #' @importFrom methods setClass
 #' @exportClass muscadet
 #'
+#' @examples
+#' data(muscadet_obj)
+#'
+#' muscadet_obj
+#'
+#' str(muscadet_obj, max.level = 2)
+#'
+#'
 methods::setClass(
   "muscadet",
   slots = c(
@@ -104,7 +120,7 @@ methods::setClass(
 #' @param allele_counts Data frame of allele counts at variant positions per
 #'   cell (`data.frame`). Variant positions can be either common single
 #'   nucleotide polymorphisms (SNPs) positions or individual-specific
-#'   heterozygous positions retrieved by bulk sequencing. The data frame format
+#'   heterozygous positions retrieved from bulk sequencing. The data frame format
 #'   is based on the Variant Calling Format (VCF), thereby it must contain the
 #'   following columns : `cell`, `id`, `CHROM`, `POS`, `REF`, `ALT`, `RD`, `AD`,
 #'   `DP`, (`GT`). See [allele_counts] for details.

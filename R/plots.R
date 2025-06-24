@@ -124,7 +124,17 @@
 #' heatmapMuscadet(muscadet_obj,
 #'                 filename = file.path("heatmap_res0.6.png"),
 #'                 partition = 0.6,
-#'                 show_missing = FALSE)
+#'                 show_missing = FALSE) # only displaying cells without missing data
+#'
+#' ht <- heatmapMuscadet(muscadet_obj, partition = 0.6)
+#' pdf(
+#'     file = file.path("heatmap_res0.6.pdf"),
+#'     width = ht$width * 0.0393701, # convert to inches
+#'     height = ht$height * 0.0393701, # convert to inches
+#' )
+#' grid.draw(ht$plot)
+#' dev.off()
+#'
 #'
 #' # Loop over partitions
 #' for (p in names(muscadet_obj$clustering$clusters)) {
@@ -266,11 +276,9 @@ heatmapMuscadet <- function(x,
 
     ## filename ------
     # Check if output directory exists
-    if (!is.null(filename))
+    if (!is.null(filename)) {
         stopifnot("`filename`: the directory doesn't exist" = file.exists(dirname(filename)))
-
-    if (!is.null(filename) & !grepl(".(png|pdf|svg)$", filename)) {
-        stop("The `filename` argument must end with either .png, .pdf or svg.")
+        stopifnot("The `filename` argument must end with either .png, .pdf or svg." = grepl(".(png|pdf|svg)$", filename))
     }
 
     ## Validate clusters & partition ------
@@ -538,7 +546,7 @@ heatmapMuscadet <- function(x,
         muscomic <- x@omics[[omic_name]]
 
         pdf(file = NULL)
-        ht_opt(message = F)
+        ComplexHeatmap::ht_opt(message = F)
 
         # Get chromosome info for features
         coord <- muscomic@coverage$coord.features
@@ -784,26 +792,30 @@ heatmapMuscadet <- function(x,
     dev.off()
 
     # Save complete plot of heatmaps as PNG PDF or SVG
-    if (!is.null(filename) & grepl(".png", basename(filename))) {
-        grDevices::png(
-            filename = filename,
-            width = ht_all@ht_list_param[["width"]],
-            height = ht_all@ht_list_param[["height"]],
-            units = "mm",
-            res = png_res
-        )
-    } else if (!is.null(filename) & grepl(".pdf", basename(filename))) {
-        grDevices::pdf(
-            file = filename,
-            width = (ht_all@ht_list_param[["width"]]) / 25.4, # from mm to inches
-            height = (ht_all@ht_list_param[["height"]]) / 25.4 # from mm to inches
-        )
-    } else if (!is.null(filename) & grepl(".svg", basename(filename))) {
-        grDevices::svg(
-            filename = filename,
-            width = (ht_all@ht_list_param[["width"]]) / 25.4, # from mm to inches
-            height = (ht_all@ht_list_param[["height"]]) / 25.4 # from mm to inches
-        )
+    if (!is.null(filename)) {
+        if (grepl(".png", basename(filename))) {
+            grDevices::png(
+                filename = filename,
+                width = ht_all@ht_list_param[["width"]],
+                height = ht_all@ht_list_param[["height"]],
+                units = "mm",
+                res = png_res
+            )
+        } else if (grepl(".pdf", basename(filename))) {
+            grDevices::pdf(
+                file = filename,
+                width = (ht_all@ht_list_param[["width"]]) / 25.4,
+                # from mm to inches
+                height = (ht_all@ht_list_param[["height"]]) / 25.4 # from mm to inches
+            )
+        } else if (grepl(".svg", basename(filename))) {
+            grDevices::svg(
+                filename = filename,
+                width = (ht_all@ht_list_param[["width"]]) / 25.4,
+                # from mm to inches
+                height = (ht_all@ht_list_param[["height"]]) / 25.4 # from mm to inches
+            )
+        }
     } else {
         pdf(file = NULL)
     }
@@ -1305,8 +1317,8 @@ plotIndexes <- function(x,
 #'
 #' This function generates a multi-panel plot of copy number alteration (CNA)
 #' profiles from a \code{\link{muscadet}} object, including: log R ratios
-#' values, log odds ratio (or variant allele frequency), copy numbers and cell
-#' fractions.
+#' values, log odds ratio (or variant allele frequency), copy numbers, CNA
+#' status and cell fractions.
 #'
 #' @param x A \code{\link{muscadet}} object containing CNA calling data to be
 #'   visualized (generated using [muscadet::cnaCalling()]).
@@ -1316,8 +1328,9 @@ plotIndexes <- function(x,
 #' @param allelic.type A character string indicating the allelic metric to plot:
 #'   "lor" for log odds ratio or "vaf" for variant allele frequency. Default is
 #'   "lor".
-#' @param point.size Numeric value specifying the size of points in the plot in
-#'   pixel (with pch = "."). Default is `2`.
+#' @param point.cex Numeric vector of length 1 or 2 specifying the size of
+#'   points in the plots. If a single value is provided, it will be replicated
+#'   for both plots. Default is `c(0.4, 0.5)`.
 #' @param chrom.colors A character vector of length 2 defining alternating
 #'   chromosome colors. Default is `c("slategrey", "skyblue")`.
 #' @param lor.colors A character vector of length 2 for log odds ratio point
@@ -1361,7 +1374,7 @@ plotProfile <- function(x,
                         data,
                         title = NULL,
                         allelic.type = "lor",
-                        point.size = 2,
+                        point.cex = c(0.4, 0.5),
                         chrom.colors = c("slategrey", "skyblue"),
                         lor.colors = c("peachpuff2", "paleturquoise3"),
                         cn.colors = c("grey20", "brown2"),
@@ -1376,9 +1389,11 @@ plotProfile <- function(x,
     # Argument checks
     stopifnot(
         "Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"),
+
+        "Input object `x` must contain CNA calling data." = !is.null(x@cnacalling$table),
+
         "Invalid `allelic.type'. Use allelic.type = \"lor\" or allelic.type = \"vaf\"." = allelic.type %in% c("lor", "vaf"),
-        "`point.size` must be a numeric value." = is.numeric(point.size) &&
-            length(point.size) == 1,
+        "`point.cex` must be numeric." = is.numeric(point.cex),
         "`chrom.colors` must be a character vector of length 2." = is.character(chrom.colors) &&
             length(chrom.colors) == 2,
         "`lor.colors` must be a character vector of length 2 or `none`." = (is.character(lor.colors) &&
@@ -1393,6 +1408,10 @@ plotProfile <- function(x,
         "`seg.color` must be a single character value." = is.character(seg.color) &&
             length(seg.color) == 1
     )
+    if (length(point.cex) == 1) {
+        point.cex <- rep(point.cex, 2)
+    }
+
 
     # Extract data -------------------------------------------------------------
     if (data == "allcells") {
@@ -1466,8 +1485,8 @@ plotProfile <- function(x,
     # 1- Plot the LRR data -----------------------------------------------------
     plot(
         pos$cnlr,
-        pch = ".",
-        cex = point.size,
+        pch = 16,
+        cex = point.cex[1],
         col = chrom.colors[chrcol],
         ylab = "Log R ratio",
         cex.lab = 1.5,
@@ -1498,8 +1517,8 @@ plotProfile <- function(x,
     if (allelic.type == "lor") {
         plot(
             pos$valor,
-            pch = ".",
-            cex = point.size,
+            pch = 16,
+            cex = point.cex[2],
             col = cols,
             ylab = "Log odds ratio",
             cex.lab = 1.5,
@@ -1522,8 +1541,8 @@ plotProfile <- function(x,
         pos[which(pos$signal == "coverage"), "vafT"] <- NA
         plot(
             pos$vafT,
-            pch = ".",
-            cex = point.size,
+            pch = 16,
+            cex = point.cex[2],
             col = cols,
             ylab = "Variant allele frequency",
             cex.lab = 1.5,
@@ -2371,7 +2390,7 @@ heatmapStep <- function(obj,
     # Calculate bin_width
     bin_width <- (max(mat) - min(mat)) / 1000
 
-    ht_opt(message = F)
+    ComplexHeatmap::ht_opt(message = F)
 
     # Create heatmaps
     ht_Tum <- ComplexHeatmap::Heatmap(

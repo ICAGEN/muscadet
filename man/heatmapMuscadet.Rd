@@ -140,7 +140,17 @@ print(muscadet_obj$clustering$params$method)
 heatmapMuscadet(muscadet_obj,
                 filename = file.path("heatmap_res0.6.png"),
                 partition = 0.6,
-                show_missing = FALSE)
+                show_missing = FALSE) # only displaying cells without missing data
+
+ht <- heatmapMuscadet(muscadet_obj, partition = 0.6)
+pdf(
+    file = file.path("heatmap_res0.6.pdf"),
+    width = ht$width * 0.0393701, # convert to inches
+    height = ht$height * 0.0393701, # convert to inches
+)
+grid.draw(ht$plot)
+dev.off()
+
 
 # Loop over partitions
 for (p in names(muscadet_obj$clustering$clusters)) {
