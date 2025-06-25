@@ -94,6 +94,7 @@ peaks <- read.delim(
   col.names = c("CHROM", "start", "end", "id")
 )
 peaks <- peaks[sort(sample(as.integer(rownames(peaks)), 1000)), ]
+rownames(peaks) <- NULL
 
 # from gtf file corresponding to genome
 genes <- read.delim(
@@ -297,6 +298,7 @@ muscadet <- computeLogRatio(
 )
 
 # clustering
+set.seed(123)
 muscadet <- clusterMuscadet(
     muscadet,
     method = "seurat",
