@@ -62,6 +62,7 @@ evaluating cell fractions and copy numbers.</p>
 <span>  clonal.thresh <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>  cf.thresh <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  dist.breakpoints <span class="op">=</span> <span class="fl">1e+06</span>,</span>
+<span>  minoverlap <span class="op">=</span> <span class="fl">1e+06</span>,</span>
 <span>  ploidy <span class="op">=</span> <span class="st">"auto"</span>,</span>
 <span>  dipLogR <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -170,7 +171,13 @@ regardless of CF.</p></dd>
 
 <dt id="arg-dist-breakpoints">dist.breakpoints<a class="anchor" aria-label="anchor" href="#arg-dist-breakpoints"></a></dt>
 <dd><p>Minimum distance between breakpoints to define
-distinct segments (default: 1e6).</p></dd>
+distinct segments (see <code><a href="getSegConsensus.html">getSegConsensus()</a></code>) (default: 1e6).</p></dd>
+
+
+<dt id="arg-minoverlap">minoverlap<a class="anchor" aria-label="anchor" href="#arg-minoverlap"></a></dt>
+<dd><p>Minimum distance between a cluster specific segment and a
+consensus segment for them to overlap (see <code><a href="annotateSegments.html">annotateSegments()</a></code>) (default:
+1e6).</p></dd>
 
 
 <dt id="arg-ploidy">ploidy<a class="anchor" aria-label="anchor" href="#arg-ploidy"></a></dt>
@@ -287,7 +294,7 @@ Acids Res. 2016 Sep 19;44(16):e131. doi:
 <span class="r-msg co"><span class="r-pr">#&gt;</span> From 1733 positions to 404 positions</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing segmentation per cluster...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding diploid log R ratio on clusters...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Diploid log R ratio = -0.27827549623585</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Diploid log R ratio = -0.279348299298531</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing cell fractions and copy numbers on clusters...</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering positions on all cells based on provided filters...</span>

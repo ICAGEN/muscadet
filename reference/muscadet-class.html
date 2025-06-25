@@ -81,6 +81,36 @@ of copy number alterations (CNAs) (<code>list</code>).</p></dd>
 </ul></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">muscadet_obj</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A muscadet object </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2 omics: ATAC, RNA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  types: ATAC, RNA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  labels: scATAC-seq, scRNA-seq </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  coverage data matrix: log.ratio, log.ratio </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cells: 112, 119 (common: 84, total: 147) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  features: 133, 349 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  feature labels: windows of peaks, genes </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variant positions: 691, 373 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  data from paired bulk sequencing: WGS </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  clustering: partitions = 0.6, 0.8, 1 ; optimal partition = 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  CNA calling: 2 clusters ; 47 consensus segments including 1 CNA segments </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  genome: hg38 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formal class 'muscadet' [package "muscadet"] with 5 slots</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ omics     :List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ bulk.data :List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ clustering:List of 9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ cnacalling:List of 21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ genome    : chr "hg38"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

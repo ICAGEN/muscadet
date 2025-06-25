@@ -62,14 +62,14 @@ size and median coordinates.</p>
 following required columns:</p><ul><li><p><code>chrom</code>: Chromosome name (<code>factor</code> or <code>character</code>).</p></li>
 <li><p><code>start</code>: Start position of the segment (<code>numeric</code>).</p></li>
 <li><p><code>end</code>: End position of the segment (<code>numeric</code>).</p></li>
-<li><p><code>cluster</code>: Cluster identifier for each breakpoint (<code>numeric</code>).</p></li>
+<li><p><code>cluster</code>: Cluster identifier (<code>numeric</code>).</p></li>
 </ul></dd>
 
 
 <dt id="arg-ncells">ncells<a class="anchor" aria-label="anchor" href="#arg-ncells"></a></dt>
 <dd><p>A named vector specifying the number of cells per cluster
-(<code>numeric</code> vector). The names should correspond to the cluster identifiers
-in the <code>cluster</code> column of <code>x</code>.</p></dd>
+(<code>numeric</code> vector). The names must match the cluster identifiers in the
+<code>cluster</code> column of <code>x</code>.</p></dd>
 
 
 <dt id="arg-dist-breakpoints">dist.breakpoints<a class="anchor" aria-label="anchor" href="#arg-dist-breakpoints"></a></dt>
@@ -86,7 +86,7 @@ segment (<code>numeric</code> value). Default: <code>1e6</code>.</p></dd>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="cnaCalling.html">cnaCalling()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="annotateSegments.html">annotateSegments()</a></code>, <code><a href="cnaCalling.html">cnaCalling()</a></code></p></div>
     </div>
 
     <div class="section level2">
