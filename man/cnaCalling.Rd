@@ -32,6 +32,7 @@ cnaCalling(
   clonal.thresh = 0.9,
   cf.thresh = 0.5,
   dist.breakpoints = 1e+06,
+  minoverlap = 1e+06,
   ploidy = "auto",
   dipLogR = NULL,
   quiet = FALSE
@@ -95,7 +96,11 @@ is \code{0.5}. Can be set to \code{0} or \code{NULL} to disable this threshold a
 regardless of CF.}
 
 \item{dist.breakpoints}{Minimum distance between breakpoints to define
-distinct segments (default: 1e6).}
+distinct segments (see \code{\link[=getSegConsensus]{getSegConsensus()}}) (default: 1e6).}
+
+\item{minoverlap}{Minimum distance between a cluster specific segment and a
+consensus segment for them to overlap (see \code{\link[=annotateSegments]{annotateSegments()}}) (default:
+1e6).}
 
 \item{ploidy}{Specifies ploidy assumption: \code{"auto"}, \code{"median"}, or numeric
 value (default: \code{"auto"}).}

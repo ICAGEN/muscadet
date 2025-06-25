@@ -43,7 +43,10 @@
 #'   is `0.5`. Can be set to `0` or `NULL` to disable this threshold and retain all segments
 #'   regardless of CF.
 #' @param dist.breakpoints Minimum distance between breakpoints to define
-#'   distinct segments (default: 1e6).
+#'   distinct segments (see [getSegConsensus()]) (default: 1e6).
+#' @param minoverlap Minimum distance between a cluster specific segment and a
+#'   consensus segment for them to overlap (see [annotateSegments()]) (default:
+#'   1e6).
 #' @param ploidy Specifies ploidy assumption: `"auto"`, `"median"`, or numeric
 #'   value (default: `"auto"`).
 #' @param dipLogR Optional. Numeric value specifying an expected log ratio for
@@ -182,6 +185,7 @@ cnaCalling <- function(
         clonal.thresh = 0.9,
         cf.thresh = 0.5,
         dist.breakpoints = 1e6,
+        minoverlap = 1e6,
         ploidy = "auto",
         dipLogR = NULL,
         quiet = FALSE
@@ -538,81 +542,29 @@ cnaCalling <- function(
 
     # DEFINE PLOIDY ------------------------------------------------------------
 
-    if(ploidy == "median") { ploidy <- round(median(out_full$tcn)) }
+    if(ploidy == "median") { ploidy <- round(median(out_full$tcn.em)) }
     if (ploidy == "auto") {
         # define ploidy based on the number of segments being 2:1 or 4:2
-        diploid <- length(which(out_full$tcn == 2 & out_full$lcn == 1))
-        tetraploid <- length(which(out_full$tcn == 4 & out_full$lcn == 2))
+        diploid <- length(which(out_full$tcn.em == 2 & out_full$lcn.em == 1))
+        tetraploid <- length(which(out_full$tcn.em == 4 & out_full$lcn.em == 2))
         if (diploid >= tetraploid) ploidy <- 2
         if (diploid < tetraploid) ploidy <- 4
     }
 
-    # GET SEGMENTS DATA --------------------------------------------------------
+    # ANNOTATE SEGMENTS --------------------------------------------------------
 
-    out.segs <- Map(function(cluster) {
-        clusGR <- GenomicRanges::GRanges(out_full[out_full$cluster == cluster,
-                                                  c("chrom", "start", "end", "cluster", "cf.em", "tcn.em", "lcn.em")])
-        idx_segs <- GenomicRanges::findOverlaps(
-            GenomicRanges::GRanges(consensus_segs),
-            clusGR,
-            minoverlap = dist.breakpoints,
-            select = "first")
-        valid_idx <- !is.na(idx_segs)
-
-        cbind(consensus_segs[valid_idx, ],
-              data.frame(id = which(valid_idx)),
-              as.data.frame(clusGR)[idx_segs[valid_idx], -c(1:5)])
-    },
-    unique(out_full$cluster)
-    )
-    out.segs <- Reduce(rbind, out.segs)
-
-    # Add number of cells and proportion of each cluster
-    out.segs$ncells <- ncells[as.character(out.segs$cluster)]
-    prop.ncells <- ncells/sum(ncells)
-    out.segs$prop.cluster <- prop.ncells[as.character(out.segs$cluster)]
-
-    # Add gain-neutral-loss (gnl) status, state gain-neu-loss-cnloh
-    out.segs <- dplyr::mutate(
-        out.segs,
-        gnl = dplyr::case_when(
-            round(.data$tcn.em) - ploidy > 0 ~ 1,
-            round(.data$tcn.em) - ploidy < 0 ~ -1,
-            round(.data$tcn.em) - ploidy == 0 ~ 0
-        ),
-        loh = dplyr::case_when(round(.data$lcn.em) == 0 ~ T, round(.data$lcn.em) > 0 ~ F),
-        state = dplyr::case_when(
-            .data$gnl == 1 ~ "gain",
-            .data$gnl == -1 ~ "loss",
-            .data$gnl == 0 & .data$loh == TRUE ~ "cnloh",
-            .data$gnl == 0 & .data$loh == FALSE ~ "neu"
-        ),
-        cna = dplyr::case_when(.data$gnl == 0 & .data$loh == FALSE ~ F, .data$gnl != 0 | .data$loh == TRUE ~ T),
-        cna_state = dplyr::case_when(.data$cna == T ~ .data$state, .data$cna == F ~ NA)
-    )
-
-    # Add proportion across all clusters with same state
-    # group by segment id and by state (to separate the same segment if this one has different states across clusters)
-    out.segs <- out.segs %>%
-        dplyr::group_by(.data$id, .data$state) %>%
-        dplyr::mutate(prop.tot = sum(.data$prop.cluster)) %>%
-        dplyr::ungroup()
-
-    # Add info if CNA is clonal and state
-    out.segs <- dplyr::mutate(
-        out.segs,
-        state_clonal = dplyr::case_when(.data$prop.tot >= clonal.thresh ~ .data$state),
-        cna_clonal = dplyr::case_when(
-            .data$cna == T & .data$prop.tot >= clonal.thresh  ~ T,
-            .data$cna == T & .data$prop.tot <= clonal.thresh  ~ F,
-            .data$cna == F ~ F
-        ),
-        cna_clonal_state = dplyr::case_when(.data$cna_clonal == T ~ .data$state)
+    table <- annotateSegments(
+        x = out_full,
+        consensus_segs = consensus_segs,
+        ncells,
+        ploidy = ploidy,
+        minoverlap = minoverlap,
+        clonal.thresh = clonal.thresh
     )
 
     # Add CNA information to consensus segments
     consensus_segs <- dplyr::left_join(consensus_segs,
-                                       out.segs[, c("chrom", "start", "end", "cna", "cna_clonal")],
+                                       table[, c("chrom", "start", "end", "cna", "cna_clonal")],
                                        by = c("chrom", "start", "end")) %>%
         dplyr::group_by(.data$chrom, .data$start) %>%
         dplyr::mutate(cna = any(.data$cna)) %>%
@@ -622,7 +574,7 @@ cnaCalling <- function(
     # SAVE OBJECTS -------------------------------------------------------------
 
     x@cnacalling[["consensus.segs"]] <- consensus_segs
-    x@cnacalling[["table"]] <- out.segs
+    x@cnacalling[["table"]] <- table
     x@cnacalling[["ncells"]] <- ncells
 
     x@cnacalling[["dipLogR.clusters"]] <- dipLogR
@@ -844,10 +796,10 @@ preProcSample2 <- function(
 #'   - `chrom`: Chromosome name (`factor` or `character`).
 #'   - `start`: Start position of the segment (`numeric`).
 #'   - `end`: End position of the segment (`numeric`).
-#'   - `cluster`: Cluster identifier for each breakpoint (`numeric`).
+#'   - `cluster`: Cluster identifier (`numeric`).
 #' @param ncells A named vector specifying the number of cells per cluster
-#'   (`numeric` vector). The names should correspond to the cluster identifiers
-#'   in the `cluster` column of `x`.
+#'   (`numeric` vector). The names must match the cluster identifiers in the
+#'   `cluster` column of `x`.
 #' @param dist.breakpoints A numeric value specifying the minimum genomic
 #'   distance between adjacent breakpoints to be grouped into the same consensus
 #'   segment (`numeric` value). Default: `1e6`.
@@ -866,7 +818,7 @@ preProcSample2 <- function(
 #'
 #' @export
 #'
-#' @seealso [muscadet::cnaCalling()]
+#' @seealso [muscadet::annotateSegments()], [muscadet::cnaCalling()]
 #'
 #' @examples
 #' # Example data frame
@@ -984,4 +936,163 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
 
     return(as.data.frame(consensus_segs))
 }
+
+
+
+#' Annotate consensus segments across cluster with CNA states
+#'
+#' This function annotates consensus segments across clusters using
+#' segment-level data from each cluster. It assigns states (i.e., gain, loss,
+#' cnloh, neutral), computes proportions of cells per cluster, and defines
+#' whether alterations are clonal.
+#'
+#' @param x A data frame containing cluster segments information with the
+#'   following required columns:
+#'   - `chrom`: Chromosome name (`factor` or `character`).
+#'   - `start`: Start position of the segment (`numeric`).
+#'   - `end`: End position of the segment (`numeric`).
+#'   - `cluster`: Cluster identifier (`numeric` or `integer`).
+#'   - `tcn.em`: Total copy number (EM algorithm) (`numeric`).
+#'   - `lcn.em`: Lower copy number (EM algorithm) (`numeric`).
+#' @param consensus_segs A `data.frame` of unique consensus segments.
+#' @param ploidy An `integer` specifying the expected ploidy (default is `2`).
+#'   Used to determine whether a segment is classified as gain, loss, or neutral.
+#' @param minoverlap A non-negative integer specifying the minimum overlap
+#'   between a cluster specific segment and a consensus segment (see
+#'   [IRanges::findOverlaps()]) (`integer`). Default: `1e6`.
+#' @param clonal.thresh Minimum cell proportion to label a
+#'   segment as clonal. Default: `1e6`.
+#'
+#' @inheritParams getSegConsensus
+#'
+#' @return A `data.frame` with the consensus segments annotated per cluster,
+#'   including CNA state, clonal status, and proportion of cells per cluster and
+#'   across clusters:
+#'   - `ncells`: Number of cells in cluster.
+#'   - `prop.cluster`: Proportion of cells in cluster relatively to the total number of cells.
+#'   - `gnl`: GNL (gain ; neutral ; loss) status as an integer value (1 ; 0 ; -1).
+#'   - `loh`: Loss of heterozygosity status (logical).
+#'   - `state`: State of segment (gain ; loss ; neu ; cnloh).
+#'   - `cna`: Segment CNA status (logical).
+#'   - `cna_state`: State of CNA segment (gain ; loss ; cnloh).
+#'   - `prop.tot`: Proportion of cells for the state across clusters.
+#'   - `state_clonal`: Clonal state of segment (gain ; loss ; neu ; cnloh).
+#'   - `cna_clonal`: Segment clonal CNA status (logical).
+#'   - `cna_clonal_state`: Clonal state of CNA segment (gain ; loss ; cnloh).
+#'
+#' @import dplyr
+#' @importFrom GenomicRanges GRanges
+#' @importFrom GenomicRanges findOverlaps
+#' @importFrom rlang .data
+#'
+#' @seealso [muscadet::getSegConsensus()], [muscadet::cnaCalling()]
+#'
+#' @examples
+#' #' # Example data frame
+#' segs <- data.frame(
+#'     chrom = c("chr1", "chr1", "chr2", "chr2"),
+#'     start = c(1.2e6, 1.1e6, 3.1e6, 3.2e6),
+#'     end = c(2.5e6, 2.6e6, 5.5e6, 5.7e6),
+#'     cluster = c("1", "2", "1", "2"),
+#'     cf.em = c(1, 1, 1, 1),
+#'     tcn.em = c(1, 2, 3, 3),
+#'     lcn.em = c(0, 1, 1, 1)
+#' )
+#'
+#' consensus_segs <- getSegConsensus(
+#'     x = segs,
+#'     ncells = c("1" = 50, "2" = 30)
+#' )
+#'
+#' # Annotate consensus segments
+#' table <- annotateSegments(
+#'     x = segs,
+#'     consensus_segs = consensus_segs,
+#'     ncells = c("1" = 50, "2" = 30)
+#' )
+#'
+#' print(table)
+#'
+#' @export
+annotateSegments <- function(
+        x,
+        consensus_segs,
+        ncells,
+        ploidy = 2,
+        minoverlap = 1e6,
+        clonal.thresh = 0.9
+) {
+
+    segs <- x[, c("chrom", "start", "end", "cluster", "cf.em", "tcn.em", "lcn.em")]
+
+    # Annotate consensus segments data for each cluster
+    out.segs <- Map(function(cluster) {
+        clusGR <- GenomicRanges::GRanges(segs[segs$cluster == cluster, ])
+
+        idx_segs <- GenomicRanges::findOverlaps(
+            GenomicRanges::GRanges(consensus_segs),
+            clusGR,
+            minoverlap = minoverlap,
+            select = "first"
+        )
+        valid_idx <- !is.na(idx_segs)
+
+        cbind(consensus_segs[valid_idx, ],
+              data.frame(id = which(valid_idx)),
+              as.data.frame(clusGR)[idx_segs[valid_idx], -c(1:5)])
+    }, unique(sort(segs$cluster)))
+
+    out.segs <- Reduce(rbind, out.segs)
+
+    # Add number of cells and cluster proportions
+    out.segs$ncells <- ncells[as.character(out.segs$cluster)]
+    prop.ncells <- ncells / sum(ncells)
+    out.segs$prop.cluster <- prop.ncells[as.character(out.segs$cluster)]
+
+    # Add gain-neutral-loss (gnl) status, state gain-neu-loss-cnloh
+    out.segs <- dplyr::mutate(
+        out.segs,
+        gnl = dplyr::case_when(
+            round(.data$tcn.em) - ploidy > 0 ~ 1,
+            round(.data$tcn.em) - ploidy < 0 ~ -1,
+            round(.data$tcn.em) - ploidy == 0 ~ 0
+        ),
+        loh = dplyr::case_when(round(.data$lcn.em) == 0 ~ T, round(.data$lcn.em) > 0 ~ F),
+        state = dplyr::case_when(
+            .data$gnl == 1 ~ "gain",
+            .data$gnl == -1 ~ "loss",
+            .data$gnl == 0 & .data$loh == TRUE ~ "cnloh",
+            .data$gnl == 0 & .data$loh == FALSE ~ "neu"
+        ),
+        cna = dplyr::case_when(
+            .data$state == "neu" ~ FALSE,
+            .data$state %in% c("gain", "loss", "cnloh") ~ TRUE,
+            .default = NA
+        ),
+        cna_state = ifelse(.data$cna, .data$state, NA)
+    )
+
+    # Compute proportions across all clusters with same state
+    # group by segment id and by state (to separate the same segment if this one has different states across clusters)
+    out.segs <- out.segs %>%
+        dplyr::group_by(.data$id, .data$state) %>%
+        dplyr::mutate(prop.tot = sum(.data$prop.cluster)) %>%
+        dplyr::ungroup()
+
+
+    # Define clonal status
+    out.segs <- dplyr::mutate(
+        out.segs,
+        state_clonal = dplyr::case_when(.data$prop.tot >= clonal.thresh ~ .data$state),
+        cna_clonal = dplyr::case_when(
+            .data$cna == TRUE & .data$prop.tot >= clonal.thresh ~ TRUE,
+            .data$cna == TRUE & .data$prop.tot < clonal.thresh ~ FALSE,
+            .data$cna == FALSE ~ FALSE
+        ),
+        cna_clonal_state = dplyr::case_when(.data$cna_clonal == TRUE ~ .data$state)
+    )
+
+    return(as.data.frame(out.segs))
+}
+
 

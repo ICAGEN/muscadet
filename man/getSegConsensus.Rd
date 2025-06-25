@@ -13,12 +13,12 @@ following required columns:
 \item \code{chrom}: Chromosome name (\code{factor} or \code{character}).
 \item \code{start}: Start position of the segment (\code{numeric}).
 \item \code{end}: End position of the segment (\code{numeric}).
-\item \code{cluster}: Cluster identifier for each breakpoint (\code{numeric}).
+\item \code{cluster}: Cluster identifier (\code{numeric}).
 }}
 
 \item{ncells}{A named vector specifying the number of cells per cluster
-(\code{numeric} vector). The names should correspond to the cluster identifiers
-in the \code{cluster} column of \code{x}.}
+(\code{numeric} vector). The names must match the cluster identifiers in the
+\code{cluster} column of \code{x}.}
 
 \item{dist.breakpoints}{A numeric value specifying the minimum genomic
 distance between adjacent breakpoints to be grouped into the same consensus
@@ -56,5 +56,5 @@ print(consensus_segs)
 
 }
 \seealso{
-\code{\link[=cnaCalling]{cnaCalling()}}
+\code{\link[=annotateSegments]{annotateSegments()}}, \code{\link[=cnaCalling]{cnaCalling()}}
 }

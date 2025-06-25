@@ -61,6 +61,7 @@ reference:
   - cnaCalling
   - preProcSample2
   - getSegConsensus
+  - annotateSegments
 - title: "Visualization - Copy Number Alterations profiles"
   desc: >
     Functions to visualize Copy Number Alterations profiles at clone-level and sample-level
