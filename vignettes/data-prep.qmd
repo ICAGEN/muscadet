@@ -1,0 +1,320 @@
+---
+title: "Preparation of input data"
+vignette: >
+  %\VignetteIndexEntry{Preparation of input data}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+format:
+  html:
+    toc: true
+    toc-location: right
+    code-tools: true
+    number-sections: true
+    link-external-icon: true
+    link-external-newwindow: true
+    embed-resources: true
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+#| include: false
+if (!dir.exists("figures")) dir.create("figures")
+library(muscadet)
+library(knitr)
+library(dplyr)
+```
+
+
+
+# Count matrices {#sec-mat-counts}
+
+The `mat_counts` input is required for muscadet analysis and must be provided with `CreateMuscomicObject()`.
+
+This input should be a matrix (sparse `dgCMatrix` or not) of raw read counts with features as rows and cells as columns (@tbl-mat-counts).
+
+See `?mat_counts` for full documentation.
+
+```{r}
+#| label: tbl-mat-counts
+#| tbl-cap: "Allele counts table example"
+
+data("mat_counts_atac_tumor")
+kable(mat_counts_atac_tumor[698:700,34:36])
+```
+
+
+* From Seurat/Signac analysis:
+```{r}
+#| label: seurat
+#| eval: false
+
+library(Seurat) # Seurat v5
+library(Signac)
+
+data("atac_small") # Example Seurat class object from Signac
+
+# dgCMatrix matrix from Assay named "RNA"
+mat_counts_RNA <- atac_small[["RNA"]]$counts 
+# dgCMatrix matrix from ChromatinAssay named "peaks"
+mat_counts_ATAC <- atac_small[["peaks"]]$counts 
+```
+
+* From ArchR/SummarizedExperiment analysis:
+```{r}
+#| label: archr-peaks
+#| eval: false
+
+library(SummarizedExperiment)
+# RangedSummarizedExperiment class object
+se <- readRDS("<SummarizedExperiment_path>") 
+# dgCMatrix matrix
+mat_counts_ATAC <- assay(se) 
+```
+
+
+
+# Allele counts tables {#sec-allele-counts}
+
+The `allele_counts` input is optional for the clustering step (allelic information not used for clustering) but required for the CNA calling step: it can be provided in the initial object creation step with `CreateMuscomicObject()` or added to `muscadet` objects later on with `addAlleleCounts()`.
+
+This input should be in a data frame format containing allelic read counts at specific variant positions across cells (@tbl-allele-counts). 
+The format follows a Variant Calling Format (VCF)-like structure and should include:
+
+* `cell`: unique cell barcode
+* `id`: variant identifier (e.g. CHROM_POS_REF_ALT)
+* `CHROM`: chromosome
+* `POS`: position
+* `REF` / `ALT`: reference and alternate alleles
+* `RD` / `AD`: counts for reference and alternate alleles
+* `DP`: total depth
+* `GT`: genotype *(optional)*
+
+See `?allele_counts` for full documentation.
+
+```{r}
+#| label: tbl-allele-counts
+#| tbl-cap: "Allele counts table example"
+
+data("allele_counts_atac_tumor")
+kable(head(allele_counts_atac_tumor))
+```
+
+
+
+## Variant positions
+
+Variant positions can be derived from:
+
+* Matched bulk sequencing to identify individual-specific heterozygous SNPs, or
+* Reference panels of common SNPs (e.g. gnomAD, 1000G).
+
+### Individual-specific heterozygous positions from bulk data
+
+Positions can be retrieved by running [FACETS](https://github.com/mskcc/facets)[^1] on matched WGS/WES normal samples. 
+
+Use `snp-pileup` to extract allele counts from bulk BAM files at known sites (VCF of common SNPs from the [NCBI database](https://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/00-common_all.vcf.gz)). 
+The output of `snp-pileup` can be filtered on depth and allele frequency to keep only heterozygous positions well covered.
+
+See [FACETS snp-pileup documentation](https://github.com/mskcc/facets/blob/master/inst/extcode/README.txt).
+
+### Panels of common SNPs
+
+* [gnomAD](https://gnomad.broadinstitute.org/) database (4,099 SNPs): [data here](https://cloud.google.com/life-sciences/docs/resources/public-datasets/gnomad?hl=en)
+* [1000G](https://www.internationalgenome.org/) database (2,548 SNPs): [data here](https://sourceforge.net/projects/cellsnp/files/SNPlist)
+
+## Count reads from single cells
+
+[SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)[^2] is used to get read counts per allele from single cell BAM files.
+
+> The program `scReadCounts` manages the sequential execution of programs `readCounts` and `readCountsMatrix`, collects the necessary arguments for successful execution, and avoids unnecessary execution of the expensive `readCounts` tool if possible. `readCounts` requires three input files: a pooled single cell alignment, a list of genomic positions of interest, and the barcodes file (barcodes.tsv) . Optionally, `readCounts` can be user-configured for *read filtering* and *cell-barcode handling*, including restriction to barcodes of interest (achieved through specifying barcodes file - barcodes.tsv). `readCounts` utilizes the barcode information from the pooled single cell alignments and **outputs the variant and reference read counts (nvar and nref, respectively), for each barcode (cell), restricted to those present in the barcodes file, in a tab separated text file**. This file is then used as an input for the second program - `readCountsMatrix` - which, upon providing an output prefix, generates two outputs: (1) a cell-position matrix with absolute nvar and nref counts, and (2) a cell-position matrix with the expressed VAFRNA. VAFRNA is estimated at a user-defined threshold of minimum required sequencing reads (minR); default minR = 5. `readCountsMatrix` is time-efficient and can be re-run multiple times at various minR thresholds. Together, these tools facilitate single-cell level assessment of read counts. 
+*From [https://horvathlab.github.io/NGS/SCReadCounts/](https://horvathlab.github.io/NGS/SCReadCounts/)*
+
+As the desired output is the tab separated text file with variant and reference read counts for each barcode, the command [`readCounts`](https://horvathlab.github.io/NGS/ReadCounts/) is preferred to avoid unnecessary large matrix outputs from `readCountsMatrix`.
+
+* [Command usage](https://horvathlab.github.io/NGS/ReadCounts/docs/Usage.html) for`readCounts`
+* Details on [Read grouping](https://horvathlab.github.io/NGS/ReadCounts/docs/Grouping.html)
+* Details on [Alignment filter](https://horvathlab.github.io/NGS/ReadCounts/docs/Filtering.html)
+* Example of `readCounts` command, with `STARsolo_CB` read grouping and `MPileup` alignment filter: 
+
+```{bash}
+#| eval: false
+readCounts \
+    -s <vcf_file.vcf> \
+    -r <bam_file.bam> \
+    -b None \
+    -G STARsolo_CB \
+    -f MPileup \
+    -o <output_file.tsv> \
+    -t <threads> \
+    &> <log_file>
+```
+
+
+Then, the output of `readCounts` (table of variant and reference read counts) can be formatted to fit `muscadet` input requirement with `process_allele()` (@tbl-process-allele1, @tbl-process-allele2).
+
+```{r}
+#| label: process-allele
+
+# Example data frame of readCounts results
+readcounts <- data.frame(
+  CHROM = c("1", "1", "2"),
+  POS = c(10101, 20202, 30303),
+  REF = c("A", "G", "T"),
+  ALT = c("G", "A", "C"),
+  ReadGroup = c("cell1", "cell1", "cell1"),
+  SNVCountForward = c(5, 10, 3),
+  SNVCountReverse = c(4, 6, 2),
+  RefCountForward = c(20, 15, 10),
+  RefCountReverse = c(18, 12, 8)
+)
+readcounts$SNVCount <- readcounts$SNVCountForward + readcounts$SNVCountReverse
+readcounts$RefCount <- readcounts$RefCountForward +readcounts$RefCountReverse
+readcounts$GoodReads <- readcounts$SNVCount + readcounts$RefCount
+readcounts[, "%BadRead"] <- c(0, 0, 0)
+readcounts$VAF <- round(readcounts$SNVCount / readcounts$GoodReads, 4)
+```
+
+```{r}
+#| label: tbl-process-allele1
+#| tbl-cap: "Example of readCounts output"
+
+kable(readcounts)
+```
+
+```{r}
+#| label: tbl-process-allele2
+#| tbl-cap: "Formatted table of allele counts"
+
+kable(process_allele(readcounts))
+```
+# Feature coordinates {#sec-features}
+
+A table of features coordinates with 4 columns (`CHROM`, `start`, `end`, `id`) matching features of count matrices (section @sec-mat-counts) is required (@tbl-features).
+
+See `?features` for full documentation.
+
+```{r}
+#| label: tbl-features
+#| tbl-cap: "Features coordinates table example"
+
+data("peaks")
+kable(head(peaks))
+```
+
+
+## Peaks
+
+* From Seurat/Signac
+```{r}
+#| label: seurat-signac-peaks
+#| eval: false
+
+library(Signac)
+# Example Seurat class object from Signac
+data("atac_small") 
+# GRanges class object
+peaks_coord <- atac_small[["peaks"]]$ranges 
+
+peaks_coord <- as.data.frame(peaks_coord) 
+peaks_coord$id <- paste(peaks_coord$seqnames,
+                        peaks_coord$start,
+                        peaks_coord$end,
+                        sep = "-")
+peaks_coord <- peaks_coord[, c("seqnames", "start", "end", "id")]
+colnames(peaks_coord) <- c("CHROM", "start", "end", "id")
+```
+
+* From ArchR/SummarizedExperiment: 
+```{r}
+#| label: archr
+#| eval: false
+
+library(SummarizedExperiment)
+# RangedSummarizedExperiment class object
+se <- readRDS("<SummarizedExperiment_path>") 
+# GRanges class object
+peaks_coord <- rowRanges(se) 
+
+peaks_coord <- as.data.frame(peaks_coord)
+peaks_coord$id <- paste(peaks_coord$seqnames, peaks_coord$start, peaks_coord$end, sep = "-")
+peaks_coord <- peaks_coord[, c("seqnames", "start", "end", "id")]
+colnames(peaks_coord) <- c("CHROM", "start", "end", "id")
+```
+
+
+## Genes
+
+```{r}
+#| label: genes
+#| eval: false
+
+# Use your own annotation
+genes_coord <- read.delim( "<genes_gtf_file>")
+genes_coord <- genes_coord[, c("seqnames", "start", "end", "gene_name")]
+colnames(genes_coord) <- c("CHROM", "start", "end", "id")
+
+# Or get coordinates 
+library(EnsDb.Hsapiens.v86) # for human
+library(AnnotationDbi)
+
+genes <- rownames(mat_counts_RNA)
+genes_coord <- genes(EnsDb.Hsapiens.v86, filter = GeneNameFilter(genes))
+genes_coord <- as.data.frame(genes_coord)
+genes_coord <- genes_coord[genes_coord$seqnames %in% c(1:22, "X", "Y"), ]
+genes_coord <- genes_coord[, c("seqnames", "start", "end", "gene_name")]
+colnames(genes_coord) <- c("CHROM", "start", "end", "id")
+rownames(genes_coord) <- NULL
+```
+
+
+## Match cells and features 
+
+:::{.callout-important}
+Cell names (columns) and features names (rows) must match between assays and features coordinates table ids.
+:::
+
+```{r}
+#| label: match-ids
+#| eval: false
+
+# Make sure row names of mat_counts match features ids
+identical(rownames(mat_counts_ATAC), peaks_coord[, "id"])
+rownames(mat_counts_ATAC) <- peaks_coord[, "id"]
+
+table(rownames(mat_counts_RNA) %in% genes_coord[, "id"])
+
+# Cell names format must match between different assays
+intersect(colnames(mat_counts_ATAC), colnames(mat_counts_RNA))
+```
+
+
+
+# Bulk log-ratios
+
+A table of log ratios computed from matched bulk sequencing (e.g. Whole Genome Sequencing) can optionally be provided to `CreateMuscadetObject()` and will be displayed at the bottom of log ratio heatmaps for validation purposes (@tbl-bulk-lrr).
+
+Log ratios for bulk sequencing can be obtained through [FACETS](https://github.com/mskcc/facets)[^1] analysis.
+
+See `?bulk_lrr` for full documentation.
+
+```{r}
+#| label: tbl-bulk-lrr
+#| tbl-cap: "Bulk log ratios table example"
+
+data("bulk_lrr")
+kable(head(bulk_lrr))
+```
+
+
+
+[^1]: Shen R, Seshan VE. **FACETS: allele-specific copy number and clonal heterogeneity analysis tool for high-throughput DNA sequencing. **
+*Nucleic Acids Res* (2016). [https://www.doi.org/10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520)
+
+
+[^2]: Prashant, N.M., Alomran, N., Chen, Y. et al. **SCReadCounts: estimation of cell-level SNVs expression from scRNA-seq data.** *BMC Genomics* (2021). [https://doi.org/10.1186/s12864-021-07974-8](https://doi.org/10.1186/s12864-021-07974-8)
+
+
