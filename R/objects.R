@@ -14,7 +14,6 @@
 #' @slot allelic Allelic data at variant positions (common SNPs or
 #'   individual-specific heterozygous positions) (`list`).
 #'
-#'
 #' @aliases muscomic
 #'
 #' @seealso
@@ -28,7 +27,8 @@
 #' @exportClass muscomic
 #'
 #' @examples
-#' data(muscadet_obj)
+#' # Load example muscadet object
+#' # data("muscadet_obj")
 #'
 #' muscadet_obj$ATAC
 #' muscadet_obj$RNA
@@ -36,13 +36,13 @@
 #' str(muscadet_obj$ATAC, max.level = 2)
 #'
 methods::setClass(
-  "muscomic",
-  slots = c(
-    type = "character",
-    label.omic = "character",
-    coverage = "list",
-    allelic = "list"
-  )
+    "muscomic",
+    slots = c(
+        type = "character",
+        label.omic = "character",
+        coverage = "list",
+        allelic = "list"
+    )
 )
 
 
@@ -75,7 +75,8 @@ methods::setClass(
 #' @exportClass muscadet
 #'
 #' @examples
-#' data(muscadet_obj)
+#' # Load example muscadet object
+#' # data("muscadet_obj")
 #'
 #' muscadet_obj
 #'
@@ -83,16 +84,15 @@ methods::setClass(
 #'
 #'
 methods::setClass(
-  "muscadet",
-  slots = c(
-    omics = "list",
-    bulk.data = "list",
-    clustering = "list",
-    cnacalling = "list",
-    genome = "character"
-  )
+    "muscadet",
+    slots = c(
+        omics = "list",
+        bulk.data = "list",
+        clustering = "list",
+        cnacalling = "list",
+        genome = "character"
+    )
 )
-
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Create objects functions -----------------------------------------------------
@@ -484,7 +484,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#' muscadet_obj$ATAC
 #'
 ".DollarNames.muscadet" <- function(x, pattern = "") {
     # Combine available omics names and slot names
@@ -504,7 +505,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#' muscadet_obj$ATAC$type
 #'
 ".DollarNames.muscomic" <- function(x, pattern = "") {
     available <- c(slotNames(x))
@@ -535,7 +537,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Access to muscadet omics or slots
 #' muscadet_obj["ATAC"]
 #' muscadet_obj["genome"]
@@ -560,7 +563,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Access to muscomic slots
 #' muscadet_obj["ATAC"]["label.omic"]
 #'
@@ -585,7 +589,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Access to muscadet omics or slots
 #' muscadet_obj$ATAC
 #' muscadet_obj$genome
@@ -610,7 +615,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Access to muscomic slots
 #' muscadet_obj$ATAC$label.omic
 #'
@@ -640,7 +646,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Assign new data in muscadet object
 #' muscadet_obj["genome"] <- "hg38"
 #'
@@ -666,7 +673,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Assign new data in muscomic object
 #' muscadet_obj["ATAC"]["label.omic"] <- "scATAC-seq"
 #'
@@ -686,7 +694,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Assign new data in muscadet object
 #' muscadet_obj$genome <- "hg38"
 #'
@@ -703,7 +712,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
+#'
 #' # Assign new data in muscomic object
 #' muscadet_obj$ATAC$label.omic <- "scATAC-seq"
 #'
@@ -797,7 +807,7 @@ setMethod(
 #'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Overview of the muscadet object
 #' show(muscadet_obj)
@@ -904,8 +914,9 @@ setMethod(
 #'
 #' @examples
 #' library("SeuratObject")
+#'
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' Cells(muscadet_obj) # list of 2 cell names vectors for the 2 omics
 #' Cells(muscadet_obj)$ATAC # cell names vector from the omic ATAC

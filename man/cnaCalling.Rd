@@ -192,7 +192,7 @@ evaluating cell fractions and copy numbers.
 library("facets")
 
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 muscadet_obj <- cnaCalling(muscadet_obj,
                            omics.coverage = "ATAC",

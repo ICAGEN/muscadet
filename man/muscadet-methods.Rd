@@ -100,8 +100,9 @@ and \code{muscadet} to \code{\link[SeuratObject:Cells]{SeuratObject::Features()}
 }
 \examples{
 library("SeuratObject")
+
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 Cells(muscadet_obj) # list of 2 cell names vectors for the 2 omics
 Cells(muscadet_obj)$ATAC # cell names vector from the omic ATAC

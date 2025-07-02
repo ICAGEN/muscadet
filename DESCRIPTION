@@ -73,12 +73,12 @@ Config/testthat/edition: 3
 Depends: 
     R (>= 3.5)
 Collate: 
+    'objects.R'
     'clustering.R'
     'cnaCalling.R'
     'computeLogRatio.R'
     'data.R'
     'muscadet-package.R'
-    'objects.R'
     'plots.R'
     'utils.R'
 Remotes: 

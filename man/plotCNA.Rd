@@ -38,7 +38,7 @@ in each cluster.
 library("ggplot2")
 
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Plot CNA segments
 p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")

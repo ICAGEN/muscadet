@@ -74,7 +74,7 @@ status and cell fractions.
 \examples{
 \dontrun{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Plot profile for all cells
 pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF

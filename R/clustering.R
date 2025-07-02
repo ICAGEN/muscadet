@@ -66,13 +66,17 @@
 #' - [assignClusters()] to assign final cluster assignments in the `muscadet`
 #' object after cluster partition validation.
 #'
+#' @include objects.R
+#'
 #' @importFrom methods slot slot<-
 #' @importFrom cluster silhouette
 #' @importFrom stats as.dist
 #'
+#' @export
+#'
 #' @examples
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Perform clustering with "seurat" method
 #' muscadet_obj <- clusterMuscadet(
@@ -98,7 +102,6 @@
 #' clusters <- muscadet_obj$clustering$clusters
 #' lapply(clusters, table)
 #'
-#' @export
 clusterMuscadet <- function(x,
                             method = c("seurat", "hclust"),
                             omics = NULL,
@@ -287,14 +290,21 @@ clusterMuscadet <- function(x,
 #'   labels) for each value in `res_range` (`list`).}
 #' }
 #'
-#'
 #' @seealso
 #' [Weighted Nearest Neighbor Analysis Vignette from Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
+#'
+#' @include objects.R
+#'
+#' @importFrom SeuratObject CreateAssay5Object as.sparse
+#' @importFrom Seurat CreateSeuratObject FindMultiModalNeighbors FindNeighbors RunUMAP FindClusters
+#' @importFrom stats prcomp
+#'
+#' @export
 #'
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Format input
 #' # transpose matrices to: cells x features matrices
@@ -307,10 +317,6 @@ clusterMuscadet <- function(x,
 #' lapply(result$clusters, table)
 #' }
 #'
-#' @importFrom SeuratObject CreateAssay5Object as.sparse
-#' @importFrom Seurat CreateSeuratObject FindMultiModalNeighbors FindNeighbors RunUMAP FindClusters
-#' @importFrom stats prcomp
-#' @export
 cluster_seurat <- function(mat_list,
                            res_range = seq(0.1, 0.5, 0.1),
                            dims_list = rep(list(1:8), length(mat_list)),
@@ -606,10 +612,22 @@ cluster_seurat <- function(mat_list,
 #' @seealso
 #' Similarity Network Fusion: [weightedSNF()].
 #'
+#' @include objects.R
+#'
+#' @importFrom Rfast Dist
+#' @importFrom SNFtool affinityMatrix
+#' @importFrom fastcluster hclust
+#' @importFrom stats as.dist
+#' @importFrom dendextend cutree
+#' @importFrom utils packageVersion
+#' @importFrom uwot umap
+#'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Format input
 #' # transpose matrices to: cells x features matrices
@@ -622,15 +640,6 @@ cluster_seurat <- function(mat_list,
 #' lapply(result$clusters, table)
 #' }
 #'
-#' @importFrom Rfast Dist
-#' @importFrom SNFtool affinityMatrix
-#' @importFrom fastcluster hclust
-#' @importFrom stats as.dist
-#' @importFrom dendextend cutree
-#' @importFrom utils packageVersion
-#' @importFrom uwot umap
-#'
-#' @export
 cluster_hclust <- function(mat_list,
                            k_range = seq(2, 10, 1),
                            dist_method = "euclidean",

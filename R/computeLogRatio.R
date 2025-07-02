@@ -115,9 +115,6 @@
 #'   refReads = 2 # low value for example subsampled datasets
 #' )
 #'
-#' # Load example muscadet object
-#' data(muscadet_obj)
-#'
 computeLogRatio <- function(x,
                             reference,
                             omic,

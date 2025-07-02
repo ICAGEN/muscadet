@@ -84,7 +84,7 @@ within the specified window (\code{snp.nbhd}) to reduce serial correlation.
 library("facets")
 
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 counts <- muscadet_obj$cnacalling$combined.counts
 counts <- counts[complete.cases(counts),]

@@ -40,9 +40,9 @@ counts at individual-specific variant positions (e.g. found by bulk
 sequencing) before Copy Number Alterations (CNAs) calling.
 }
 \examples{
-# Load example muscadet objects
-data(muscadet_obj)
-data(muscadet_obj_ref)
+# Load example muscadet object
+# data("muscadet_obj")
+# data("muscadet_obj_ref")
 
 # Add allele counts data frames to muscadet objects
 muscadet_obj <- addAlleleCounts(

@@ -63,7 +63,7 @@ which the mean of indexes is maximal is highlighted with a dot.
 library(ggplot2)
 
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Plot all indexes
 plotIndexes(muscadet_obj)

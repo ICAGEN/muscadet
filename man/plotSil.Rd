@@ -36,7 +36,7 @@ Generate a silhouette plot for a specified clustering partition within a
 library("ggplot2")
 
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 plotSil(muscadet_obj, partition = 0.6)
 
 # Loop over partitions

@@ -27,9 +27,11 @@ omic datasets contained inside the \code{omics} slot.
 }
 \examples{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
+muscadet_obj$ATAC
 
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
+muscadet_obj$ATAC$type
 
 }

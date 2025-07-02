@@ -119,7 +119,7 @@ annotation under the heatmaps.
 \examples{
 \dontrun{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 
 # --- Method "seurat" ---

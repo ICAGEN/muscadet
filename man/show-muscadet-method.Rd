@@ -18,7 +18,7 @@ Overview of a \code{\link{muscadet}} object.
 }
 \examples{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Overview of the muscadet object
 show(muscadet_obj)

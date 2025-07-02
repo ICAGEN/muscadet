@@ -45,13 +45,14 @@
 #' assignments in `muscadet_obj$cnacalling$clusters`.
 #'
 #' @include objects.R
+#'
 #' @importFrom SeuratObject Cells
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Select clustering result for partition = 0.6
 #' muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
@@ -254,9 +255,9 @@ assignClusters <- function(x,
 #' @export
 #'
 #' @examples
-#' # Load example muscadet objects
-#' data(muscadet_obj)
-#' data(muscadet_obj_ref)
+#' # Load example muscadet object
+#' # data("muscadet_obj")
+#' # data("muscadet_obj_ref")
 #'
 #' # Add allele counts data frames to muscadet objects
 #' muscadet_obj <- addAlleleCounts(
@@ -355,9 +356,9 @@ addAlleleCounts <- function(x, allele_counts) {
 #' @export
 #'
 #' @examples
-#' # Load example muscadet objects
-#' data(muscadet_obj)
-#' data(muscadet_obj_ref)
+#' # Load example muscadet object
+#' # data("muscadet_obj")
+#' # data("muscadet_obj_ref")
 #'
 #' # Merge counts from all omics from both sample and reference
 #' muscadet_obj <- mergeCounts(muscadet_obj, muscadet_obj_ref)

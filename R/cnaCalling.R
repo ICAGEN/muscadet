@@ -126,13 +126,6 @@
 #'   \item \code{ploidy}: Ploidy used for the CNA analysis.
 #' }
 #'
-#' @import dplyr
-#' @import facets
-#' @import pctGCdata
-#' @importFrom GenomicRanges GRanges
-#' @importFrom stats na.omit
-#' @importFrom rlang .data
-#'
 #' @seealso [muscadet::assignClusters()], [muscadet::mergeCounts()],
 #' [muscadet::preProcSample2()]
 #'
@@ -151,13 +144,22 @@
 #'   Acids Res. 2016 Sep 19;44(16):e131. doi:
 #'   [10.1093/nar/gkw520](http://doi.org/10.1093/nar/gkw520).
 #'
+#' @include objects.R
+#'
+#' @import dplyr
+#' @import facets
+#' @import pctGCdata
+#' @importFrom GenomicRanges GRanges
+#' @importFrom stats na.omit
+#' @importFrom rlang .data
+#'
 #' @export
 #'
 #' @examples
 #' library("facets")
 #'
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' muscadet_obj <- cnaCalling(muscadet_obj,
 #'                            omics.coverage = "ATAC",
@@ -654,6 +656,8 @@ cnaCalling <- function(
 #'   PMID: 27270079; PMCID: PMC5027494.}
 #' }
 #'
+#' @include objects.R
+#'
 #' @import dplyr
 #' @import facets
 #' @import pctGCdata
@@ -664,7 +668,7 @@ cnaCalling <- function(
 #' library("facets")
 #'
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' counts <- muscadet_obj$cnacalling$combined.counts
 #' counts <- counts[complete.cases(counts),]
@@ -980,12 +984,14 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
 #'   - `cna_clonal`: Segment clonal CNA status (logical).
 #'   - `cna_clonal_state`: Clonal state of CNA segment (gain ; loss ; cnloh).
 #'
+#' @seealso [muscadet::getSegConsensus()], [muscadet::cnaCalling()]
+#'
 #' @import dplyr
 #' @importFrom GenomicRanges GRanges
 #' @importFrom GenomicRanges findOverlaps
 #' @importFrom rlang .data
 #'
-#' @seealso [muscadet::getSegConsensus()], [muscadet::cnaCalling()]
+#' @export
 #'
 #' @examples
 #' #' # Example data frame
@@ -1013,7 +1019,6 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
 #'
 #' print(table)
 #'
-#' @export
 annotateSegments <- function(
         x,
         consensus_segs,

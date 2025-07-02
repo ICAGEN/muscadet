@@ -106,7 +106,7 @@ help identify the optimal clustering partition.
 }
 \examples{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Perform clustering with "seurat" method
 muscadet_obj <- clusterMuscadet(

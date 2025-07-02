@@ -90,6 +90,8 @@
 #' If the `filename` argument is provided, the heatmap is directly saved as a
 #' PNG image at the provided path.
 #'
+#' @include objects.R
+#'
 #' @import ComplexHeatmap
 #' @importFrom circlize colorRamp2
 #' @importFrom methods slot
@@ -103,7 +105,7 @@
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #'
 #' # --- Method "seurat" ---
@@ -903,6 +905,8 @@ heatmapMuscadet <- function(x,
 #'
 #' @return A ggplot object representing the silhouette plot.
 #'
+#' @include objects.R
+#'
 #' @import ggplot2
 #' @importFrom stats aggregate
 #' @importFrom rlang .data
@@ -913,7 +917,7 @@ heatmapMuscadet <- function(x,
 #' library("ggplot2")
 #'
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #' plotSil(muscadet_obj, partition = 0.6)
 #'
 #' # Loop over partitions
@@ -1114,6 +1118,8 @@ plotSil <- function(x,
 #'   "c"), their values are reversed for easier comparison. The partition for
 #'   which the mean of indexes is maximal is highlighted with a dot.
 #'
+#' @include objects.R
+#'
 #' @import ggplot2
 #' @importFrom stats as.dist
 #' @importFrom cluster silhouette
@@ -1129,7 +1135,7 @@ plotSil <- function(x,
 #' library(ggplot2)
 #'
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Plot all indexes
 #' plotIndexes(muscadet_obj)
@@ -1354,6 +1360,8 @@ plotIndexes <- function(x,
 #'
 #' @return A multi-panel plot of CNA profiles is produced.
 #'
+#' @include objects.R
+#'
 #' @import graphics
 #' @import grDevices
 #'
@@ -1362,7 +1370,7 @@ plotIndexes <- function(x,
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Plot profile for all cells
 #' pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
@@ -1694,6 +1702,8 @@ plotProfile <- function(x,
 #'
 #' @return A ggplot object representing the CNA segments plot.
 #'
+#' @include objects.R
+#'
 #' @import ggplot2
 #' @importFrom dplyr mutate
 #' @importFrom dplyr left_join
@@ -1707,7 +1717,7 @@ plotProfile <- function(x,
 #' library("ggplot2")
 #'
 #' # Load example muscadet object
-#' data(muscadet_obj)
+#' # data("muscadet_obj")
 #'
 #' # Plot CNA segments
 #' p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
@@ -1914,6 +1924,8 @@ plotCNA <- function(x,
 #'   [geom_text_repel()], or [geom_label_repel()]).
 #'
 #' @return A `ggplot` object.
+#'
+#' @include objects.R
 #'
 #' @import ggplot2
 #' @importFrom SeuratObject Cells
@@ -2229,6 +2241,8 @@ add_labels <- function(
 #'
 #' @return The function does not return any value but saves a
 #'   heatmaps-histograms plot to the specified file.
+#'
+#' @include objects.R
 #'
 #' @import ggplot2
 #' @importFrom rlang .data

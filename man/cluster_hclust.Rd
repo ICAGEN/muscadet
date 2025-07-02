@@ -100,7 +100,7 @@ by \code{k_range}.
 \examples{
 \dontrun{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Format input
 # transpose matrices to: cells x features matrices

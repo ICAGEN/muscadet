@@ -51,9 +51,9 @@ reference. The resulting merged data is stored in the \code{cnacalling} slot of
 the sample \code{muscadet} object.
 }
 \examples{
-# Load example muscadet objects
-data(muscadet_obj)
-data(muscadet_obj_ref)
+# Load example muscadet object
+# data("muscadet_obj")
+# data("muscadet_obj_ref")
 
 # Merge counts from all omics from both sample and reference
 muscadet_obj <- mergeCounts(muscadet_obj, muscadet_obj_ref)

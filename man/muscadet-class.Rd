@@ -29,7 +29,8 @@ of copy number alterations (CNAs) (\code{list}).}
 }}
 
 \examples{
-data(muscadet_obj)
+# Load example muscadet object
+# data("muscadet_obj")
 
 muscadet_obj
 

@@ -66,7 +66,7 @@ argument.
 \examples{
 \dontrun{
 # Load example muscadet object
-data(muscadet_obj)
+# data("muscadet_obj")
 
 # Select clustering result for partition = 0.6
 muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
