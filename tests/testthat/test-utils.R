@@ -158,3 +158,91 @@ test_that("mergeCounts() returns an updated muscadet object with data frames in 
 })
 
 
+test_that("process_allele() returns a correct data frame", {
+
+    sc_data <- data.frame(
+        ReadGroup = c("cell1", "cell2"),
+        CHROM = c(1, 1),
+        POS = c(1001, 1002),
+        REF = c("A", "C"),
+        ALT = c("G", "T"),
+        SNVCount = c(3, 5),
+        RefCount = c(7, 5),
+        GoodReads = c(10, 10)
+    )
+
+    vcf_data <- data.frame(
+        CHROM = c(1, 1),
+        POS = c(1001, 1002),
+        ID = c(".", "."),
+        REF = c("A", "C"),
+        ALT = c("G", "T"),
+        QUAL = c(".", "."),
+        FILTER = c(".", "."),
+        INFO = c(".", "."),
+        FORMAT = c("GT", "GT"),
+        sample1 = c("0|1", "1|0"),
+        stringsAsFactors = FALSE
+    )
+
+    expect_s3_class(process_allele(sc_data, vcf = vcf_data),
+                    "data.frame")
+    expect_length(process_allele(sc_data, vcf = vcf_data),
+                  10)
+    # expects no GT column when no vcf is provided
+    expect_s3_class(process_allele(sc_data), "data.frame")
+    expect_length(process_allele(sc_data), 9)
+})
+
+
+test_that("process_allele() with scReadcounts data input missing columns", {
+
+    sc_data <- data.frame(
+        ReadGroup = c("cell1", "cell2"),
+        CHROM = c(1, 1),
+        POS = c(1001, 1002),
+        REF = c("A", "C"),
+        ALT = c("G", "T"),
+        SNVCount = c(3, 5)
+    )
+
+    vcf_data <- data.frame(
+        CHROM = c(1, 1),
+        POS = c(1001, 1002),
+        ID = c(".", "."),
+        REF = c("A", "C"),
+        ALT = c("G", "T"),
+        QUAL = c(".", "."),
+        FILTER = c(".", "."),
+        INFO = c(".", "."),
+        FORMAT = c("GT", "GT"),
+        sample1 = c("0|1", "1|0"),
+        stringsAsFactors = FALSE
+    )
+
+    expect_error(process_allele(sc_data))
+    expect_error(process_allele(sc_data, vcf = vcf_data))
+})
+
+
+test_that("save_as_vcf() creates a vcf file", {
+    vcf_data <- data.frame(
+        CHROM = c("chr1", "chr2"),
+        POS = c(12345, 67890),
+        ID = c(".", "."),
+        REF = c("A", "T"),
+        ALT = c("G", "C"),
+        QUAL = c(".", "."),
+        FILTER = c("PASS", "PASS"),
+        INFO = c("AF=0.5", "AF=0.3"),
+        FORMAT = c("GT", "GT"),
+        SAMPLE = c("0/1", "1/1")
+    )
+
+    output_filename <- withr::local_tempfile(fileext = ".vcf")
+    # temp file in session, so automatically cleaned up after
+
+    save_as_vcf(vcf_data, output_filename)
+    expect_true(file.exists(output_filename))
+})
+
