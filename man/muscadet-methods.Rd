@@ -16,7 +16,8 @@
 \alias{matCounts,muscadet-method}
 \alias{matLogRatio,muscomic-method}
 \alias{matLogRatio,muscadet-method}
-\title{Methods for \code{\link{muscomic}} and \code{\link{muscadet}} objects}
+\title{Methods for \code{[muscadet::muscomic()]} and \code{[muscadet::muscadet()]}
+objects}
 \usage{
 coordFeatures(x)
 
@@ -45,7 +46,8 @@ matLogRatio(x)
 \S4method{matLogRatio}{muscadet}(x)
 }
 \arguments{
-\item{x}{A \code{\link{muscomic}} or \code{\link{muscadet}} object.}
+\item{x}{A \code{[muscadet::muscomic()]} or \code{[muscadet::muscadet()]}
+object.}
 
 \item{...}{Other arguments (ignored).}
 }
@@ -73,21 +75,21 @@ coordinates, one list element per omic.
 
 \code{matCounts}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A \code{\link{dgCMatrix-class}} \emph{features x cells}.
-\item if \code{x} is a \code{muscadet} object: A list of \code{\link{dgCMatrix-class}} \emph{features x cells},
+\item if \code{x} is a \code{muscomic} object: A \code{[Matrix::dgCMatrix()]} \emph{features x cells}.
+\item if \code{x} is a \code{muscadet} object: A list of \code{[Matrix::dgCMatrix()]} \emph{features x cells},
 one list element per omic.
 }
 
 \code{matLogRatio}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A \code{\link{matrix}} \emph{features x cells}.
-\item if \code{x} is a \code{muscadet} object: A list of \code{\link{matrix}} \emph{features x cells},
+\item if \code{x} is a \code{muscomic} object: A \code{[base::matrix()]} \emph{features x cells}.
+\item if \code{x} is a \code{muscadet} object: A list of \code{[base::matrix()]} \emph{features x cells},
 one list element per omic.
 }
 }
 \description{
-Methods to facilitate access to data within the \code{\link{muscomic}} and
-\code{\link{muscadet}} objects.
+Methods to facilitate access to data within the \code{[muscadet::muscomic()]}
+and \code{[muscadet::muscadet()]} objects.
 \itemize{
 \item \code{Cells()}: Get cell identifiers (addition of methods for \code{muscomic} and
 \code{muscadet} to \code{\link[SeuratObject:Cells]{SeuratObject::Cells()}}).
@@ -110,5 +112,6 @@ Cells(muscadet_obj$ATAC) # cell names vector from the ATAC muscomic object
 
 }
 \seealso{
-\code{\link{muscomic-class}} \code{\link{muscadet-class}}
+\code{[muscadet::muscomic-class()]}
+\code{[muscadet::muscadet-class()]}
 }

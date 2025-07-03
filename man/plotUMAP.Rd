@@ -19,7 +19,7 @@ plotUMAP(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing clustering data (using
+\item{x}{A \code{[muscadet::muscadet-class()]} object containing clustering data (using
 \code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
 
 \item{partition}{(Optional) Value specifying the clustering partition to
@@ -52,13 +52,16 @@ string). Default is an empty character string.}
 \item{add_clusters_labels}{Logical. If \code{TRUE}, adds the cluster names as
 text or boxed labels using \code{\link[=add_labels]{add_labels()}}. Default is \code{FALSE}.}
 
-\item{point.size}{Numeric. Size of the points in the UMAP plot passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}. Default is \code{0.5}.}
+\item{point.size}{Numeric. Size of the points in the UMAP plot passed to
+\code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}. Default is \code{0.5}.}
 
-\item{legend.point.size}{Numeric. Size of the points in the legend of the UMAP plot. Default is \code{3}.}
+\item{legend.point.size}{Numeric. Size of the points in the legend of the
+UMAP plot. Default is \code{3}.}
 
-\item{...}{Additional arguments passed to \code{\link[=add_labels]{add_labels()}} providing an
-underlying geom for label names (\code{\link[=geom_text]{geom_text()}}, \code{\link[=geom_label]{geom_label()}},
-\code{\link[=geom_text_repel]{geom_text_repel()}}, or \code{\link[=geom_label_repel]{geom_label_repel()}}).}
+\item{...}{Additional arguments passed to \code{\link[=add_labels]{add_labels()}} providing
+an underlying geom for label names (\code{\link[ggplot2:geom_text]{ggplot2::geom_text()}},
+\code{\link[ggplot2:geom_text]{ggplot2::geom_label()}}, \code{\link[ggrpel:geom_text_repel]{ggrpel::geom_text_repel()}}, or
+\code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}}).}
 }
 \value{
 A \code{ggplot} object.

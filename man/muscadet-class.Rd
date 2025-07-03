@@ -7,13 +7,13 @@
 \title{The muscadet class}
 \description{
 A \code{muscadet} object encapsulates data from different single-cell omics
-as \code{\link{muscomic}} objects as well as downstream analysis results after
+as \code{[muscadet::muscomic()]} objects as well as downstream analysis results after
 clustering and CNA calling.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{omics}}{List of \code{\link{muscomic}} objects, one per single-cell omic
+\item{\code{omics}}{List of \code{[muscadet::muscomic()]} objects, one per single-cell omic
 (\code{list}).}
 
 \item{\code{bulk.data}}{List of objects containing data from paired bulk sequencing

@@ -58,15 +58,17 @@ cluster. Default is \code{FALSE}.}
 \item{title}{Character string for the title of the plot (\code{character}
 string). Default is an empty character string.}
 
-\item{row_annots}{Optional. A list of \linkS4class{HeatmapAnnotation} objects from
-the \link{ComplexHeatmap-package} package, specifying row annotations to add on
-left part of the heatmap. Each element in the list must be of class
-\linkS4class{HeatmapAnnotation}, must be a row annotation (using
-\code{\link[=rowAnnotation]{rowAnnotation()}} or \code{\link[=HeatmapAnnotation]{HeatmapAnnotation()}} with \code{which = 'row'}), and must
-have a unique name (\code{name} argument in \code{\link[=rowAnnotation]{rowAnnotation()}} or
-\code{\link[=HeatmapAnnotation]{HeatmapAnnotation()}}). If \code{averages = FALSE}, annotations must concern
-cells, while if \code{averages = TRUE} they must concern clusters. Default is
-\code{NULL}, no row annotations is added.}
+\item{row_annots}{Optional. A list of
+\code{\link[ComplexHeatmap:HeatmapAnnotation-class]{ComplexHeatmap::HeatmapAnnotation-class()}} objects from the
+\code{\link[ComplexHeatmap:ComplexHeatmap]{ComplexHeatmap::ComplexHeatmap()}} package, specifying row annotations to
+add on left part of the heatmap. Each element in the list must be of class
+\code{\link[ComplexHeatmap:HeatmapAnnotation-class]{ComplexHeatmap::HeatmapAnnotation-class()}}, must be a row annotation
+(using \code{\link[ComplexHeatmap:rowAnnotation]{ComplexHeatmap::rowAnnotation()}} or
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}} with \code{which = 'row'}), and must have
+a unique name (\code{name} argument in \code{\link[ComplexHeatmap:rowAnnotation]{ComplexHeatmap::rowAnnotation()}} or
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}). If \code{averages = FALSE}, annotations
+must concern cells, while if \code{averages = TRUE} they must concern clusters.
+Default is \code{NULL}, no row annotations is added.}
 
 \item{white_scale}{Numeric vector of length 2 or a list of numeric vectors
 (\code{numeric} vector or \code{list}).

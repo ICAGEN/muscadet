@@ -29,7 +29,8 @@
 \method{$}{muscomic}(x, i) <- value
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} or \code{\link{muscomic}} object.}
+\item{x}{A \code{[muscadet::muscadet()]} or \code{[muscadet::muscomic()]}
+object.}
 
 \item{i}{The name of the slot (or omic).}
 
@@ -40,17 +41,18 @@
 \item{value}{The new value to assign.}
 }
 \value{
-The selected slot or the omic dataset (\code{\link{muscomic}} object)
-for \code{muscadet} objects. The selected slot for \code{muscomic} objects.
+The selected slot or the omic dataset (\code{[muscadet::muscomic()]}
+object) for \code{muscadet} objects. The selected slot for \code{muscomic} objects.
 
-The updated \code{\link{muscadet}} or \code{\link{muscomic}} object.
+The updated \code{[muscadet::muscadet()]} or
+\code{[muscadet::muscomic()]} object.
 }
 \description{
 Simplified access to omic datasets and slots inside
 \code{\link{muscadet}} objects.
 
-Assign new data in a \code{\link{muscadet}} or
-\code{\link{muscomic}} object. For \code{muscadet} objects, the omic datasets in
+Assign new data in a \code{[muscadet::muscadet()]} or
+\code{[muscadet::muscomic()]} object. For \code{muscadet} objects, the omic datasets in
 the \code{omics} slot can be directly reassigned.
 }
 \examples{

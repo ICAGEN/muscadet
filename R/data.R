@@ -42,7 +42,7 @@
 #' @rdname mat_counts
 #'
 #' @format
-#' A `dgCMatrix` (\code{\link{dgCMatrix-class}}) of numeric values with the following dimensions:
+#' A `dgCMatrix` (\code{[Matrix::dgCMatrix-class()]}) of numeric values with the following dimensions:
 #' \describe{
 #'   \item{`rows`}{Features (peaks, genes).}
 #'   \item{`columns`}{Cell barcodes.}
@@ -144,13 +144,13 @@
 #' }
 #'
 #' @note Data obtained from whole genome sequencing (WGS) after using
-#' [facets::fitcncf()] from [facets] "Cellular Fraction and Copy Numbers from
+#' [facets::fitcncf()] from [facets::facets()] "Cellular Fraction and Copy Numbers from
 #' Tumor Sequencing" version `0.6.2`: `$cncf` data frame columns `chrom`, `start`,
 #' `end`, and `cnlr.median`.
 #'
 #' @references
 #' \describe{
-#'   \item{[facets-package] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
+#'   \item{[facets::facets()] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
 #'   clonal heterogeneity analysis tool for high-throughput DNA sequencing.
 #'   Nucleic Acids Res. 2016 Sep 19;44(16):e131.
 #'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520).
@@ -166,7 +166,7 @@
 
 #' Genome chromosome sizes (internal data)
 #'
-#' @description \code{\link{GRanges}} objects containing chromosomes sizes for
+#' @description \code{[GenomicRanges::GRanges()]} objects containing chromosomes sizes for
 #'   hg38, hg19 and mm10 genome assemblies.
 #'
 #' @name genome_chrom
@@ -175,7 +175,7 @@
 #'
 #' @keywords internal
 #'
-#' @format A \code{\link{GRanges}} object containing:
+#' @format A \code{[GenomicRanges::GRanges()]} object containing:
 #' \describe{
 #'   \item{`seqnames`}{Chromosome name: 1 to 22, X and Y for human ; and 1 to
 #'   19, X and Y for mouse (`Rle`).}

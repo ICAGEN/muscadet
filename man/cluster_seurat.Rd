@@ -34,7 +34,7 @@ algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leide
 algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
 
 \item{knn_seurat}{Integer specifying the number of nearest neighbors used for
-graph construction with \link{Seurat-package} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
 Default is \code{20}.}
 
@@ -63,7 +63,7 @@ labels) for each value in \code{res_range} (\code{list}).}
 }
 }
 \description{
-Performs graph-based clustering of cells using \link{Seurat-package}, based on one or two
+Performs graph-based clustering of cells using \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}}, based on one or two
 log R ratio matrices (\code{mat_list}), including shared nearest neighbors (SNN)
 graph construction on selected dimensions from PCA (\code{dims_list}), to identify
 clusters of cells for each specified resolution (\code{res_range}).

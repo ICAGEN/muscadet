@@ -22,7 +22,7 @@ add_labels(
 \item{color}{Color of the label text (\code{character}). Default is \code{"black"}.}
 
 \item{repel}{Logical. If \code{TRUE}(default), overlapping labels are repelled
-using the \link{ggrepel} package.}
+using the \link[ggrepel:ggrepel]{ggrepel::ggrepel} package.}
 
 \item{label.box}{Logical. If \code{TRUE} it uses a boxed label (\code{geom_label})
 instead of plain text (\code{geom_text}). Default is \code{FALSE}.}
@@ -31,15 +31,15 @@ instead of plain text (\code{geom_text}). Default is \code{FALSE}.}
 
 \item{...}{Additional arguments passed to the corresponding underlying geom:
 \itemize{
-\item \code{\link[=geom_text]{geom_text()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{FALSE})
-\item \code{\link[=geom_label]{geom_label()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{TRUE})
-\item \code{\link[=geom_text_repel]{geom_text_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{FALSE})
-\item \code{\link[=geom_label_repel]{geom_label_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{TRUE})
+\item \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{FALSE})
+\item \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{TRUE})
+\item \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_text_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{FALSE})
+\item \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{TRUE})
 }}
 }
 \value{
-A ggplot2 layer (\code{\link[=geom_text]{geom_text()}}, \code{\link[=geom_label]{geom_label()}}, \code{\link[=geom_text_repel]{geom_text_repel()}},
-or \code{\link[=geom_label_repel]{geom_label_repel()}}).
+A ggplot2 layer (\code{\link[ggplot2:geom_text]{ggplot2::geom_text()}}, \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}},
+\code{\link[ggrepel:geom_text_repel]{ggrepel::geom_text_repel()}}, or \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}}).
 }
 \description{
 This function adds labels at the median position of each group to a ggplot

@@ -9,7 +9,7 @@
 \alias{mat_counts_rna_ref}
 \title{Example data: Matrices of raw counts}
 \format{
-A \code{dgCMatrix} (\code{\link{dgCMatrix-class}}) of numeric values with the following dimensions:
+A \code{dgCMatrix} (\code{[Matrix::dgCMatrix-class()]}) of numeric values with the following dimensions:
 \describe{
 \item{\code{rows}}{Features (peaks, genes).}
 \item{\code{columns}}{Cell barcodes.}

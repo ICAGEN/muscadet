@@ -11,7 +11,8 @@
 \method{.DollarNames}{muscomic}(x, pattern = "")
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} or \code{\link{muscomic}} object.}
+\item{x}{A \code{[muscadet::muscadet()]} or \code{[muscadet::muscomic()]}
+object.}
 
 \item{pattern}{ A regular expression.  Only matching names are
     returned.
@@ -21,9 +22,10 @@
 Character vector of matching element names.
 }
 \description{
-Enable autocompletion for \code{$} access for \code{\link{muscadet}}
-or \code{\link{muscomic}} objects. For \code{muscadet} objects, it also lists
-omic datasets contained inside the \code{omics} slot.
+Enable autocompletion for \code{$} access for
+\code{[muscadet::muscadet()]} or \code{[muscadet::muscomic()]} objects. For
+\code{muscadet} objects, it also lists omic datasets contained inside the
+\code{omics} slot.
 }
 \examples{
 # Load example muscadet object

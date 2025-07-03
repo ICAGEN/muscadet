@@ -52,7 +52,7 @@
 #' Methodology and functionality:
 #'
 #' - [muscadet-class]
-#' - [cluster_seurat()] for graph-based clustering using [Seurat-package].
+#' - [cluster_seurat()] for graph-based clustering using [Seurat::Seurat()].
 #' - [cluster_hclust()] for hierarchical clustering of SNF-fused distances.
 #' - [weightedSNF()] for weighted Similarity Network Fusion (SNF).
 #' - [imputeClusters()] for imputing cluster labels across omics.
@@ -241,7 +241,7 @@ clusterMuscadet <- function(x,
 
 #' Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering
 #'
-#' Performs graph-based clustering of cells using [Seurat-package], based on one or two
+#' Performs graph-based clustering of cells using [Seurat::Seurat()], based on one or two
 #' log R ratio matrices (`mat_list`), including shared nearest neighbors (SNN)
 #' graph construction on selected dimensions from PCA (`dims_list`), to identify
 #' clusters of cells for each specified resolution (`res_range`).
@@ -266,7 +266,7 @@ clusterMuscadet <- function(x,
 #'   algorithm with multilevel refinement; `3` = SLM algorithm; `4` = Leiden
 #'   algorithm). Leiden requires the leidenalg python. Default is `1`.
 #' @param knn_seurat Integer specifying the number of nearest neighbors used for
-#'   graph construction with [Seurat-package] functions [Seurat::FindNeighbors()]
+#'   graph construction with [Seurat::Seurat()] functions [Seurat::FindNeighbors()]
 #'   (`k.param`) or [Seurat::FindMultiModalNeighbors()] (`k.nn`) (`integer`).
 #'   Default is `20`.
 #' @param knn_range_seurat Integer specifying the approximate number of nearest

@@ -49,7 +49,7 @@ by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = origina
 algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leiden
 algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
-graph construction with \link{Seurat-package} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
 Default is \code{20}.}
     \item{\code{knn_range_seurat}}{Integer specifying the approximate number of nearest
@@ -137,7 +137,7 @@ lapply(clusters, table)
 Methodology and functionality:
 \itemize{
 \item \linkS4class{muscadet}
-\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using \link{Seurat-package}.
+\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}}.
 \item \code{\link[=cluster_hclust]{cluster_hclust()}} for hierarchical clustering of SNF-fused distances.
 \item \code{\link[=weightedSNF]{weightedSNF()}} for weighted Similarity Network Fusion (SNF).
 \item \code{\link[=imputeClusters]{imputeClusters()}} for imputing cluster labels across omics.

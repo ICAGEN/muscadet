@@ -23,13 +23,13 @@ from bulk sequencing data.
 }
 \note{
 Data obtained from whole genome sequencing (WGS) after using
-\code{\link[facets:fitcncf]{facets::fitcncf()}} from \link{facets} "Cellular Fraction and Copy Numbers from
+\code{\link[facets:fitcncf]{facets::fitcncf()}} from \code{\link[facets:facets-package]{facets::facets()}} "Cellular Fraction and Copy Numbers from
 Tumor Sequencing" version \verb{0.6.2}: \verb{$cncf} data frame columns \code{chrom}, \code{start},
 \code{end}, and \code{cnlr.median}.
 }
 \references{
 \describe{
-\item{\link{facets-package} package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
+\item{\code{\link[facets:facets-package]{facets::facets()}} package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
 clonal heterogeneity analysis tool for high-throughput DNA sequencing.
 Nucleic Acids Res. 2016 Sep 19;44(16):e131.
 doi: \href{https://www.doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}.

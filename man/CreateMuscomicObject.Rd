@@ -38,7 +38,7 @@ nucleotide polymorphisms (SNPs) positions or individual-specific
 heterozygous positions retrieved from bulk sequencing. The data frame format
 is based on the Variant Calling Format (VCF), thereby it must contain the
 following columns : \code{cell}, \code{id}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}, \code{RD}, \code{AD},
-\code{DP}, (\code{GT}). See \link{allele_counts} for details.}
+\code{DP}, (\code{GT}). See \code{\link[=allele_counts]{allele_counts()}} for details.}
 
 \item{label.omic}{Label for the single cell omic (\code{character} string). By
 default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"
@@ -48,10 +48,10 @@ type.}
 "peaks" is used for "ATAC" type and "genes" for "RNA" type.}
 }
 \value{
-A \code{\link{muscomic}} object.
+A \code{[muscadet::muscomic()]} object.
 }
 \description{
-Create a \code{\link{muscomic}} object.
+Create a \code{[muscadet::muscomic()]} object.
 }
 \examples{
 atac <- CreateMuscomicObject(
@@ -97,6 +97,6 @@ atac2
 \seealso{
 \itemize{
 \item \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
-\item \code{\link{muscomic-class}}, \code{\link{muscadet-class}}
+\item \code{[muscadet::muscomic-class()]}, \code{[muscadet::muscadet-class()]}
 }
 }

@@ -46,15 +46,17 @@
 #' @param title Character string for the title of the plot (`character`
 #'   string). Default is an empty character string.
 #'
-#' @param row_annots Optional. A list of [HeatmapAnnotation-class] objects from
-#'   the [ComplexHeatmap-package] package, specifying row annotations to add on
-#'   left part of the heatmap. Each element in the list must be of class
-#'   [HeatmapAnnotation-class], must be a row annotation (using
-#'   [rowAnnotation()] or [HeatmapAnnotation()] with `which = 'row'`), and must
-#'   have a unique name (`name` argument in [rowAnnotation()] or
-#'   [HeatmapAnnotation()]). If `averages = FALSE`, annotations must concern
-#'   cells, while if `averages = TRUE` they must concern clusters. Default is
-#'   `NULL`, no row annotations is added.
+#' @param row_annots Optional. A list of
+#'   [ComplexHeatmap::HeatmapAnnotation-class()] objects from the
+#'   [ComplexHeatmap::ComplexHeatmap()] package, specifying row annotations to
+#'   add on left part of the heatmap. Each element in the list must be of class
+#'   [ComplexHeatmap::HeatmapAnnotation-class()], must be a row annotation
+#'   (using [ComplexHeatmap::rowAnnotation()] or
+#'   [ComplexHeatmap::HeatmapAnnotation()] with `which = 'row'`), and must have
+#'   a unique name (`name` argument in [ComplexHeatmap::rowAnnotation()] or
+#'   [ComplexHeatmap::HeatmapAnnotation()]). If `averages = FALSE`, annotations
+#'   must concern cells, while if `averages = TRUE` they must concern clusters.
+#'   Default is `NULL`, no row annotations is added.
 #'
 #' @param white_scale Numeric vector of length 2 or a list of numeric vectors
 #'   (`numeric` vector or `list`).
@@ -1906,22 +1908,23 @@ plotCNA <- function(x,
 #' stored in a `muscadet` object. The function allows coloring by clusters and
 #' optionally adding cluster labels.
 #'
-#' @param x A \code{\link{muscadet}} object containing clustering data (using
+#' @param x A \code{[muscadet::muscadet-class()]} object containing clustering data (using
 #'   [muscadet::clusterMuscadet()]).
 #'
 #' @inheritParams heatmapMuscadet
 #'
 #' @param lab.x Label for the x-axis (`character` string). Default is "UMAP 1".
 #' @param lab.y Label for the y-axis (`character` string). Default is "UMAP 2".
-#'
 #' @param add_clusters_labels Logical. If `TRUE`, adds the cluster names as
-#'   text or boxed labels using [add_labels()]. Default is `FALSE`.
-#'
-#' @param point.size Numeric. Size of the points in the UMAP plot passed to [ggplot2::geom_point()]. Default is `0.5`.
-#' @param legend.point.size Numeric. Size of the points in the legend of the UMAP plot. Default is `3`.
-#' @param ... Additional arguments passed to [add_labels()] providing an
-#'   underlying geom for label names ([geom_text()], [geom_label()],
-#'   [geom_text_repel()], or [geom_label_repel()]).
+#'   text or boxed labels using [muscadet::add_labels()]. Default is `FALSE`.
+#' @param point.size Numeric. Size of the points in the UMAP plot passed to
+#'   [ggplot2::geom_point()]. Default is `0.5`.
+#' @param legend.point.size Numeric. Size of the points in the legend of the
+#'   UMAP plot. Default is `3`.
+#' @param ... Additional arguments passed to [muscadet::add_labels()] providing
+#'   an underlying geom for label names ([ggplot2::geom_text()],
+#'   [ggplot2::geom_label()], [ggrpel::geom_text_repel()], or
+#'   [ggrepel::geom_label_repel()]).
 #'
 #' @return A `ggplot` object.
 #'
@@ -2065,19 +2068,19 @@ plotUMAP <- function(x,
 #' @param labels Column name (unquoted) indicating the group label to display.
 #' @param color Color of the label text (`character`). Default is `"black"`.
 #' @param repel Logical. If `TRUE`(default), overlapping labels are repelled
-#'   using the [ggrepel] package.
+#'   using the [ggrepel::ggrepel] package.
 #' @param label.box Logical. If `TRUE` it uses a boxed label (`geom_label`)
 #'   instead of plain text (`geom_text`). Default is `FALSE`.
 #' @param size Size of the label text (`numeric`). Default is `2`.
 #'
 #' @param ... Additional arguments passed to the corresponding underlying geom:
-#' - [geom_text()] (`repel`= `FALSE` and `label.box` = `FALSE`)
-#' - [geom_label()] (`repel`= `FALSE` and `label.box` = `TRUE`)
-#' - [geom_text_repel()] (`repel`= `TRUE` and `label.box` = `FALSE`)
-#' - [geom_label_repel()] (`repel`= `TRUE` and `label.box` = `TRUE`)
+#' - [ggplot2::geom_text()] (`repel`= `FALSE` and `label.box` = `FALSE`)
+#' - [ggplot2::geom_label()] (`repel`= `FALSE` and `label.box` = `TRUE`)
+#' - [ggrepel::geom_text_repel()] (`repel`= `TRUE` and `label.box` = `FALSE`)
+#' - [ggrepel::geom_label_repel()] (`repel`= `TRUE` and `label.box` = `TRUE`)
 #'
-#' @return A ggplot2 layer ([geom_text()], [geom_label()], [geom_text_repel()],
-#'   or [geom_label_repel()]).
+#' @return A ggplot2 layer ([ggplot2::geom_text()], [ggplot2::geom_label()],
+#'   [ggrepel::geom_text_repel()], or [ggrepel::geom_label_repel()]).
 #'
 #' @details The function summarizes the data by computing the median x and y
 #' positions for each label group.

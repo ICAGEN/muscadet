@@ -12,9 +12,9 @@ CreateMuscadetObject(
 )
 }
 \arguments{
-\item{omics}{A list of \code{\link{muscomic}} objects (\code{list}). The names of
-the list will set the names of omics in the final object, if the list is
-unamed, the type is taken instead.}
+\item{omics}{A list of \code{[muscadet::muscomic()]} objects (\code{list}). The
+names of the list will set the names of omics in the final object, if the
+list is unamed, the type is taken instead.}
 
 \item{bulk.lrr}{A data frame containing log R ratio per genomic segments from
 bulk sequencing data (\code{data.frame}). One row per segment and 4 columns
@@ -27,14 +27,14 @@ end position (\code{integer}), and Log R ratio value (\code{numeric}).}
 (\code{character} string). "hg38" by default.}
 }
 \value{
-A \code{\link{muscadet}} object.
+A \code{[muscadet::muscadet()]} object.
 }
 \description{
-Create a \code{\link{muscadet}} object.
+Create a \code{\[muscadet::muscadet()]} object.
 }
 \note{
-A \code{\link{muscadet}} object can contain several
-\code{\link{muscomic}} objects of the same type (\code{ATAC} or \code{RNA} for slot
+A \code{[muscadet::muscadet()]} object can contain several
+\code{[muscadet::muscomic()]} objects of the same type (\code{ATAC} or \code{RNA} for slot
 \code{type}) but they can't have identical labels (slot \code{label.omic}).
 }
 \examples{
@@ -80,6 +80,6 @@ muscadet_ref <- CreateMuscadetObject(
 \seealso{
 \itemize{
 \item \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
-\item \code{\link{muscomic-class}}, \code{\link{muscadet-class}}
+\item \code{[muscadet::muscomic-class()]}, \code{[muscadet::muscadet-class()]}
 }
 }
