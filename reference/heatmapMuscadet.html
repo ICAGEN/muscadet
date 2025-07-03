@@ -138,15 +138,17 @@ string). Default is an empty character string.</p></dd>
 
 
 <dt id="arg-row-annots">row_annots<a class="anchor" aria-label="anchor" href="#arg-row-annots"></a></dt>
-<dd><p>Optional. A list of <a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation-class.html" class="external-link">HeatmapAnnotation</a> objects from
-the <a href="https://rdrr.io/pkg/ComplexHeatmap/man/ComplexHeatmap-package.html" class="external-link">ComplexHeatmap-package</a> package, specifying row annotations to add on
-left part of the heatmap. Each element in the list must be of class
-<a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation-class.html" class="external-link">HeatmapAnnotation</a>, must be a row annotation (using
-<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/rowAnnotation.html" class="external-link">rowAnnotation()</a></code> or <code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation.html" class="external-link">HeatmapAnnotation()</a></code> with <code>which = 'row'</code>), and must
-have a unique name (<code>name</code> argument in <code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/rowAnnotation.html" class="external-link">rowAnnotation()</a></code> or
-<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation.html" class="external-link">HeatmapAnnotation()</a></code>). If <code>averages = FALSE</code>, annotations must concern
-cells, while if <code>averages = TRUE</code> they must concern clusters. Default is
-<code>NULL</code>, no row annotations is added.</p></dd>
+<dd><p>Optional. A list of
+<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation-class.html" class="external-link">ComplexHeatmap::HeatmapAnnotation-class()</a></code> objects from the
+<code>ComplexHeatmap::ComplexHeatmap()</code> package, specifying row annotations to
+add on left part of the heatmap. Each element in the list must be of class
+<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation-class.html" class="external-link">ComplexHeatmap::HeatmapAnnotation-class()</a></code>, must be a row annotation
+(using <code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/rowAnnotation.html" class="external-link">ComplexHeatmap::rowAnnotation()</a></code> or
+<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation.html" class="external-link">ComplexHeatmap::HeatmapAnnotation()</a></code> with <code>which = 'row'</code>), and must have
+a unique name (<code>name</code> argument in <code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/rowAnnotation.html" class="external-link">ComplexHeatmap::rowAnnotation()</a></code> or
+<code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation.html" class="external-link">ComplexHeatmap::HeatmapAnnotation()</a></code>). If <code>averages = FALSE</code>, annotations
+must concern cells, while if <code>averages = TRUE</code> they must concern clusters.
+Default is <code>NULL</code>, no row annotations is added.</p></dd>
 
 
 <dt id="arg-white-scale">white_scale<a class="anchor" aria-label="anchor" href="#arg-white-scale"></a></dt>
