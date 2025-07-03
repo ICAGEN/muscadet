@@ -60,7 +60,7 @@ string). Default is an empty character string.}
 
 \item{row_annots}{Optional. A list of
 \code{\link[ComplexHeatmap:HeatmapAnnotation-class]{ComplexHeatmap::HeatmapAnnotation-class()}} objects from the
-\code{\link[ComplexHeatmap:ComplexHeatmap]{ComplexHeatmap::ComplexHeatmap()}} package, specifying row annotations to
+\code{\link[ComplexHeatmap:ComplexHeatmap-package]{ComplexHeatmap::ComplexHeatmap-package()}} package, specifying row annotations to
 add on left part of the heatmap. Each element in the list must be of class
 \code{\link[ComplexHeatmap:HeatmapAnnotation-class]{ComplexHeatmap::HeatmapAnnotation-class()}}, must be a row annotation
 (using \code{\link[ComplexHeatmap:rowAnnotation]{ComplexHeatmap::rowAnnotation()}} or

@@ -48,7 +48,7 @@
 #'
 #' @param row_annots Optional. A list of
 #'   [ComplexHeatmap::HeatmapAnnotation-class()] objects from the
-#'   [ComplexHeatmap::ComplexHeatmap()] package, specifying row annotations to
+#'   [ComplexHeatmap::ComplexHeatmap-package()] package, specifying row annotations to
 #'   add on left part of the heatmap. Each element in the list must be of class
 #'   [ComplexHeatmap::HeatmapAnnotation-class()], must be a row annotation
 #'   (using [ComplexHeatmap::rowAnnotation()] or
@@ -1923,7 +1923,7 @@ plotCNA <- function(x,
 #'   UMAP plot. Default is `3`.
 #' @param ... Additional arguments passed to [muscadet::add_labels()] providing
 #'   an underlying geom for label names ([ggplot2::geom_text()],
-#'   [ggplot2::geom_label()], [ggrpel::geom_text_repel()], or
+#'   [ggplot2::geom_label()], [ggrepel::geom_text_repel()], or
 #'   [ggrepel::geom_label_repel()]).
 #'
 #' @return A `ggplot` object.
