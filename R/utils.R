@@ -112,15 +112,18 @@ assignClusters <- function(x,
 
     # Validate that either partition or clusters is provided, but not both
     stopifnot(
-        "Either `partition` or `clusters` must be provided, but not both." = xor(!is.null(partition), !is.null(clusters))
+        "Either `partition` or `clusters` must be provided, but not both."
+        = xor(!is.null(partition), !is.null(clusters))
     )
 
     # If partition is provided, validate that clustering has been performed
     if (!is.null(partition)) {
         stopifnot(
-            "Clustering results are not available in the muscadet object `x`. Perform clustering first using `clusterMuscadet()`."
+            "Clustering results are not available in the muscadet object `x`.
+            Perform clustering first using `clusterMuscadet()`."
             = !is.null(x@clustering),
-            "Clustering results for the chosen `partition` are not available. Use `clusterMuscadet()` with the `res_range`/`k_range` argument to compute the partition."
+            "Clustering results for the chosen `partition` are not available.
+            Use `clusterMuscadet()` with the `res_range`/`k_range` argument to compute the partition."
             = as.character(partition) %in% names(x@clustering$clusters)
         )
     }
@@ -130,8 +133,24 @@ assignClusters <- function(x,
         if (is.factor(clusters) && !is.null(names(clusters))) {
             clusters <- stats::setNames(as.vector(clusters), names(clusters))
         } else {
-            stopifnot("`clusters` must be a named vector or factor." = is.vector(clusters) && !is.null(names(clusters)))
+            stopifnot("`clusters` must be a named vector or factor."
+                      = is.vector(clusters) && !is.null(names(clusters)))
         }
+    }
+
+    # Helper function to impute clusters if needed
+    .check_and_impute_clusters <- function(clusters_vec) {
+
+        common_cells <- sort(Reduce(intersect, Cells(x)))
+        stopifnot("`clusters` must contain at least all common cells when `redo_imputation = TRUE`." =
+                      all(common_cells %in% names(clusters_vec)))
+
+        # Remove cells missing data that needs to go through cluster imputation (cleaner)
+        clusters_vec <- clusters_vec[intersect(names(clusters_vec), common_cells)]
+
+        mat_list <- lapply(muscadet::matLogRatio(x), t)
+
+        imputeClusters(mat_list, clusters_vec, knn_imp = knn_imp)
     }
 
     # Apply mapping if provided
@@ -140,7 +159,8 @@ assignClusters <- function(x,
         stopifnot(
             "`mapping` must be a named vector." = is.vector(mapping) &&
                 !is.null(names(mapping)),
-            "All cluster values must have corresponding mappings in `mapping`." = all(as.character(unique(clusters)) %in% names(mapping))
+            "All cluster values must have corresponding mappings in `mapping`."
+            = all(as.character(unique(clusters)) %in% names(mapping))
         )
 
         # Get clusters from partition
@@ -151,29 +171,15 @@ assignClusters <- function(x,
         # Remap clusters
         remapped_clusters <- setNames(mapping[as.character(clusters)], names(clusters))
 
+        stopifnot(
+            "`clusters` must contain all cell names within the muscadet object `x`."
+            = all(names(remapped_clusters) %in% Reduce(union, Cells(x)))
+        )
+
         # Rerun cluster imputation (following remapping)
         if (redo_imputation) {
-
-            mat_list <- lapply(muscadet::matLogRatio(x), t)
-            common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
-
-            # Validate clusters cells
-            stopifnot(
-                "`clusters` must contain at least all common cells when `redo_imputation = TRUE`." = all(common_cells %in% names(remapped_clusters))
-            )
-
-            # Remove cells missing data that needs to go through cluster imputation (cleaner)
-            remapped_clusters <- remapped_clusters[intersect(names(remapped_clusters), common_cells)]
-            # Impute clusters
-            remapped_clusters <- imputeClusters(mat_list, remapped_clusters, knn_imp = knn_imp)
-
-        } else {
-            # Validate clusters cells
-            stopifnot(
-                "`clusters` must contain all cell names within the muscadet object `x`." = all(names(remapped_clusters) %in% Reduce(union, Cells(x)))
-            )
+            remapped_clusters <- .check_and_impute_clusters(remapped_clusters)
         }
-
 
         x@cnacalling[["clusters"]] <- remapped_clusters
 
@@ -181,27 +187,14 @@ assignClusters <- function(x,
         # Assign clusters without remapping - custom clusters
         if (!is.null(clusters)) {
 
+            stopifnot(
+                "`clusters` must contain all cell names within the muscadet object `x`."
+                = all(names(clusters) %in% Reduce(union, Cells(x)))
+            )
+
             # Rerun cluster imputation (in case custom clusters have been modified)
             if (redo_imputation) {
-
-                mat_list <- lapply(muscadet::matLogRatio(x), t)
-                common_cells <- sort(Reduce(intersect, lapply(mat_list, rownames)))
-
-                # Validate clusters cells
-                stopifnot(
-                    "`clusters` must contain at least all common cells when `redo_imputation = TRUE`." = all(common_cells %in% names(clusters))
-                )
-
-                # Remove cells missing data that needs to go through cluster imputation (cleaner)
-                clusters <- clusters[intersect(names(clusters), common_cells)]
-                # Impute clusters
-                clusters <- imputeClusters(mat_list, clusters, knn_imp = knn_imp)
-
-            } else {
-                # Validate clusters cells
-                stopifnot(
-                    "`clusters` must contain all cell names within the muscadet object `x`." = all(names(clusters) %in% Reduce(union, Cells(x)))
-                )
+                clusters <- .check_and_impute_clusters(clusters)
             }
             x@cnacalling[["clusters"]] <- clusters
 
