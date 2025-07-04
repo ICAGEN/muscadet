@@ -21,7 +21,7 @@ Authors@R: c(
 Description: Identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.
 URL: https://github.com/ICAGEN/muscadet, https://icagen.github.io/muscadet/
 BugReports: https://github.com/ICAGEN/muscadet/issues
-License: GPL-3
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
