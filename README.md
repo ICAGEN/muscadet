@@ -1,8 +1,14 @@
-<br>
-<img src="https://img.shields.io/badge/version-dev-blue" alt="dev-version" align="left"/>
-<br>
+
 
 # muscadet <img src="man/figures/logo.png" align="right" height="139" alt="" />
+
+<!-- badges: start -->
+
+![Version](https://img.shields.io/github/v/release/ICAGEN/muscadet?label=version)
+[![R-CMD-check](https://github.com/ICAGEN/muscadet/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ICAGEN/muscadet/actions/workflows/R-CMD-check.yaml)
+
+<!-- badges: end -->
+
 
 ### *multiomics single-cell copy number alterations detection*
 
