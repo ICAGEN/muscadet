@@ -9,7 +9,8 @@
 \alias{mat_counts_rna_ref}
 \title{Example data: Matrices of raw counts}
 \format{
-A \code{dgCMatrix} (\code{[Matrix::dgCMatrix-class()]}) of numeric values with the following dimensions:
+A \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}} of numeric values with the following
+dimensions:
 \describe{
 \item{\code{rows}}{Features (peaks, genes).}
 \item{\code{columns}}{Cell barcodes.}
@@ -25,6 +26,7 @@ mat_counts_rna_tumor
 mat_counts_rna_ref
 }
 \description{
-Matrices of raw read counts \emph{features x cells} in \code{dgCMatrix} format.
+Matrices of raw read counts \emph{features x cells} in
+\code{\link[Matrix:dgCMatrix-class]{dgCMatrix}} format.
 }
 \keyword{datasets}

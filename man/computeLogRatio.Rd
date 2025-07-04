@@ -17,10 +17,11 @@ computeLogRatio(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing sample data (\code{muscadet}).}
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing sample data
+(\code{muscadet}).}
 
-\item{reference}{Another \code{\link{muscadet}} object containing reference
-data (\code{muscadet}).}
+\item{reference}{Another \code{\link[=muscadet-class]{muscadet}} object containing
+reference data (\code{muscadet}).}
 
 \item{omic}{Name of the omic to apply this function (\code{character} string).}
 
@@ -47,9 +48,9 @@ execution. Default is \code{FALSE}.}
 
 \item{all_steps}{Logical value to indicate whether matrices at each step of
 the log ratio computation are kept and returned (\code{logical}). IMPORTANT: if
-\code{TRUE}, the function does not return an updated \code{muscadet} object but a
-list with matrices at each step of the log ratio computation (see Value
-section). Default is \code{FALSE}.}
+\code{TRUE}, the function does not return an updated
+\code{\link[=muscadet-class]{muscadet}} object but a list with matrices at each step
+of the log ratio computation (see Value section). Default is \code{FALSE}.}
 
 \item{...}{
   Arguments passed on to \code{\link[=computeLogRatioATAC]{computeLogRatioATAC}}, \code{\link[=computeLogRatioRNA]{computeLogRatioRNA}}
@@ -74,8 +75,8 @@ value). By default: \code{0.01}.}
   }}
 }
 \value{
-A \code{\link{muscadet}} object corresponding to the sample
-\code{\link{muscadet}} object (\code{x}) containing the computed log R ratio
+A \code{\link[=muscadet-class]{muscadet}} object corresponding to the sample
+\code{\link[=muscadet-class]{muscadet}} object (\code{x}) containing the computed log R ratio
 matrix in the \code{coverage} slot of the selected \code{omic}.
 
 If the \code{all_steps} argument is set to \code{TRUE}, it returns a list with intermediate
@@ -84,12 +85,12 @@ matrices \code{matTumor} and \code{matRef} from every step from \code{step01} to
 and associated data, and \code{params} list of parameters used for the function.
 }
 \description{
-Computes log R ratios from raw count matrices within \code{\link{muscadet}}
-objects. The log R ratios values are computed based on read counts from a
-sample \code{\link{muscadet}} object \emph{versus} read counts a the \code{reference}
-\code{\link{muscadet}} object. In the output sample \code{\link{muscadet}}
-object, the newly computed matrix of log R ratios is added for the
-selected \code{omic}.
+Computes log R ratios from raw count matrices within
+\code{\link[=muscadet-class]{muscadet}} objects. The log R ratios values are computed
+based on read counts from a sample \code{\link[=muscadet-class]{muscadet}} object
+\emph{versus} read counts a the \code{reference} \code{\link[=muscadet-class]{muscadet}} object.
+In the output sample \code{\link[=muscadet-class]{muscadet}} object, the newly computed
+matrix of log R ratios is added for the selected \code{omic}.
 }
 \details{
 Log R ratios computation steps are described in functions:

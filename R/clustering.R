@@ -1,7 +1,7 @@
 #' Multi Omics Integration and Clustering on a `muscadet` Object
 #'
 #' Performs integration of multi omics and clustering of cells based on log
-#' ratio data contained in a [`muscadet`] object.
+#' ratio data contained in a [`muscadet`][muscadet-class] object.
 #'
 #' Two methods are available for integration and clustering of common cells
 #' between omics:
@@ -16,8 +16,8 @@
 #' Finally, silhouette widths are computed on the integrated distance matrix to
 #' help identify the optimal clustering partition.
 #'
-#' @param x A `muscadet` object containing omics data and previously computed
-#'   log R ratio matrices (`muscadet`).
+#' @param x A [`muscadet`][muscadet-class] object containing omics data and
+#'   previously computed log R ratio matrices (`muscadet`).
 #' @param method The clustering method to apply (`character` string). One of
 #'   `"seurat"` or `"hclust"`. For  medthod `"seurat"`, arguments for
 #'   [cluster_seurat()] should be provided, and for method `"hclust"`, arguments
@@ -36,7 +36,8 @@
 #' @inheritDotParams cluster_hclust k_range dist_method hclust_method weights
 #'
 #'
-#' @return The input [`muscadet`] object with its `clustering` slot updated. This slot contains:
+#' @return The input [`muscadet`][muscadet-class] object with its `clustering`
+#'   slot updated. This slot contains:
 #' \describe{
 #'   \item{params}{List of parameters used for clustering (`list`).}
 #'   \item{...}{Output objects depending on the method. See [cluster_seurat()] or [cluster_hclust()].}
@@ -52,7 +53,7 @@
 #' Methodology and functionality:
 #'
 #' - [muscadet-class]
-#' - [cluster_seurat()] for graph-based clustering using [Seurat::Seurat()].
+#' - [cluster_seurat()] for graph-based clustering using [`Seurat`][Seurat::Seurat-package].
 #' - [cluster_hclust()] for hierarchical clustering of SNF-fused distances.
 #' - [weightedSNF()] for weighted Similarity Network Fusion (SNF).
 #' - [imputeClusters()] for imputing cluster labels across omics.
@@ -241,10 +242,11 @@ clusterMuscadet <- function(x,
 
 #' Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering
 #'
-#' Performs graph-based clustering of cells using [Seurat::Seurat()], based on one or two
-#' log R ratio matrices (`mat_list`), including shared nearest neighbors (SNN)
-#' graph construction on selected dimensions from PCA (`dims_list`), to identify
-#' clusters of cells for each specified resolution (`res_range`).
+#' Performs graph-based clustering of cells using
+#' [`Seurat`][Seurat::Seurat-package], based on one or two log R ratio matrices
+#' (`mat_list`), including shared nearest neighbors (SNN) graph construction on
+#' selected dimensions from PCA (`dims_list`), to identify clusters of cells for
+#' each specified resolution (`res_range`).
 #'
 #' - For two omics: multimodal integration is performed using
 #' [Seurat::FindMultiModalNeighbors()] (weighted shared nearest neighbors graph).
@@ -281,17 +283,18 @@ clusterMuscadet <- function(x,
 #' @return A list containing:
 #' \describe{
 #'   \item{params}{List of parameters used for clustering (`list`).}
-#'   \item{pcs}{List of principal components summaries for each omic (`list` of `summary.prcomp` [stats::prcomp]).}
-#'   \item{nn}{Nearest neighbors object (`Neighbor` [SeuratObject::Neighbor-class]).}
-#'   \item{graph}{Shared nearest neighbors graph (`Graph` [SeuratObject::Graph-class]).}
+#'   \item{pcs}{List of principal components summaries for each omic (`list` of
+#'   [`summary.prcomp`][stats::summary.prcomp]).}
+#'   \item{nn}{Nearest neighbors object ([`Neighbor`][SeuratObject::Neighbor-class]).}
+#'   \item{graph}{Shared nearest neighbors graph ([`Graph`][SeuratObject::Graph-class]).}
 #'   \item{dist}{Distance matrix derived from the graph (`matrix`).}
 #'   \item{umap}{UMAP coordinates (`matrix`).}
 #'   \item{clusters}{A named list of clustering results (vectors of cluster
 #'   labels) for each value in `res_range` (`list`).}
 #' }
 #'
-#' @seealso
-#' [Weighted Nearest Neighbor Analysis Vignette from Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
+#' @seealso [Weighted Nearest Neighbor Analysis Vignette from
+#' Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
 #'
 #' @include objects.R
 #'
@@ -330,7 +333,8 @@ cluster_seurat <- function(mat_list,
     stopifnot(is.list(mat_list), all(sapply(mat_list, is.matrix)))
 
     stopifnot(
-        "This method is not applicable for more than 2 omics. `mat_list` can contain either 1 or 2 matrices." = length(mat_list) <= 2
+        "This method is not applicable for more than 2 omics. `mat_list` can contain either 1 or 2 matrices."
+        = length(mat_list) <= 2
     )
 
     if (!is.numeric(res_range) || any(res_range <= 0)) {
@@ -563,7 +567,7 @@ cluster_seurat <- function(mat_list,
 #' @param weights A numeric vector of non-negative values of length equal to the
 #'   number of omic (internally normalized to sum to 1) (`numeric` vector). It
 #'   specifies the relatives weights of each omic for SNF with
-#'   [muscadet::weightedSNF()]. Omics with a weight of 0 will not contribute to
+#'   [weightedSNF()]. Omics with a weight of 0 will not contribute to
 #'   the clustering. If `NULL` (default), weights are uniform.
 #' @param knn_affinity Integer specifying the number of nearest neighbors used
 #'   when building affinity matrices with [SNFtool::affinityMatrix()]
@@ -572,10 +576,10 @@ cluster_seurat <- function(mat_list,
 #'   width `sigma`) when building affinity matrix with
 #'   [SNFtool::affinityMatrix()] (`numeric`). Default is `1`.
 #' @param knn_SNF Integer specifying the number of nearest neighbors used during
-#'   the Similarity Network Fusion (SNF) with [muscadet::weightedSNF()]
+#'   the Similarity Network Fusion (SNF) with [weightedSNF()]
 #'   (`integer`). Default is `40`.
 #' @param iter_SNF Integer specifying the number of iterations for SNF with
-#'   [muscadet::weightedSNF()] (`integer`). Default is `50`.
+#'   [weightedSNF()] (`integer`). Default is `50`.
 #' @param knn_umap Integer specifying the number of nearest neighbors used for
 #'   manifold approximation (UMAP) (see [uwot::umap()]). Default is `20`.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during

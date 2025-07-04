@@ -20,8 +20,8 @@ plotProfile(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing CNA calling data to be
-visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing CNA calling data to
+be visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
 
 \item{data}{Either a cluster identifier to plot data of a cluster or
 "allcells" to plot data on all cells.}
@@ -67,7 +67,7 @@ A multi-panel plot of CNA profiles is produced.
 }
 \description{
 This function generates a multi-panel plot of copy number alteration (CNA)
-profiles from a \code{\link{muscadet}} object, including: log R ratios
+profiles from a \code{\link[=muscadet-class]{muscadet}} object, including: log R ratios
 values, log odds ratio (or variant allele frequency), copy numbers, CNA
 status and cell fractions.
 }

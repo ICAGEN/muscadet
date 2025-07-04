@@ -14,8 +14,8 @@ clusterMuscadet(
 )
 }
 \arguments{
-\item{x}{A \code{muscadet} object containing omics data and previously computed
-log R ratio matrices (\code{muscadet}).}
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing omics data and
+previously computed log R ratio matrices (\code{muscadet}).}
 
 \item{method}{The clustering method to apply (\code{character} string). One of
 \code{"seurat"} or \code{"hclust"}. For  medthod \code{"seurat"}, arguments for
@@ -72,7 +72,8 @@ the clustering. If \code{NULL} (default), weights are uniform.}
   }}
 }
 \value{
-The input \code{\link{muscadet}} object with its \code{clustering} slot updated. This slot contains:
+The input \code{\link[=muscadet-class]{muscadet}} object with its \code{clustering}
+slot updated. This slot contains:
 \describe{
 \item{params}{List of parameters used for clustering (\code{list}).}
 \item{...}{Output objects depending on the method. See \code{\link[=cluster_seurat]{cluster_seurat()}} or \code{\link[=cluster_hclust]{cluster_hclust()}}.}
@@ -86,7 +87,7 @@ average silhouette width.}
 }
 \description{
 Performs integration of multi omics and clustering of cells based on log
-ratio data contained in a \code{\link{muscadet}} object.
+ratio data contained in a \code{\link[=muscadet-class]{muscadet}} object.
 }
 \details{
 Two methods are available for integration and clustering of common cells
@@ -137,7 +138,7 @@ lapply(clusters, table)
 Methodology and functionality:
 \itemize{
 \item \linkS4class{muscadet}
-\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}}.
+\item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using \code{\link[Seurat:Seurat-package]{Seurat}}.
 \item \code{\link[=cluster_hclust]{cluster_hclust()}} for hierarchical clustering of SNF-fused distances.
 \item \code{\link[=weightedSNF]{weightedSNF()}} for weighted Similarity Network Fusion (SNF).
 \item \code{\link[=imputeClusters]{imputeClusters()}} for imputing cluster labels across omics.

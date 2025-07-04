@@ -53,9 +53,10 @@ execution. Default is \code{FALSE}.}
 A list containing:
 \describe{
 \item{params}{List of parameters used for clustering (\code{list}).}
-\item{pcs}{List of principal components summaries for each omic (\code{list} of \code{summary.prcomp} \link[stats:prcomp]{stats::prcomp}).}
-\item{nn}{Nearest neighbors object (\code{Neighbor} \link[SeuratObject:Neighbor-class]{SeuratObject::Neighbor}).}
-\item{graph}{Shared nearest neighbors graph (\code{Graph} \link[SeuratObject:Graph-class]{SeuratObject::Graph}).}
+\item{pcs}{List of principal components summaries for each omic (\code{list} of
+\code{\link[stats:prcomp]{summary.prcomp}}).}
+\item{nn}{Nearest neighbors object (\code{\link[SeuratObject:Neighbor-class]{Neighbor}}).}
+\item{graph}{Shared nearest neighbors graph (\code{\link[SeuratObject:Graph-class]{Graph}}).}
 \item{dist}{Distance matrix derived from the graph (\code{matrix}).}
 \item{umap}{UMAP coordinates (\code{matrix}).}
 \item{clusters}{A named list of clustering results (vectors of cluster
@@ -63,10 +64,11 @@ labels) for each value in \code{res_range} (\code{list}).}
 }
 }
 \description{
-Performs graph-based clustering of cells using \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}}, based on one or two
-log R ratio matrices (\code{mat_list}), including shared nearest neighbors (SNN)
-graph construction on selected dimensions from PCA (\code{dims_list}), to identify
-clusters of cells for each specified resolution (\code{res_range}).
+Performs graph-based clustering of cells using
+\code{\link[Seurat:Seurat-package]{Seurat}}, based on one or two log R ratio matrices
+(\code{mat_list}), including shared nearest neighbors (SNN) graph construction on
+selected dimensions from PCA (\code{dims_list}), to identify clusters of cells for
+each specified resolution (\code{res_range}).
 }
 \details{
 \itemize{

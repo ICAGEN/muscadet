@@ -1,17 +1,18 @@
 #' Heatmap plot for `muscadet` object
 #'
 #' This function generates a heatmap to visualize log R ratio (LRR) data
-#' contained in \code{\link{muscadet}} objects. One heatmap is generated per
-#' omic, rows are cells and columns are chromosomes, for `muscadet` object
-#' containing multiple omics, the heatmaps are plotted horizontally aligned. The
-#' cells can be clustered for a specific clustering partition following the
-#' clustering step of `muscadet` object, or custom cluster assignments can be
+#' contained in [`muscadet`][muscadet-class] objects. One heatmap is generated
+#' per omic, rows are cells and columns are chromosomes, for
+#' [`muscadet`][muscadet-class] object containing multiple omics, the heatmaps
+#' are plotted horizontally aligned. The cells can be clustered for a specific
+#' clustering partition following the clustering step of
+#' [`muscadet`][muscadet-class] object, or custom cluster assignments can be
 #' used. Additionally, LRR values from bulk sequencing data can be plotted as an
 #' annotation under the heatmaps.
 #'
-#' @param x A \code{\link{muscadet}} object containing LRR data for all omics
-#'   (with [muscadet::computeLogRatio()]) and clustering data (with
-#'   [muscadet::clusterMuscadet()]) (`muscadet`).
+#' @param x A [`muscadet`][muscadet-class] object containing LRR data for all
+#'   omics (with [computeLogRatio()]) and clustering data (with
+#'   [clusterMuscadet()]) (`muscadet`).
 #'
 #' @param filename (Optional) Character string specifying the file path to save
 #'   the heatmap image in the PNG (if it ends by .png), PDF (if it ends by
@@ -20,7 +21,7 @@
 #' @param partition (Optional) Value specifying the clustering partition to
 #'   plot (`numeric` or `character`). It should be either the resolution or the
 #'   number of cluster (k) used for clustering depending on the clustering
-#'   method (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
+#'   method (`res_range` or `k_range` with [clusterMuscadet()]).
 #'   If both `partition` and `clusters` arguments are `NULL` (default), the
 #'   assigned clusters for CNA calling (`x@cnacalling$cluster`) are used if
 #'   available in `x` (see [assignClusters()]).
@@ -47,16 +48,18 @@
 #'   string). Default is an empty character string.
 #'
 #' @param row_annots Optional. A list of
-#'   [ComplexHeatmap::HeatmapAnnotation-class()] objects from the
-#'   [ComplexHeatmap::ComplexHeatmap-package()] package, specifying row annotations to
-#'   add on left part of the heatmap. Each element in the list must be of class
-#'   [ComplexHeatmap::HeatmapAnnotation-class()], must be a row annotation
-#'   (using [ComplexHeatmap::rowAnnotation()] or
-#'   [ComplexHeatmap::HeatmapAnnotation()] with `which = 'row'`), and must have
-#'   a unique name (`name` argument in [ComplexHeatmap::rowAnnotation()] or
-#'   [ComplexHeatmap::HeatmapAnnotation()]). If `averages = FALSE`, annotations
-#'   must concern cells, while if `averages = TRUE` they must concern clusters.
-#'   Default is `NULL`, no row annotations is added.
+#'   [`HeatmapAnnotation`][ComplexHeatmap::HeatmapAnnotation-class] objects from
+#'   the [`ComplexHeatmap`][ComplexHeatmap::ComplexHeatmap-package] package,
+#'   specifying row annotations to add on left part of the heatmap. Each element
+#'   in the list must be of class
+#'   [`HeatmapAnnotation`][ComplexHeatmap::HeatmapAnnotation-class], must be a row
+#'   annotation (using [`rowAnnotation()`][ComplexHeatmap::rowAnnotation()] or
+#'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()] with
+#'   `which = 'row'`), and must have a unique name (`name` argument in
+#'   [`rowAnnotation()`][ComplexHeatmap::rowAnnotation()] or
+#'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()]). If
+#'   `averages =FALSE`, annotations must concern cells, while if `averages = TRUE`
+#'   they must concern clusters. Default is `NULL`, no row annotations is added.
 #'
 #' @param white_scale Numeric vector of length 2 or a list of numeric vectors
 #'   (`numeric` vector or `list`).
@@ -85,9 +88,10 @@
 #'   execution. Default is `FALSE`.
 #'
 #' @return A list containing:
-#' - `plot`: A \code{\link{gTree}} object created with [grid::grid.grab()] (\code{\link{gTree}}).
-#' - `width`: Width of the heatmap plot in mm (\code{\link{unit}}).
-#' - `height`: Height of the heatmap plot in mm (\code{\link{unit}}).
+#' - `plot`: A [`gTree`][grid::gTree] object created with [grid::grid.grab()]
+#' ([`gTree`][grid::gTree]).
+#' - `width`: Width of the heatmap plot in mm ([`unit`][grid::unit()]).
+#' - `height`: Height of the heatmap plot in mm ([`unit`][grid::unit()]).
 #'
 #' If the `filename` argument is provided, the heatmap is directly saved as a
 #' PNG image at the provided path.
@@ -886,15 +890,15 @@ heatmapMuscadet <- function(x,
 #' Silhouette plot for `muscadet` object
 #'
 #' Generate a silhouette plot for a specified clustering partition within a
-#' `muscadet` object.
+#' [`muscadet`][muscadet-class] object.
 #'
-#' @param x A \code{\link{muscadet}} object containing clustering data (using
-#'   [muscadet::clusterMuscadet()]).
+#' @param x A [`muscadet`][muscadet-class] object containing clustering data (using
+#'   [clusterMuscadet()]).
 #'
 #' @param partition Value specifying the clustering partition to plot (`numeric`
 #'   or `character`). It should be either the resolution or the k number of
 #'   cluster (k) used for clustering depending on the clustering method
-#'   (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
+#'   (`res_range` or `k_range` with [clusterMuscadet()]).
 #'
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). Default is `NULL`, which uses predefined colors.
@@ -1073,11 +1077,12 @@ plotSil <- function(x,
 #' Plot clustering validation indexes for a `muscadet` object
 #'
 #' It generates a plot of clustering validation indexes for a clustering
-#' partition within a `muscadet` object. The index values are computed only using
-#' distances between common cells across omics in the `muscadet` object.
+#' partition within a [`muscadet`][muscadet-class] object. The index values are
+#' computed only using distances between common cells across omics in the
+#' [`muscadet`][muscadet-class] object.
 #'
-#' @param x A \code{\link{muscadet}} object containing clustering data
-#'   (generated using [muscadet::clusterMuscadet()]).
+#' @param x A [`muscadet`][muscadet-class] object containing clustering data
+#'   (generated using [clusterMuscadet()]).
 #'
 #' @param index Character vector specifying one or more validation indexes to
 #'   plot among `"silhouette"`, `"dunn2"`, `"daviesbouldin"`, `"pearsongamma"`,
@@ -1098,21 +1103,21 @@ plotSil <- function(x,
 #'   including:
 #'   \itemize{
 #'     \item \strong{Silhouette}: Measures how similar an object is to its own
-#'     cluster compared to others (see [cluster::silhouette]). Average of
+#'     cluster compared to others (see [cluster::silhouette()]). Average of
 #'     individual silhouette widths.
 #'     \item \strong{Dunn2}: The ratio of the smallest distance between
 #'     observations in different clusters to the largest within-cluster distance
-#'     (see [fpc::cluster.stats] `$dunn2`). Minimum average dissimilarity
+#'     (see [fpc::cluster.stats()] `$dunn2`). Minimum average dissimilarity
 #'     between two cluster / maximum average within cluster dissimilarity.
 #'     \item \strong{Davies-Bouldin}: Measures cluster compactness and
-#'     separation (see [clusterSim::index.DB]).
+#'     separation (see [clusterSim::index.DB()]).
 #'     \item \strong{Pearson's Gamma}: Evaluates the goodness of clustering
-#'     based on correlation (see [fpc::cluster.stats] `$pearsongamma`).
+#'     based on correlation (see [fpc::cluster.stats()] `$pearsongamma`).
 #'     Correlation between distances and a 0-1-vector where 0 means same
 #'     cluster, 1 means different clusters. "Normalized gamma" in Halkidi et al.
 #'     (2001).
 #'     \item \strong{C Index} (Hubert & Levin C index): Measures the internal
-#'     cluster quality compared to random data (see [clusterSim::index.C]).
+#'     cluster quality compared to random data (see [clusterSim::index.C()]).
 #'   }
 #'
 #'   If multiple indexes are selected, the values are normalized to fall between
@@ -1324,12 +1329,12 @@ plotIndexes <- function(x,
 #' Plot CNA profiles from muscadet object
 #'
 #' This function generates a multi-panel plot of copy number alteration (CNA)
-#' profiles from a \code{\link{muscadet}} object, including: log R ratios
+#' profiles from a [`muscadet`][muscadet-class] object, including: log R ratios
 #' values, log odds ratio (or variant allele frequency), copy numbers, CNA
 #' status and cell fractions.
 #'
-#' @param x A \code{\link{muscadet}} object containing CNA calling data to be
-#'   visualized (generated using [muscadet::cnaCalling()]).
+#' @param x A [`muscadet`][muscadet-class] object containing CNA calling data to
+#'   be visualized (generated using [cnaCalling()]).
 #' @param data Either a cluster identifier to plot data of a cluster or
 #'   "allcells" to plot data on all cells.
 #' @param title An optional title for the plot. Default is `NULL`.
@@ -1688,12 +1693,12 @@ plotProfile <- function(x,
 #' Plot CNA segments across clusters from a muscadet object
 #'
 #' This function visualizes copy number alteration (CNA) segments across
-#' clusters based on data stored in a \code{\link{muscadet}} object. It displays
-#' CNAs for each clusters and scales the y-axis based on the proportion of cells
-#' in each cluster.
+#' clusters based on data stored in a [`muscadet`][muscadet-class] object. It
+#' displays CNAs for each clusters and scales the y-axis based on the proportion
+#' of cells in each cluster.
 #'
-#' @param x A \code{\link{muscadet}} object containing CNA calling data to be
-#'   visualized (generated using [muscadet::cnaCalling()]).
+#' @param x A [`muscadet`][muscadet-class] object containing CNA calling data to be
+#'   visualized (generated using [cnaCalling()]).
 #' @param title An optional title for the plot. Default is `NULL`.
 #' @param cna.colors A vector of 3 colors for CNA states: gain, loss, and cnloh
 #'   (or named vector where names are "gain", "loss", and "cnloh" and the values
@@ -1905,26 +1910,27 @@ plotCNA <- function(x,
 #' Plot UMAP Coordinates from a muscadet Object
 #'
 #' Visualize UMAP (Uniform Manifold Approximation and Projection) coordinates
-#' stored in a `muscadet` object. The function allows coloring by clusters and
-#' optionally adding cluster labels.
+#' stored in a [`muscadet`][muscadet-class] object. The function allows coloring
+#' by clusters and optionally adding cluster labels.
 #'
-#' @param x A \code{[muscadet::muscadet-class()]} object containing clustering data (using
-#'   [muscadet::clusterMuscadet()]).
+#' @param x A [`muscadet`][muscadet-class] object containing clustering data (using
+#'   [clusterMuscadet()]).
 #'
 #' @inheritParams heatmapMuscadet
 #'
 #' @param lab.x Label for the x-axis (`character` string). Default is "UMAP 1".
 #' @param lab.y Label for the y-axis (`character` string). Default is "UMAP 2".
 #' @param add_clusters_labels Logical. If `TRUE`, adds the cluster names as
-#'   text or boxed labels using [muscadet::add_labels()]. Default is `FALSE`.
+#'   text or boxed labels using [add_labels()]. Default is `FALSE`.
 #' @param point.size Numeric. Size of the points in the UMAP plot passed to
 #'   [ggplot2::geom_point()]. Default is `0.5`.
 #' @param legend.point.size Numeric. Size of the points in the legend of the
 #'   UMAP plot. Default is `3`.
-#' @param ... Additional arguments passed to [muscadet::add_labels()] providing
-#'   an underlying geom for label names ([ggplot2::geom_text()],
-#'   [ggplot2::geom_label()], [ggrepel::geom_text_repel()], or
-#'   [ggrepel::geom_label_repel()]).
+#' @param ... Additional arguments passed to [add_labels()] providing an
+#'   underlying geom for label names ([`geom_text`][ggplot2::geom_text()],
+#'   [`geom_label`][ggplot2::geom_label()],
+#'   [`geom_text_repel`][ggrepel::geom_text_repel()], or
+#'   [`geom_label_repel`][ggrepel::geom_label_repel()]).
 #'
 #' @return A `ggplot` object.
 #'
@@ -2061,14 +2067,14 @@ plotUMAP <- function(x,
 #'
 #' This function adds labels at the median position of each group to a ggplot
 #' object. Labels can be added either as plain text or as label boxes, with
-#' optional repelling to avoid overlaps (using the `ggrepel` package if
-#' installed).
+#' optional repelling to avoid overlaps (using the
+#' [`ggprepel`][ggrepel::ggrepel] package if installed).
 #'
 #' @param p A ggplot object with mapping and data (`ggplot`).
 #' @param labels Column name (unquoted) indicating the group label to display.
 #' @param color Color of the label text (`character`). Default is `"black"`.
 #' @param repel Logical. If `TRUE`(default), overlapping labels are repelled
-#'   using the [ggrepel::ggrepel] package.
+#'   using the [`ggprepel`][ggrepel::ggrepel] package.
 #' @param label.box Logical. If `TRUE` it uses a boxed label (`geom_label`)
 #'   instead of plain text (`geom_text`). Default is `FALSE`.
 #' @param size Size of the label text (`numeric`). Default is `2`.
@@ -2079,17 +2085,24 @@ plotUMAP <- function(x,
 #' - [ggrepel::geom_text_repel()] (`repel`= `TRUE` and `label.box` = `FALSE`)
 #' - [ggrepel::geom_label_repel()] (`repel`= `TRUE` and `label.box` = `TRUE`)
 #'
-#' @return A ggplot2 layer ([ggplot2::geom_text()], [ggplot2::geom_label()],
-#'   [ggrepel::geom_text_repel()], or [ggrepel::geom_label_repel()]).
+#' @return A ggplot2 layer  ([`geom_text`][ggplot2::geom_text()],
+#'   [`geom_label`][ggplot2::geom_label()],
+#'   [`geom_text_repel`][ggrepel::geom_text_repel()], or
+#'   [`geom_label_repel`][ggrepel::geom_label_repel()]).
 #'
 #' @details The function summarizes the data by computing the median x and y
 #' positions for each label group.
-#' If \code{repel = TRUE}, it uses \code{ggrepel::geom_text_repel()}
-#' (\code{label.box = FALSE}) or \code{ggrepel::geom_label_repel()}
-#' (\code{label.box = TRUE}).
-#' If \code{repel = FALSE}, it uses \code{ggplot2::geom_text()} (\code{label.box
-#' = FALSE}) or \code{ggplot2::geom_label()} (\code{label.box = TRUE}).
-#' If \code{repel = TRUE}, the `ggrepel` package must be installed.
+#'
+#' If \code{repel = TRUE}, it uses
+#' [`geom_text_repel()`][ggrepel::geom_text_repel()] (\code{label.box = FALSE})
+#' or [`geom_label_repel()`][ggrepel::geom_label_repel()] (\code{label.box =
+#' TRUE}).
+#'
+#' If \code{repel = FALSE}, it uses [`geom_text()`][ggplot2::geom_text()] (\code{label.box
+#' = FALSE}) or [`geom_label()`][ggplot2::geom_label()] (\code{label.box = TRUE}).
+#'
+#' If \code{repel = TRUE}, the [`ggprepel`][ggrepel::ggrepel] package must be
+#' installed.
 #'
 #' @importFrom rlang enquo as_label
 #' @import dplyr

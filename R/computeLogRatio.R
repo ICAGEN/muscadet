@@ -1,15 +1,16 @@
 #' Compute log R ratios
 #'
-#' Computes log R ratios from raw count matrices within \code{\link{muscadet}}
-#' objects. The log R ratios values are computed based on read counts from a
-#' sample \code{\link{muscadet}} object *versus* read counts a the `reference`
-#' \code{\link{muscadet}} object. In the output sample \code{\link{muscadet}}
-#' object, the newly computed matrix of log R ratios is added for the
-#' selected `omic`.
+#' Computes log R ratios from raw count matrices within
+#' [`muscadet`][muscadet-class] objects. The log R ratios values are computed
+#' based on read counts from a sample [`muscadet`][muscadet-class] object
+#' *versus* read counts a the `reference` [`muscadet`][muscadet-class] object.
+#' In the output sample [`muscadet`][muscadet-class] object, the newly computed
+#' matrix of log R ratios is added for the selected `omic`.
 #'
-#' @param x A \code{\link{muscadet}} object containing sample data (`muscadet`).
-#' @param reference Another \code{\link{muscadet}} object containing reference
-#'   data (`muscadet`).
+#' @param x A [`muscadet`][muscadet-class] object containing sample data
+#'   (`muscadet`).
+#' @param reference Another [`muscadet`][muscadet-class] object containing
+#'   reference data (`muscadet`).
 #' @param omic Name of the omic to apply this function (`character` string).
 #' @param method Method to apply to the selected omic (`character` string).
 #'   Supported methods are "ATAC" and "RNA":
@@ -26,9 +27,9 @@
 #'   will keep raw count matrices within the object.
 #' @param all_steps Logical value to indicate whether matrices at each step of
 #'   the log ratio computation are kept and returned (`logical`). IMPORTANT: if
-#'   `TRUE`, the function does not return an updated `muscadet` object but a
-#'   list with matrices at each step of the log ratio computation (see Value
-#'   section). Default is `FALSE`.
+#'   `TRUE`, the function does not return an updated
+#'   [`muscadet`][muscadet-class] object but a list with matrices at each step
+#'   of the log ratio computation (see Value section). Default is `FALSE`.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
@@ -36,8 +37,8 @@
 #' @inheritDotParams computeLogRatioRNA genesPerWindow refReads refMeanReads thresh_capping
 #'
 #' @return
-#' A \code{\link{muscadet}} object corresponding to the sample
-#' \code{\link{muscadet}} object (`x`) containing the computed log R ratio
+#' A [`muscadet`][muscadet-class] object corresponding to the sample
+#' [`muscadet`][muscadet-class] object (`x`) containing the computed log R ratio
 #' matrix in the `coverage` slot of the selected `omic`.
 #'
 #' If the `all_steps` argument is set to `TRUE`, it returns a list with intermediate

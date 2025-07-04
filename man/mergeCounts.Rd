@@ -7,12 +7,12 @@
 mergeCounts(x, reference, nor.het = TRUE, quiet = FALSE)
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing sample data (\code{muscadet}).
-This object must include clustering assignments in the
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing sample data
+(\code{muscadet}). This object must include clustering assignments in the
 \code{cnacalling$clusters} slot.}
 
-\item{reference}{A \code{\link{muscadet}} object containing reference data
-(\code{muscadet}).}
+\item{reference}{A \code{\link[=muscadet-class]{muscadet}} object containing reference
+data (\code{muscadet}).}
 
 \item{nor.het}{A logical value to specify if normal reference allele counts
 are modified to: total normal depth counts divided by 2, to force these
@@ -25,8 +25,8 @@ and allelic data. Default is \code{TRUE}.}
 execution. Default is \code{FALSE}.}
 }
 \value{
-A modified \code{\link{muscadet}} object corresponding to the \code{x} muscadet object,
-with updated \code{cnacalling} slot containing:
+A modified \code{\link[=muscadet-class]{muscadet}} object corresponding to the \code{x}
+\code{\link[=muscadet-class]{muscadet}} object, with updated \code{cnacalling} slot containing:
 \itemize{
 \item \code{allelic.counts}: Processed allelic counts on variant positions, for all omics.
 \item \code{coverage.counts}: Processed coverage counts merged with the reference.
@@ -48,7 +48,7 @@ This function combines allelic (counts at variant positions, either common
 SNPs or individual-specific heterozygous positions) and coverage counts
 (counts on features) from all omics per cluster for both sample and
 reference. The resulting merged data is stored in the \code{cnacalling} slot of
-the sample \code{muscadet} object.
+the sample \code{\link[=muscadet-class]{muscadet}} object.
 }
 \examples{
 # Load example muscadet object

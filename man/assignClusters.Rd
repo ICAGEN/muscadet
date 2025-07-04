@@ -14,13 +14,13 @@ assignClusters(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object (\code{muscadet}).}
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object (\code{muscadet}).}
 
 \item{partition}{Value specifying the clustering partition to choose from the
-muscadet object (\code{numeric} or \code{character}). It should be either the resolution or the
-k number of cluster (k) used for clustering depending on the clustering
-method (\code{res_range} or \code{k_range} with \code{\link[=clusterMuscadet]{clusterMuscadet()}}).
-Should be provided if \code{clusters} is \code{NULL}.}
+\code{\link[=muscadet-class]{muscadet}} object (\code{numeric} or \code{character}). It should
+be either the resolution or the k number of cluster (k) used for clustering
+depending on the clustering method (\code{res_range} or \code{k_range} with
+\code{\link[=clusterMuscadet]{clusterMuscadet()}}). Should be provided if \code{clusters} is \code{NULL}.}
 
 \item{clusters}{A custom named vector of cluster assignments (\code{vector}). The
 vector names must match cell names in the muscadet object \code{x}, at least
@@ -43,19 +43,19 @@ use for imputation (\code{integer}). Must be a positive integer. Default is
 \code{10}.}
 }
 \value{
-A \code{\link{muscadet}} object updated with the user chosen cluster
-assignments in \code{muscadet_obj$cnacalling$clusters}.
+A \code{\link[=muscadet-class]{muscadet}} object updated with the user chosen
+cluster assignments in \code{muscadet_obj$cnacalling$clusters}.
 }
 \description{
 Add the user selected cluster assignments to cells in a
-\code{\link{muscadet}} object. This function allows the user to choose the
+\code{\link[=muscadet-class]{muscadet}} object. This function allows the user to choose the
 cluster assignments they consider to fit the data and their requirements, or
 cluster assignments based on other data and methods.
 }
 \details{
 \itemize{
-\item The clusters can be taken directly from the \code{muscadet} object clustering
-results with setting the \code{partition} argument (e.g.
+\item The clusters can be taken directly from the \code{\link[=muscadet-class]{muscadet}}
+object clustering results with setting the \code{partition} argument (e.g.
 \code{muscadet_obj$clustering$clusters[["0.8"]]} for res=\code{0.8}).
 \item A custom vector of cluster assignments
 can be attributed using the \code{clusters} argument.

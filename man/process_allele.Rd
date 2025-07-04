@@ -76,10 +76,12 @@ data <- process_allele(sc_data, vcf = vcf_data, samplename = "sampleA")
 
 }
 \references{
-\href{https://horvathlab.github.io/NGS/SCReadCounts/}{SCReadCounts}
-
+\describe{
+\item{\href{https://horvathlab.github.io/NGS/SCReadCounts/}{SCReadCounts}}{
 Liu, H., Bousounis, P., Movassagh, M., Edwards, N., and Horvath, A.
 SCReadCounts: estimation of cell-level SNVs expression from scRNA-seq data.
 BMC Genomics 22, 689 (2021).
 doi: \href{https://doi.org/10.1186/s12864-021-07974-8}{10.1186/s12864-021-07974-8}
+}
+}
 }

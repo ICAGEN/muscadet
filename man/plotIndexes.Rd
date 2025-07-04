@@ -7,7 +7,7 @@
 plotIndexes(x, index = NULL, colors = NULL, title = NULL)
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing clustering data
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing clustering data
 (generated using \code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
 
 \item{index}{Character vector specifying one or more validation indexes to
@@ -28,29 +28,30 @@ depending on the used clustering method).
 }
 \description{
 It generates a plot of clustering validation indexes for a clustering
-partition within a \code{muscadet} object. The index values are computed only using
-distances between common cells across omics in the \code{muscadet} object.
+partition within a \code{\link[=muscadet-class]{muscadet}} object. The index values are
+computed only using distances between common cells across omics in the
+\code{\link[=muscadet-class]{muscadet}} object.
 }
 \details{
 The function computes several clustering validation indexes,
 including:
 \itemize{
 \item \strong{Silhouette}: Measures how similar an object is to its own
-cluster compared to others (see \link[cluster:silhouette]{cluster::silhouette}). Average of
+cluster compared to others (see \code{\link[cluster:silhouette]{cluster::silhouette()}}). Average of
 individual silhouette widths.
 \item \strong{Dunn2}: The ratio of the smallest distance between
 observations in different clusters to the largest within-cluster distance
-(see \link[fpc:cluster.stats]{fpc::cluster.stats} \verb{$dunn2}). Minimum average dissimilarity
+(see \code{\link[fpc:cluster.stats]{fpc::cluster.stats()}} \verb{$dunn2}). Minimum average dissimilarity
 between two cluster / maximum average within cluster dissimilarity.
 \item \strong{Davies-Bouldin}: Measures cluster compactness and
-separation (see \link[clusterSim:index.DB]{clusterSim::index.DB}).
+separation (see \code{\link[clusterSim:index.DB]{clusterSim::index.DB()}}).
 \item \strong{Pearson's Gamma}: Evaluates the goodness of clustering
-based on correlation (see \link[fpc:cluster.stats]{fpc::cluster.stats} \verb{$pearsongamma}).
+based on correlation (see \code{\link[fpc:cluster.stats]{fpc::cluster.stats()}} \verb{$pearsongamma}).
 Correlation between distances and a 0-1-vector where 0 means same
 cluster, 1 means different clusters. "Normalized gamma" in Halkidi et al.
 (2001).
 \item \strong{C Index} (Hubert & Levin C index): Measures the internal
-cluster quality compared to random data (see \link[clusterSim:index.C]{clusterSim::index.C}).
+cluster quality compared to random data (see \code{\link[clusterSim:index.C]{clusterSim::index.C()}}).
 }
 
 If multiple indexes are selected, the values are normalized to fall between

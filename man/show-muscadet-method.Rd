@@ -7,14 +7,14 @@
 \S4method{show}{muscadet}(object)
 }
 \arguments{
-\item{object}{A \code{[muscadet::muscadet()]} object.}
+\item{object}{A \code{\link[=muscadet-class]{muscadet}} object.}
 }
 \value{
 Prints summary to \code{\link[base]{stdout}} and invisibly returns
 \code{NULL}
 }
 \description{
-Overview of a \code{[muscadet::muscadet()]} object.
+Overview of a \code{\link[=muscadet-class]{muscadet}} object.
 }
 \examples{
 # Load example muscadet object
@@ -31,6 +31,6 @@ show(slot(muscadet_obj, "omics")[[1]])
 
 }
 \seealso{
-\code{[muscadet::muscadet-class()]}, \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
+\linkS4class{muscadet}, \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
 }
 \keyword{internal}

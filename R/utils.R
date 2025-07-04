@@ -1,17 +1,17 @@
 #' Assign a cluster assignment to a `muscadet` object
 #'
 #' Add the user selected cluster assignments to cells in a
-#' \code{\link{muscadet}} object. This function allows the user to choose the
+#' [`muscadet`][muscadet-class] object. This function allows the user to choose the
 #' cluster assignments they consider to fit the data and their requirements, or
 #' cluster assignments based on other data and methods.
 #'
-#' @param x A \code{\link{muscadet}} object (`muscadet`).
+#' @param x A [`muscadet`][muscadet-class] object (`muscadet`).
 #'
 #' @param partition Value specifying the clustering partition to choose from the
-#'   muscadet object (`numeric` or `character`). It should be either the resolution or the
-#'   k number of cluster (k) used for clustering depending on the clustering
-#'   method (`res_range` or `k_range` with [muscadet::clusterMuscadet()]).
-#'   Should be provided if `clusters` is `NULL`.
+#'   [`muscadet`][muscadet-class] object (`numeric` or `character`). It should
+#'   be either the resolution or the k number of cluster (k) used for clustering
+#'   depending on the clustering method (`res_range` or `k_range` with
+#'   [clusterMuscadet()]). Should be provided if `clusters` is `NULL`.
 #'
 #' @param clusters A custom named vector of cluster assignments (`vector`). The
 #'   vector names must match cell names in the muscadet object `x`, at least
@@ -33,16 +33,16 @@
 #' @inheritParams imputeClusters
 #'
 #' @details
-#' - The clusters can be taken directly from the `muscadet` object clustering
-#' results with setting the `partition` argument (e.g.
+#' - The clusters can be taken directly from the [`muscadet`][muscadet-class]
+#' object clustering results with setting the `partition` argument (e.g.
 #' `muscadet_obj$clustering$clusters[["0.8"]]` for res=`0.8`).
 #' - A custom vector of cluster assignments
 #' can be attributed using the `clusters` argument.
 #' - Either way, the clusters assignments can be rearranged using the `mapping`
 #' argument.
 #'
-#' @return A \code{\link{muscadet}} object updated with the user chosen cluster
-#' assignments in `muscadet_obj$cnacalling$clusters`.
+#' @return A [`muscadet`][muscadet-class] object updated with the user chosen
+#'   cluster assignments in `muscadet_obj$cnacalling$clusters`.
 #'
 #' @include objects.R
 #'
@@ -211,10 +211,10 @@ assignClusters <- function(x,
 #' Add allele counts to a `muscadet` object
 #'
 #' This function adds allele counts data to the `omics` of a
-#' \code{\link{muscadet}} object. The data frames in the `allele_counts` list
+#' [`muscadet`][muscadet-class] object. The data frames in the `allele_counts` list
 #' are assigned to the `allelic` slots of `omics`.
 #'
-#' @param x A \code{\link{muscadet}} object.
+#' @param x A [`muscadet`][muscadet-class] object.
 #' @param allele_counts A list of data frames where each data frame contains
 #'   allele counts for a specific omic (`list`). The list must have the same
 #'   length and order as the number of omics in the `x` object. Each data frames
@@ -222,7 +222,7 @@ assignClusters <- function(x,
 #'   `ALT`, `RD`, `AD`, `DP`, `GT`. See [allele_counts] for details.
 #'
 #' @return
-#' A modified \code{\link{muscadet}} object with updated allele counts in the
+#' A modified [`muscadet`][muscadet-class] object with updated allele counts in the
 #' `allelic` slot of each `muscomic` object in the `omics` slot.
 #'
 #' @note
@@ -230,7 +230,7 @@ assignClusters <- function(x,
 #' ratios and cell clustering, they are not mandatory at the creation of
 #' `muscomic` and `muscadet` objects. The allele counts data can be added to
 #' objects later with this `addAlleleCounts` function, before using the
-#' [muscadet::mergeCounts()] function.
+#' [mergeCounts()] function.
 #'
 #' This function is also useful to add allele counts for individual-specific
 #' variant positions to a common `muscadet` object, for example for the
@@ -240,7 +240,7 @@ assignClusters <- function(x,
 #' counts at individual-specific variant positions (e.g. found by bulk
 #' sequencing) before Copy Number Alterations (CNAs) calling.
 #'
-#' @seealso [muscadet::CreateMuscomicObject()], [muscadet::mergeCounts()]
+#' @seealso [CreateMuscomicObject()], [mergeCounts()]
 #'
 #' @importFrom stringr str_remove
 #' @importFrom gtools mixedsort
@@ -309,13 +309,13 @@ addAlleleCounts <- function(x, allele_counts) {
 #' SNPs or individual-specific heterozygous positions) and coverage counts
 #' (counts on features) from all omics per cluster for both sample and
 #' reference. The resulting merged data is stored in the `cnacalling` slot of
-#' the sample `muscadet` object.
+#' the sample [`muscadet`][muscadet-class] object.
 #'
-#' @param x A \code{\link{muscadet}} object containing sample data (`muscadet`).
-#'   This object must include clustering assignments in the
+#' @param x A [`muscadet`][muscadet-class] object containing sample data
+#'   (`muscadet`). This object must include clustering assignments in the
 #'   `cnacalling$clusters` slot.
-#' @param reference A \code{\link{muscadet}} object containing reference data
-#'   (`muscadet`).
+#' @param reference A [`muscadet`][muscadet-class] object containing reference
+#'   data (`muscadet`).
 #' @param nor.het A logical value to specify if normal reference allele counts
 #'   are modified to: total normal depth counts divided by 2, to force these
 #'   positions to be heterozygous in the normal reference in allelic data (e.g.
@@ -326,8 +326,8 @@ addAlleleCounts <- function(x, allele_counts) {
 #'   execution. Default is `FALSE`.
 #'
 #' @return
-#' A modified \code{\link{muscadet}} object corresponding to the `x` muscadet object,
-#' with updated `cnacalling` slot containing:
+#' A modified [`muscadet`][muscadet-class] object corresponding to the `x`
+#' [`muscadet`][muscadet-class] object, with updated `cnacalling` slot containing:
 #' \itemize{
 #'   \item \code{allelic.counts}: Processed allelic counts on variant positions, for all omics.
 #'   \item \code{coverage.counts}: Processed coverage counts merged with the reference.
@@ -699,12 +699,14 @@ save_as_vcf <- function(data, file, header = NULL) {
 #' - [Variant Call Format (VCF) format](https://en.wikipedia.org/wiki/Variant_Call_Format)
 #'
 #' @references
-#' [SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)
-#'
-#' Liu, H., Bousounis, P., Movassagh, M., Edwards, N., and Horvath, A.
-#' SCReadCounts: estimation of cell-level SNVs expression from scRNA-seq data.
-#' BMC Genomics 22, 689 (2021).
-#' doi: [10.1186/s12864-021-07974-8](https://doi.org/10.1186/s12864-021-07974-8)
+#' \describe{
+#'   \item{[SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)}{
+#'   Liu, H., Bousounis, P., Movassagh, M., Edwards, N., and Horvath, A.
+#'   SCReadCounts: estimation of cell-level SNVs expression from scRNA-seq data.
+#'   BMC Genomics 22, 689 (2021).
+#'   doi: [10.1186/s12864-021-07974-8](https://doi.org/10.1186/s12864-021-07974-8)
+#'   }
+#' }
 #'
 #' @examples
 #'

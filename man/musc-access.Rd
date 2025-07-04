@@ -29,7 +29,7 @@
 \method{$}{muscomic}(x, i) <- value
 }
 \arguments{
-\item{x}{A \code{[muscadet::muscadet()]} or \code{[muscadet::muscomic()]}
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} or \code{\link[=muscomic-class]{muscomic}}
 object.}
 
 \item{i}{The name of the slot (or omic).}

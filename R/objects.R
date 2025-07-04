@@ -48,11 +48,11 @@ methods::setClass(
 
 #' The muscadet class
 #'
-#' A `muscadet` object encapsulates data from different single-cell omics
-#' as \code{[muscadet::muscomic()]} objects as well as downstream analysis results after
-#' clustering and CNA calling.
+#' A `muscadet` object encapsulates data from different single-cell omics as
+#' [`muscomic`][muscomic-class] objects as well as downstream analysis results
+#' after clustering and CNA calling.
 #'
-#' @slot omics List of \code{[muscadet::muscomic()]} objects, one per single-cell omic
+#' @slot omics List of [`muscomic`][muscomic-class] objects, one per single-cell omic
 #'   (`list`).
 #' @slot bulk.data List of objects containing data from paired bulk sequencing
 #'   (`list`).
@@ -98,9 +98,9 @@ methods::setClass(
 # Create objects functions -----------------------------------------------------
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#' Create a muscomic object
+#' Create a `muscomic` object
 #'
-#' Create a \code{[muscadet::muscomic()]} object.
+#' Create a [`muscomic`][muscomic-class] object.
 #'
 #' @param type Type of single cell omic, either "ATAC" or "RNA"
 #'   (`character` string).
@@ -123,7 +123,7 @@ methods::setClass(
 #'   heterozygous positions retrieved from bulk sequencing. The data frame format
 #'   is based on the Variant Calling Format (VCF), thereby it must contain the
 #'   following columns : `cell`, `id`, `CHROM`, `POS`, `REF`, `ALT`, `RD`, `AD`,
-#'   `DP`, (`GT`). See [muscadet::allele_counts()] for details.
+#'   `DP`, (`GT`). See [allele_counts()] for details.
 #' @param label.omic Label for the single cell omic (`character` string). By
 #'   default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"
 #'   type.
@@ -131,7 +131,7 @@ methods::setClass(
 #'   "peaks" is used for "ATAC" type and "genes" for "RNA" type.
 #'
 #' @return
-#' A \code{[muscadet::muscomic()]} object.
+#' A [`muscomic`][muscomic-class] object.
 #'
 #' @import dplyr
 #' @importClassesFrom Matrix dgCMatrix
@@ -145,7 +145,7 @@ methods::setClass(
 #'
 #' @seealso
 #' * [CreateMuscadetObject()]
-#' * \code{[muscadet::muscomic-class()]}, \code{[muscadet::muscadet-class()]}
+#' * [muscomic-class], [muscadet-class]
 #'
 #' @examples
 #' atac <- CreateMuscomicObject(
@@ -307,11 +307,11 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 }
 
 
-#' Create a muscadet object
+#' Create a `muscadet` object
 #'
-#' Create a \code{\[muscadet::muscadet()]} object.
+#' Create a [`muscadet`][muscadet-class] object.
 #'
-#' @param omics A list of \code{[muscadet::muscomic()]} objects (`list`). The
+#' @param omics A list of [`muscomic`][muscomic-class] objects (`list`). The
 #'   names of the list will set the names of omics in the final object, if the
 #'   list is unamed, the type is taken instead.
 #' @param bulk.lrr A data frame containing log R ratio per genomic segments from
@@ -323,20 +323,20 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 #'   (`character` string). "hg38" by default.
 #'
 #' @return
-#' A \code{[muscadet::muscadet()]} object.
+#' A [`muscadet`][muscadet-class] object.
 #'
 #' @importFrom stats setNames ave
 #' @importFrom methods new
 #'
 #' @export
 #'
-#' @note A \code{[muscadet::muscadet()]} object can contain several
-#'   \code{[muscadet::muscomic()]} objects of the same type (`ATAC` or `RNA` for slot
-#'   `type`) but they can't have identical labels (slot `label.omic`).
+#' @note A [`muscadet`][muscadet-class] object can contain several
+#'   [`muscomic`][muscomic-class] objects of the same type (`ATAC` or `RNA` for
+#'   slot `type`) but they can't have identical labels (slot `label.omic`).
 #'
 #' @seealso
 #' * [CreateMuscomicObject()]
-#' * \code{[muscadet::muscomic-class()]}, \code{[muscadet::muscadet-class()]}
+#' * [muscomic-class], [muscadet-class]
 #'
 #' @examples
 #' # Create muscomic objects
@@ -463,7 +463,7 @@ CreateMuscadetObject <- function(omics,
 #' @title Autocompletion for `$` access on `muscadet` or `muscomic` objects
 #'
 #' @description Enable autocompletion for `$` access for
-#'   \code{[muscadet::muscadet()]} or \code{[muscadet::muscomic()]} objects. For
+#'   [`muscadet`][muscadet-class] or [`muscomic`][muscomic-class] objects. For
 #'   `muscadet` objects, it also lists omic datasets contained inside the
 #'   `omics` slot.
 #'
@@ -471,7 +471,7 @@ CreateMuscadetObject <- function(omics,
 #' @rdname musc-auto
 #'
 #' @inheritParams utils::.DollarNames
-#' @param x A \code{[muscadet::muscadet()]} or \code{[muscadet::muscomic()]}
+#' @param x A [`muscadet`][muscadet-class] or [`muscomic`][muscomic-class]
 #'   object.
 #'
 #' @return Character vector of matching element names.
@@ -739,16 +739,16 @@ CreateMuscadetObject <- function(omics,
 
 #' muscomic object overview
 #'
-#' Overview of a \code{[muscadet::muscomic()]} object.
+#' Overview of a [`muscomic`][muscomic-class] object.
 #'
-#' @param object A \code{[muscadet::muscomic()]} object.
+#' @param object A [`muscomic`][muscomic-class] object.
 #'
 #' @return Prints summary to \code{\link[base]{stdout}} and invisibly returns
 #'   \code{NULL}
 #'
 #' @keywords internal
 #'
-#' @seealso \code{[muscadet::muscomic-class()]}, [CreateMuscomicObject()]
+#' @seealso [muscomic-class], [CreateMuscomicObject()]
 #'
 #' @examples
 #' atac <- CreateMuscomicObject(
@@ -795,9 +795,9 @@ setMethod(
 
 #' muscadet object overview
 #'
-#' Overview of a \code{[muscadet::muscadet()]} object.
+#' Overview of a [`muscadet`][muscadet-class] object.
 #'
-#' @param object A \code{[muscadet::muscadet()]} object.
+#' @param object A [`muscadet`][muscadet-class] object.
 #'
 #' @return Prints summary to \code{\link[base]{stdout}} and invisibly returns
 #'   \code{NULL}
@@ -806,7 +806,7 @@ setMethod(
 #'
 #' @keywords internal
 #'
-#' @seealso \code{[muscadet::muscadet-class()]}, [CreateMuscadetObject()]
+#' @seealso [muscadet-class], [CreateMuscadetObject()]
 #'
 #' @examples
 #' # Load example muscadet object
@@ -894,11 +894,11 @@ setMethod(
 
 # Other methods ----------------------------------------------------------------
 
-#' Methods for \code{[muscadet::muscomic()]} and \code{[muscadet::muscadet()]}
+#' Methods for [`muscomic`][muscomic-class] and [`muscadet`][muscadet-class]
 #' objects
 #'
-#' Methods to facilitate access to data within the \code{[muscadet::muscomic()]}
-#' and \code{[muscadet::muscadet()]} objects.
+#' Methods to facilitate access to data within the [`muscomic`][muscomic-class]
+#' and [`muscadet`][muscadet-class] objects.
 #' - `Cells()`: Get cell identifiers (addition of methods for `muscomic` and
 #' `muscadet` to [SeuratObject::Cells()]).
 #' - `Features()`: Get feature identifiers (addition of methods for `muscomic`
@@ -911,12 +911,11 @@ setMethod(
 #' @rdname muscadet-methods
 #' @aliases muscomic-methods
 #'
-#' @param x A \code{[muscadet::muscomic()]} or \code{[muscadet::muscadet()]}
+#' @param x A [`muscomic`][muscomic-class] or [`muscadet`][muscadet-class]
 #'   object.
 #' @param ... Other arguments (ignored).
 #'
-#' @seealso \code{[muscadet::muscomic-class()]}
-#'   \code{[muscadet::muscadet-class()]}
+#' @seealso [muscomic-class], [muscadet-class]
 #'
 #' @examples
 #' library("SeuratObject")

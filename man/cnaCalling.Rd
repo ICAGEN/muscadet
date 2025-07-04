@@ -4,10 +4,17 @@
 \alias{cnaCalling}
 \title{Copy Number Alteration (CNA) Calling from muscadet object}
 \source{
-This function uses several functions from the \code{\link[facets:facets-package]{facets::facets()}} package,
-including: \code{\link[facets:facets-internal]{facets::clustersegs()}}, \code{\link[facets:emcncf]{facets::emcncf()}},
-\code{\link[facets:facets-internal]{facets::findDiploidLogR()}}, \code{\link[facets:fitcncf]{facets::fitcncf()}}, \code{\link[facets:procSample]{facets::procSample()}},
-\code{\link[facets:facets-internal]{facets::procSnps()}}, and adapted function \code{\link[=preProcSample2]{preProcSample2()}}.
+This function uses several functions from the
+\code{\link[facets:facets-package]{facets}} package, including:
+\itemize{
+\item \code{\link[facets:facets-internal]{facets::clustersegs()}}
+\item \code{\link[facets:emcncf]{facets::emcncf()}}
+\item \code{\link[facets:facets-internal]{facets::findDiploidLogR()}}
+\item \code{\link[facets:fitcncf]{facets::fitcncf()}}
+\item \code{\link[facets:procSample]{facets::procSample()}}
+\item \code{\link[facets:facets-internal]{facets::procSnps()}}
+\item adapted function \code{\link[=preProcSample2]{preProcSample2()}}
+}
 
 Seshan VE, Shen R (2021). \emph{facets: Cellular Fraction and Copy Numbers from
 Tumor Sequencing}. R package version 0.6.2,
@@ -39,7 +46,7 @@ cnaCalling(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object. Must contain:
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object. Must contain:
 \itemize{
 \item Clustering assignments in the \code{cnacalling$clusters} slot
 (use \code{\link[=assignClusters]{assignClusters()}}).
@@ -113,7 +120,7 @@ log ratio is estimated automatically from the data.}
 execution. Default is \code{FALSE}.}
 }
 \value{
-A modified \code{\link{muscadet}} object with added CNA analysis results in
+A modified \code{\link[=muscadet-class]{muscadet}} object with added CNA analysis results in
 the \code{cnacalling} slot, including: filtered counts and positions, segmentation
 data for clusters and all cells, consensus segments across clusters based on
 breakpoints, diploid log R ratio, purity and ploidy.
@@ -184,9 +191,9 @@ computed with EM algorithm), \code{ncells} (number of cells in cluster),
 }
 }
 \description{
-Performs copy number alteration (CNA) analysis on a \code{\link{muscadet}}
-object by processing allelic and coverage counts across clusters and
-evaluating cell fractions and copy numbers.
+Performs copy number alteration (CNA) analysis on a
+\code{\link[=muscadet-class]{muscadet}} object by processing allelic and coverage counts
+across clusters and evaluating cell fractions and copy numbers.
 }
 \examples{
 library("facets")
@@ -204,12 +211,14 @@ muscadet_obj <- cnaCalling(muscadet_obj,
 
 }
 \references{
-Shen R, Seshan VE. FACETS: allele-specific copy number and clonal
-heterogeneity analysis tool for high-throughput DNA sequencing. Nucleic
-Acids Res. 2016 Sep 19;44(16):e131. doi:
-\href{http://doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}.
+\describe{
+\item{\code{\link[facets:facets-package]{facets}} package}{Shen R, Seshan VE. FACETS:
+allele-specific copy number and clonal heterogeneity analysis tool for
+high-throughput DNA sequencing. Nucleic Acids Res. 2016 Sep 19;44(16):e131.
+doi: \href{https://www.doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}. PMID:
+27270079; PMCID: PMC5027494.}
+}
 }
 \seealso{
-\code{\link[=assignClusters]{assignClusters()}}, \code{\link[=mergeCounts]{mergeCounts()}},
-\code{\link[=preProcSample2]{preProcSample2()}}
+\code{\link[=assignClusters]{assignClusters()}}, \code{\link[=mergeCounts]{mergeCounts()}},\code{\link[=preProcSample2]{preProcSample2()}}
 }

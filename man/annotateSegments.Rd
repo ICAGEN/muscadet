@@ -93,5 +93,5 @@ print(table)
 
 }
 \seealso{
-\code{\link[=getSegConsensus]{getSegConsensus()}}, \code{\link[=cnaCalling]{cnaCalling()}}
+\code{\link[=getSegConsensus]{getSegConsensus()}}, \code{\link[=cnaCalling]{cnaCalling()}}.
 }

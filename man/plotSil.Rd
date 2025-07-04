@@ -7,7 +7,7 @@
 plotSil(x, partition, colors = NULL, title = NULL, annotations = TRUE)
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing clustering data (using
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing clustering data (using
 \code{\link[=clusterMuscadet]{clusterMuscadet()}}).}
 
 \item{partition}{Value specifying the clustering partition to plot (\code{numeric}
@@ -29,7 +29,7 @@ A ggplot object representing the silhouette plot.
 }
 \description{
 Generate a silhouette plot for a specified clustering partition within a
-\code{muscadet} object.
+\code{\link[=muscadet-class]{muscadet}} object.
 }
 \examples{
 \dontrun{

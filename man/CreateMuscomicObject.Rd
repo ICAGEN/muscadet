@@ -2,7 +2,7 @@
 % Please edit documentation in R/objects.R
 \name{CreateMuscomicObject}
 \alias{CreateMuscomicObject}
-\title{Create a muscomic object}
+\title{Create a \code{muscomic} object}
 \usage{
 CreateMuscomicObject(
   type = c("ATAC", "RNA"),
@@ -48,10 +48,10 @@ type.}
 "peaks" is used for "ATAC" type and "genes" for "RNA" type.}
 }
 \value{
-A \code{[muscadet::muscomic()]} object.
+A \code{\link[=muscomic-class]{muscomic}} object.
 }
 \description{
-Create a \code{[muscadet::muscomic()]} object.
+Create a \code{\link[=muscomic-class]{muscomic}} object.
 }
 \examples{
 atac <- CreateMuscomicObject(
@@ -97,6 +97,6 @@ atac2
 \seealso{
 \itemize{
 \item \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
-\item \code{[muscadet::muscomic-class()]}, \code{[muscadet::muscadet-class()]}
+\item \linkS4class{muscomic}, \linkS4class{muscadet}
 }
 }

@@ -6,9 +6,10 @@
 \alias{muscadet_obj_ref}
 \title{Example data: muscadet objects}
 \format{
-\code{\link{muscadet}} objects with the following slots:
+\code{\link[=muscadet-class]{muscadet}} objects with the following slots:
 \describe{
-\item{\code{omics}}{List of \code{\link{muscomic}} objects, one per single-cell omic (\code{list}).}
+\item{\code{omics}}{List of \code{\link[=muscomic-class]{muscomic}} objects, one per
+single-cell omic (\code{list}).}
 \item{\code{bulk.data}}{List of data from paired bulk sequencing (\code{list}).}
 \item{\code{clustering}}{List of data associated with the clustering of cells
 based on coverage log R ratio values (\code{list}).}
@@ -23,7 +24,7 @@ muscadet_obj
 muscadet_obj_ref
 }
 \description{
-\code{\link{muscadet}} objects, containing two
+\code{\link[=muscadet-class]{muscadet}} objects, containing two
 single-cell omic datasets: scATAC-seq and scRNA-seq.
 \itemize{
 \item \code{muscadet_obj} with tumor cells data: sample cells

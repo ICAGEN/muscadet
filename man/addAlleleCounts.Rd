@@ -7,7 +7,7 @@
 addAlleleCounts(x, allele_counts)
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object.}
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object.}
 
 \item{allele_counts}{A list of data frames where each data frame contains
 allele counts for a specific omic (\code{list}). The list must have the same
@@ -16,12 +16,12 @@ must contain the following columns : \code{cell}, \code{id}, \code{CHROM}, \code
 \code{ALT}, \code{RD}, \code{AD}, \code{DP}, \code{GT}. See \link{allele_counts} for details.}
 }
 \value{
-A modified \code{\link{muscadet}} object with updated allele counts in the
+A modified \code{\link[=muscadet-class]{muscadet}} object with updated allele counts in the
 \code{allelic} slot of each \code{muscomic} object in the \code{omics} slot.
 }
 \description{
 This function adds allele counts data to the \code{omics} of a
-\code{\link{muscadet}} object. The data frames in the \code{allele_counts} list
+\code{\link[=muscadet-class]{muscadet}} object. The data frames in the \code{allele_counts} list
 are assigned to the \code{allelic} slots of \code{omics}.
 }
 \note{

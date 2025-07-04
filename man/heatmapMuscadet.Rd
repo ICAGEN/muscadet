@@ -21,8 +21,8 @@ heatmapMuscadet(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing LRR data for all omics
-(with \code{\link[=computeLogRatio]{computeLogRatio()}}) and clustering data (with
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing LRR data for all
+omics (with \code{\link[=computeLogRatio]{computeLogRatio()}}) and clustering data (with
 \code{\link[=clusterMuscadet]{clusterMuscadet()}}) (\code{muscadet}).}
 
 \item{filename}{(Optional) Character string specifying the file path to save
@@ -59,16 +59,18 @@ cluster. Default is \code{FALSE}.}
 string). Default is an empty character string.}
 
 \item{row_annots}{Optional. A list of
-\code{\link[ComplexHeatmap:HeatmapAnnotation-class]{ComplexHeatmap::HeatmapAnnotation-class()}} objects from the
-\code{\link[ComplexHeatmap:ComplexHeatmap-package]{ComplexHeatmap::ComplexHeatmap-package()}} package, specifying row annotations to
-add on left part of the heatmap. Each element in the list must be of class
-\code{\link[ComplexHeatmap:HeatmapAnnotation-class]{ComplexHeatmap::HeatmapAnnotation-class()}}, must be a row annotation
-(using \code{\link[ComplexHeatmap:rowAnnotation]{ComplexHeatmap::rowAnnotation()}} or
-\code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}} with \code{which = 'row'}), and must have
-a unique name (\code{name} argument in \code{\link[ComplexHeatmap:rowAnnotation]{ComplexHeatmap::rowAnnotation()}} or
-\code{\link[ComplexHeatmap:HeatmapAnnotation]{ComplexHeatmap::HeatmapAnnotation()}}). If \code{averages = FALSE}, annotations
-must concern cells, while if \code{averages = TRUE} they must concern clusters.
-Default is \code{NULL}, no row annotations is added.}
+\code{\link[ComplexHeatmap:HeatmapAnnotation-class]{HeatmapAnnotation}} objects from
+the \code{\link[ComplexHeatmap:ComplexHeatmap-package]{ComplexHeatmap}} package,
+specifying row annotations to add on left part of the heatmap. Each element
+in the list must be of class
+\code{\link[ComplexHeatmap:HeatmapAnnotation-class]{HeatmapAnnotation}}, must be a row
+annotation (using \code{\link[ComplexHeatmap:rowAnnotation]{rowAnnotation()}} or
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}} with
+\code{which = 'row'}), and must have a unique name (\code{name} argument in
+\code{\link[ComplexHeatmap:rowAnnotation]{rowAnnotation()}} or
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}}). If
+\code{averages =FALSE}, annotations must concern cells, while if \code{averages = TRUE}
+they must concern clusters. Default is \code{NULL}, no row annotations is added.}
 
 \item{white_scale}{Numeric vector of length 2 or a list of numeric vectors
 (\code{numeric} vector or \code{list}).
@@ -100,9 +102,10 @@ execution. Default is \code{FALSE}.}
 \value{
 A list containing:
 \itemize{
-\item \code{plot}: A \code{\link{gTree}} object created with \code{\link[grid:grid.grab]{grid::grid.grab()}} (\code{\link{gTree}}).
-\item \code{width}: Width of the heatmap plot in mm (\code{\link{unit}}).
-\item \code{height}: Height of the heatmap plot in mm (\code{\link{unit}}).
+\item \code{plot}: A \code{\link[grid:grid.grob]{gTree}} object created with \code{\link[grid:grid.grab]{grid::grid.grab()}}
+(\code{\link[grid:grid.grob]{gTree}}).
+\item \code{width}: Width of the heatmap plot in mm (\code{\link[grid:unit]{unit}}).
+\item \code{height}: Height of the heatmap plot in mm (\code{\link[grid:unit]{unit}}).
 }
 
 If the \code{filename} argument is provided, the heatmap is directly saved as a
@@ -110,11 +113,12 @@ PNG image at the provided path.
 }
 \description{
 This function generates a heatmap to visualize log R ratio (LRR) data
-contained in \code{\link{muscadet}} objects. One heatmap is generated per
-omic, rows are cells and columns are chromosomes, for \code{muscadet} object
-containing multiple omics, the heatmaps are plotted horizontally aligned. The
-cells can be clustered for a specific clustering partition following the
-clustering step of \code{muscadet} object, or custom cluster assignments can be
+contained in \code{\link[=muscadet-class]{muscadet}} objects. One heatmap is generated
+per omic, rows are cells and columns are chromosomes, for
+\code{\link[=muscadet-class]{muscadet}} object containing multiple omics, the heatmaps
+are plotted horizontally aligned. The cells can be clustered for a specific
+clustering partition following the clustering step of
+\code{\link[=muscadet-class]{muscadet}} object, or custom cluster assignments can be
 used. Additionally, LRR values from bulk sequencing data can be plotted as an
 annotation under the heatmaps.
 }

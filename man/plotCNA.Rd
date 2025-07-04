@@ -12,7 +12,7 @@ plotCNA(
 )
 }
 \arguments{
-\item{x}{A \code{\link{muscadet}} object containing CNA calling data to be
+\item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing CNA calling data to be
 visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
 
 \item{title}{An optional title for the plot. Default is \code{NULL}.}
@@ -29,9 +29,9 @@ A ggplot object representing the CNA segments plot.
 }
 \description{
 This function visualizes copy number alteration (CNA) segments across
-clusters based on data stored in a \code{\link{muscadet}} object. It displays
-CNAs for each clusters and scales the y-axis based on the proportion of cells
-in each cluster.
+clusters based on data stored in a \code{\link[=muscadet-class]{muscadet}} object. It
+displays CNAs for each clusters and scales the y-axis based on the proportion
+of cells in each cluster.
 }
 \examples{
 \dontrun{

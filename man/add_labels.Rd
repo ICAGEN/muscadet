@@ -22,7 +22,7 @@ add_labels(
 \item{color}{Color of the label text (\code{character}). Default is \code{"black"}.}
 
 \item{repel}{Logical. If \code{TRUE}(default), overlapping labels are repelled
-using the \link[ggrepel:ggrepel]{ggrepel::ggrepel} package.}
+using the \code{\link[ggrepel:ggrepel]{ggprepel}} package.}
 
 \item{label.box}{Logical. If \code{TRUE} it uses a boxed label (\code{geom_label})
 instead of plain text (\code{geom_text}). Default is \code{FALSE}.}
@@ -38,24 +38,31 @@ instead of plain text (\code{geom_text}). Default is \code{FALSE}.}
 }}
 }
 \value{
-A ggplot2 layer (\code{\link[ggplot2:geom_text]{ggplot2::geom_text()}}, \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}},
-\code{\link[ggrepel:geom_text_repel]{ggrepel::geom_text_repel()}}, or \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}}).
+A ggplot2 layer  (\code{\link[ggplot2:geom_text]{geom_text}},
+\code{\link[ggplot2:geom_text]{geom_label}},
+\code{\link[ggrepel:geom_text_repel]{geom_text_repel}}, or
+\code{\link[ggrepel:geom_text_repel]{geom_label_repel}}).
 }
 \description{
 This function adds labels at the median position of each group to a ggplot
 object. Labels can be added either as plain text or as label boxes, with
-optional repelling to avoid overlaps (using the \code{ggrepel} package if
-installed).
+optional repelling to avoid overlaps (using the
+\code{\link[ggrepel:ggrepel]{ggprepel}} package if installed).
 }
 \details{
 The function summarizes the data by computing the median x and y
 positions for each label group.
-If \code{repel = TRUE}, it uses \code{ggrepel::geom_text_repel()}
-(\code{label.box = FALSE}) or \code{ggrepel::geom_label_repel()}
-(\code{label.box = TRUE}).
-If \code{repel = FALSE}, it uses \code{ggplot2::geom_text()} (\code{label.box
-= FALSE}) or \code{ggplot2::geom_label()} (\code{label.box = TRUE}).
-If \code{repel = TRUE}, the \code{ggrepel} package must be installed.
+
+If \code{repel = TRUE}, it uses
+\code{\link[ggrepel:geom_text_repel]{geom_text_repel()}} (\code{label.box = FALSE})
+or \code{\link[ggrepel:geom_text_repel]{geom_label_repel()}} (\code{label.box =
+TRUE}).
+
+If \code{repel = FALSE}, it uses \code{\link[ggplot2:geom_text]{geom_text()}} (\code{label.box
+= FALSE}) or \code{\link[ggplot2:geom_text]{geom_label()}} (\code{label.box = TRUE}).
+
+If \code{repel = TRUE}, the \code{\link[ggrepel:ggrepel]{ggprepel}} package must be
+installed.
 }
 \examples{
 \dontrun{

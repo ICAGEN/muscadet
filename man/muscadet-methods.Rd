@@ -16,7 +16,7 @@
 \alias{matCounts,muscadet-method}
 \alias{matLogRatio,muscomic-method}
 \alias{matLogRatio,muscadet-method}
-\title{Methods for \code{[muscadet::muscomic()]} and \code{[muscadet::muscadet()]}
+\title{Methods for \code{\link[=muscomic-class]{muscomic}} and \code{\link[=muscadet-class]{muscadet}}
 objects}
 \usage{
 coordFeatures(x)
@@ -46,7 +46,7 @@ matLogRatio(x)
 \S4method{matLogRatio}{muscadet}(x)
 }
 \arguments{
-\item{x}{A \code{[muscadet::muscomic()]} or \code{[muscadet::muscadet()]}
+\item{x}{A \code{\link[=muscomic-class]{muscomic}} or \code{\link[=muscadet-class]{muscadet}}
 object.}
 
 \item{...}{Other arguments (ignored).}
@@ -92,8 +92,8 @@ with one list element per omic.
 }
 }
 \description{
-Methods to facilitate access to data within the \code{[muscadet::muscomic()]}
-and \code{[muscadet::muscadet()]} objects.
+Methods to facilitate access to data within the \code{\link[=muscomic-class]{muscomic}}
+and \code{\link[=muscadet-class]{muscadet}} objects.
 \itemize{
 \item \code{Cells()}: Get cell identifiers (addition of methods for \code{muscomic} and
 \code{muscadet} to \code{\link[SeuratObject:Cells]{SeuratObject::Cells()}}).
@@ -116,6 +116,5 @@ Cells(muscadet_obj$ATAC) # cell names vector from the ATAC muscomic object
 
 }
 \seealso{
-\code{[muscadet::muscomic-class()]}
-\code{[muscadet::muscadet-class()]}
+\linkS4class{muscomic}, \linkS4class{muscadet}
 }

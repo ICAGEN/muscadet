@@ -7,7 +7,7 @@
 \alias{mm10_chrom}
 \title{Genome chromosome sizes (internal data)}
 \format{
-A \code{[GenomicRanges::GRanges()]} object containing:
+A \code{\link[GenomicRanges:GRanges-class]{GRanges}} object containing:
 \describe{
 \item{\code{seqnames}}{Chromosome name: 1 to 22, X and Y for human ; and 1 to
 19, X and Y for mouse (\code{Rle}).}
@@ -16,8 +16,8 @@ A \code{[GenomicRanges::GRanges()]} object containing:
 }
 }
 \description{
-\code{[GenomicRanges::GRanges()]} objects containing chromosomes sizes for
-hg38, hg19 and mm10 genome assemblies.
+\code{\link[GenomicRanges:GRanges-class]{GRanges}} objects containing
+chromosomes sizes for hg38, hg19 and mm10 genome assemblies.
 }
 \note{
 Data obtained from assemblies provided by the \code{BSgenome} package.
@@ -26,15 +26,17 @@ Data obtained from assemblies provided by the \code{BSgenome} package.
 \item \code{BSgenome.Hsapiens.UCSC.hg19} version 1.4.3 - \code{GRCh37.p13}
 \item \code{BSgenome.Mmusculus.UCSC.mm10} version 1.4.3 - \code{GRCm38.p6}
 }
+
+#' @references
+\describe{
+\item{BSgenome package}{Pagès H (2024). BSgenome: Software infrastructure
+for efficient representation of full genomes and their SNPs.
+\url{https://bioconductor.org/packages/BSgenome}.}
+}
 }
 \examples{
 muscadet:::hg38_chrom
 muscadet:::hg19_chrom
 muscadet:::mm10_chrom
-}
-\references{
-Pagès H (2024). BSgenome: Software infrastructure for efficient
-representation of full genomes and their SNPs.
-\url{https://bioconductor.org/packages/BSgenome}.
 }
 \keyword{internal}

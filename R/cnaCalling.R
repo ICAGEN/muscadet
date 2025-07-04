@@ -1,10 +1,10 @@
 #' Copy Number Alteration (CNA) Calling from muscadet object
 #'
-#' Performs copy number alteration (CNA) analysis on a \code{\link{muscadet}}
-#' object by processing allelic and coverage counts across clusters and
-#' evaluating cell fractions and copy numbers.
+#' Performs copy number alteration (CNA) analysis on a
+#' [`muscadet`][muscadet-class] object by processing allelic and coverage counts
+#' across clusters and evaluating cell fractions and copy numbers.
 #'
-#' @param x A \code{\link{muscadet}} object. Must contain:
+#' @param x A [`muscadet`][muscadet-class] object. Must contain:
 #'   - Clustering assignments in the `cnacalling$clusters` slot
 #'   (use [assignClusters()]).
 #'   - Combined allelic and coverage counts per cluster in the
@@ -56,7 +56,7 @@
 #'   execution. Default is `FALSE`.
 #'
 #' @return
-#' A modified \code{\link{muscadet}} object with added CNA analysis results in
+#' A modified [`muscadet`][muscadet-class] object with added CNA analysis results in
 #' the `cnacalling` slot, including: filtered counts and positions, segmentation
 #' data for clusters and all cells, consensus segments across clusters based on
 #' breakpoints, diploid log R ratio, purity and ploidy.
@@ -126,23 +126,30 @@
 #'   \item \code{ploidy}: Ploidy used for the CNA analysis.
 #' }
 #'
-#' @seealso [muscadet::assignClusters()], [muscadet::mergeCounts()],
-#' [muscadet::preProcSample2()]
+#' @seealso [assignClusters()], [mergeCounts()],[preProcSample2()]
 #'
-#'
-#' @source This function uses several functions from the [facets::facets()] package,
-#'   including: [facets::clustersegs()], [facets::emcncf()],
-#'   [facets::findDiploidLogR()], [facets::fitcncf()], [facets::procSample()],
-#'   [facets::procSnps()], and adapted function [muscadet::preProcSample2()].
+#' @source This function uses several functions from the
+#'   [`facets`][facets::facets-package] package, including:
+#'   - [facets::clustersegs()]
+#'   - [facets::emcncf()]
+#'   - [facets::findDiploidLogR()]
+#'   - [facets::fitcncf()]
+#'   - [facets::procSample()]
+#'   - [facets::procSnps()]
+#'   - adapted function [preProcSample2()]
 #'
 #'   Seshan VE, Shen R (2021). _facets: Cellular Fraction and Copy Numbers from
 #'   Tumor Sequencing_. R package version 0.6.2,
 #'   [https://github.com/mskcc/facets](https://github.com/mskcc/facets).
 #'
-#' @references Shen R, Seshan VE. FACETS: allele-specific copy number and clonal
-#'   heterogeneity analysis tool for high-throughput DNA sequencing. Nucleic
-#'   Acids Res. 2016 Sep 19;44(16):e131. doi:
-#'   [10.1093/nar/gkw520](http://doi.org/10.1093/nar/gkw520).
+#' @references
+#' \describe{
+#'   \item{[`facets`][facets::facets-package] package}{Shen R, Seshan VE. FACETS:
+#'   allele-specific copy number and clonal heterogeneity analysis tool for
+#'   high-throughput DNA sequencing. Nucleic Acids Res. 2016 Sep 19;44(16):e131.
+#'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520). PMID:
+#'   27270079; PMCID: PMC5027494.}
+#' }
 #'
 #' @include objects.R
 #'
@@ -649,11 +656,11 @@ cnaCalling <- function(
 #'
 #' @references
 #' \describe{
-#'   \item{[facets::facets()] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
-#'   clonal heterogeneity analysis tool for high-throughput DNA sequencing.
-#'   Nucleic Acids Res. 2016 Sep 19;44(16):e131.
-#'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520).
-#'   PMID: 27270079; PMCID: PMC5027494.}
+#'   \item{[`facets`][facets::facets-package] package}{Shen R, Seshan VE. FACETS:
+#'   allele-specific copy number and clonal heterogeneity analysis tool for
+#'   high-throughput DNA sequencing. Nucleic Acids Res. 2016 Sep 19;44(16):e131.
+#'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520). PMID:
+#'   27270079; PMCID: PMC5027494.}
 #' }
 #'
 #' @include objects.R
@@ -984,7 +991,7 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
 #'   - `cna_clonal`: Segment clonal CNA status (logical).
 #'   - `cna_clonal_state`: Clonal state of CNA segment (gain ; loss ; cnloh).
 #'
-#' @seealso [muscadet::getSegConsensus()], [muscadet::cnaCalling()]
+#' @seealso [getSegConsensus()], [cnaCalling()].
 #'
 #' @import dplyr
 #' @importFrom GenomicRanges GRanges

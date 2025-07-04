@@ -2,7 +2,7 @@
 % Please edit documentation in R/objects.R
 \name{CreateMuscadetObject}
 \alias{CreateMuscadetObject}
-\title{Create a muscadet object}
+\title{Create a \code{muscadet} object}
 \usage{
 CreateMuscadetObject(
   omics,
@@ -12,7 +12,7 @@ CreateMuscadetObject(
 )
 }
 \arguments{
-\item{omics}{A list of \code{[muscadet::muscomic()]} objects (\code{list}). The
+\item{omics}{A list of \code{\link[=muscomic-class]{muscomic}} objects (\code{list}). The
 names of the list will set the names of omics in the final object, if the
 list is unamed, the type is taken instead.}
 
@@ -27,15 +27,15 @@ end position (\code{integer}), and Log R ratio value (\code{numeric}).}
 (\code{character} string). "hg38" by default.}
 }
 \value{
-A \code{[muscadet::muscadet()]} object.
+A \code{\link[=muscadet-class]{muscadet}} object.
 }
 \description{
-Create a \code{\[muscadet::muscadet()]} object.
+Create a \code{\link[=muscadet-class]{muscadet}} object.
 }
 \note{
-A \code{[muscadet::muscadet()]} object can contain several
-\code{[muscadet::muscomic()]} objects of the same type (\code{ATAC} or \code{RNA} for slot
-\code{type}) but they can't have identical labels (slot \code{label.omic}).
+A \code{\link[=muscadet-class]{muscadet}} object can contain several
+\code{\link[=muscomic-class]{muscomic}} objects of the same type (\code{ATAC} or \code{RNA} for
+slot \code{type}) but they can't have identical labels (slot \code{label.omic}).
 }
 \examples{
 # Create muscomic objects
@@ -80,6 +80,6 @@ muscadet_ref <- CreateMuscadetObject(
 \seealso{
 \itemize{
 \item \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
-\item \code{[muscadet::muscomic-class()]}, \code{[muscadet::muscadet-class()]}
+\item \linkS4class{muscomic}, \linkS4class{muscadet}
 }
 }

@@ -35,14 +35,15 @@
 
 #' Example data: Matrices of raw counts
 #'
-#' @description
-#' Matrices of raw read counts *features x cells* in `dgCMatrix` format.
+#' @description Matrices of raw read counts *features x cells* in
+#' [`dgCMatrix`][Matrix::dgCMatrix-class] format.
 #'
 #' @name mat_counts
 #' @rdname mat_counts
 #'
 #' @format
-#' A `dgCMatrix` (\code{[Matrix::dgCMatrix-class()]}) of numeric values with the following dimensions:
+#' A [`dgCMatrix`][Matrix::dgCMatrix-class] of numeric values with the following
+#' dimensions:
 #' \describe{
 #'   \item{`rows`}{Features (peaks, genes).}
 #'   \item{`columns`}{Cell barcodes.}
@@ -144,17 +145,17 @@
 #' }
 #'
 #' @note Data obtained from whole genome sequencing (WGS) after using
-#' [facets::fitcncf()] from [facets::facets()] "Cellular Fraction and Copy Numbers from
-#' Tumor Sequencing" version `0.6.2`: `$cncf` data frame columns `chrom`, `start`,
-#' `end`, and `cnlr.median`.
+#'   [facets::fitcncf()] from [`facets`][facets::facets-package] "Cellular
+#'   Fraction and Copy Numbers from Tumor Sequencing" version `0.6.2`: `$cncf`
+#'   data frame columns `chrom`, `start`, `end`, and `cnlr.median`.
 #'
 #' @references
 #' \describe{
-#'   \item{[facets::facets()] package}{Shen R, Seshan VE. FACETS: allele-specific copy number and
-#'   clonal heterogeneity analysis tool for high-throughput DNA sequencing.
-#'   Nucleic Acids Res. 2016 Sep 19;44(16):e131.
-#'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520).
-#'   PMID: 27270079; PMCID: PMC5027494.}
+#'   \item{[`facets`][facets::facets-package] package}{Shen R, Seshan VE. FACETS:
+#'   allele-specific copy number and clonal heterogeneity analysis tool for
+#'   high-throughput DNA sequencing. Nucleic Acids Res. 2016 Sep 19;44(16):e131.
+#'   doi: [10.1093/nar/gkw520](https://www.doi.org/10.1093/nar/gkw520). PMID:
+#'   27270079; PMCID: PMC5027494.}
 #' }
 #'
 "bulk_lrr"
@@ -166,8 +167,8 @@
 
 #' Genome chromosome sizes (internal data)
 #'
-#' @description \code{[GenomicRanges::GRanges()]} objects containing chromosomes sizes for
-#'   hg38, hg19 and mm10 genome assemblies.
+#' @description [`GRanges`][GenomicRanges::GRanges()] objects containing
+#'   chromosomes sizes for hg38, hg19 and mm10 genome assemblies.
 #'
 #' @name genome_chrom
 #' @aliases hg38_chrom hg19_chrom mm10_chrom
@@ -175,7 +176,7 @@
 #'
 #' @keywords internal
 #'
-#' @format A \code{[GenomicRanges::GRanges()]} object containing:
+#' @format A [`GRanges`][GenomicRanges::GRanges()] object containing:
 #' \describe{
 #'   \item{`seqnames`}{Chromosome name: 1 to 22, X and Y for human ; and 1 to
 #'   19, X and Y for mouse (`Rle`).}
@@ -188,9 +189,13 @@
 #' - `BSgenome.Hsapiens.UCSC.hg19` version 1.4.3 - `GRCh37.p13`
 #' - `BSgenome.Mmusculus.UCSC.mm10` version 1.4.3 - `GRCm38.p6`
 #'
-#' @references Pagès H (2024). BSgenome: Software infrastructure for efficient
-#'   representation of full genomes and their SNPs.
-#'   [https://bioconductor.org/packages/BSgenome](https://bioconductor.org/packages/BSgenome).
+#'
+#' #' @references
+#' \describe{
+#'   \item{BSgenome package}{Pagès H (2024). BSgenome: Software infrastructure
+#'   for efficient representation of full genomes and their SNPs.
+#'   [https://bioconductor.org/packages/BSgenome](https://bioconductor.org/packages/BSgenome).}
+#' }
 #'
 #' @examples
 #' muscadet:::hg38_chrom
@@ -208,15 +213,16 @@ NULL
 #' @name muscadet_obj
 #' @rdname muscadet_obj
 #'
-#' @description \code{\link{muscadet}} objects, containing two
+#' @description [`muscadet`][muscadet-class] objects, containing two
 #'   single-cell omic datasets: scATAC-seq and scRNA-seq.
 #' - `muscadet_obj` with tumor cells data: sample cells
 #' - `muscadet_obj_ref` with normal cells data: reference cells
 #'
 #'
-#' @format \code{\link{muscadet}} objects with the following slots:
+#' @format [`muscadet`][muscadet-class] objects with the following slots:
 #' \describe{
-#'   \item{`omics`}{List of \code{\link{muscomic}} objects, one per single-cell omic (`list`).}
+#'   \item{`omics`}{List of [`muscomic`][muscomic-class] objects, one per
+#'   single-cell omic (`list`).}
 #'   \item{`bulk.data`}{List of data from paired bulk sequencing (`list`).}
 #'   \item{`clustering`}{List of data associated with the clustering of cells
 #'   based on coverage log R ratio values (`list`).}

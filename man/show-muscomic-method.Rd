@@ -7,14 +7,14 @@
 \S4method{show}{muscomic}(object)
 }
 \arguments{
-\item{object}{A \code{[muscadet::muscomic()]} object.}
+\item{object}{A \code{\link[=muscomic-class]{muscomic}} object.}
 }
 \value{
 Prints summary to \code{\link[base]{stdout}} and invisibly returns
 \code{NULL}
 }
 \description{
-Overview of a \code{[muscadet::muscomic()]} object.
+Overview of a \code{\link[=muscomic-class]{muscomic}} object.
 }
 \examples{
 atac <- CreateMuscomicObject(
@@ -26,6 +26,6 @@ atac <- CreateMuscomicObject(
 atac
 }
 \seealso{
-\code{[muscadet::muscomic-class()]}, \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
+\linkS4class{muscomic}, \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
 }
 \keyword{internal}
