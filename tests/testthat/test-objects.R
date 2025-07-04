@@ -90,7 +90,7 @@ test_that("CreateMuscadetObject returns a correct muscadet object", {
     expect_identical(as.character(class(slot(muscadet, "omics")[[1]])), "muscomic")
 })
 
-test_that("CreateMuscadetObject with identical muscomic : error of identical labels", {
+test_that("CreateMuscadetObject with identical muscomic: error of identical labels", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
         mat_counts = mat_counts_atac_tumor,
@@ -139,7 +139,7 @@ test_that("CreateMuscadetObject with incorrect genome : error of incorrect genom
 
 # Methods ----------------------------------------------------------------------
 
-test_that("Check methods outputs", {
+test_that("Check Cells/Features methods outputs", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
         mat_counts = mat_counts_atac_tumor,
@@ -171,5 +171,12 @@ test_that("Check methods outputs", {
         return(rownames(slot(omic, "coverage")[["mat.counts"]]))
     }))
 
+    muscadet_monoomic <- CreateMuscadetObject(
+        omics = list(atac),
+        bulk.lrr = bulk_lrr,
+        bulk.label = "WGS",
+        genome = "hg38"
+    )
+    expect_identical(Cells(muscadet_monoomic), colnames(slot(atac, "coverage")[["mat.counts"]]))
 })
 

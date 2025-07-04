@@ -54,37 +54,41 @@ object.}
 \value{
 \code{Cells}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A vector of cell names.
-\item if \code{x} is a \code{muscadet} object: A list of vectors of cell names, one list
-element per omic.
+\item if \code{x} is a \code{\link[=muscomic]{muscomic()}} object: a vector of cell names.
+\item if \code{x} is a \code{\link[=muscadet]{muscadet()}} object: a vector of cell names (one omic),
+or a list of vectors of cell names, one list element per omic.
 }
 
 \code{Features}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A vector of feature names.
-\item if \code{x} is a \code{muscadet} object: A list of vectors of feature names, one list
-element per omic.
+\item if \code{x} is a \code{\link[=muscomic]{muscomic()}} object: a vector of feature names.
+\item if \code{x} is a \code{\link[=muscadet]{muscadet()}} object: a vector of feature names (one omic),
+or a list of vectors of feature names, one list element per omic.
 }
 
 \code{coordFeatures}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A data frame of feature coordinates.
-\item if \code{x} is a \code{muscadet} object: A list of data frames of feature
-coordinates, one list element per omic.
+\item if \code{x} is a \code{\link[=muscomic]{muscomic()}} object: a data frame of feature
+coordinates.
+\item if \code{x} is a \code{\link[=muscadet]{muscadet()}} object: a data frame of feature
+coordinates (one omic), or a list of data frames of feature coordinates,
+with one list element per omic.
 }
 
 \code{matCounts}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A \code{[Matrix::dgCMatrix()]} \emph{features x cells}.
-\item if \code{x} is a \code{muscadet} object: A list of \code{[Matrix::dgCMatrix()]} \emph{features x cells},
-one list element per omic.
+\item if \code{x} is a \code{\link[=muscomic]{muscomic()}} object: a \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}} \emph{features x cells}.
+\item if \code{x} is a \code{\link[=muscadet]{muscadet()}} object: a \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}}
+\emph{features x cells} (one omic), or a list of \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}},
+with one list element per omic.
 }
 
 \code{matLogRatio}:
 \itemize{
-\item if \code{x} is a \code{muscomic} object: A \code{[base::matrix()]} \emph{features x cells}.
-\item if \code{x} is a \code{muscadet} object: A list of \code{[base::matrix()]} \emph{features x cells},
-one list element per omic.
+\item if \code{x} is a \code{\link[=muscomic]{muscomic()}} object: a \code{matrix} \emph{features x cells}.
+\item if \code{x} is a \code{\link[=muscadet]{muscadet()}} object: a \code{matrix}
+\emph{features x cells} (one omic), or a list of \code{matrix},
+with one list element per omic.
 }
 }
 \description{

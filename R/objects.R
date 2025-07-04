@@ -955,9 +955,9 @@ matLogRatio <- function(x) {
 #'
 #' @return
 #' `Cells`:
-#' - if `x` is a `muscomic` object: A vector of cell names.
-#' - if `x` is a `muscadet` object: A list of vectors of cell names, one list
-#' element per omic.
+#' - if `x` is a [muscadet::muscomic()] object: a vector of cell names.
+#' - if `x` is a [muscadet::muscadet()] object: a vector of cell names (one omic),
+#' or a list of vectors of cell names, one list element per omic.
 #'
 #' @method Cells muscomic
 #' @export
@@ -977,14 +977,18 @@ Cells.muscomic <- function(x, ...) {
 #' @method Cells muscadet
 #' @export
 Cells.muscadet <- function(x, ...) {
-    lapply(slot(x, "omics"), function(omic) {
+    cells <- lapply(slot(x, "omics"), function(omic) {
         if (!is.null(slot(omic, "coverage")[["log.ratio"]])) {
-            cells <- colnames(slot(omic, "coverage")[["log.ratio"]])
+            colnames(slot(omic, "coverage")[["log.ratio"]])
         } else if (!is.null(slot(omic, "coverage")[["mat.counts"]])) {
-            cells <- colnames(slot(omic, "coverage")[["mat.counts"]])
+            colnames(slot(omic, "coverage")[["mat.counts"]])
         }
-        return(cells)
     })
+    if (length(cells) == 1) {
+        return(cells[[1]])
+    } else {
+        return(cells)
+    }
 }
 
 #' @rdname muscadet-methods
@@ -993,9 +997,9 @@ Cells.muscadet <- function(x, ...) {
 #'
 #' @return
 #' `Features`:
-#' - if `x` is a `muscomic` object: A vector of feature names.
-#' - if `x` is a `muscadet` object: A list of vectors of feature names, one list
-#' element per omic.
+#' - if `x` is a [muscadet::muscomic()] object: a vector of feature names.
+#' - if `x` is a [muscadet::muscadet()] object: a vector of feature names (one omic),
+#' or a list of vectors of feature names, one list element per omic.
 #'
 #' @method Features muscomic
 #' @export
@@ -1015,14 +1019,18 @@ Features.muscomic <- function(x, ...) {
 #' @method Features muscadet
 #' @export
 Features.muscadet <- function(x, ...) {
-    lapply(slot(x, "omics"), function(omic) {
+    features <- lapply(slot(x, "omics"), function(omic) {
         if (!is.null(slot(omic, "coverage")[["log.ratio"]])) {
-            features <- rownames(slot(omic, "coverage")[["log.ratio"]])
+            rownames(slot(omic, "coverage")[["log.ratio"]])
         } else if (!is.null(slot(omic, "coverage")[["mat.counts"]])) {
-            features <- rownames(slot(omic, "coverage")[["mat.counts"]])
+            rownames(slot(omic, "coverage")[["mat.counts"]])
         }
-        return(features)
     })
+    if (length(features) == 1) {
+        return(features[[1]])
+    } else {
+        return(features)
+    }
 }
 
 
@@ -1030,9 +1038,11 @@ Features.muscadet <- function(x, ...) {
 #'
 #' @return
 #' `coordFeatures`:
-#' - if `x` is a `muscomic` object: A data frame of feature coordinates.
-#' - if `x` is a `muscadet` object: A list of data frames of feature
-#' coordinates, one list element per omic.
+#' - if `x` is a [muscadet::muscomic()] object: a data frame of feature
+#' coordinates.
+#' - if `x` is a [muscadet::muscadet()] object: a data frame of feature
+#' coordinates (one omic), or a list of data frames of feature coordinates,
+#' with one list element per omic.
 #'
 setMethod(
   f = "coordFeatures",
@@ -1045,22 +1055,28 @@ setMethod(
 #' @rdname muscadet-methods
 #'
 setMethod(
-  f = "coordFeatures",
-  signature = signature(x = "muscadet"),
-  definition = function(x) {
-    lapply(slot(x, "omics"), function(omic) {
-      return(slot(omic, "coverage")[["coord.features"]])
-    })
-  }
+    f = "coordFeatures",
+    signature = signature(x = "muscadet"),
+    definition = function(x) {
+        coord <- lapply(slot(x, "omics"), function(omic) {
+            slot(omic, "coverage")[["coord.features"]]
+        })
+        if (length(coord) == 1) {
+            return(coord[[1]])
+        } else {
+            return(coord)
+        }
+    }
 )
 
 #' @rdname muscadet-methods
 #'
 #' @return
 #' `matCounts`:
-#' - if `x` is a `muscomic` object: A \code{[Matrix::dgCMatrix()]} *features x cells*.
-#' - if `x` is a `muscadet` object: A list of \code{[Matrix::dgCMatrix()]} *features x cells*,
-#' one list element per omic.
+#' - if `x` is a [muscadet::muscomic()] object: a [`dgCMatrix`][Matrix::dgCMatrix-class] *features x cells*.
+#' - if `x` is a [muscadet::muscadet()] object: a [`dgCMatrix`][Matrix::dgCMatrix-class]
+#' *features x cells* (one omic), or a list of [`dgCMatrix`][Matrix::dgCMatrix-class],
+#' with one list element per omic.
 #'
 setMethod(
   f = "matCounts",
@@ -1073,22 +1089,28 @@ setMethod(
 #' @rdname muscadet-methods
 #'
 setMethod(
-  f = "matCounts",
-  signature = signature(x = "muscadet"),
-  definition = function(x) {
-    lapply(slot(x, "omics"), function(omic) {
-      return(slot(omic, "coverage")[["mat.counts"]])
-    })
-  }
+    f = "matCounts",
+    signature = signature(x = "muscadet"),
+    definition = function(x) {
+        mat <- lapply(slot(x, "omics"), function(omic) {
+            slot(omic, "coverage")[["mat.counts"]]
+        })
+        if (length(mat) == 1) {
+            return(mat[[1]])
+        } else {
+            return(mat)
+        }
+    }
 )
 
 #' @rdname muscadet-methods
 #'
 #' @return
 #' `matLogRatio`:
-#' - if `x` is a `muscomic` object: A \code{[base::matrix()]} *features x cells*.
-#' - if `x` is a `muscadet` object: A list of \code{[base::matrix()]} *features x cells*,
-#' one list element per omic.
+#' - if `x` is a [muscadet::muscomic()] object: a `matrix` *features x cells*.
+#' - if `x` is a [muscadet::muscadet()] object: a `matrix`
+#' *features x cells* (one omic), or a list of `matrix`,
+#' with one list element per omic.
 #'
 setMethod(
     f = "matLogRatio",
@@ -1101,11 +1123,16 @@ setMethod(
 #' @rdname muscadet-methods
 #'
 setMethod(
-  f = "matLogRatio",
-  signature = signature(x = "muscadet"),
-  definition = function(x) {
-    lapply(slot(x, "omics"), function(omic) {
-      return(slot(omic, "coverage")[["log.ratio"]])
-    })
-  }
+    f = "matLogRatio",
+    signature = signature(x = "muscadet"),
+    definition = function(x) {
+        mat <- lapply(slot(x, "omics"), function(omic) {
+            slot(omic, "coverage")[["log.ratio"]]
+        })
+        if (length(mat) == 1) {
+            return(mat[[1]])
+        } else {
+            return(mat)
+        }
+    }
 )
