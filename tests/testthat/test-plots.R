@@ -312,7 +312,7 @@ test_that("heatmapStep() generates a PNG heatmap", {
     expect_true("step08" %in% names(obj_atac_all))
 
     # Temp file
-    heatmap_file <- file.path(tempdir(), "step08_test.png")
+    heatmap_file <-tempfile(fileext = ".png")
 
     # Plot heatmap
     expect_no_error(

@@ -9,14 +9,16 @@ test_that("clusterMuscadet() returns an updated muscadet object", {
         method = "seurat",
         res_range = c(0.6, 0.8),
         knn_seurat = 10,
-        knn_range_seurat = 30
+        knn_range_seurat = 30,
+        quiet = TRUE
     )
     obj2 <- clusterMuscadet(
         muscadet_obj,
         method = "hclust",
         dist_method = "euclidean",
         hclust_method = "ward.D",
-        k_range = 2:5
+        k_range = 2:5,
+        quiet = TRUE
     )
     expect_s4_class(obj, "muscadet")
     expect_s4_class(obj2, "muscadet")

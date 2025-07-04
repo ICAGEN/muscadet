@@ -2,7 +2,7 @@
 
 test_that("assignClusters() returns an updated muscadet object", {
 
-    data(muscadet_obj)
+    data("muscadet_obj", package = "muscadet")
     # remove cna calling result
     muscadet_obj@cnacalling <- list()
 
@@ -22,7 +22,7 @@ test_that("assignClusters() returns an updated muscadet object", {
     obj2 <- assignClusters(muscadet_obj, clusters = custom_clusters)
 
     expect_true(length(obj2@cnacalling) != 0)
-    expect_identical(length(table(obj2@cnacalling$clusters)), as.integer(2)) # 2 clusters
+    expect_length(table(obj2@cnacalling$clusters), 2) # 2 clusters
 
     # Assign clusters with remapping
     # example to remap from 5 clusters to 4 by merging clusters 1 and 2
@@ -32,12 +32,12 @@ test_that("assignClusters() returns an updated muscadet object", {
     obj3 <- assignClusters(muscadet_obj, clusters = clusters, mapping = mapping)
 
     expect_true(length(obj3@cnacalling) != 0)
-    expect_identical(length(table(obj3@cnacalling$clusters)), as.integer(4)) # 4 clusters
+    expect_length(table(obj3@cnacalling$clusters), 4) # 4 clusters
 
     obj4 <- assignClusters(muscadet_obj, partition = 1, mapping = mapping)
 
     expect_true(length(obj4@cnacalling) != 0)
-    expect_identical(length(table(obj4@cnacalling$clusters)), as.integer(4)) # 4 clusters
+    expect_length(table(obj4@cnacalling$clusters), 4) # 4 clusters
 })
 
 
@@ -226,6 +226,8 @@ test_that("process_allele() with scReadcounts data input missing columns", {
 
 
 test_that("save_as_vcf() creates a vcf file", {
+    skip_on_cran()
+
     vcf_data <- data.frame(
         CHROM = c("chr1", "chr2"),
         POS = c(12345, 67890),
@@ -239,10 +241,13 @@ test_that("save_as_vcf() creates a vcf file", {
         SAMPLE = c("0/1", "1/1")
     )
 
-    output_filename <- withr::local_tempfile(fileext = ".vcf")
+    output_filename <- tempfile(fileext = ".vcf")
     # temp file in session, so automatically cleaned up after
 
     save_as_vcf(vcf_data, output_filename)
     expect_true(file.exists(output_filename))
+
+    # Clean up
+    unlink(output_filename)
 })
 

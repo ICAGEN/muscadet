@@ -68,8 +68,7 @@ Suggests:
     knitr,
     quarto,
     Rsamtools,
-    testthat (>= 3.0.0),
-    withr
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
     R (>= 3.5)

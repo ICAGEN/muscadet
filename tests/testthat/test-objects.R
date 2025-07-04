@@ -139,6 +139,39 @@ test_that("CreateMuscadetObject with incorrect genome : error of incorrect genom
 
 # Methods ----------------------------------------------------------------------
 
+
+test_that("Check access methods", {
+
+    data("muscadet_obj")
+
+    obj <- muscadet_obj
+    obj["clustering"] <- muscadet_obj["clustering"]
+
+    expect_length(obj["clustering"], 9)
+    expect_error(muscadet_obj["abc"])
+
+    expect_length(obj["ATAC"], 1)
+    expect_length(obj["ATAC"]["type"], 1)
+    expect_error(obj["ATAC"]["abc"])
+
+    expect_length(obj$ATAC, 1)
+    expect_length(obj$ATAC$type, 1)
+    expect_error(obj$ATAC$abc)
+
+
+})
+
+
+test_that("Check show methods", {
+
+    data("muscadet_obj")
+    expect_output(show(muscadet_obj), regexp = "muscadet")
+
+    atac <- muscadet_obj$ATAC
+    expect_output(show(atac), regexp = "muscomic")
+})
+
+
 test_that("Check Cells/Features methods outputs", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
