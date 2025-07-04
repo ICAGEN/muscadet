@@ -1,10 +1,13 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://icagen.github.io/muscadet/404.html</loc></url>
+<url><loc>https://icagen.github.io/muscadet/LICENSE-text.html</loc></url>
+<url><loc>https://icagen.github.io/muscadet/LICENSE.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/articles/data-prep.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/articles/index.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/articles/muscadet.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/authors.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/index.html</loc></url>
+<url><loc>https://icagen.github.io/muscadet/news/index.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/CreateMuscadetObject.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/CreateMuscomicObject.html</loc></url>
 <url><loc>https://icagen.github.io/muscadet/reference/addAlleleCounts.html</loc></url>
