@@ -339,8 +339,9 @@ heatmapMuscadet <- function(x,
     stopifnot("`show_missing` must be a single TRUE/FALSE value." =
                   is.logical(show_missing) && length(show_missing) == 1 && !is.na(show_missing))
     # Set to no missing cells if only one omic
-    if (length(x@omics) == 1)
+    if (length(x@omics) == 1) {
         show_missing <- FALSE
+    }
 
     ## Validate add_bulk_lrr ------
     # Default addition of bulk data depending on its presence in muscadet object
@@ -465,7 +466,7 @@ heatmapMuscadet <- function(x,
 
             # Replace cell names by cluster names
             colnames(mat_lrr_av) <- unique(clusters_mat)
-            mat_lrr_av <- mat_lrr_av[, gtools::mixedsort(colnames(mat_lrr_av))]
+            mat_lrr_av <- mat_lrr_av[, colnames(mat_lrr_av), drop = FALSE]
 
             # Replace log ratio matrix per cell by average matrix per cluster
             x@omics[[omic]]@coverage[["log.ratio"]] <- mat_lrr_av
@@ -576,12 +577,12 @@ heatmapMuscadet <- function(x,
                 )
                 mat <- rbind(mat, mat.na)[all_cells, ] # add empty rows to matrix
             } else {
-                mat <- mat[all_cells, ]
+                mat <- mat[all_cells, , drop = FALSE]
             }
         }
         if (show_missing == FALSE) {
             mat <- t(muscadet::matLogRatio(muscomic))
-            mat <- mat[common_cells, ]
+            mat <- mat[common_cells, , drop = FALSE]
         }
 
         # Create heatmap
@@ -698,12 +699,19 @@ heatmapMuscadet <- function(x,
             annotation_legend_list <- list()
         }
 
+        # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
+        if (length(all_cells) > 1) {
+            row_split <- factor(clusters[all_cells], levels = unique(clusters))
+        } else {
+            row_split <- NULL
+        }
+
         # Draw heatmap
         ht_all <- ComplexHeatmap::draw(
             ht_list,
             column_title = title,
             ht_gap = ht_gap,
-            row_split = factor(clusters[all_cells], levels = unique(clusters)),
+            row_split = row_split,
             row_order = names(clusters),
             cluster_rows = F,
             annotation_legend_list = annotation_legend_list,
@@ -746,12 +754,19 @@ heatmapMuscadet <- function(x,
                 clusters <- x@clustering$clusters[[as.character(partition)]]
                 n_cells <- table(clusters[common_cells])[unique(clusters[common_cells])]
 
+                # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
+                if (length(common_cells) > 1) {
+                    row_split <- factor(clusters[common_cells], levels = unique(clusters))
+                } else {
+                    row_split <- NULL
+                }
+
                 # Draw heatmap
                 ht_all <- ComplexHeatmap::draw(
                     ht_list,
                     column_title = title,
                     ht_gap = ht_gap,
-                    row_split = factor(clusters[common_cells], levels = unique(clusters)),
+                    row_split = row_split,
                     row_order = names(clusters)[names(clusters) %in% common_cells],
                     cluster_rows = FALSE,
                     annotation_legend_list = annotation_legend_list,
@@ -784,12 +799,19 @@ heatmapMuscadet <- function(x,
             }
             n_cells <- table(clusters[common_cells])
 
+            # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
+            if (length(common_cells) > 1) {
+                row_split <- factor(clusters[common_cells], levels = unique(clusters))
+            } else {
+                row_split <- NULL
+            }
+
             # Draw heatmap
             ht_all <- ComplexHeatmap::draw(
                 ht_list,
                 column_title = title,
                 ht_gap = ht_gap,
-                row_split = factor(clusters[common_cells], levels = unique(clusters)),
+                row_split = row_split,
                 row_order = names(clusters)[names(clusters) %in% common_cells],
                 cluster_rows = FALSE,
                 annotation_legend_list = annotation_legend_list,
