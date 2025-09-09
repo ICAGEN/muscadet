@@ -182,6 +182,7 @@ heatmapMuscadet(muscadet_obj,
 # --- Add Row Annotation ---
 
 library("ComplexHeatmap")
+library("grid")
 
 # Define example cell annotation
 muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
@@ -214,6 +215,7 @@ heatmapMuscadet(muscadet_obj,
 # --- Add Row Annotation for averages ---
 
 library("ComplexHeatmap")
+library("grid")
 
 # Define example cluster annotation
 clus <- setNames(c("annot1", "annot2"), c(1, 2)) # 2 clusters for partition 0.6

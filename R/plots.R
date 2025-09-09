@@ -168,6 +168,7 @@
 #' # --- Add Row Annotation ---
 #'
 #' library("ComplexHeatmap")
+#' library("grid")
 #'
 #' # Define example cell annotation
 #' muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
@@ -200,6 +201,7 @@
 #' # --- Add Row Annotation for averages ---
 #'
 #' library("ComplexHeatmap")
+#' library("grid")
 #'
 #' # Define example cluster annotation
 #' clus <- setNames(c("annot1", "annot2"), c(1, 2)) # 2 clusters for partition 0.6
@@ -599,9 +601,9 @@ heatmapMuscadet <- function(x,
                 "coverage on",
                 muscomic@coverage$label.features
             ),
-            row_title_gp = gpar(fontsize = 10),
-            column_title_gp = gpar(fontsize = 10),
-            border_gp = gpar(col = "black", lwd = 1),
+            row_title_gp = grid::gpar(fontsize = 10),
+            column_title_gp = grid::gpar(fontsize = 10),
+            border_gp = grid::gpar(col = "black", lwd = 1),
             heatmap_height = unit(12, "cm"),
             heatmap_width = unit(18, "cm"),
             col = circlize::colorRamp2(col_breaks, c(
@@ -646,7 +648,7 @@ heatmapMuscadet <- function(x,
                 col = bulk_col,
                 annotation_label = x@bulk.data$label,
                 annotation_name_side = "left",
-                annotation_name_gp = gpar(cex = 0.7)
+                annotation_name_gp = grid::gpar(cex = 0.7)
             )
             # Attach annotation to heatmap
             ht <- ComplexHeatmap::attach_annotation(ht, annot_bulk, side = "bottom")
@@ -690,7 +692,7 @@ heatmapMuscadet <- function(x,
                 Legend(
                     labels = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@levels,
                     title = ha@anno_list[["annot"]]@label,
-                    legend_gp = gpar(fill = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@colors)
+                    legend_gp = grid::gpar(fill = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@colors)
                 )
             })
 
@@ -738,7 +740,7 @@ heatmapMuscadet <- function(x,
                 Legend(
                     labels = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@levels,
                     title = ha@anno_list[["annot"]]@label,
-                    legend_gp = gpar(fill = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@colors)
+                    legend_gp = grid::gpar(fill = ha@anno_list[["annot"]]@fun@var_env[["color_mapping"]]@colors)
                 )
             })
 
@@ -856,18 +858,18 @@ heatmapMuscadet <- function(x,
     # Add annotation: number of cells per cluster
     for (i in 1:length(n_cells)) {
         ComplexHeatmap::decorate_annotation("ncells", slice = i, envir = environment(), {
-            grid.rect(
+            grid::grid.rect(
                 x = 1,
                 width = unit(2, "mm"),
-                gp = gpar(fill = colors[i], col = NA),
+                gp = grid::gpar(fill = colors[i], col = NA),
                 just = "right"
             )
             if (!averages) {
-                grid.text(
+                grid::grid.text(
                     n_cells[i],
                     x = 0.7,
                     just = "right",
-                    gp = gpar(cex = 0.75)
+                    gp = grid::gpar(cex = 0.75)
                 )
             }
         })
@@ -881,9 +883,9 @@ heatmapMuscadet <- function(x,
                                                 slice = i,
                                                 envir = environment(),
                                                 {
-                                                    grid.text(chrom_names[i],
-                                                              just = "center",
-                                                              gp = gpar(fontsize = 8.5))
+                                                    grid::grid.text(chrom_names[i],
+                                                                    just = "center",
+                                                                    gp = grid::gpar(fontsize = 8.5))
                                                 })
         }
     }
@@ -891,7 +893,7 @@ heatmapMuscadet <- function(x,
     # store plot object
     if (is.null(filename)) {
         plot.obj <- list(
-            plot = grid.grab(),
+            plot = grid::grid.grab(),
             width = ht_all@ht_list_param[["width"]],
             height = ht_all@ht_list_param[["height"]]
         )
@@ -2450,15 +2452,15 @@ heatmapStep <- function(obj,
         name = "Tumor",
         heatmap_legend_param = list(title = name),
         row_title = "Tumor cells",
-        row_title_gp = gpar(fontsize = 12),
+        row_title_gp = grid::gpar(fontsize = 12),
         show_column_names = FALSE,
         show_row_names = FALSE,
         cluster_columns = FALSE,
         cluster_rows = TRUE,
         show_row_dend = FALSE,
         column_split = chrom,
-        column_title_gp = gpar(fontsize = 10),
-        border_gp = gpar(col = "black", lwd = 1),
+        column_title_gp = grid::gpar(fontsize = 10),
+        border_gp = grid::gpar(col = "black", lwd = 1),
         heatmap_height = unit(12, "cm"),
         heatmap_width = unit(18, "cm"),
         col = col_fun,
@@ -2471,15 +2473,15 @@ heatmapStep <- function(obj,
         name = "Ref",
         heatmap_legend_param = list(title = name),
         row_title = "Reference cells",
-        row_title_gp = gpar(fontsize = 12),
+        row_title_gp = grid::gpar(fontsize = 12),
         show_column_names = FALSE,
         show_row_names = FALSE,
         cluster_columns = FALSE,
         cluster_rows = TRUE,
         show_row_dend = FALSE,
         column_split = chrom,
-        column_title_gp = gpar(fontsize = 10),
-        border_gp = gpar(col = "black", lwd = 1),
+        column_title_gp = grid::gpar(fontsize = 10),
+        border_gp = grid::gpar(col = "black", lwd = 1),
         heatmap_height = unit(12, "cm"),
         heatmap_width = unit(18, "cm"),
         col = col_fun,

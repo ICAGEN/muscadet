@@ -507,7 +507,7 @@ computeLogRatioATAC <- function(matTumor,
         i = match(ovlaps[,1], window_names), # windows indexes
         j = ovlaps[,2], # peak indexes
         x = 1,
-        dims = c(length(window_names), max(ovlaps[,2]))
+        dims = c(length(window_names), length(peaksCoord))
     )
     rownames(M) <- window_names
 
