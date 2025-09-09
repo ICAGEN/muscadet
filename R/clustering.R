@@ -202,9 +202,12 @@ clusterMuscadet <- function(x,
     # Compute Silhouette
     partitions_list <- setNames(as.list(names(clusters)), names(clusters))
     sil <- lapply(partitions_list, function(partition) {
-        cl <- as.vector(clusters[[as.character(partition)]])
+        # Apply same cell order between clusters and dist
+        cl <- as.vector(clusters[[as.character(partition)]][rownames(as.matrix(dist))])
         if (length(unique(cl)) > 1) {
-            cluster::silhouette(as.vector(clusters[[as.character(partition)]]), dist)
+            cluster::silhouette(cl, dist)
+        } else {
+            NULL
         }
     })
 
@@ -538,6 +541,7 @@ cluster_seurat <- function(mat_list,
         cl <- seurat@meta.data$seurat_clusters
         levels(cl) <- seq(1, length(levels(cl)), by = 1)
         cl <- setNames(as.integer(cl), Cells(seurat))
+        return(sort(cl))
     })
 
     out[["clusters"]] <- clusters
@@ -1221,7 +1225,7 @@ imputeClusters <- function(mat_list,
     })
 
     # Combine original clusters with imputed clusters
-    clusters_complete <- c(clusters, clusters_imp)
+    clusters_complete <- sort(c(clusters, clusters_imp))
 
     return(clusters_complete)
 }
