@@ -37,7 +37,6 @@ Imports:
     data.table,
     dendextend,
     dplyr,
-    facets (>= 0.6.2),
     fastcluster,
     fpc,
     GenomeInfoDb,
@@ -51,13 +50,11 @@ Imports:
     matrixStats,
     methods,
     patchwork,
-    pctGCdata (>= 0.3.0),
     RANN,
     Rfast,
     rlang,
     S4Vectors,
     Seurat,
-    SeuratObject,
     SNFtool,
     sparseMatrixStats,
     stats,
@@ -65,13 +62,16 @@ Imports:
     tidyr,
     uwot
 Suggests: 
+    facets (>= 0.6.2),
     knitr,
+    pctGCdata (>= 0.3.0),
     quarto,
     Rsamtools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
-    R (>= 3.5)
+    R (>= 3.5),
+    SeuratObject
 Collate: 
     'objects.R'
     'clustering.R'
