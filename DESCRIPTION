@@ -37,6 +37,7 @@ Imports:
     data.table,
     dendextend,
     dplyr,
+    facets (>= 0.6.2),
     fastcluster,
     fpc,
     GenomeInfoDb,
@@ -50,6 +51,7 @@ Imports:
     matrixStats,
     methods,
     patchwork,
+    pctGCdata (>= 0.3.0),
     RANN,
     Rfast,
     rlang,
@@ -62,9 +64,7 @@ Imports:
     tidyr,
     uwot
 Suggests: 
-    facets (>= 0.6.2),
     knitr,
-    pctGCdata (>= 0.3.0),
     quarto,
     Rsamtools,
     testthat (>= 3.0.0)
