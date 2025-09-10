@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,19 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="muscadet-011">muscadet 0.1.1<a class="anchor" aria-label="anchor" href="#muscadet-011"></a></h2>
+<div class="section level4">
+<h4 id="bug-fixes-0-1-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-1"></a></h4>
+<ul><li>Fix issue of <code><a href="../reference/heatmapMuscadet.html">heatmapMuscadet()</a></code> crashing corner case: <code><a href="../reference/heatmapMuscadet.html">heatmapMuscadet()</a></code> no longer crashes when <code>averages=TRUE</code> for one cluster only (monoclonal samples).</li>
+<li>Fix issue of <code><a href="../reference/heatmapMuscadet.html">heatmapMuscadet()</a></code> with a wrong cluster order after Seurat clustering: <code><a href="../reference/cluster_seurat.html">cluster_seurat()</a></code> and <code><a href="../reference/imputeClusters.html">imputeClusters()</a></code> now return sorted clusters vectors, from 1 to n, cells with imputed clusters are therefore placed at the end of each cluster group.</li>
+<li>Fix issue of wrong silhouette computation (due to clusters sorting changes): clusters are ordered according to the distance matrix order of cells used for silhouette computation, giving the correct silhouette scores.</li>
+<li>The <code>SeuratObject</code> package is now attached along with <code>muscadet</code>to easily use <code><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells()</a></code> and <code><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features()</a></code> methods on muscadet objects.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="muscadet-010">muscadet 0.1.0<a class="anchor" aria-label="anchor" href="#muscadet-010"></a></h2>
 <div class="section level3">

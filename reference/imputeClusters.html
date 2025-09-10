@@ -9,7 +9,7 @@ some omics by leveraging nearest neighbor cells in other omic matrices."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@ some omics by leveraging nearest neighbor cells in other omic matrices."><meta p
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Impute cluster assignments for missing cells by similarity</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.0/R/clustering.R" class="external-link"><code>R/clustering.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/clustering.R" class="external-link"><code>R/clustering.R</code></a></small>
       <div class="d-none name"><code>imputeClusters.Rd</code></div>
     </div>
 
@@ -123,12 +123,12 @@ are aggregated to provide final cluster assignments.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># View the imputed cluster assignments</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">imputed_clusters</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Cell1  Cell2  Cell3  Cell4  Cell5 Cell11 Cell12 Cell13 Cell14 Cell15 Cell16 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      4      2      1      4      3      1      2      2      2      4      2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cell17 Cell18 Cell19 Cell20 Cell10  Cell6  Cell7  Cell8  Cell9 Cell21 Cell22 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      3      4      3      2      2      2      2      1      2      4      1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cell23 Cell24 Cell25 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      2      2      3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Cell3 Cell11  Cell8 Cell22  Cell2 Cell12 Cell13 Cell14 Cell16 Cell20 Cell10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      1      1      1      1      2      2      2      2      2      2      2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Cell6  Cell7  Cell9 Cell23 Cell24  Cell5 Cell17 Cell19 Cell25  Cell1  Cell4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      2      2      2      2      2      3      3      3      3      4      4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cell15 Cell18 Cell21 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      4      4      4 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
