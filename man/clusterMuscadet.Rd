@@ -18,7 +18,6 @@ clusterMuscadet(
 previously computed log R ratio matrices (\code{muscadet}).}
 
 \item{method}{The clustering method to apply (\code{character} string). One of
-\code{"seurat"} or \code{"hclust"}. For  medthod \code{"seurat"}, arguments for
 \code{\link[=cluster_seurat]{cluster_seurat()}} should be provided, and for method \code{"hclust"}, arguments
 for \code{\link[=cluster_hclust]{cluster_hclust()}} should be provided. Note: The \code{"seurat"} method can
 only be applied for a maximum of 2 omics. Default is \code{"seurat"}.}
@@ -45,9 +44,10 @@ values to use for \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\co
 list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 provided omic.}
     \item{\code{algorithm}}{Integer specifying the algorithm for modularity optimization
-by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} = Louvain
-algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leiden
-algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
+by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} =
+Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
+Leiden algorithm). Default is \code{1}. RECOMMENDED: \code{4} for Leiden algorithm
+but requires the \code{leidenalg} python package, see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
@@ -88,8 +88,6 @@ average silhouette width.}
 \description{
 Performs integration of multi omics and clustering of cells based on log
 ratio data contained in a \code{\link[=muscadet-class]{muscadet}} object.
-}
-\details{
 Two methods are available for integration and clustering of common cells
 between omics:
 \itemize{
@@ -97,13 +95,11 @@ between omics:
 graph-based clustering.
 \item Method \code{hclust} uses Similarity Network Fusion (SNF) for integration
 followed by hierarchical clustering.
-}
-
 Then, clusters are imputed for cells missing data in at least one omic, by
 similarity using nearest neighbor cells.
-
 Finally, silhouette widths are computed on the integrated distance matrix to
 help identify the optimal clustering partition.
+}
 }
 \examples{
 # Load example muscadet object

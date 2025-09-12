@@ -29,9 +29,10 @@ list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 provided omic.}
 
 \item{algorithm}{Integer specifying the algorithm for modularity optimization
-by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} = Louvain
-algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} = Leiden
-algorithm). Leiden requires the leidenalg python. Default is \code{1}.}
+by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} =
+Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
+Leiden algorithm). Default is \code{1}. RECOMMENDED: \code{4} for Leiden algorithm
+but requires the \code{leidenalg} python package, see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
 
 \item{knn_seurat}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
@@ -69,8 +70,6 @@ Performs graph-based clustering of cells using
 (\code{mat_list}), including shared nearest neighbors (SNN) graph construction on
 selected dimensions from PCA (\code{dims_list}), to identify clusters of cells for
 each specified resolution (\code{res_range}).
-}
-\details{
 \itemize{
 \item For two omics: multimodal integration is performed using
 \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (weighted shared nearest neighbors graph).
@@ -78,6 +77,25 @@ Only common cells between omics are used.
 \item For a single omic: \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}} (shared nearest neighbors
 graph) is used.
 }
+}
+\details{
+The Leiden algorithm (\code{algorithm = 4}) is recommended based on published work and best-practice
+guidelines:
+\itemize{
+\item Traag, V.A., Waltman, L. & van Eck, N.J. \emph{From Louvain to Leiden: guaranteeing well-connected communities.} Sci Rep 9, 5233 (2019).
+\url{https://doi.org/10.1038/s41598-019-41695-z>}
+\item Heumos, L., Schaar, A.C., Lance, C. et al. \emph{Best practices for single-cell
+analysis across modalities.} Nat Rev Genet (2023).
+\url{https://doi.org/10.1038/s41576-023-00586-w}
+\url{https://www.sc-best-practices.org/cellular_structure/clustering.html}
+}
+
+It requires the Python package \code{leidenalg} which can be installed with \verb{pip install leidenalg}. Since the implementation runs through
+\code{\link[reticulate:reticulate]{reticulate}} it’s important to ensure that
+R is using the correct Python environment with \code{reticulate::py_config()}. If
+you work within a conda or virtual environment, you can specify the Python
+path explicitly by setting the environment variable \code{RETICULATE_PYTHON}
+before starting R, or by using \code{reticulate::use_python()}.
 }
 \examples{
 \dontrun{

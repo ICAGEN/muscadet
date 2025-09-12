@@ -2,24 +2,20 @@
 #'
 #' Performs integration of multi omics and clustering of cells based on log
 #' ratio data contained in a [`muscadet`][muscadet-class] object.
-#'
 #' Two methods are available for integration and clustering of common cells
 #' between omics:
 #' - Method `seurat` uses nearest neighbors for integration followed by
 #' graph-based clustering.
 #' - Method `hclust` uses Similarity Network Fusion (SNF) for integration
 #' followed by hierarchical clustering.
-#'
 #' Then, clusters are imputed for cells missing data in at least one omic, by
 #' similarity using nearest neighbor cells.
-#'
 #' Finally, silhouette widths are computed on the integrated distance matrix to
 #' help identify the optimal clustering partition.
 #'
 #' @param x A [`muscadet`][muscadet-class] object containing omics data and
 #'   previously computed log R ratio matrices (`muscadet`).
 #' @param method The clustering method to apply (`character` string). One of
-#'   `"seurat"` or `"hclust"`. For  medthod `"seurat"`, arguments for
 #'   [cluster_seurat()] should be provided, and for method `"hclust"`, arguments
 #'   for [cluster_hclust()] should be provided. Note: The `"seurat"` method can
 #'   only be applied for a maximum of 2 omics. Default is `"seurat"`.
@@ -250,7 +246,6 @@ clusterMuscadet <- function(x,
 #' (`mat_list`), including shared nearest neighbors (SNN) graph construction on
 #' selected dimensions from PCA (`dims_list`), to identify clusters of cells for
 #' each specified resolution (`res_range`).
-#'
 #' - For two omics: multimodal integration is performed using
 #' [Seurat::FindMultiModalNeighbors()] (weighted shared nearest neighbors graph).
 #' Only common cells between omics are used.
@@ -267,9 +262,10 @@ clusterMuscadet <- function(x,
 #'   list(1:8, 1:8) for 2 omics). Default is the first 8 dimensions for each
 #'   provided omic.
 #' @param algorithm Integer specifying the algorithm for modularity optimization
-#'   by [Seurat::FindClusters()] (`1` = original Louvain algorithm; `2` = Louvain
-#'   algorithm with multilevel refinement; `3` = SLM algorithm; `4` = Leiden
-#'   algorithm). Leiden requires the leidenalg python. Default is `1`.
+#'   by [Seurat::FindClusters()] (`1` = original Louvain algorithm; `2` =
+#'   Louvain algorithm with multilevel refinement; `3` = SLM algorithm; `4` =
+#'   Leiden algorithm). Default is `1`. RECOMMENDED: `4` for Leiden algorithm
+#'   but requires the `leidenalg` python package, see [cluster_seurat()] Details section.
 #' @param knn_seurat Integer specifying the number of nearest neighbors used for
 #'   graph construction with [Seurat::Seurat()] functions [Seurat::FindNeighbors()]
 #'   (`k.param`) or [Seurat::FindMultiModalNeighbors()] (`k.nn`) (`integer`).
@@ -295,6 +291,26 @@ clusterMuscadet <- function(x,
 #'   \item{clusters}{A named list of clustering results (vectors of cluster
 #'   labels) for each value in `res_range` (`list`).}
 #' }
+#'
+#' @details
+#' The Leiden algorithm (`algorithm = 4`) is recommended based on published work and best-practice
+#' guidelines:
+#'
+#' - Traag, V.A., Waltman, L. & van Eck, N.J. _From Louvain to Leiden: guaranteeing well-connected communities._ Sci Rep 9, 5233 (2019).
+#' [https://doi.org/10.1038/s41598-019-41695-z>](https://doi.org/10.1038/s41598-019-41695-z>)
+#' - Heumos, L., Schaar, A.C., Lance, C. et al. _Best practices for single-cell
+#' analysis across modalities._ Nat Rev Genet (2023).
+#' [https://doi.org/10.1038/s41576-023-00586-w](https://doi.org/10.1038/s41576-023-00586-w)
+#' [https://www.sc-best-practices.org/cellular_structure/clustering.html](https://www.sc-best-practices.org/cellular_structure/clustering.html)
+#'
+#' It requires the Python package `leidenalg` which can be installed with `pip
+#' install leidenalg`. Since the implementation runs through
+#' [`reticulate`][reticulate::reticulate-package] it’s important to ensure that
+#' R is using the correct Python environment with `reticulate::py_config()`. If
+#' you work within a conda or virtual environment, you can specify the Python
+#' path explicitly by setting the environment variable `RETICULATE_PYTHON`
+#' before starting R, or by using `reticulate::use_python()`.
+#'
 #'
 #' @seealso [Weighted Nearest Neighbor Analysis Vignette from
 #' Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis)
