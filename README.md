@@ -12,15 +12,16 @@
 
 ### *multiomics single-cell copy number alterations detection*
 
-**R package for the identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.**
+**muscadet is an R package for identifying copy number alterations (CNAs) in cancer cells from single-cell multiomics data.**
 
-The package `muscadet` is designed for:
+#### Key features of `muscadet`:
 
- * **Integration**: Integrate information from multiple omics (e.g. Multiome with matched scATAC-seq and scRNA-seq data).
+ * **Data**: Copy number analysis from a single omic to multiple omics at once on the same cells.
+ * **Integration**: Integrate information at low-level from the matched omics.
  * **Clustering**: Cluster cells based on genome-wide coverage profiles.
- * **Imputation**: Impute clusters for cells missing data in one of the omic by nearest neighbor similarity.
- * **Detection**: Detect and call CNA segments using both coverage (log ratio of read counts) and allelic (read counts per allele) data.
- * **Visualization**: Visualize genome-wide coverage, clusters of cells, UMAP, CNA profiles, etc.
+ * **Imputation**: Impute cluster for cells missing data in one of the omic by nearest neighbor similarity.
+ * **Detection**: Detect and call CNA segments using both coverage (log ratio of read counts) and allelic imbalance (read counts per allele).
+ * **Visualization**: Explore genome-wide coverage, clusters of cells, UMAP embeddings, CNA profiles, and more.
  
  
 

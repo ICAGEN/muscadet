@@ -26,18 +26,11 @@ if (!dir.exists("figures")) dir.create("figures")
 library(SeuratObject)
 library(knitr)
 library(dplyr)
+library(ggplot2)
 ```
 
 
-`muscadet` (**mu**ltiomics **s**ingle-cell **c**opy number **a**lterations **det**ection) is an R package for the integration of **single-cell multiomics data** (e.g. scRNA-seq, scATAC-seq, scCUT&Tag) to detect somatic **copy number alterations (CNAs)** and cluster cells based on their CNA profiles.
-
-The package `muscadet` is designed for:
-
- * **Integration**: Integrate information from multiple omics (e.g. Multiome with matched scATAC-seq and scRNA-seq data).
- * **Clustering**: Cluster cells based on genome-wide coverage profiles.
- * **Imputation**: Impute clusters for cells missing data in one of the omic by nearest neighbor similarity.
- * **Detection**: Detect and call CNA segments using both coverage (log ratio of read counts) and allelic (read counts per allele) data.
- * **Visualization**: Visualize genome-wide coverage, clusters of cells, UMAP, CNA profiles, etc.
+`muscadet` (**mu**ltiomics **s**ingle-cell **c**opy number **a**lterations **det**ection) is an R package for identifying copy number alterations (CNAs) in cancer cells from single-cell multiomics data.
 
 # Installation
 
@@ -211,8 +204,39 @@ muscadet <- computeLogRatio(
     reference = muscadet_ref,
     omic = "RNA",
     method = "RNA",
-    refReads = 2) # low value for small example dataset
+    refReads = 2, # low value for small example dataset
+    refMeanReads = 0.01) 
 ```
+
+To adjust filters applied to features by `computeLogRatio()`, you can check distribution of data and filter status of features.
+
+```{r}
+#| label: check features filters
+
+ATAC_features <- coordFeatures(muscadet_obj)$ATAC
+
+ggplot(ATAC_features, aes(x = nPeaks, y = meanReads.ref, color = keep)) +
+    geom_point() +
+    geom_vline(xintercept = 1 , linetype = "dashed", color = "red") + # minPeaks threshold
+    geom_hline(yintercept = 1, linetype = "dashed", color = "red") + # minReads threshold
+    scale_y_log10() +
+    labs(x = "Number of peaks (minPeaks)", y = "Mean of reads in reference cells (minReads)",
+         title = "ATAC features (windows of peaks) filtered by thresholds") +
+    theme_minimal()
+
+RNA_features <- coordFeatures(muscadet_obj)$RNA  
+
+ggplot(RNA_features, aes(x = sumReads.ref, y = meanReads.ref, color = keep)) +
+    geom_point() +
+    geom_vline(xintercept = 2, linetype = "dashed", color = "red") + # refReads threshold
+    geom_hline(yintercept = 0.01, linetype = "dashed", color = "red") + # refMeanReads threshold
+    scale_x_log10() + scale_y_log10() +
+    labs(x = "Sum of reads in reference cells (refReads)", y = "Mean of reads in reference cells (refMeanReads)",
+         title = "RNA features (genes) filtered by thresholds") +
+    theme_minimal()
+
+```
+
 
 # Multimodal integrated clustering
 
@@ -227,7 +251,7 @@ The cells are clustered based on log ratio profiles with `clusterMuscadet()`, tw
 set.seed(123)
 
 # Perform clustering with "seurat" method
-muscadet_1 <- clusterMuscadet(
+muscadet_obj <- clusterMuscadet(
   x = muscadet_obj,
   method = "seurat",
   res_range = c(0.5, 0.8),
@@ -243,7 +267,7 @@ muscadet_1 <- clusterMuscadet(
 set.seed(123)
 
 # Perform clustering with "hclust" method
-muscadet_2 <- clusterMuscadet(
+muscadet_obj2 <- clusterMuscadet(
   x = muscadet_obj,
   k_range = 2:4,
   method = "hclust",
