@@ -32,7 +32,7 @@ provided omic.}
 by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} =
 Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
 Leiden algorithm). Default is \code{1}. RECOMMENDED: \code{4} for Leiden algorithm
-but requires the \code{leidenalg} python package, see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
+see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
 
 \item{knn_seurat}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
@@ -89,13 +89,6 @@ analysis across modalities.} Nat Rev Genet (2023).
 \url{https://doi.org/10.1038/s41576-023-00586-w}
 \url{https://www.sc-best-practices.org/cellular_structure/clustering.html}
 }
-
-It requires the Python package \code{leidenalg} which can be installed with \verb{pip install leidenalg}. Since the implementation runs through
-\code{\link[reticulate:reticulate]{reticulate}} it’s important to ensure that
-R is using the correct Python environment with \code{reticulate::py_config()}. If
-you work within a conda or virtual environment, you can specify the Python
-path explicitly by setting the environment variable \code{RETICULATE_PYTHON}
-before starting R, or by using \code{reticulate::use_python()}.
 }
 \examples{
 \dontrun{

@@ -47,7 +47,7 @@ provided omic.}
 by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} =
 Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
 Leiden algorithm). Default is \code{1}. RECOMMENDED: \code{4} for Leiden algorithm
-but requires the \code{leidenalg} python package, see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
+see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).

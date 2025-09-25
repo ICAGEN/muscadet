@@ -265,7 +265,7 @@ clusterMuscadet <- function(x,
 #'   by [Seurat::FindClusters()] (`1` = original Louvain algorithm; `2` =
 #'   Louvain algorithm with multilevel refinement; `3` = SLM algorithm; `4` =
 #'   Leiden algorithm). Default is `1`. RECOMMENDED: `4` for Leiden algorithm
-#'   but requires the `leidenalg` python package, see [cluster_seurat()] Details section.
+#'   see [cluster_seurat()] Details section.
 #' @param knn_seurat Integer specifying the number of nearest neighbors used for
 #'   graph construction with [Seurat::Seurat()] functions [Seurat::FindNeighbors()]
 #'   (`k.param`) or [Seurat::FindMultiModalNeighbors()] (`k.nn`) (`integer`).
@@ -302,14 +302,6 @@ clusterMuscadet <- function(x,
 #' analysis across modalities._ Nat Rev Genet (2023).
 #' [https://doi.org/10.1038/s41576-023-00586-w](https://doi.org/10.1038/s41576-023-00586-w)
 #' [https://www.sc-best-practices.org/cellular_structure/clustering.html](https://www.sc-best-practices.org/cellular_structure/clustering.html)
-#'
-#' It requires the Python package `leidenalg` which can be installed with `pip
-#' install leidenalg`. Since the implementation runs through
-#' [`reticulate`][reticulate::reticulate-package] it’s important to ensure that
-#' R is using the correct Python environment with `reticulate::py_config()`. If
-#' you work within a conda or virtual environment, you can specify the Python
-#' path explicitly by setting the environment variable `RETICULATE_PYTHON`
-#' before starting R, or by using `reticulate::use_python()`.
 #'
 #'
 #' @seealso [Weighted Nearest Neighbor Analysis Vignette from
