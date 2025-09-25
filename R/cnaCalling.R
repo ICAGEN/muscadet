@@ -286,7 +286,6 @@ cnaCalling <- function(
 
     x@cnacalling[["combined.counts.filtered"]] <- rcmat_filtered
 
-
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
 
     msg("Performing segmentation per cluster...")
@@ -304,9 +303,26 @@ cnaCalling <- function(
                                  ndepthmax = depthmax.nor)
             oo <- facets::procSample(xx, cval = cval2, min.nhet = min.nhet, dipLogR = dipLogR)
             oo[["clusters"]] <- i
-            oo_list[[i]] <- oo
+            oo_list[[as.character(i)]] <- oo
         }
     }
+
+    # Filtered clusters without enough data
+    processed_clusters <- as.integer(names(oo_list))
+    initial_clusters <- as.integer(unique(sort(clusters)))
+    skipped_clusters <- setdiff(initial_clusters, processed_clusters)
+
+    if (length(skipped_clusters) >= 1) {
+        msg("Clusters without enough data are filtered out: ", paste(skipped_clusters, collapse = ", "))
+
+        # Update clusters and ncells
+        clusters <- clusters[which(clusters %in% processed_clusters)]
+        ncells <- table(clusters)
+
+        x@cnacalling[["clusters"]] <- clusters
+        x@cnacalling[["skipped_clusters"]] <- skipped_clusters
+    }
+
 
     # Add cluster column to output "out" table
     oo_list <- lapply(oo_list, function(x) {
