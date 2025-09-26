@@ -1886,7 +1886,7 @@ plotCNA <- function(x,
             breaks = chromStarts$chrom.start + (chromSizes$width / 2),
             labels = as.character(chromNames)
         ) +
-        # method labels in the center
+        # cluster labels in the center
         scale_y_continuous(
             expand = c(0, 0),
             trans = "reverse",
