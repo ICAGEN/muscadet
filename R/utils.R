@@ -138,6 +138,11 @@ assignClusters <- function(x,
         }
     }
 
+    # Reset CNA calling results to avoid discordant outputs
+    x@cnacalling <- list()
+
+    ########
+
     # Helper function to impute clusters if needed
     .check_and_impute_clusters <- function(clusters_vec) {
 
@@ -384,6 +389,9 @@ mergeCounts <- function(x,
             !is.null(omic@allelic$table.counts)
         })))
     )
+
+    # Reset CNA calling results to avoid discordant outputs
+    x@cnacalling <- list(clusters = x@cnacalling$clusters)
 
     # Allelic Data Processing --------------------------------------------------
     if (!quiet) {

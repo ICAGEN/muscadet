@@ -240,6 +240,16 @@ cnaCalling <- function(
         stop("The input muscadet object `x` must contain valid 'x@cnacalling$clusters' and 'x@cnacalling$combined.counts'.")
     }
 
+    # Reset CNA calling results to avoid discordant outputs
+    x@cnacalling <- list(
+        clusters = x@cnacalling$clusters,
+        allelic.counts = x@cnacalling$allelic.counts,
+        coverage.counts = x@cnacalling$coverage.counts,
+        combined.counts = x@cnacalling$combined.counts
+    )
+
+    ######
+
     # Filter coverage data based on selected omics
     if(!is.null(omics.coverage)) {
 

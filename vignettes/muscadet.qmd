@@ -365,9 +365,15 @@ plotIndexes(muscadet_obj)
 First, a clustering partition must be selected using `assignClusters()`.
 ```{r}
 #| label: assign clusters
+#| eval: false
 muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
+```
+
+```{r}
+#| label: show table clusters
 table(muscadet_obj$cnacalling$clusters)
 ```
+
 
 Then, run `mergeCounts()` using both the sample (tumor cells) and reference (normal cells) `muscadet` objects, to combine counts per cluster from multiple omics from both.
 
