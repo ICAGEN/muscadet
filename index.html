@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,20 +71,25 @@
 <h3 id="multiomics-single-cell-copy-number-alterations-detection">
 <em>multiomics single-cell copy number alterations detection</em><a class="anchor" aria-label="anchor" href="#multiomics-single-cell-copy-number-alterations-detection"></a>
 </h3>
-<p><strong>R package for the identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.</strong></p>
-<p>The package <code>muscadet</code> is designed for:</p>
+<p><strong>muscadet is an R package for identifying copy number alterations (CNAs) in cancer cells from single-cell multiomics data.</strong></p>
+<div class="section level4">
+<h4 id="key-features-of-muscadet">Key features of <code>muscadet</code>:<a class="anchor" aria-label="anchor" href="#key-features-of-muscadet"></a>
+</h4>
 <ul>
 <li>
-<strong>Integration</strong>: Integrate information from multiple omics (e.g. Multiome with matched scATAC-seq and scRNA-seq data).</li>
+<strong>Data</strong>: Copy number analysis from a single omic to multiple omics at once on the same cells.</li>
+<li>
+<strong>Integration</strong>: Integrate information at low-level from the matched omics.</li>
 <li>
 <strong>Clustering</strong>: Cluster cells based on genome-wide coverage profiles.</li>
 <li>
-<strong>Imputation</strong>: Impute clusters for cells missing data in one of the omic by nearest neighbor similarity.</li>
+<strong>Imputation</strong>: Impute cluster for cells missing data in one of the omic by nearest neighbor similarity.</li>
 <li>
-<strong>Detection</strong>: Detect and call CNA segments using both coverage (log ratio of read counts) and allelic (read counts per allele) data.</li>
+<strong>Detection</strong>: Detect and call CNA segments using both coverage (log ratio of read counts) and allelic imbalance (read counts per allele).</li>
 <li>
-<strong>Visualization</strong>: Visualize genome-wide coverage, clusters of cells, UMAP, CNA profiles, etc.</li>
+<strong>Visualization</strong>: Explore genome-wide coverage, clusters of cells, UMAP embeddings, CNA profiles, and more.</li>
 </ul>
+</div>
 </div>
 <div class="section level3">
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>

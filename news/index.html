@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,22 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.1/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.2" id="muscadet-012">muscadet 0.1.2<a class="anchor" aria-label="anchor" href="#muscadet-012"></a></h2>
+<div class="section level4">
+<h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>
+<ul><li>Seurat dependency set to <code>5.3.0</code> at minimum to avoid the installation of <code>leidenalg</code> python package when selecting the Leiden method for clustering.</li>
+<li>The <code>clusters</code> and <code>ncells</code> elements of the <code>@cnacalling</code> slot in muscadet objects are now updated during the <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> function right after some clusters need to be skipped due to not enough data. This resolves discordance between <code>clusters</code> and <code>ncells</code> elements with other <code>@cnacalling</code> elements, and avoids issues in plotting functions.</li>
+<li>The CNA calling functions (<code><a href="../reference/assignClusters.html">assignClusters()</a></code>, <code><a href="../reference/mergeCounts.html">mergeCounts()</a></code> and <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> now all in <code>cnaCalling.R</code>) now include a reset of the <code>@cnacalling</code> slot of the muscadet object, to avoid discordance between results if clusters or parameters are changed in between the different steps of the CNA calling.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="documentation-0-1-2">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-1-2"></a></h4>
+<ul><li>Documentation added to <code><a href="../reference/clusterMuscadet.html">clusterMuscadet()</a></code> and <code><a href="../reference/cluster_seurat.html">cluster_seurat()</a></code> for Leiden clustering algorithm recommendation when using the Seurat method.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="muscadet-011">muscadet 0.1.1<a class="anchor" aria-label="anchor" href="#muscadet-011"></a></h2>
 <div class="section level4">

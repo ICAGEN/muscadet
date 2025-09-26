@@ -3,11 +3,25 @@
 Seurat, based on one or two log R ratio matrices
 (mat_list), including shared nearest neighbors (SNN) graph construction on
 selected dimensions from PCA (dims_list), to identify clusters of cells for
-each specified resolution (res_range)."><meta property="og:description" content="Performs graph-based clustering of cells using
+each specified resolution (res_range).
+For two omics: multimodal integration is performed using
+Seurat::FindMultiModalNeighbors() (weighted shared nearest neighbors graph).
+Only common cells between omics are used.
+For a single omic: Seurat::FindNeighbors() (shared nearest neighbors
+graph) is used.
+
+"><meta property="og:description" content="Performs graph-based clustering of cells using
 Seurat, based on one or two log R ratio matrices
 (mat_list), including shared nearest neighbors (SNN) graph construction on
 selected dimensions from PCA (dims_list), to identify clusters of cells for
-each specified resolution (res_range)."><meta property="og:image" content="https://icagen.github.io/muscadet/logo.png"></head><body>
+each specified resolution (res_range).
+For two omics: multimodal integration is performed using
+Seurat::FindMultiModalNeighbors() (weighted shared nearest neighbors graph).
+Only common cells between omics are used.
+For a single omic: Seurat::FindNeighbors() (shared nearest neighbors
+graph) is used.
+
+"><meta property="og:image" content="https://icagen.github.io/muscadet/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +29,7 @@ each specified resolution (res_range)."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +55,7 @@ each specified resolution (res_range)."><meta property="og:image" content="https
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Multi Omics Clustering using Seurat Multi Modal Graph-based Clustering</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.1/R/clustering.R" class="external-link"><code>R/clustering.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/clustering.R" class="external-link"><code>R/clustering.R</code></a></small>
       <div class="d-none name"><code>cluster_seurat.Rd</code></div>
     </div>
 
@@ -50,8 +64,12 @@ each specified resolution (res_range)."><meta property="og:image" content="https
 <code><a href="https://satijalab.org/seurat/reference/Seurat-package.html" class="external-link">Seurat</a></code>, based on one or two log R ratio matrices
 (<code>mat_list</code>), including shared nearest neighbors (SNN) graph construction on
 selected dimensions from PCA (<code>dims_list</code>), to identify clusters of cells for
-each specified resolution (<code>res_range</code>).</p>
-    </div>
+each specified resolution (<code>res_range</code>).</p><ul><li><p>For two omics: multimodal integration is performed using
+<code><a href="https://satijalab.org/seurat/reference/FindMultiModalNeighbors.html" class="external-link">Seurat::FindMultiModalNeighbors()</a></code> (weighted shared nearest neighbors graph).
+Only common cells between omics are used.</p></li>
+<li><p>For a single omic: <code><a href="https://satijalab.org/seurat/reference/FindNeighbors.html" class="external-link">Seurat::FindNeighbors()</a></code> (shared nearest neighbors
+graph) is used.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
@@ -91,9 +109,10 @@ provided omic.</p></dd>
 
 <dt id="arg-algorithm">algorithm<a class="anchor" aria-label="anchor" href="#arg-algorithm"></a></dt>
 <dd><p>Integer specifying the algorithm for modularity optimization
-by <code><a href="https://satijalab.org/seurat/reference/FindClusters.html" class="external-link">Seurat::FindClusters()</a></code> (<code>1</code> = original Louvain algorithm; <code>2</code> = Louvain
-algorithm with multilevel refinement; <code>3</code> = SLM algorithm; <code>4</code> = Leiden
-algorithm). Leiden requires the leidenalg python. Default is <code>1</code>.</p></dd>
+by <code><a href="https://satijalab.org/seurat/reference/FindClusters.html" class="external-link">Seurat::FindClusters()</a></code> (<code>1</code> = original Louvain algorithm; <code>2</code> =
+Louvain algorithm with multilevel refinement; <code>3</code> = SLM algorithm; <code>4</code> =
+Leiden algorithm). Default is <code>1</code>. RECOMMENDED: <code>4</code> for Leiden algorithm
+see <code>cluster_seurat()</code> Details section.</p></dd>
 
 
 <dt id="arg-knn-seurat">knn_seurat<a class="anchor" aria-label="anchor" href="#arg-knn-seurat"></a></dt>
@@ -149,12 +168,13 @@ labels) for each value in <code>res_range</code> (<code>list</code>).</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-
-<ul><li><p>For two omics: multimodal integration is performed using
-<code><a href="https://satijalab.org/seurat/reference/FindMultiModalNeighbors.html" class="external-link">Seurat::FindMultiModalNeighbors()</a></code> (weighted shared nearest neighbors graph).
-Only common cells between omics are used.</p></li>
-<li><p>For a single omic: <code><a href="https://satijalab.org/seurat/reference/FindNeighbors.html" class="external-link">Seurat::FindNeighbors()</a></code> (shared nearest neighbors
-graph) is used.</p></li>
+    <p>The Leiden algorithm (<code>algorithm = 4</code>) is recommended based on published work and best-practice
+guidelines:</p><ul><li><p>Traag, V.A., Waltman, L. &amp; van Eck, N.J. <em>From Louvain to Leiden: guaranteeing well-connected communities.</em> Sci Rep 9, 5233 (2019).
+<a href="https://doi.org/10.1038/s41598-019-41695-z&gt;" class="external-link">https://doi.org/10.1038/s41598-019-41695-z&gt;</a></p></li>
+<li><p>Heumos, L., Schaar, A.C., Lance, C. et al. <em>Best practices for single-cell
+analysis across modalities.</em> Nat Rev Genet (2023).
+<a href="https://doi.org/10.1038/s41576-023-00586-w" class="external-link">https://doi.org/10.1038/s41576-023-00586-w</a>
+<a href="https://www.sc-best-practices.org/cellular_structure/clustering.html" class="external-link">https://www.sc-best-practices.org/cellular_structure/clustering.html</a></p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

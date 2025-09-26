@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.1/vignettes/muscadet.qmd" class="external-link"><code>vignettes/muscadet.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/vignettes/muscadet.qmd" class="external-link"><code>vignettes/muscadet.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -74,20 +74,7 @@
 
 
 
-    <p><code>muscadet</code> (<strong>mu</strong>ltiomics <strong>s</strong>ingle-cell <strong>c</strong>opy number <strong>a</strong>lterations <strong>det</strong>ection) is an R package for the integration of <strong>single-cell multiomics data</strong> (e.g. scRNA-seq, scATAC-seq, scCUT&amp;Tag) to detect somatic <strong>copy number alterations (CNAs)</strong> and cluster cells based on their CNA profiles.</p>
-<p>The package <code>muscadet</code> is designed for:</p>
-<ul>
-<li>
-<strong>Integration</strong>: Integrate information from multiple omics (e.g. Multiome with matched scATAC-seq and scRNA-seq data).</li>
-<li>
-<strong>Clustering</strong>: Cluster cells based on genome-wide coverage profiles.</li>
-<li>
-<strong>Imputation</strong>: Impute clusters for cells missing data in one of the omic by nearest neighbor similarity.</li>
-<li>
-<strong>Detection</strong>: Detect and call CNA segments using both coverage (log ratio of read counts) and allelic (read counts per allele) data.</li>
-<li>
-<strong>Visualization</strong>: Visualize genome-wide coverage, clusters of cells, UMAP, CNA profiles, etc.</li>
-</ul>
+    <p><code>muscadet</code> (<strong>mu</strong>ltiomics <strong>s</strong>ingle-cell <strong>c</strong>opy number <strong>a</strong>lterations <strong>det</strong>ection) is an R package for identifying copy number alterations (CNAs) in cancer cells from single-cell multiomics data.</p>
 <section class="section level2" data-number="1"><h2 data-number="1" id="installation">
 <span class="header-section-number">1</span> Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -313,7 +300,51 @@
 <span>    reference <span class="op">=</span> <span class="va">muscadet_ref</span>,</span>
 <span>    omic <span class="op">=</span> <span class="st">"RNA"</span>,</span>
 <span>    method <span class="op">=</span> <span class="st">"RNA"</span>,</span>
-<span>    refReads <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># low value for small example dataset</span></span></code></pre></div>
+<span>    refReads <span class="op">=</span> <span class="fl">2</span>, <span class="co"># low value for small example dataset</span></span>
+<span>    refMeanReads <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span> </span></code></pre></div>
+</div>
+<p>To adjust filters applied to features by <code><a href="../reference/computeLogRatio.html">computeLogRatio()</a></code>, you can check distribution of data and filter status of features.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ATAC_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">ATAC_features</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">nPeaks</span>, y <span class="op">=</span> <span class="va">meanReads.ref</span>, color <span class="op">=</span> <span class="va">keep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1</span> , linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># minPeaks threshold</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># minReads threshold</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Number of peaks (minPeaks)"</span>, y <span class="op">=</span> <span class="st">"Mean of reads in reference cells (minReads)"</span>,</span>
+<span>         title <span class="op">=</span> <span class="st">"ATAC features (windows of peaks) filtered by thresholds"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in scale_y_log10(): log-10 transformation introduced infinite values.</span></span>
+<span><span class="co">#&gt; Warning: Removed 197 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="muscadet_files/figure-html/check%20features%20filters-1.png" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">RNA_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">RNA</span>  </span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">RNA_features</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sumReads.ref</span>, y <span class="op">=</span> <span class="va">meanReads.ref</span>, color <span class="op">=</span> <span class="va">keep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">2</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># refReads threshold</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0.01</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># refMeanReads threshold</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Sum of reads in reference cells (refReads)"</span>, y <span class="op">=</span> <span class="st">"Mean of reads in reference cells (refMeanReads)"</span>,</span>
+<span>         title <span class="op">=</span> <span class="st">"RNA features (genes) filtered by thresholds"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in scale_x_log10(): log-10 transformation introduced infinite values.</span></span>
+<span><span class="co">#&gt; Warning in scale_y_log10(): log-10 transformation introduced infinite values.</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="muscadet_files/figure-html/check%20features%20filters-2.png" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 </section><section class="section level2" data-number="4"><h2 data-number="4" id="multimodal-integrated-clustering">
 <span class="header-section-number">4</span> Multimodal integrated clustering<a class="anchor" aria-label="anchor" href="#multimodal-integrated-clustering"></a>
@@ -326,11 +357,11 @@
 <code>method = "hclust"</code>: Integration by Similarity Network Fusion (SNF) followed by hierarchical clustering (see <code><a href="../reference/cluster_hclust.html">cluster_hclust()</a></code>).</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Perform clustering with "seurat" method</span></span>
-<span><span class="va">muscadet_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
+<span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">muscadet_obj</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"seurat"</span>,</span>
 <span>  res_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
@@ -340,11 +371,11 @@
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Perform clustering with "hclust" method</span></span>
-<span><span class="va">muscadet_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
+<span><span class="va">muscadet_obj2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">muscadet_obj</span>,</span>
 <span>  k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"hclust"</span>,</span>
@@ -354,7 +385,7 @@
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Number of cells per cluster per partition</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span>, <span class="va">table</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $`0.6`</span></span>
@@ -377,7 +408,7 @@
 </h2>
 <p>The genome-wide coverage profiles and clusters are visualized as a heatmap using <code><a href="../reference/heatmapMuscadet.html">heatmapMuscadet()</a></code> on a chosen clustering partition stored in the <code>muscadet</code> object.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot heatmap </span></span>
 <span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
 <span>    <span class="va">muscadet_obj</span>,</span>
@@ -388,7 +419,7 @@
 </div>
 <p><img src="figures/heatmap_res0.6.png" id="fig-ht" class="quarto-figure quarto-figure-center" style="width:100.0%" alt="Heatmap of log ratios"> An heatmap of log ratio averages per clusters can also be plotted.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot heatmap of log ratio averages per cluster</span></span>
 <span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
 <span>    <span class="va">muscadet_obj</span>,</span>
@@ -408,7 +439,7 @@ Figure 1: Heatmap of log ratios averages per cluster
 </div>
 <p>The integrated genome-wide coverage profiles are projected into a low-dimensional space using Uniform Manifold Approximation and Projection (UMAP).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotUMAP.html">plotUMAP</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -422,7 +453,7 @@ Figure 1: Heatmap of log ratios averages per cluster
 </h2>
 <p>To validate and select the clustering partition, Silhouette scores are stored in the <code>muscadet</code> object and are visualized using <code><a href="../reference/plotSil.html">plotSil()</a></code> and other clustering validation indexes with <code><a href="../reference/plotIndexes.html">plotIndexes()</a></code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View stored silhouette average widths per partition</span></span>
 <span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">silhouette</span><span class="op">$</span><span class="va">sil.w.avg</span></span>
 <span><span class="co">#&gt; $`0.6`</span></span>
@@ -435,7 +466,7 @@ Figure 1: Heatmap of log ratios averages per cluster
 <span><span class="co">#&gt; [1] 0.1456324</span></span></code></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Silhouette plot for individual clustering partition</span></span>
 <span><span class="fu"><a href="../reference/plotSil.html">plotSil</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -450,7 +481,7 @@ Figure 2: Silhouette plot for a clustering partition
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot clustering indexes for every stored partitions</span></span>
 <span><span class="fu"><a href="../reference/plotIndexes.html">plotIndexes</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, index <span class="op">=</span> <span class="st">"silhouette"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -465,7 +496,7 @@ Figure 3: Plot of Silhouette scores across partitions
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot clustering indexes for every stored partitions</span></span>
 <span><span class="fu"><a href="../reference/plotIndexes.html">plotIndexes</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -484,22 +515,25 @@ Figure 4: Plot of clustering validation indexes across partitions
 </h2>
 <p>First, a clustering partition must be selected using <code><a href="../reference/assignClusters.html">assignClusters()</a></code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assignClusters.html">assignClusters</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">cnacalling</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assignClusters.html">assignClusters</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">cnacalling</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  1  2 </span></span>
 <span><span class="co">#&gt; 84 63</span></span></code></pre></div>
 </div>
 <p>Then, run <code><a href="../reference/mergeCounts.html">mergeCounts()</a></code> using both the sample (tumor cells) and reference (normal cells) <code>muscadet</code> objects, to combine counts per cluster from multiple omics from both.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Merge counts per cluster from all omics from both sample and reference</span></span>
 <span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mergeCounts.html">mergeCounts</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, <span class="va">muscadet_obj_ref</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>Finally, run <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> to call CNA segments</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cnaCalling.html">cnaCalling</a></span><span class="op">(</span></span>
 <span>    <span class="va">muscadet_obj</span>,</span>
 <span>    omics.coverage <span class="op">=</span> <span class="st">"ATAC"</span>, <span class="co"># only ATAC coverage used</span></span>
@@ -534,7 +568,7 @@ Figure 4: Plot of clustering validation indexes across partitions
 <li>Fraction of cells estimated to harbor the CNA at each segment.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, data <span class="op">=</span> <span class="fl">1</span>, title <span class="op">=</span> <span class="st">"Cluster 1 profile"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -544,7 +578,7 @@ Figure 4: Plot of clustering validation indexes across partitions
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, data <span class="op">=</span> <span class="st">"allcells"</span>, title <span class="op">=</span> <span class="st">"Profile for all cells"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -555,7 +589,7 @@ Figure 4: Plot of clustering validation indexes across partitions
 </div>
 <p>The complete CNA profile of the sample across clusters is visualized using <code><a href="../reference/plotCNA.html">plotCNA()</a></code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -563,7 +597,7 @@ Figure 4: Plot of clustering validation indexes across partitions
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, cf.gradient <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
