@@ -561,6 +561,10 @@ computeLogRatioATAC <- function(matTumor,
     matTumor <- matTumor[windowsDF$keep[window_names], ]
     matRef <- matRef[windowsDF$keep[window_names], ]
 
+    # Filter coord table for windows with peaks
+    windowsDF <- windowsDF[windowsDF$nPeaks != 0, ]
+    windowsDF$CHROM <- droplevels(windowsDF$CHROM)
+
     if (all_steps == TRUE) {
         obj$step02 <- list(
             matTumor = matTumor,
