@@ -713,7 +713,18 @@ cnaCalling <- function(
     # Extract and validate required slots
     gbuild <- x$genome
     rcmat <- x@cnacalling$combined.counts
+    chromlevels <- levels(rcmat$Chromosome)
     clusters <- x@cnacalling$clusters
+    ncells <- table(clusters)
+
+    # Determine chromosome number for X based on genome build
+    nX <- switch(
+        gbuild,
+        "hg19" = 23,
+        "hg38" = 23,
+        "mm10" = 20,
+        stop("Unsupported genome: ", gbuild)
+    )
 
     if (is.null(rcmat) || is.null(clusters)) {
         stop("The input muscadet object `x` must contain valid 'x@cnacalling$clusters' and 'x@cnacalling$combined.counts'.")
@@ -746,10 +757,6 @@ cnaCalling <- function(
 
     # Ensure no missing values in combined counts
     rcmat <- na.omit(rcmat)
-
-    chromlevels <- levels(rcmat$Chromosome)
-    nX <- length(chromlevels)
-    ncells <- table(clusters)
 
     # 1. PER CLUSTER -----------------------------------------------------------
 
