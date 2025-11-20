@@ -8,10 +8,12 @@ cluster_seurat(
   mat_list,
   res_range = seq(0.1, 0.5, 0.1),
   dims_list = rep(list(1:8), length(mat_list)),
-  algorithm = 1,
+  algorithm = 4,
+  leiden_method = "igraph",
   knn_seurat = 20,
   knn_range_seurat = 200,
   max_dim = 200,
+  random.seed = 1,
   quiet = FALSE
 )
 }
@@ -31,8 +33,12 @@ provided omic.}
 \item{algorithm}{Integer specifying the algorithm for modularity optimization
 by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} =
 Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
-Leiden algorithm). Default is \code{1}. RECOMMENDED: \code{4} for Leiden algorithm
+Leiden algorithm). Default is \code{4} for Leiden algorithm as recommended,
 see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
+
+\item{leiden_method}{Character string to choose from which package for
+running leiden algorithm, either leidenbase ("leidenbase") or igraph
+("igraph") packages (\code{character}). Default is "igraph".}
 
 \item{knn_seurat}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
@@ -46,6 +52,10 @@ neighbors to compute for \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::Fin
 \item{max_dim}{Integer specifying the maximum number of principal components
 to be used for PCA computation with \code{\link[stats:prcomp]{stats::prcomp()}} (\code{integer}). Default
 is \code{200}.}
+
+\item{random.seed}{Integer specifying the seed of the random number
+generator, must be greater than 0 for Leiden algorithm. (\code{integer}).
+Default is \code{1}.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
@@ -89,6 +99,9 @@ analysis across modalities.} Nat Rev Genet (2023).
 \url{https://doi.org/10.1038/s41576-023-00586-w}
 \url{https://www.sc-best-practices.org/cellular_structure/clustering.html}
 }
+
+Explanation about igraph being the default package for Leiden implementation
+(\code{leiden_method = "igraph"}) here: https://github.com/satijalab/seurat/issues/9800
 }
 \examples{
 \dontrun{

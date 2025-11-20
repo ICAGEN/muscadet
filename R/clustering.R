@@ -264,8 +264,11 @@ clusterMuscadet <- function(x,
 #' @param algorithm Integer specifying the algorithm for modularity optimization
 #'   by [Seurat::FindClusters()] (`1` = original Louvain algorithm; `2` =
 #'   Louvain algorithm with multilevel refinement; `3` = SLM algorithm; `4` =
-#'   Leiden algorithm). Default is `1`. RECOMMENDED: `4` for Leiden algorithm
+#'   Leiden algorithm). Default is `4` for Leiden algorithm as recommended,
 #'   see [cluster_seurat()] Details section.
+#' @param leiden_method Character string to choose from which package for
+#'   running leiden algorithm, either leidenbase ("leidenbase") or igraph
+#'   ("igraph") packages (`character`). Default is "igraph".
 #' @param knn_seurat Integer specifying the number of nearest neighbors used for
 #'   graph construction with [Seurat::Seurat()] functions [Seurat::FindNeighbors()]
 #'   (`k.param`) or [Seurat::FindMultiModalNeighbors()] (`k.nn`) (`integer`).
@@ -276,6 +279,9 @@ clusterMuscadet <- function(x,
 #' @param max_dim Integer specifying the maximum number of principal components
 #'   to be used for PCA computation with [stats::prcomp()] (`integer`). Default
 #'   is `200`.
+#' @param random.seed Integer specifying the seed of the random number
+#'   generator, must be greater than 0 for Leiden algorithm. (`integer`).
+#'   Default is `1`.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
@@ -302,6 +308,9 @@ clusterMuscadet <- function(x,
 #' analysis across modalities._ Nat Rev Genet (2023).
 #' [https://doi.org/10.1038/s41576-023-00586-w](https://doi.org/10.1038/s41576-023-00586-w)
 #' [https://www.sc-best-practices.org/cellular_structure/clustering.html](https://www.sc-best-practices.org/cellular_structure/clustering.html)
+#'
+#' Explanation about igraph being the default package for Leiden implementation
+#' (`leiden_method = "igraph"`) here: https://github.com/satijalab/seurat/issues/9800
 #'
 #'
 #' @seealso [Weighted Nearest Neighbor Analysis Vignette from
@@ -334,10 +343,12 @@ clusterMuscadet <- function(x,
 cluster_seurat <- function(mat_list,
                            res_range = seq(0.1, 0.5, 0.1),
                            dims_list = rep(list(1:8), length(mat_list)),
-                           algorithm = 1,
+                           algorithm = 4,
+                           leiden_method = "igraph",
                            knn_seurat = 20,
                            knn_range_seurat = 200,
                            max_dim = 200,
+                           random.seed = 1,
                            quiet = FALSE
 ) {
     # Arguments validations
@@ -369,6 +380,8 @@ cluster_seurat <- function(mat_list,
         method = "seurat",
         res_range = res_range,
         dims_list = dims_list,
+        algorithm = algorithm,
+        leiden_method = ifelse(algorithm == 4, leiden_method, NA),
         knn_seurat = knn_seurat,
         knn_range_seurat = knn_range_seurat
     )
@@ -542,8 +555,10 @@ cluster_seurat <- function(mat_list,
         seurat <- Seurat::FindClusters(
             seurat,
             algorithm = algorithm,
+            leiden_method = leiden_method,
             resolution = res,
             graph.name = grep("snn", names(seurat@graphs), value = TRUE),
+            random.seed = random.seed,
             verbose = FALSE
         )
         cl <- seurat@meta.data$seurat_clusters

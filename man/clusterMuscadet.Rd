@@ -46,7 +46,7 @@ provided omic.}
     \item{\code{algorithm}}{Integer specifying the algorithm for modularity optimization
 by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = original Louvain algorithm; \code{2} =
 Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
-Leiden algorithm). Default is \code{1}. RECOMMENDED: \code{4} for Leiden algorithm
+Leiden algorithm). Default is \code{4} for Leiden algorithm as recommended,
 see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
