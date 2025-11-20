@@ -1,3 +1,10 @@
+# muscadet 0.1.3
+
+### Bug Fixes
+- Fixed issue on methods applied to one-omic muscadet objects to get back to methods returning a list of objects instead of returning the object itself in the one-element list case.
+- Fixed the table of features coordinates for ATAC in `computeLogRatioATAC()`, now the windows not covered by peaks are dropped.
+- Fixed issue about nX number of chromosomes in `cnaCalling()` to take the maximum number of chromosomes depending on genome and not on the number of chromosomes in the object (case with missing chromosomes).
+
 # muscadet 0.1.2
 
 ### Bug Fixes
