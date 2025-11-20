@@ -210,6 +210,8 @@ test_that("Check Cells/Features methods outputs", {
         bulk.label = "WGS",
         genome = "hg38"
     )
-    expect_identical(Cells(muscadet_monoomic), colnames(slot(atac, "coverage")[["mat.counts"]]))
+    expect_identical(Cells(muscadet_monoomic), lapply(slot(muscadet_monoomic, "omics"), function(omic) {
+        return(colnames(slot(omic, "coverage")[["mat.counts"]]))
+    }))
 })
 

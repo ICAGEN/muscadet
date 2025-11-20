@@ -19,7 +19,7 @@ test_that("assignClusters() returns an updated muscadet object", {
     custom_clusters <- c(rep.int(1, n1), rep.int(2, n2))
     names(custom_clusters) <- cell_names
 
-    obj2 <- assignClusters(muscadet_obj, clusters = custom_clusters)
+    obj2 <- assignClusters(muscadet_obj, clusters = custom_clusters, redo_imputation = FALSE)
 
     expect_true(length(obj2@cnacalling) != 0)
     expect_length(table(obj2@cnacalling$clusters), 2) # 2 clusters
