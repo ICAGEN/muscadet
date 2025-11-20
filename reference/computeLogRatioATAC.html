@@ -11,7 +11,7 @@ of peaks, thereby features become windows of peaks instead of peaks."><meta prop
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@ of peaks, thereby features become windows of peaks instead of peaks."><meta prop
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Compute log R ratios for scATAC-seq data</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.2/R/computeLogRatio.R" class="external-link"><code>R/computeLogRatio.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/computeLogRatio.R" class="external-link"><code>R/computeLogRatio.R</code></a></small>
       <div class="d-none name"><code>computeLogRatioATAC.Rd</code></div>
     </div>
 
@@ -182,8 +182,8 @@ steps:</p><ul><li><p>Group peaks in windows (<code>windowSize</code> and <code>s
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other computeLogRatio:
-<code><a href="computeLogRatio.html">computeLogRatio</a>()</code>,
-<code><a href="computeLogRatioRNA.html">computeLogRatioRNA</a>()</code></p></div>
+<code><a href="computeLogRatio.html">computeLogRatio()</a></code>,
+<code><a href="computeLogRatioRNA.html">computeLogRatioRNA()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -246,7 +246,7 @@ steps:</p><ul><li><p>Group peaks in windows (<code>windowSize</code> and <code>s
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">obj_atac</span><span class="op">$</span><span class="va">coord</span><span class="op">$</span><span class="va">keep</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FALSE  TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1329   133 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1132   133 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># With results form every step when `all_steps = TRUE`</span></span></span>
 <span class="r-in"><span><span class="va">obj_atac_all</span> <span class="op">&lt;-</span> <span class="fu">computeLogRatioATAC</span><span class="op">(</span></span></span>
@@ -272,7 +272,7 @@ steps:</p><ul><li><p>Group peaks in windows (<code>windowSize</code> and <code>s
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">obj_atac_all</span><span class="op">$</span><span class="va">coord</span><span class="op">$</span><span class="va">keep</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FALSE  TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1329   133 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1132   133 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">obj_atac_all</span><span class="op">$</span><span class="va">step08</span><span class="op">$</span><span class="va">matTumor</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 133</span>
 <span class="r-in"><span></span></span>
@@ -287,7 +287,7 @@ steps:</p><ul><li><p>Group peaks in windows (<code>windowSize</code> and <code>s
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

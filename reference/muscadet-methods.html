@@ -27,7 +27,7 @@ matLogRatio(): Get log R ratio matrices.
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@ matLogRatio(): Get log R ratio matrices.
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Methods for <code><a href="muscomic-class.html">muscomic</a></code> and <code><a href="muscadet-class.html">muscadet</a></code> objects</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.2/R/objects.R" class="external-link"><code>R/objects.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/objects.R" class="external-link"><code>R/objects.R</code></a></small>
       <div class="d-none name"><code>muscadet-methods.Rd</code></div>
     </div>
 
@@ -123,24 +123,20 @@ object.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>Cells</code>:</p><ul><li><p>if <code>x</code> is a <code><a href="muscomic-class.html">muscomic()</a></code> object: a vector of cell names.</p></li>
-<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a vector of cell names (one omic),
-or a list of vectors of cell names, one list element per omic.</p></li>
+<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a list of cell names vectors,
+one list element per omic.</p></li>
 </ul><p><code>Features</code>:</p><ul><li><p>if <code>x</code> is a <code><a href="muscomic-class.html">muscomic()</a></code> object: a vector of feature names.</p></li>
-<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a vector of feature names (one omic),
-or a list of vectors of feature names, one list element per omic.</p></li>
-</ul><p><code>coordFeatures</code>:</p><ul><li><p>if <code>x</code> is a <code><a href="muscomic-class.html">muscomic()</a></code> object: a data frame of feature
-coordinates.</p></li>
-<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a data frame of feature
-coordinates (one omic), or a list of data frames of feature coordinates,
-with one list element per omic.</p></li>
+<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a list of feature names vectors,
+one list element per omic.</p></li>
+</ul><p><code>coordFeatures</code>:</p><ul><li><p>if <code>x</code> is a <code><a href="muscomic-class.html">muscomic()</a></code> object: a data frame of feature coordinates.</p></li>
+<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a list of feature coordinates data frames,
+one list element per omic.</p></li>
 </ul><p><code>matCounts</code>:</p><ul><li><p>if <code>x</code> is a <code><a href="muscomic-class.html">muscomic()</a></code> object: a <code><a href="https://rdrr.io/pkg/Matrix/man/dgCMatrix-class.html" class="external-link">dgCMatrix</a></code> <em>features x cells</em>.</p></li>
-<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a <code><a href="https://rdrr.io/pkg/Matrix/man/dgCMatrix-class.html" class="external-link">dgCMatrix</a></code>
-<em>features x cells</em> (one omic), or a list of <code><a href="https://rdrr.io/pkg/Matrix/man/dgCMatrix-class.html" class="external-link">dgCMatrix</a></code>,
-with one list element per omic.</p></li>
+<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a list of <code><a href="https://rdrr.io/pkg/Matrix/man/dgCMatrix-class.html" class="external-link">dgCMatrices</a></code>
+<em>features x cells</em>, one list element per omic.</p></li>
 </ul><p><code>matLogRatio</code>:</p><ul><li><p>if <code>x</code> is a <code><a href="muscomic-class.html">muscomic()</a></code> object: a <code>matrix</code> <em>features x cells</em>.</p></li>
-<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a <code>matrix</code>
-<em>features x cells</em> (one omic), or a list of <code>matrix</code>,
-with one list element per omic.</p></li>
+<li><p>if <code>x</code> is a <code><a href="muscadet-class.html">muscadet()</a></code> object: a list of <code>matrices</code> <em>features x cells</em>,
+one list element per omic.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -401,7 +397,7 @@ with one list element per omic.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
