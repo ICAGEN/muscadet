@@ -1,3 +1,110 @@
+
+#' Construct Sparse Matrices for Allelic Data
+#'
+#' This function converts a long-format allele counts table into two sparse
+#' matrices: one containing reference allele depths (RD) and one containing
+#' alternate allele depths (AD). Each matrix has cells as rows and variant
+#' positions as columns. Variant coordinates and metadata (id, CHROM, POS, REF,
+#' ALT) is also returned in a structured data frame in the list of outputs.
+#'
+#' @param allele_counts A data.frame containing at least the columns:
+#'   \code{cell}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT},
+#'   \code{RD}, \code{AD}. Each row represents a single variant in a
+#'   specific cell.
+#'
+#' @return A list with the following elements:
+#' \describe{
+#'   \item{mat.RD}{A \code{Matrix::dgCMatrix} sparse matrix of reference depths.}
+#'   \item{mat.AD}{A \code{Matrix::dgCMatrix} sparse matrix of alternate depths.}
+#'   \item{coord.vars}{A data.frame of variant metadata with columns:
+#'     \code{id}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}.}
+#' }
+#'
+#' @importFrom data.table as.data.table :=
+#' @importFrom Matrix sparseMatrix
+#'
+#' @examples
+#' allele_counts <- data.frame(
+#'   cell = c("cell1","cell1","cell2"),
+#'   CHROM = c("1","1","1"),
+#'   POS = c(101,102,101),
+#'   REF = c("A","G","A"),
+#'   ALT = c("C","T","C"),
+#'   RD = c(10, 0, 4),
+#'   AD = c(3, 5, 0)
+#' )
+#' out <- makeAllelicSparse(allele_counts)
+#' str(out)
+#' # access cells names
+#' rownames(out$mat.RD)
+#' # access variants ids
+#' colnames(out$mat.RD) # or
+#' out$coord.vars$id
+#'
+#' @export
+makeAllelicSparse <- function(allele_counts) {
+
+    # Check input columns
+    required_cols <- c("cell", "CHROM", "POS", "REF", "ALT", "RD", "AD")
+    stopifnot(
+        "The data frame `allele_counts` must contain the required columns: cell, CHROM, POS, REF, ALT, RD, AD." =
+            all(required_cols %in% colnames(allele_counts))
+    )
+
+    # Convert to data.table (faster)
+    dt <- data.table::as.data.table(allele_counts)
+
+    # Reorder data on genomic positions
+    chromorder <- c(as.character(1:22), "X", "Y")
+    dt[, CHROM := ordered(CHROM, levels = chromorder[chromorder %in% unique(CHROM)])]
+    dt <- dt[order(CHROM, POS), ]
+
+    # Create variant identifier
+    dt[, id := paste(CHROM, POS, REF, ALT, sep = "_")]
+
+    # Unique ordering of variant loci and cells
+    loci  <- unique(dt$id)
+    cells <- unique(dt$cell)
+
+    # Map to matrix indices
+    i <- match(dt$cell, cells)
+    j <- match(dt$id, loci)
+
+    # Index non-zero values
+    keep_RD <- dt$RD != 0
+    keep_AD <- dt$AD != 0
+
+    # Build sparse matrices
+    M_RD <- Matrix::sparseMatrix(
+        i = i[keep_RD],
+        j = j[keep_RD],
+        x = dt$RD[keep_RD],
+        dims = c(length(cells), length(loci)),
+        dimnames = list(cells, loci)
+    )
+    M_AD <- Matrix::sparseMatrix(
+        i = i[keep_AD],
+        j = j[keep_AD],
+        x = dt$AD[keep_AD],
+        dims = c(length(cells), length(loci)),
+        dimnames = list(cells, loci)
+    )
+
+    # Extract variant coordinates and metadata
+    coord.vars <- dt[match(loci, id), .(id, CHROM, POS, REF, ALT)]
+
+    # Correct types and reorder
+    coord.vars[, CHROM := ordered(CHROM, levels = chromorder[chromorder %in% unique(CHROM)])]
+    coord.vars[, POS := as.integer(POS)]
+    coord.vars <- coord.vars[order(CHROM, POS), ]
+
+    return(list(
+        mat.RD = M_RD,
+        mat.AD = M_AD,
+        coord.vars = as.data.frame(coord.vars)
+    ))
+}
+
 #' Add allele counts to a `muscadet` object
 #'
 #' This function adds allele counts data to the `omics` of a

@@ -1,4 +1,41 @@
 
+test_that("makeAllelicSparse produces correct sparse matrices", {
+    allele_counts <- data.frame(
+        cell = c("cell1", "cell1", "cell2"),
+        CHROM = c("1", "1", "1"),
+        POS = c(101, 102, 101),
+        REF = c("A", "G", "A"),
+        ALT = c("C", "T", "C"),
+        RD = c(10, 0, 4),
+        AD = c(3, 5, 0)
+    )
+
+    out <- makeAllelicSparse(allele_counts)
+
+    # Structure checks
+    expect_true(is.list(out))
+    expect_true(inherits(out$mat.RD, "dgCMatrix"))
+    expect_true(inherits(out$mat.AD, "dgCMatrix"))
+    expect_true(is.data.frame(out$coord.vars))
+
+    # Dimensions
+    expect_equal(nrow(out$mat.RD), 2)    # two cells
+    expect_equal(ncol(out$mat.RD), 2)    # two variants
+
+    # RD matrix content
+    expect_equal(out$mat.RD["cell1", 1], 10)
+    expect_equal(out$mat.RD["cell2", 1], 4)
+    expect_equal(out$mat.RD["cell1", 2], 0) # RD=0 should be absent => treated as 0
+
+    # AD matrix content
+    expect_equal(out$mat.AD["cell1", 1], 3)
+    expect_equal(out$mat.AD["cell1", 2], 5)
+    expect_equal(out$mat.AD["cell2", 1], 0)
+
+    # Metadata checks
+    expect_equal(colnames(out$mat.RD), out$coord.vars$id)
+})
+
 
 test_that("addAlleleCounts() returns a muscadet object with allele table counts,
           identically as if allele counts were added through CreateMuscomicObject()" , {
