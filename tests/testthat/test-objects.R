@@ -1,15 +1,53 @@
 # CreateMuscomicObject ---------------------------------------------------------
 
+test_that("CreateMuscomicObject works with minimal input", {
+
+    mat <- Matrix::sparseMatrix(
+        i = c(1,1,2), j = c(1,2,1), x = c(5,3,2),
+        dims = c(2,2),
+        dimnames = list(c("cell1","cell2"), c("f1","f2"))
+    )
+
+    features <- data.frame(
+        CHROM = c("1","1"),
+        start = c(100,200),
+        end   = c(150,250),
+        id    = c("f1","f2")
+    )
+
+    allele <- data.frame(
+        cell = c("cell1","cell2"),
+        CHROM = c("1","1"),
+        POS = c(100,200),
+        REF = c("A","G"),
+        ALT = c("C","T"),
+        RD = c(10,5),
+        AD = c(3,1)
+    )
+
+    obj <- CreateMuscomicObject(
+        type="ATAC",
+        mat_counts = mat,
+        features = features,
+        allele_counts = allele
+    )
+
+    expect_s4_class(obj, "muscomic")
+    expect_true(nrow(obj@coverage$counts$mat) == 2)
+    expect_true(ncol(obj@coverage$counts$mat) == 2)
+    expect_true(length(obj@allelic$coord.vars$id) == 2)
+})
+
 test_that("CreateMuscomicObject returns a correct muscomic object", {
   atac <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = mat_counts_atac_tumor,
+    mat_counts = t(mat_counts_atac_tumor),
     allele_counts = allele_counts_atac_tumor,
     features = peaks
   )
   rna <- CreateMuscomicObject(
       type = "RNA",
-      mat_counts = mat_counts_rna_tumor,
+      mat_counts = t(mat_counts_rna_tumor),
       allele_counts = allele_counts_rna_tumor,
       features = genes
   )
@@ -26,13 +64,15 @@ test_that("CreateMuscomicObject returns a correct muscomic object", {
   expect_identical(slot(atac, "label.omic"), "scATAC-seq")
   expect_identical(slot(rna, "label.omic"), "scRNA-seq")
   # cov
-  expect_identical(class(slot(atac, "coverage")), "list")
-  expect_identical(class(slot(rna, "coverage")), "list")
-  expect_identical(names(slot(atac, "coverage")), c("mat.counts","table.counts","coord.features","label.features"))
-  expect_identical(names(slot(rna, "coverage")), c("mat.counts","table.counts","coord.features","label.features"))
+  expect_identical(class(atac@coverage), "list")
+  expect_identical(class(rna@coverage), "list")
+  expect_identical(names(atac@coverage), "counts")
+  expect_identical(names(rna@coverage), "counts")
+  expect_identical(names(atac@coverage$counts), c("mat", "coord.features", "label.features"))
+  expect_identical(names(rna@coverage$counts), c("mat", "coord.features", "label.features"))
   # dgCMatrix
-  expect_identical(as.character(class(slot(atac, "coverage")[["mat.counts"]])), "dgCMatrix")
-  expect_identical(as.character(class(slot(rna, "coverage")[["mat.counts"]])), "dgCMatrix")
+  expect_identical(as.character(class(atac@coverage$counts$mat)), "dgCMatrix")
+  expect_identical(as.character(class(rna@coverage$counts$mat)), "dgCMatrix")
 })
 
 test_that("CreateMuscomicObject without a matrix in input: error", {
@@ -60,7 +100,7 @@ test_that(
     }
 )
 
-# CreateMuscomicObject ---------------------------------------------------------
+# CreateMuscadetObject ---------------------------------------------------------
 
 test_that("CreateMuscadetObject returns a correct muscadet object", {
     atac <- CreateMuscomicObject(

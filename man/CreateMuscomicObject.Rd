@@ -17,9 +17,9 @@ CreateMuscomicObject(
 \item{type}{Type of single cell omic, either "ATAC" or "RNA"
 (\code{character} string).}
 
-\item{mat_counts}{Matrix of raw counts \emph{features x cells} (\code{matrix} or
-\code{dgCMatrix}). Rows are features (they must correspond to the id column of
-\code{features}), and columns are cells.}
+\item{mat_counts}{Matrix of raw counts \emph{cells x features} (\code{matrix} or
+\code{dgCMatrix}). Rows are cells and columns are features. (they must
+correspond to the id column of \code{features})}
 
 \item{features}{Data frame of features (peaks, genes...) coordinates on
 genome (\code{data.frame}). It should contain 4 columns:
@@ -37,8 +37,8 @@ cell (\code{data.frame}). Variant positions can be either common single
 nucleotide polymorphisms (SNPs) positions or individual-specific
 heterozygous positions retrieved from bulk sequencing. The data frame format
 is based on the Variant Calling Format (VCF), thereby it must contain the
-following columns : \code{cell}, \code{id}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}, \code{RD}, \code{AD},
-\code{DP}, (\code{GT}). See \code{\link[=allele_counts]{allele_counts()}} for details.}
+following columns : \code{cell}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}, \code{RD}, \code{AD}. See
+\code{\link[=allele_counts]{allele_counts()}} for details.}
 
 \item{label.omic}{Label for the single cell omic (\code{character} string). By
 default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"
@@ -51,44 +51,57 @@ type.}
 A \code{\link[=muscomic-class]{muscomic}} object.
 }
 \description{
-Create a \code{\link[=muscomic-class]{muscomic}} object.
+Create a \code{\link[=muscomic-class]{muscomic}} object containing coverage and
+(optionally) allelic count information for a single-cell omic dataset.
 }
 \examples{
+
+# Minimal example
+mat <- Matrix::sparseMatrix(
+    i = c(1, 1, 2),
+    j = c(1, 2, 1),
+    x = c(5, 3, 2),
+    dims = c(2, 2),
+    dimnames = list(c("cell1", "cell2"), c("f1", "f2"))
+)
+
+features <- data.frame(
+    CHROM = c("1", "1"),
+    start = c(100, 200),
+    end   = c(150, 250),
+    id    = c("f1", "f2")
+)
+
+allele <- data.frame(
+    cell = c("cell1", "cell2"),
+    CHROM = c("1", "1"),
+    POS = c(100, 200),
+    REF = c("A", "G"),
+    ALT = c("C", "T"),
+    RD = c(10, 5),
+    AD = c(3, 1)
+)
+
+muscomic <- CreateMuscomicObject(
+    type = "ATAC",
+    mat_counts = mat,
+    features = features,
+    allele_counts = allele
+)
+
+# On the example dataset
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
+  mat_counts = t(mat_counts_atac_tumor),
   allele_counts = allele_counts_atac_tumor,
   features = peaks
 )
 atac
 
-rna <- CreateMuscomicObject(
-  type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
-)
-rna
-
-atac_ref <- CreateMuscomicObject(
-  type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
-)
-
-rna_ref <- CreateMuscomicObject(
-  type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
-)
-rna_ref
-
 # without allele counts data (not required for clustering step)
 atac2 <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
+  mat_counts = t(mat_counts_atac_tumor),
   features = peaks
 )
 atac2

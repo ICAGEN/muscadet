@@ -100,6 +100,17 @@ and \code{muscadet} to \code{\link[SeuratObject:Cells]{SeuratObject::Features()}
 \item \code{matLogRatio()}: Get log R ratio matrices.
 }
 }
+\details{
+The \code{Cells()}, \code{Features()}, and \code{coordFeatures()} functions return information
+associated with the coverage slot of \code{muscomic} objects. Their behavior depends
+on whether log R ratios have been computed:
+\itemize{
+\item \strong{Before log R ratio computation:} they return data from the \emph{counts} layer
+of the coverage slot.
+\item \strong{After log R ratio computation:} if the coverage slot contains a \emph{logratio}
+layer, they return the corresponding data instead of the raw counts.
+}
+}
 \examples{
 library("SeuratObject")
 
@@ -109,6 +120,25 @@ library("SeuratObject")
 Cells(muscadet_obj) # list of 2 cell names vectors for the 2 omics
 Cells(muscadet_obj)$ATAC # cell names vector from the omic ATAC
 Cells(muscadet_obj$ATAC) # cell names vector from the ATAC muscomic object
+length(Cells(muscadet_obj))
+length(Cells(muscadet_obj)$ATAC)
+length(Cells(muscadet_obj$ATAC))
+
+Features(muscadet_obj)
+Features(muscadet_obj)$ATAC
+Features(muscadet_obj$ATAC)
+
+coordFeatures(muscadet_obj)
+coordFeatures(muscadet_obj)$ATAC
+coordFeatures(muscadet_obj$ATAC)
+
+matCounts(muscadet_obj)
+matCounts(muscadet_obj)$ATAC
+matCounts(muscadet_obj$ATAC)
+
+matLogRatio(muscadet_obj)
+matLogRatio(muscadet_obj)$ATAC
+matLogRatio(muscadet_obj$ATAC)
 
 }
 \seealso{

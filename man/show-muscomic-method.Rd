@@ -19,7 +19,7 @@ Overview of a \code{\link[=muscomic-class]{muscomic}} object.
 \examples{
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
+  mat_counts = t(mat_counts_atac_tumor),
   allele_counts = allele_counts_atac_tumor,
   features = peaks
 )
