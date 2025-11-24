@@ -136,7 +136,6 @@ methods::setClass(
 #'
 #' @importClassesFrom Matrix dgCMatrix
 #' @importFrom Matrix Matrix sparseMatrix
-#' @importFrom stringr str_remove
 #' @importFrom methods new
 #' @importFrom rlang .data
 #'
@@ -257,7 +256,7 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
     features$end <- as.integer(features$end)
     features$id <- as.character(features$id)
     # Remove "chr" in CHROM if necessary
-    features$CHROM <- stringr::str_remove(features$CHROM, "chr")
+    features$CHROM <- gsub("chr", "", features$CHROM)
     # Order chromosomes
     chromorder <- c(as.character(1:22), "X", "Y")
     features$CHROM <- ordered(features$CHROM, levels = chromorder[chromorder %in% unique(features$CHROM)])
@@ -337,7 +336,7 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 #'
 #' @param omics A list of [`muscomic`][muscomic-class] objects (`list`). The
 #'   names of the list will set the names of omics in the final object, if the
-#'   list is unamed, the type is taken instead.
+#'   list is unnamed, the type is taken instead.
 #' @param bulk.lrr A data frame containing log R ratio per genomic segments from
 #'   bulk sequencing data (`data.frame`). One row per segment and 4 columns
 #'   ordered as followed: chromosome (`integer`), start position (`integer`),
@@ -366,25 +365,25 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = mat_counts_atac_tumor,
+#'   mat_counts = t(mat_counts_atac_tumor),
 #'   allele_counts = allele_counts_atac_tumor,
 #'   features = peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = mat_counts_rna_tumor,
+#'   mat_counts = t(mat_counts_rna_tumor),
 #'   allele_counts = allele_counts_rna_tumor,
 #'   features = genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = mat_counts_atac_ref,
+#'   mat_counts = t(mat_counts_atac_ref),
 #'   allele_counts = allele_counts_atac_ref,
 #'   features = peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = mat_counts_rna_ref,
+#'   mat_counts = t(mat_counts_rna_ref),
 #'   allele_counts = allele_counts_rna_ref,
 #'   features = genes
 #' )
@@ -467,7 +466,7 @@ CreateMuscadetObject <- function(omics,
   )
 
   # Add bulk log R ratio data
-  bulk.data <- list(log.ratio = bulk.lrr, label = bulk.label)
+  bulk.data <- list(logratio = bulk.lrr, label = bulk.label)
 
   # Create object
   obj <- new(
@@ -787,39 +786,56 @@ setMethod(
     signature = signature(object = "muscomic"),
     definition = function(object) {
 
+        # Extract summary helper function
         get_muscomic_summary <- function(i) {
             list(
                 type = i@type,
                 label = i@label.omic,
-                cells = nrow(i@coverage$counts$mat),
-                features_counts = nrow(i@coverage$counts$coord.features),
-                feature_lab_counts = i@coverage$counts$label.features,
-                features_logratio = nrow(i@coverage$logratio$mat),
-                feature_lab_logratio = i@coverage$logratio$label.features,
-                vars = nrow(i@allelic$coord.vars)
+                counts = c(
+                    "n_cells" = nrow(i@coverage$counts$mat),
+                    "n_features" = ncol(i@coverage$counts$mat),
+                    "label" = i@coverage$counts$label.features
+                ),
+                logratio = if (!is.null(i@coverage$logratio)) {
+                    c(
+                        "n_cells" = nrow(i@coverage$logratio$mat),
+                        "n_features" = ncol(i@coverage$logratio$mat),
+                        "label" = i@coverage$logratio$label.features
+                    )
+                } else NULL,
+                vars = if (!is.null(i@allelic$coord.vars)) {
+                    nrow(i@allelic$coord.vars)
+                } else 0
             )
         }
 
         summary <- get_muscomic_summary(object)
 
-        line1 <- paste0("A muscomic object of type ", summary$type, ", labelled ", summary$label, ", containing:")
-        line_counts <- paste0("counts data: ", summary$features_counts, " features (", summary$feature_lab_counts, ")")
-        line_logratio <- paste0("logratio data: ", summary$features_logratio, " features (", summary$feature_lab_logratio, ")")
+        # Header lines
+        line_start <- paste("A muscomic object", "\n",
+                            "type:", summary$type, "\n",
+                            "label:", summary$label, "\n",
+                            "cells:", length(Cells(object)), "\n")
 
 
-        if (!is.null(summary$features_logratio)) {
-            cat(line1, "\n",
-                summary$cells, "cells", "\n",
-                line_counts, "\n",
-                line_logratio, "\n",
-                summary$vars, "variant positions", "\n")
-
+        # Counts layer summary
+        line_counts <- paste0("counts: ",
+                              summary$counts[1], " cells x ",
+                              summary$counts[2], " features (",
+                              summary$counts[3], ")", "\n")
+        # Logratio layer summary
+        if(!is.null(summary$logratio)) {
+            line_logratio <- paste0("logratio: ",
+                                    summary$logratio[1], " cells x ",
+                                    summary$logratio[2], " features (",
+                                    summary$logratio[3], ")", "\n")
         } else {
-            cat(line1, "\n",
-                summary$cells, "cells", "\n",
-                line_counts, "\n",
-                summary$vars, "variant positions", "\n")
+            line_logratio <- paste0("logratio: None", "\n")
         }
+
+        line_vars <- paste0("variant positions: ", summary$vars, "\n")
+
+        cat(line_start, line_counts, line_logratio, line_vars)
     }
 )
 
@@ -856,67 +872,101 @@ setMethod(
     signature = signature(object = "muscadet"),
     definition = function(object) {
 
+        # Extract summary helper function
         get_muscomic_summary <- function(i) {
-            # Determine which matrix to use (mat.counts or log.ratio)
-            matrix_type <- if ("log.ratio" %in% names(i@coverage)) {
-                "log.ratio"
-            } else {
-                "mat.counts"
-            }
             list(
                 type = i@type,
                 label = i@label.omic,
-                cells = ncol(i@coverage[[matrix_type]]),
-                features = nrow(i@coverage[[matrix_type]]),
-                vars = length(unique(i@allelic$table.counts$id)),
-                feature_labels = i@coverage$label.features,
-                matrix_used = matrix_type
+                counts = c(
+                    "n_cells" = nrow(i@coverage$counts$mat),
+                    "n_features" = ncol(i@coverage$counts$mat),
+                    "label" = i@coverage$counts$label.features
+                ),
+                logratio = if (!is.null(i@coverage$logratio)) {
+                    c(
+                        "n_cells" = nrow(i@coverage$logratio$mat),
+                        "n_features" = ncol(i@coverage$logratio$mat),
+                        "label" = i@coverage$logratio$label.features
+                        )
+                } else NULL,
+                vars = if (!is.null(i@allelic$coord.vars)) {
+                    nrow(i@allelic$coord.vars)
+                } else 0
             )
         }
 
-        # Prepare summary data for each muscomic object inside muscadet
-        omic_summary <- lapply(object@omics, get_muscomic_summary)
-        omic_types <- sapply(omic_summary, function(x) x$type)
-        omic_labels <- sapply(omic_summary, function(x) x$label)
-        omic_cells <- sapply(omic_summary, function(x) x$cells)
-        omic_features <- sapply(omic_summary, function(x) x$features)
-        omic_vars <- sapply(omic_summary, function(x) x$vars)
-        omic_feature_labels <- sapply(omic_summary, function(x) x$feature_labels)
-        omic_matrix_used <- sapply(omic_summary, function(x) x$matrix_used)
+        # Collect summaries for each omic
+        summary <- lapply(object@omics, get_muscomic_summary)
 
+        # Extract info arrays
+        omic_types  <- sapply(summary, `[[`, "type")
+        omic_labels <- sapply(summary, `[[`, "label")
+        omic_counts <- lapply(summary, `[[`, "counts")
+        omic_logratio <- lapply(summary, `[[`, "logratio")
+        omic_vars <- sapply(summary, `[[`, "vars")
 
-        if (!is.null(object@cnacalling$consensus.segs)) {
-            cnacall_txt <- paste(
-                length(unique(object@cnacalling$clusters)),
-                "clusters ;",
-                nrow(object@cnacalling$consensus.segs),
-                "consensus segments including",
-                sum(object@cnacalling$consensus.segs$cna, na.rm = TRUE),
-                "CNA segments"
-            )
-        }
+        # Cell information
+        omic_cells <- lapply(object@omics, function(x) Cells(x))
+        common_cells <- Reduce(intersect, omic_cells)
+        total_cells <- Reduce(union, omic_cells)
 
-        cat(
+        # Header lines
+        lines_start <- paste(
             "A muscadet object", "\n",
             length(object@omics), "omics:", paste(names(object@omics), collapse = ", "), "\n",
             "types:", paste(omic_types, collapse = ", "), "\n",
             "labels:", paste(omic_labels, collapse = ", "), "\n",
-            "coverage data matrix:", paste(omic_matrix_used, collapse = ", "), "\n",
-            "cells:", paste(omic_cells, collapse = ", "), paste0("(common: ", length(Reduce(intersect, Cells(object))), ", total: ", length(Reduce(union, Cells(object))), ")"), "\n", "features:", paste(omic_features, collapse = ", "), "\n",
-            "feature labels:", paste(omic_feature_labels, collapse = ", "), "\n",
+            "cells:", paste(lapply(Cells(object), length), collapse = ", "),
+            paste0("(common: ", length(Reduce(intersect, Cells(object))),
+                   ", total: ", length(Reduce(union, Cells(object))), ")"), "\n"
+        )
+
+        # Count layer summary
+        line_counts <- paste("counts:", paste(sapply(omic_counts, function(x) {
+            if (is.null(x)) return("None")
+            paste0(x[1], " cells x ", x[2], " features (", x[3], ")")
+        }), collapse = ", "), "\n")
+
+        # Logratio layer summary
+        line_logratio <- paste("logratio:", if (all(sapply(omic_logratio, is.null))) {
+            "None\n"
+        } else {
+            paste(sapply(omic_logratio[!sapply(omic_logratio, is.null)], function(x) {
+                paste0(x[1], " cells x ", x[2], " features (", x[3], ")")
+            }), collapse = ", ")
+        }, "\n")
+
+
+        # CNA calling summary
+        if (!is.null(object@cnacalling$consensus.segs)) {
+            cnacall_txt <- paste(
+                length(unique(object@cnacalling$clusters)), "clusters ;",
+                nrow(object@cnacalling$consensus.segs), "consensus segments including",
+                sum(object@cnacalling$consensus.segs$cna, na.rm = TRUE), "CNA segments"
+            )
+        }
+
+        # Last lines
+        lines_end <- paste(
             "variant positions:", paste(omic_vars, collapse = ", "), "\n",
-            "data from paired bulk sequencing:", ifelse(
+            "bulk data:", ifelse(
                 is.null(object@bulk.data$label),
                 "None", object@bulk.data$label), "\n",
-            "clustering:", ifelse(
-                length(object@clustering) == 0,
-                "None",
-                paste("partitions =", paste(names(object@clustering$clusters), collapse = ", "),
-                      "; optimal partition =", object@clustering$partition.opt)
-            ), "\n",
+            "clustering:",
+            if (length(object@clustering) == 0) {
+                "None"
+            } else {
+                paste0(
+                    "partitions = ", paste(names(object@clustering$clusters), collapse = ", "),
+                    " ; optimal partition = ", object@clustering$partition.opt
+                )
+            }, "\n",
             "CNA calling:", ifelse(is.null(object@cnacalling$consensus.segs), "None", cnacall_txt), "\n",
             "genome:", object@genome, "\n"
         )
+
+        # Print everything
+        cat(lines_start, line_counts, line_logratio, lines_end)
     }
 )
 
@@ -1018,9 +1068,9 @@ matLogRatio <- function(x) {
 #' @method Cells muscomic
 #' @export
 Cells.muscomic <- function(x, ...) {
-    if (!is.null(slot(x, "coverage")[["logratio"]])) {
+    if (!is.null(slot(x, "coverage")[["logratio"]][["mat"]])) {
         rownames(slot(x, "coverage")[["logratio"]][["mat"]])
-    } else if (!is.null(slot(x, "coverage")[["counts"]])) {
+    } else if (!is.null(slot(x, "coverage")[["counts"]][["mat"]])) {
         rownames(slot(x, "coverage")[["counts"]][["mat"]])
     }
 }
@@ -1033,10 +1083,10 @@ Cells.muscomic <- function(x, ...) {
 #' @export
 Cells.muscadet <- function(x, ...) {
     lapply(slot(x, "omics"), function(omic) {
-        if (!is.null(slot(omic, "coverage")[["log.ratio"]])) {
-            colnames(slot(omic, "coverage")[["log.ratio"]])
-        } else if (!is.null(slot(omic, "coverage")[["mat.counts"]])) {
-            colnames(slot(omic, "coverage")[["mat.counts"]])
+        if (!is.null(slot(omic, "coverage")[["logratio"]][["mat"]])) {
+            rownames(slot(omic, "coverage")[["logratio"]][["mat"]])
+        } else if (!is.null(slot(omic, "coverage")[["counts"]][["mat"]])) {
+            rownames(slot(omic, "coverage")[["counts"]][["mat"]])
         }
     })
 }
@@ -1054,9 +1104,9 @@ Cells.muscadet <- function(x, ...) {
 #' @method Features muscomic
 #' @export
 Features.muscomic <- function(x, ...) {
-    if (!is.null(slot(x, "coverage")[["logratio"]])) {
+    if (!is.null(slot(x, "coverage")[["logratio"]][["mat"]])) {
         colnames(slot(x, "coverage")[["logratio"]][["mat"]])
-    } else if (!is.null(slot(x, "coverage")[["counts"]])) {
+    } else if (!is.null(slot(x, "coverage")[["counts"]][["mat"]])) {
         colnames(slot(x, "coverage")[["counts"]][["mat"]])
     }
 }
@@ -1069,14 +1119,13 @@ Features.muscomic <- function(x, ...) {
 #' @export
 Features.muscadet <- function(x, ...) {
     lapply(slot(x, "omics"), function(omic) {
-        if (!is.null(slot(omic, "coverage")[["log.ratio"]])) {
-            rownames(slot(omic, "coverage")[["log.ratio"]])
-        } else if (!is.null(slot(omic, "coverage")[["mat.counts"]])) {
-            rownames(slot(omic, "coverage")[["mat.counts"]])
+        if (!is.null(slot(omic, "coverage")[["logratio"]][["mat"]])) {
+            colnames(slot(omic, "coverage")[["logratio"]][["mat"]])
+        } else if (!is.null(slot(omic, "coverage")[["counts"]][["mat"]])) {
+            colnames(slot(omic, "coverage")[["counts"]][["mat"]])
         }
     })
 }
-
 
 #' @rdname muscadet-methods
 #'
@@ -1090,15 +1139,13 @@ setMethod(
   f = "coordFeatures",
   signature = signature(x = "muscomic"),
   definition = function(x) {
-      if (!is.null(slot(x, "coverage")[["logratio"]])) {
+      if (!is.null(slot(x, "coverage")[["logratio"]][["coord.features"]])) {
           slot(x, "coverage")[["logratio"]][["coord.features"]]
-      } else if (!is.null(slot(x, "coverage")[["counts"]])) {
+      } else if (!is.null(slot(x, "coverage")[["counts"]][["coord.features"]])) {
           slot(x, "coverage")[["counts"]][["coord.features"]]
       }
   }
 )
-
-
 
 #' @rdname muscadet-methods
 #'
@@ -1107,7 +1154,11 @@ setMethod(
     signature = signature(x = "muscadet"),
     definition = function(x) {
         lapply(slot(x, "omics"), function(omic) {
-            slot(omic, "coverage")[["coord.features"]]
+            if (!is.null(slot(x, "coverage")[["logratio"]][["coord.features"]])) {
+                slot(x, "coverage")[["logratio"]][["coord.features"]]
+            } else if (!is.null(slot(x, "coverage")[["counts"]][["coord.features"]])) {
+                slot(x, "coverage")[["counts"]][["coord.features"]]
+            }
         })
     }
 )
@@ -1135,7 +1186,7 @@ setMethod(
     signature = signature(x = "muscadet"),
     definition = function(x) {
         lapply(slot(x, "omics"), function(omic) {
-            slot(omic, "coverage")[["mat.counts"]]
+            slot(omic, "coverage")[["counts"]][["mat"]]
         })
     }
 )
@@ -1163,7 +1214,7 @@ setMethod(
     signature = signature(x = "muscadet"),
     definition = function(x) {
         lapply(slot(x, "omics"), function(omic) {
-            slot(omic, "coverage")[["log.ratio"]]
+            slot(omic, "coverage")[["logratio"]][["mat"]]
         })
     }
 )

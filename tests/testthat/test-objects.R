@@ -3,30 +3,32 @@
 test_that("CreateMuscomicObject works with minimal input", {
 
     mat <- Matrix::sparseMatrix(
-        i = c(1,1,2), j = c(1,2,1), x = c(5,3,2),
-        dims = c(2,2),
-        dimnames = list(c("cell1","cell2"), c("f1","f2"))
+        i = c(1, 1, 2),
+        j = c(1, 2, 1),
+        x = c(5, 3, 2),
+        dims = c(2, 2),
+        dimnames = list(c("cell1", "cell2"), c("f1", "f2"))
     )
 
     features <- data.frame(
-        CHROM = c("1","1"),
-        start = c(100,200),
-        end   = c(150,250),
-        id    = c("f1","f2")
+        CHROM = c("1", "1"),
+        start = c(100, 200),
+        end = c(150, 250),
+        id = c("f1", "f2")
     )
 
     allele <- data.frame(
-        cell = c("cell1","cell2"),
-        CHROM = c("1","1"),
-        POS = c(100,200),
-        REF = c("A","G"),
-        ALT = c("C","T"),
-        RD = c(10,5),
-        AD = c(3,1)
+        cell = c("cell1", "cell2"),
+        CHROM = c("1", "1"),
+        POS = c(100, 200),
+        REF = c("A", "G"),
+        ALT = c("C", "T"),
+        RD = c(10, 5),
+        AD = c(3, 1)
     )
 
     obj <- CreateMuscomicObject(
-        type="ATAC",
+        type = "ATAC",
         mat_counts = mat,
         features = features,
         allele_counts = allele
@@ -105,13 +107,13 @@ test_that(
 test_that("CreateMuscadetObject returns a correct muscadet object", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_tumor,
+        mat_counts = t(mat_counts_atac_tumor),
         allele_counts = allele_counts_atac_tumor,
         features = peaks
     )
     rna <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_tumor,
+        mat_counts = t(mat_counts_rna_tumor),
         allele_counts = allele_counts_rna_tumor,
         features = genes
     )
@@ -133,13 +135,13 @@ test_that("CreateMuscadetObject returns a correct muscadet object", {
 test_that("CreateMuscadetObject with identical muscomic: error of identical labels", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_tumor,
+        mat_counts = t(mat_counts_atac_tumor),
         allele_counts = allele_counts_atac_tumor,
         features = peaks
     )
     rna <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_tumor,
+        mat_counts = t(mat_counts_rna_tumor),
         allele_counts = allele_counts_rna_tumor,
         features = genes
     )
@@ -156,13 +158,13 @@ test_that("CreateMuscadetObject with identical muscomic: error of identical labe
 test_that("CreateMuscadetObject with incorrect genome : error of incorrect genome", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_tumor,
+        mat_counts = t(mat_counts_atac_tumor),
         allele_counts = allele_counts_atac_tumor,
         features = peaks
     )
     rna <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_tumor,
+        mat_counts = t(mat_counts_rna_tumor),
         allele_counts = allele_counts_rna_tumor,
         features = genes
     )
@@ -197,8 +199,6 @@ test_that("Check access methods", {
     expect_length(obj$ATAC, 1)
     expect_length(obj$ATAC$type, 1)
     expect_error(obj$ATAC$abc)
-
-
 })
 
 
@@ -215,13 +215,13 @@ test_that("Check show methods", {
 test_that("Check Cells/Features methods outputs", {
     atac <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_tumor,
+        mat_counts = t(mat_counts_atac_tumor),
         allele_counts = allele_counts_atac_tumor,
         features = peaks
     )
     rna <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_tumor,
+        mat_counts = t(mat_counts_rna_tumor),
         allele_counts = allele_counts_rna_tumor,
         features = genes
     )
@@ -232,16 +232,16 @@ test_that("Check Cells/Features methods outputs", {
         genome = "hg38"
     )
 
-    expect_identical(Cells(atac), colnames(slot(atac, "coverage")[["mat.counts"]]))
-    expect_identical(Cells(rna), colnames(slot(rna, "coverage")[["mat.counts"]]))
+    expect_identical(Cells(atac), rownames(slot(atac, "coverage")[["counts"]][["mat"]]))
+    expect_identical(Cells(rna), rownames(slot(rna, "coverage")[["counts"]][["mat"]]))
     expect_identical(Cells(muscadet), lapply(slot(muscadet, "omics"), function(omic) {
-        return(colnames(slot(omic, "coverage")[["mat.counts"]]))
+        return(rownames(slot(omic, "coverage")[["counts"]][["mat"]]))
     }))
 
-    expect_identical(Features(atac), rownames(slot(atac, "coverage")[["mat.counts"]]))
-    expect_identical(Features(rna), rownames(slot(rna, "coverage")[["mat.counts"]]))
+    expect_identical(Features(atac), colnames(slot(atac, "coverage")[["counts"]][["mat"]]))
+    expect_identical(Features(rna), colnames(slot(rna, "coverage")[["counts"]][["mat"]]))
     expect_identical(Features(muscadet), lapply(slot(muscadet, "omics"), function(omic) {
-        return(rownames(slot(omic, "coverage")[["mat.counts"]]))
+        return(colnames(slot(omic, "coverage")[["counts"]][["mat"]]))
     }))
 
     muscadet_monoomic <- CreateMuscadetObject(
@@ -251,7 +251,7 @@ test_that("Check Cells/Features methods outputs", {
         genome = "hg38"
     )
     expect_identical(Cells(muscadet_monoomic), lapply(slot(muscadet_monoomic, "omics"), function(omic) {
-        return(colnames(slot(omic, "coverage")[["mat.counts"]]))
+        return(rownames(slot(omic, "coverage")[["counts"]][["mat"]]))
     }))
 })
 

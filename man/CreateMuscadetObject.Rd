@@ -14,7 +14,7 @@ CreateMuscadetObject(
 \arguments{
 \item{omics}{A list of \code{\link[=muscomic-class]{muscomic}} objects (\code{list}). The
 names of the list will set the names of omics in the final object, if the
-list is unamed, the type is taken instead.}
+list is unnamed, the type is taken instead.}
 
 \item{bulk.lrr}{A data frame containing log R ratio per genomic segments from
 bulk sequencing data (\code{data.frame}). One row per segment and 4 columns
@@ -41,25 +41,25 @@ slot \code{type}) but they can't have identical labels (slot \code{label.omic}).
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
+  mat_counts = t(mat_counts_atac_tumor),
   allele_counts = allele_counts_atac_tumor,
   features = peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
+  mat_counts = t(mat_counts_rna_tumor),
   allele_counts = allele_counts_rna_tumor,
   features = genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
+  mat_counts = t(mat_counts_atac_ref),
   allele_counts = allele_counts_atac_ref,
   features = peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
+  mat_counts = t(mat_counts_rna_ref),
   allele_counts = allele_counts_rna_ref,
   features = genes
 )
