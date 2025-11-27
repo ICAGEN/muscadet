@@ -51,9 +51,9 @@ execution. Default is \code{FALSE}.}
 \value{
 If \code{all_steps} is set to \code{FALSE}, a list containing:
 \describe{
-\item{\code{matTumor}}{Matrix of log R ratio values \emph{features x cells} for the
+\item{\code{matTumor}}{Matrix of log R ratio values \emph{cells x features} for the
 tumor/sample cells (\code{matrix}).}
-\item{\code{matRef}}{Matrix of log R ratio values \emph{features x cells} for the
+\item{\code{matRef}}{Matrix of log R ratio values \emph{cells x features} for the
 reference cells (\code{matrix}).}
 \item{\code{params}}{List of parameters set for the \code{genesPerWindow}, \code{refMeans},
 \code{refMeanReads} and \code{thresh_capping} arguments (\code{list}).}

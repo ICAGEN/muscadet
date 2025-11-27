@@ -56,9 +56,9 @@ execution. Default is \code{FALSE}.}
 \value{
 If \code{all_steps} is set to \code{FALSE}, a list containing:
 \describe{
-\item{\code{matTumor}}{Matrix of log R ratio values \emph{features x cells} for the
+\item{\code{matTumor}}{Matrix of log R ratio values \emph{cells x features} for the
 tumor/sample cells (\code{matrix}).}
-\item{\code{matRef}}{Matrix of log R ratio values \emph{features x cells} for the
+\item{\code{matRef}}{Matrix of log R ratio values \emph{cells x features} for the
 reference cells (\code{matrix}).}
 \item{\code{params}}{List of parameters set for the \code{windowSize}, \code{slidingSize},
 \code{minReads}, \code{minPeaks} and \code{thresh_capping} arguments (\code{list}).}
@@ -114,25 +114,25 @@ steps:
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
+  mat_counts = t(mat_counts_atac_tumor),
   allele_counts = allele_counts_atac_tumor,
   features = peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
+  mat_counts = t(mat_counts_rna_tumor),
   allele_counts = allele_counts_rna_tumor,
   features = genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
+  mat_counts = t(mat_counts_atac_ref),
   allele_counts = allele_counts_atac_ref,
   features = peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
+  mat_counts = t(mat_counts_rna_ref),
   allele_counts = allele_counts_rna_ref,
   features = genes
 )

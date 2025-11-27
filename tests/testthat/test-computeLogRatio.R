@@ -2,26 +2,26 @@
 
 atac <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = mat_counts_atac_tumor,
+    mat_counts = t(mat_counts_atac_tumor),
     allele_counts = allele_counts_atac_tumor,
     features = peaks
 )
 rna <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = mat_counts_rna_tumor,
+    mat_counts = t(mat_counts_rna_tumor),
     allele_counts = allele_counts_rna_tumor,
     features = genes
 )
 
 atac_ref <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = mat_counts_atac_ref,
+    mat_counts = t(mat_counts_atac_ref),
     allele_counts = allele_counts_atac_ref,
     features = peaks
 )
 rna_ref <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = mat_counts_rna_ref,
+    mat_counts = t(mat_counts_rna_ref),
     allele_counts = allele_counts_rna_ref,
     features = genes
 )
@@ -118,36 +118,22 @@ test_that("ComputeLogRatio gives a correct muscadet object as output", {
         quiet = TRUE
     )
     expect_identical(as.character(class(muscadet)), "muscadet")
-    expect_true(is.matrix(muscadet@omics[["ATAC"]]@coverage[["log.ratio"]]))
-    expect_true(is.matrix(muscadet@omics[["RNA"]]@coverage[["log.ratio"]]))
+    expect_true(is.matrix(muscadet@omics[["ATAC"]]@coverage[["logratio"]][["mat"]]))
+    expect_true(is.matrix(muscadet@omics[["RNA"]]@coverage[["logratio"]][["mat"]]))
 })
 
 
-test_that(
-    "ComputeLogRatio run 2 times on the same omic with removal of raw counts after the 1st: error",
-    {
-        muscadet <- computeLogRatio(
-            x = muscadet,
-            reference = muscadet_ref,
-            omic = "ATAC",
-            method = "ATAC",
-            minReads = 1,
-            minPeaks = 1,
-            quiet = TRUE
-        )
-        expect_error(
-            muscadet <- computeLogRatio(
-                x = muscadet,
-                reference = muscadet_ref,
-                omic = "ATAC",
-                method = "ATAC",
-                minReads = 1,
-                minPeaks = 1,
-                quiet = TRUE
-            )
-        )
-    }
-)
+test_that("getLogRatioBulk gives a correct output", {
+
+    features_bulk_lrr <- getLogRatioBulk(
+      x = muscadet_obj$ATAC,
+      bulk.lrr = muscadet_obj$bulk.data$logratio
+    )
+    expect_equal(ncol(features_bulk_lrr), 4)
+    expect_true(is.data.frame(features_bulk_lrr))
+})
+
+
 
 
 

@@ -339,7 +339,7 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 #'   list is unnamed, the type is taken instead.
 #' @param bulk.lrr A data frame containing log R ratio per genomic segments from
 #'   bulk sequencing data (`data.frame`). One row per segment and 4 columns
-#'   ordered as followed: chromosome (`integer`), start position (`integer`),
+#'   ordered as followed: chromosome (`character`), start position (`integer`),
 #'   end position (`integer`), and Log R ratio value (`numeric`).
 #' @param bulk.label Label for bulk data (`character` string).
 #' @param genome Reference genome name among: "hg38", "hg19" and "mm10"
@@ -450,20 +450,37 @@ CreateMuscadetObject <- function(omics,
           length(common_cells) != 0
   )
 
-  # Check bulk data
+  # Check for genome
+  stopifnot(
+      "Genome must be either 'hg38', 'hg19' or 'mm10'." =
+          genome %in% c("hg38", "hg19", "mm10")
+  )
+
+
+  # Check and format bulk data
   if (!is.null(bulk.lrr)) {
-      # default names for bulk df columns
-      colnames(bulk.lrr) <- c("CHROM", "start", "end", "lrr")
+
       stopifnot(
           "Label for bulk data (`bulk.label`) is required when `bulk.lrr` is provided." = !is.null(bulk.label)
       )
+
+      # default names for bulk df columns
+      colnames(bulk.lrr) <- c("CHROM", "start", "end", "lrr")
+      # Modify class if needed
+      bulk.lrr$CHROM <- as.character(bulk.lrr$CHROM)
+      bulk.lrr$start <- as.integer(bulk.lrr$start)
+      bulk.lrr$end <- as.integer(bulk.lrr$end)
+      bulk.lrr$lrr <- as.numeric(bulk.lrr$lrr)
+      # Remove "chr" in CHROM if necessary
+      bulk.lrr$CHROM <- gsub("chr", "", bulk.lrr$CHROM)
+      # Order chromosomes
+      chromorder <- c(as.character(1:22), "X", "Y")
+      bulk.lrr$CHROM <- ordered(bulk.lrr$CHROM, levels = chromorder[chromorder %in% unique(bulk.lrr$CHROM)])
+      # Reorder data
+      bulk.lrr <- bulk.lrr[order(bulk.lrr$CHROM, bulk.lrr$start), ]
   }
 
-  # Check for genome
-  stopifnot(
-    "Genome must be either 'hg38', 'hg19' or 'mm10'." =
-      genome %in% c("hg38", "hg19", "mm10")
-  )
+
 
   # Add bulk log R ratio data
   bulk.data <- list(logratio = bulk.lrr, label = bulk.label)
@@ -1154,10 +1171,10 @@ setMethod(
     signature = signature(x = "muscadet"),
     definition = function(x) {
         lapply(slot(x, "omics"), function(omic) {
-            if (!is.null(slot(x, "coverage")[["logratio"]][["coord.features"]])) {
-                slot(x, "coverage")[["logratio"]][["coord.features"]]
-            } else if (!is.null(slot(x, "coverage")[["counts"]][["coord.features"]])) {
-                slot(x, "coverage")[["counts"]][["coord.features"]]
+            if (!is.null(slot(omic, "coverage")[["logratio"]][["coord.features"]])) {
+                slot(omic, "coverage")[["logratio"]][["coord.features"]]
+            } else if (!is.null(slot(omic, "coverage")[["counts"]][["coord.features"]])) {
+                slot(omic, "coverage")[["counts"]][["coord.features"]]
             }
         })
     }

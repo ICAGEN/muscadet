@@ -10,7 +10,6 @@ computeLogRatio(
   omic,
   method = NULL,
   new.label.features = NULL,
-  remove.raw = TRUE,
   quiet = FALSE,
   all_steps = FALSE,
   ...
@@ -38,10 +37,6 @@ method will be applied.}
 \item{new.label.features}{New label for features (\code{character} string). If
 \code{NULL}, the label remains unchanged when using the "RNA" method and becomes
 "windows of peaks" when using the "ATAC" method.}
-
-\item{remove.raw}{\code{TRUE} or \code{FALSE} (\code{logical}). Whether to remove raw count
-matrices. \code{TRUE} by default to reduce object size. Setting it to \code{FALSE}
-will keep raw count matrices within the object.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}

@@ -12,13 +12,14 @@ includes the feature coordinates (\code{muscomic}).}
 
 \item{bulk.lrr}{A data frame containing log R ratio per genomic segments from
 bulk sequencing data (\code{data.frame}). One row per segment and 4 columns
-ordered as followed: chromosome (\code{integer}), start position (\code{integer}),
+ordered as followed: chromosome (\code{character}), start position (\code{integer}),
 end position (\code{integer}), and Log R ratio value (\code{numeric}).}
 }
 \value{
-A data frame of single-cell omic features, with columns: \code{CHROM}, \code{start},
-\code{end}, and \code{bulk.lrr}, where \code{bulk.lrr} corresponds to the log R ratio values
-retrieved from bulk data matching the feature coordinates.
+A data frame of single-cell omic features, with columns corresponding
+to \code{CHROM}, \code{start}, \code{end}, and \code{bulk.lrr}, where \code{bulk.lrr} corresponds to
+the log R ratio values retrieved from bulk data matching the feature
+coordinates.
 }
 \description{
 This internal function assigns the log R ratio (LRR) values from bulk data
@@ -27,30 +28,23 @@ corresponding genomic features from the single-cell omic data and returns a
 table of single-cell features with the corresponding bulk LRR values.
 }
 \examples{
-# Create a muscomic object
-atac <- CreateMuscomicObject(
-  type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
-)
-# or use a muscomic object inside a muscadet object
-atac <- slot(muscadet_obj, "omics")[["ATAC"]]
+# muscomic object inside a muscadet object
+muscadet_obj$ATAC
 
-# Load bulk Log R ratio data frame
-data(bulk_lrr)
-head(bulk_lrr)
-# or use the one inside a muscadet object
-head(slot(muscadet_obj, "bulk.data")[["log.ratio"]])
+# Bulk Log R ratio data
+head(muscadet_obj$bulk.data$logratio)
 
 features_bulk_lrr <- getLogRatioBulk(
-  x = atac,
-  bulk.lrr = bulk_lrr # or slot(muscadet_obj, "bulk.data")[["log.ratio"]]
+  x = muscadet_obj$ATAC,
+  bulk.lrr = muscadet_obj$bulk.data$logratio
 )
 head(features_bulk_lrr)
 
+
 }
 \seealso{
-example data: \code{\link{bulk_lrr}}
-functions: \code{\link{muscomic}}, \code{\link{muscadet}}
+\itemize{
+\item example data: \code{\link{bulk_lrr}}
+\item functions: \code{\link{muscomic}}, \code{\link{muscadet}}
+}
 }
