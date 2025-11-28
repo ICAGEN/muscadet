@@ -104,7 +104,7 @@ by \code{k_range}.
 
 # Format input
 # transpose matrices to: cells x features matrices
-mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+mat_list <- matLogRatio(muscadet_obj)
 
 # Run integration & clustering
 result <- cluster_hclust(mat_list, k_range = 2:4)

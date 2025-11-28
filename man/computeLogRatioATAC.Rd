@@ -115,25 +115,21 @@ steps:
 atac <- CreateMuscomicObject(
   type = "ATAC",
   mat_counts = t(mat_counts_atac_tumor),
-  allele_counts = allele_counts_atac_tumor,
   features = peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
   mat_counts = t(mat_counts_rna_tumor),
-  allele_counts = allele_counts_rna_tumor,
   features = genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
   mat_counts = t(mat_counts_atac_ref),
-  allele_counts = allele_counts_atac_ref,
   features = peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
   mat_counts = t(mat_counts_rna_ref),
-  allele_counts = allele_counts_rna_ref,
   features = genes
 )
 
@@ -154,7 +150,7 @@ obj_atac <- computeLogRatioATAC(
   matTumor = matCounts(muscadet)$ATAC,
   matRef = matCounts(muscadet_ref)$ATAC,
   peaksCoord = coordFeatures(muscadet)$ATAC,
-  genome = slot(muscadet, "genome"),
+  genome = muscadet$genome,
   minReads = 1, # low value for example subsampled datasets
   minPeaks = 1 # low value for example subsampled datasets
 )
@@ -165,7 +161,7 @@ obj_atac_all <- computeLogRatioATAC(
   matTumor = matCounts(muscadet)$ATAC,
   matRef = matCounts(muscadet_ref)$ATAC,
   peaksCoord = coordFeatures(muscadet)$ATAC,
-  genome = slot(muscadet, "genome"),
+  genome = muscadet$genome,
   minReads = 1, # low value for example subsampled datasets
   minPeaks = 1, # low value for example subsampled datasets
   all_steps = TRUE

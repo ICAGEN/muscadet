@@ -110,10 +110,15 @@ Explanation about igraph being the default package for Leiden implementation
 
 # Format input
 # transpose matrices to: cells x features matrices
-mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+mat_list <- matLogRatio(muscadet_obj)
 
 # Run integration & clustering
-result <- cluster_seurat(mat_list, res_range = c(0.1, 0.3, 0.5))
+result <- cluster_seurat(
+    mat_list,
+    res_range = c(0.1, 0.3, 0.5),
+    knn_seurat = 10,
+    knn_range_seurat = 30
+)
 
 # View results
 lapply(result$clusters, table)

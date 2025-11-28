@@ -102,7 +102,6 @@
 #' @importFrom circlize colorRamp2
 #' @importFrom methods slot
 #' @importFrom stats median
-#' @importFrom gtools mixedsort
 #' @importFrom grDevices pdf png svg palette dev.off
 #' @importFrom grid gpar unit grid.rect grid.text grid.grab
 #'
@@ -293,8 +292,8 @@ heatmapMuscadet <- function(x,
 
     ## Validate clusters & partition ------
     # Get common and all cells
-    common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames)))
-    all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), colnames)))
+    common_cells <- sort(Reduce(intersect, lapply(muscadet::matLogRatio(x), rownames)))
+    all_cells <- sort(Reduce(union, lapply(muscadet::matLogRatio(x), rownames)))
 
     # Filter cells based on provided `clusters` argument
     if (!is.null(clusters)) {
@@ -348,7 +347,7 @@ heatmapMuscadet <- function(x,
     ## Validate add_bulk_lrr ------
     # Default addition of bulk data depending on its presence in muscadet object
     if (add_bulk_lrr | !is.logical(show_missing)) {
-        add_bulk_lrr <- !is.null(x@bulk.data$log.ratio)
+        add_bulk_lrr <- !is.null(x@bulk.data$logratio)
     }
 
     ## Validate row_annots ------
@@ -375,8 +374,7 @@ heatmapMuscadet <- function(x,
     if (is.numeric(white_scale) && length(white_scale) == 2) {
         stopifnot("`white_scale` must be a numeric vector of length 2." = length(white_scale) == 2)
         stopifnot(
-            "`white_scale` values must be between 0 and 1." = all(white_scale >= 0 &
-                                                                      white_scale <= 1)
+            "`white_scale` values must be between 0 and 1." = all(white_scale >= 0 & white_scale <= 1)
         )
         # Single pair of values applied to all omics
         white_scale <- round(sort(white_scale), 2)
@@ -457,29 +455,29 @@ heatmapMuscadet <- function(x,
 
             # Retrieve log ratio matrix
             mat_lrr <- matLogRatio(x@omics[[omic]])
-            mat_lrr <- mat_lrr[, colnames(mat_lrr) %in% names(clusters)]
+            mat_lrr <- mat_lrr[rownames(mat_lrr) %in% names(clusters), , drop = FALSE]
 
-            clusters_mat <- clusters[colnames(mat_lrr)]
+            clusters_mat <- clusters[rownames(mat_lrr)]
 
             # Compute matrix of averages per cluster
-            mat_lrr_av <- sapply(unique(clusters_mat), function(cl) {
-                rowMeans(mat_lrr[, clusters_mat == cl, drop = FALSE], na.rm = TRUE)
-            })
+            mat_lrr_av <- t(sapply(unique(clusters_mat), function(cl) {
+                colMeans(mat_lrr[clusters_mat == cl, , drop = FALSE], na.rm = TRUE)
+            }))
 
             # Replace cell names by cluster names
-            colnames(mat_lrr_av) <- unique(clusters_mat)
-            mat_lrr_av <- mat_lrr_av[, colnames(mat_lrr_av), drop = FALSE]
+            rownames(mat_lrr_av) <- unique(clusters_mat)
+            mat_lrr_av <- mat_lrr_av[rownames(mat_lrr_av), , drop = FALSE]
 
             # Replace log ratio matrix per cell by average matrix per cluster
-            x@omics[[omic]]@coverage[["log.ratio"]] <- mat_lrr_av
+            x@omics[[omic]]@coverage$logratio$mat <- mat_lrr_av
         }
 
         # Define new clusters in correct order
         clusters <- setNames(clusters_order, clusters_order)
 
         # Define new "cells" becoming clusters
-        common_cells <- Reduce(intersect, lapply(muscadet::matLogRatio(x), colnames))
-        all_cells <- Reduce(union, lapply(muscadet::matLogRatio(x), colnames))
+        common_cells <- Reduce(intersect, lapply(muscadet::matLogRatio(x), rownames))
+        all_cells <- Reduce(union, lapply(muscadet::matLogRatio(x), rownames))
 
         common_cells <- common_cells[order(match(common_cells, clusters))]
         all_cells <- all_cells[order(match(all_cells, clusters))]
@@ -498,9 +496,9 @@ heatmapMuscadet <- function(x,
                 paste0(
                     m@label.omic,
                     ": ",
-                    ncol(muscadet::matLogRatio(m)),
-                    " cells x ",
                     nrow(muscadet::matLogRatio(m)),
+                    " cells x ",
+                    ncol(muscadet::matLogRatio(m)),
                     " features"
                 )
             })
@@ -535,9 +533,9 @@ heatmapMuscadet <- function(x,
                 paste0(
                     m@label.omic,
                     ": ",
-                    ncol(muscadet::matLogRatio(m)),
-                    " clusters x ",
                     nrow(muscadet::matLogRatio(m)),
+                    " clusters x ",
+                    ncol(muscadet::matLogRatio(m)),
                     " features"
                 )
             })
@@ -560,15 +558,15 @@ heatmapMuscadet <- function(x,
         ComplexHeatmap::ht_opt(message = F)
 
         # Get chromosome info for features
-        coord <- muscomic@coverage$coord.features
+        coord <- muscomic@coverage$logratio$coord.features
         chrom <- factor(coord[coord$keep, "CHROM"], levels = unique(coord[coord$keep, "CHROM"]))
 
         # Define color breaks for heatmap using white_scale argument
-        col_breaks <- c(-5, muscomic@coverage$ref.log.ratio.perc[as.character(white_scale[[omic_name]])], 5)
+        col_breaks <- c(-5, muscomic@coverage$logratio$ref.logratio.perc[as.character(white_scale[[omic_name]])], 5)
 
         # Extract log R ratio matrix
         if (show_missing == TRUE) {
-            mat <- t(muscadet::matLogRatio(muscomic))
+            mat <- matLogRatio(muscomic)
             cells.diff <- setdiff(all_cells, rownames(mat)) # identify missing cells
             if (length(cells.diff) > 0) {
                 mat.na <- matrix(
@@ -583,7 +581,7 @@ heatmapMuscadet <- function(x,
             }
         }
         if (show_missing == FALSE) {
-            mat <- t(muscadet::matLogRatio(muscomic))
+            mat <- matLogRatio(muscomic)
             mat <- mat[common_cells, , drop = FALSE]
         }
 
@@ -599,7 +597,7 @@ heatmapMuscadet <- function(x,
             column_title = paste(
                 muscomic@label.omic,
                 "coverage on",
-                muscomic@coverage$label.features
+                muscomic@coverage$logratio$label.features
             ),
             row_title_gp = grid::gpar(fontsize = 10),
             column_title_gp = grid::gpar(fontsize = 10),
@@ -631,7 +629,7 @@ heatmapMuscadet <- function(x,
         # Add bulk LRR data as annotation
         if (add_bulk_lrr) {
             # Retrieve bulk lrr values on features
-            bulk_df <- muscadet::getLogRatioBulk(muscomic, x@bulk.data$log.ratio)
+            bulk_df <- getLogRatioBulk(muscomic, x@bulk.data$logratio)
             # Define color scale
             bulk_col <- list(circlize::colorRamp2(c(
                 min(bulk_df$bulk.lrr, na.rm = TRUE),
@@ -2299,26 +2297,22 @@ add_labels <- function(
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'     type = "ATAC",
-#'     mat_counts = mat_counts_atac_tumor,
-#'     allele_counts = allele_counts_atac_tumor,
+#'     mat_counts = t(mat_counts_atac_tumor),
 #'     features = peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'     type = "RNA",
-#'     mat_counts = mat_counts_rna_tumor,
-#'     allele_counts = allele_counts_rna_tumor,
+#'     mat_counts = t(mat_counts_rna_tumor),
 #'     features = genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'     type = "ATAC",
-#'     mat_counts = mat_counts_atac_ref,
-#'     allele_counts = allele_counts_atac_ref,
+#'     mat_counts = t(mat_counts_atac_ref),
 #'     features = peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'     type = "RNA",
-#'     mat_counts = mat_counts_rna_ref,
-#'     allele_counts = allele_counts_rna_ref,
+#'     mat_counts = t(mat_counts_rna_ref),
 #'     features = genes
 #' )
 #'
@@ -2339,7 +2333,7 @@ add_labels <- function(
 #'     matTumor = matCounts(muscadet)$ATAC,
 #'     matRef = matCounts(muscadet_ref)$ATAC,
 #'     peaksCoord = coordFeatures(muscadet)$ATAC,
-#'     genome = slot(muscadet, "genome"),
+#'     genome = muscadet$genome,
 #'     minReads = 1, # low value for example subsampled datasets
 #'     minPeaks = 1, # low value for example subsampled datasets
 #'     all_steps = TRUE
@@ -2413,8 +2407,8 @@ heatmapStep <- function(obj,
     }
 
     # Extract the tumor and reference matrices
-    matTumor <- t(as.matrix(obj[[step]]$matTumor))
-    matRef <- t(as.matrix(obj[[step]]$matRef))
+    matTumor <- as.matrix(obj[[step]]$matTumor)
+    matRef <- as.matrix(obj[[step]]$matRef)
     name <- obj[[step]]$name
 
     # Generate title if NULL

@@ -1,6 +1,5 @@
 
 test_that("clusterMuscadet() returns an updated muscadet object", {
-    data(muscadet_obj)
     # remove clustering result
     muscadet_obj@clustering <- list()
 
@@ -27,7 +26,6 @@ test_that("clusterMuscadet() returns an updated muscadet object", {
 })
 
 test_that("clusterMuscadet() returns an updated muscadet object (case with one omic)", {
-    data(muscadet_obj)
     # remove one muscomic
     muscadet_obj$ATAC <- NULL
     # remove clustering result

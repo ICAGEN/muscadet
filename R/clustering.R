@@ -135,8 +135,8 @@ clusterMuscadet <- function(x,
                 matLogRatio(x), is.null
             )))
     )
-    # Extract and transpose log ratio matrices for each omic
-    mat_list <- lapply(muscadet::matLogRatio(x), t)
+    # Extract log ratio matrices for each omic
+    mat_list <- matLogRatio(x)
 
     # Clustering ---------------------------------------------------------------
 
@@ -331,10 +331,15 @@ clusterMuscadet <- function(x,
 #'
 #' # Format input
 #' # transpose matrices to: cells x features matrices
-#' mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+#' mat_list <- matLogRatio(muscadet_obj)
 #'
 #' # Run integration & clustering
-#' result <- cluster_seurat(mat_list, res_range = c(0.1, 0.3, 0.5))
+#' result <- cluster_seurat(
+#'     mat_list,
+#'     res_range = c(0.1, 0.3, 0.5),
+#'     knn_seurat = 10,
+#'     knn_range_seurat = 30
+#' )
 #'
 #' # View results
 #' lapply(result$clusters, table)
@@ -662,7 +667,7 @@ cluster_seurat <- function(mat_list,
 #'
 #' # Format input
 #' # transpose matrices to: cells x features matrices
-#' mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+#' mat_list <- matLogRatio(muscadet_obj)
 #'
 #' # Run integration & clustering
 #' result <- cluster_hclust(mat_list, k_range = 2:4)

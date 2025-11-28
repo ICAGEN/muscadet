@@ -110,26 +110,22 @@ steps:
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
+  mat_counts = t(mat_counts_atac_tumor),
   features = peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
+  mat_counts = t(mat_counts_rna_tumor),
   features = genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
+  mat_counts = t(mat_counts_atac_ref),
   features = peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
+  mat_counts = t(mat_counts_rna_ref),
   features = genes
 )
 
@@ -150,7 +146,7 @@ obj_rna <- computeLogRatioRNA(
   matTumor = matCounts(muscadet)$RNA,
   matRef = matCounts(muscadet_ref)$RNA,
   genesCoord = coordFeatures(muscadet)$RNA,
-  genome = slot(muscadet, "genome"),
+  genome = muscadet$genome,
   refReads = 2 # low value for example subsampled datasets
 )
 table(obj_rna$coord$keep)
@@ -160,7 +156,7 @@ obj_rna_all <- computeLogRatioRNA(
   matTumor = matCounts(muscadet)$RNA,
   matRef = matCounts(muscadet_ref)$RNA,
   genesCoord = coordFeatures(muscadet)$RNA,
-  genome = slot(muscadet, "genome"),
+  genome = muscadet$genome,
   refReads = 2, # low value for example subsampled datasets
   all_steps = TRUE
 )
