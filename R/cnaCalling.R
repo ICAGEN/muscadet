@@ -798,9 +798,11 @@ cnaCalling <- function(
         quiet = FALSE
 ) {
 
+    # ==========================================================================
     # Condition messages if quiet = FALSE
     msg <- function(...) if (!quiet) message(...)
 
+    # ==========================================================================
     # Argument validation
     stopifnot("Input object `x` must be of class 'muscadet'." = inherits(x, "muscadet"))
     stopifnot(
@@ -822,6 +824,7 @@ cnaCalling <- function(
             is.character(ploidy) && ploidy %in% c("auto", "median") || is.numeric(ploidy)
     )
 
+    # ==========================================================================
     # Get internal functions from facets package (to avoid using `:::`)
     clustersegs <- utils::getFromNamespace("clustersegs", "facets")
     findDiploidLogR <- utils::getFromNamespace("findDiploidLogR", "facets")
@@ -829,11 +832,14 @@ cnaCalling <- function(
     emcncf <- utils::getFromNamespace("emcncf", "facets")
     procSnps <- utils::getFromNamespace("procSnps", "facets")
 
-    # Extract and validate required slots
+    # ==========================================================================
+    # INPUTS -------------------------------------------------------------------
+
+    # Extract required inputs
     gbuild <- x$genome
     rcmat <- x@cnacalling$combined.counts
     chromlevels <- levels(rcmat$Chromosome)
-    clusters <- x@cnacalling$clusters
+    clusters <- as.character(x@cnacalling$clusters)
     ncells <- table(clusters)
 
     # Determine chromosome number for X based on genome build
@@ -849,6 +855,9 @@ cnaCalling <- function(
         stop("The input muscadet object `x` must contain valid 'x@cnacalling$clusters' and 'x@cnacalling$combined.counts'.")
     }
 
+    # Set depthmax.nor to maximum value if NULL
+    if (is.null(depthmax.nor)) depthmax.nor <- max(rcmat$NOR.DP, na.rm = TRUE) + 1
+
     # Reset CNA calling results to avoid discordant outputs
     x@cnacalling <- list(
         clusters = x@cnacalling$clusters,
@@ -856,75 +865,129 @@ cnaCalling <- function(
         coverage.counts = x@cnacalling$coverage.counts,
         combined.counts = x@cnacalling$combined.counts
     )
+    # ==========================================================================
 
-    ######
 
-    # Filter coverage data based on selected omics
-    if(!is.null(omics.coverage)) {
+    # ==========================================================================
+    # 1. PER CLUSTER ANALYSIS --------------------------------------------------
+    # ==========================================================================
+
+    msg("- Analysis per cluster -")
+
+    msg("Initial number of positions: ", nrow(rcmat))
+
+    allelic_raw  <- dplyr::filter(rcmat, .data$signal == "allelic", omic == "ATAC")
+    coverage_raw <- dplyr::filter(rcmat, .data$signal == "coverage")
+
+    msg("Initial number of allelic positions: ", nrow(allelic_raw))
+    msg("Initial number of coverage positions: ", nrow(coverage_raw))
+
+    # ==========================================================================
+    # Process allelic counts
+
+    if (length(unique(allelic_raw$omic)) > 1) {
+
+        msg("Integrating omics...")
+
+        allelic_raw <- allelic_raw %>%
+            dplyr::group_by(.data$Chromosome, .data$Position, .data$cluster, .data$signal) %>%
+            dplyr::summarise(
+                NOR.DP = sum(.data$NOR.DP, na.rm = TRUE),
+                NOR.RD = sum(.data$NOR.RD, na.rm = TRUE),
+                TUM.DP = sum(.data$TUM.DP, na.rm = TRUE),
+                TUM.RD = sum(.data$TUM.RD, na.rm = TRUE),
+                .groups = "drop"
+            ) %>%
+            dplyr::relocate(signal, .after = TUM.RD) %>%
+            dplyr::relocate(cluster, .after = signal)
+    } else {
+        allelic_raw <- allelic_raw %>% dplyr::select(-omic, -id)
+    }
+
+    # Filter allelic counts
+    msg("Filtering allelic positions: tumor depth ≥ ", depthmin.a.clusters, " reads")
+
+    allelic_rcmat <- allelic_raw %>%
+        dplyr::filter(.data$TUM.DP >= depthmin.a.clusters) %>%
+        dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
+
+    allelic_rcmat <- na.omit(allelic_rcmat)
+
+    # ==========================================================================
+    # Process coverage counts
+
+    # Optionally select omics
+    if (!is.null(omics.coverage)) {
 
         msg("Selecting coverage data from omic(s): ", omics.coverage)
 
         stopifnot(
-            "The `omics.coverage` argument must match one or more omic name (unique(x@cnacalling$combined.counts$omic))" =
-                omics.coverage %in% unique(rcmat$omic)
+            "The `omics.coverage` argument must match one or more omic name" =
+                omics.coverage %in% unique(coverage_raw$omic)
         )
 
-        rcmat <- rcmat[!(rcmat$signal == "coverage" & !(rcmat$omic %in% omics.coverage)), ]
+        coverage_raw <- coverage_raw %>% dplyr::filter(.data$omic %in% omics.coverage)
     }
-    # Remove unnecessary columns 'omic' and 'id'
-    rcmat <- rcmat[, 1:8]
 
-    # Ensure no missing values in combined counts
-    rcmat <- na.omit(rcmat)
+    # Filter coverage counts
+    msg("Filtering coverage positions: tumor depth ≥ ", depthmin.c.clusters, " reads")
+    msg("Filtering coverage positions: normal depth ≥ ", depthmin.c.nor, " reads")
 
-    # 1. PER CLUSTER -----------------------------------------------------------
+    coverage_rcmat <- coverage_raw %>%
+        dplyr::filter(
+            .data$TUM.DP >= depthmin.c.clusters,
+            .data$NOR.DP >= depthmin.c.nor
+        ) %>%
+        dplyr::select(-c(omic, id)) %>%
+        dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
 
-    # FILTER POSITIONS ---------------------------------------------------------
+    coverage_rcmat <- na.omit(coverage_rcmat)
 
-    msg("Filtering positions per clusters based on provided filters...")
+    # ==========================================================================
+    # Recombine counts
 
-    if (is.null(depthmax.nor)) depthmax.nor <- max(rcmat$NOR.DP) + 1
+    msg("Allelic positions kept: ", nrow(allelic_rcmat))
+    msg("Coverage positions kept: ", nrow(coverage_rcmat))
 
-    # Filter positions based on counts per clusters
-    rcmat_filtered <- subset(
-        rcmat,
-        (rcmat$signal == "allelic" &
-             rcmat$TUM.DP >= depthmin.a.clusters) |
-            (rcmat$signal == "coverage" &
-                 rcmat$TUM.DP >= depthmin.c.clusters &
-                 rcmat$NOR.DP >= depthmin.c.nor)
-    )
-    msg("Filtering allelic positions: tumor depth >= ", depthmin.a.clusters, " reads")
-    msg("Filtering coverage positions: tumor depth >= ", depthmin.c.clusters, " reads")
-    msg("Filtering coverage positions: normal depth >= ", depthmin.c.nor, " reads")
-    msg("From ", nrow(rcmat), " positions to ", nrow(rcmat_filtered), " positions")
+    rcmat_filtered <- dplyr::bind_rows(allelic_rcmat, coverage_rcmat) %>%
+        dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
+
+    msg("Final number of positions: ", nrow(rcmat_filtered))
 
     x@cnacalling[["combined.counts.filtered"]] <- rcmat_filtered
 
+
+    # ==========================================================================
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
 
     msg("Performing segmentation per cluster...")
 
     oo_list <- list()
-    for(i in as.integer(sort(unique(rcmat_filtered$cluster)))){
-        rcmat_clus <- dplyr::filter(rcmat_filtered, .data$cluster==i)
-        if(length(unique(rcmat_clus$signal))==2) {
-            xx <- preProcSample2(rcmat_clus,
-                                 het.thresh = het.thresh,
-                                 cval = cval1,
-                                 snp.nbhd = snp.nbhd,
-                                 gbuild = gbuild,
-                                 ndepth = 0,
-                                 ndepthmax = depthmax.nor)
-            oo <- facets::procSample(xx, cval = cval2, min.nhet = min.nhet, dipLogR = dipLogR)
-            oo[["clusters"]] <- i
+    for (i in unique(clusters)) {
+        rcmat_clus <- dplyr::filter(rcmat_filtered, .data$cluster == i)
+        if (length(unique(rcmat_clus$signal)) == 2) {
+            xx <- preProcSample2(
+                rcmat_clus,
+                het.thresh = het.thresh,
+                cval = cval1,
+                snp.nbhd = snp.nbhd,
+                gbuild = gbuild,
+                ndepth = 0,
+                ndepthmax = depthmax.nor
+            )
+            oo <- facets::procSample(xx,
+                                     cval = cval2,
+                                     min.nhet = min.nhet,
+                                     dipLogR = dipLogR)
+            oo[["clusters"]] <- as.character(i)
             oo_list[[as.character(i)]] <- oo
         }
     }
 
+    # ==========================================================================
     # Filtered clusters without enough data
-    processed_clusters <- as.integer(names(oo_list))
-    initial_clusters <- as.integer(unique(sort(clusters)))
+    processed_clusters <- names(oo_list)
+    initial_clusters <- as.character(unique(clusters))
     skipped_clusters <- setdiff(initial_clusters, processed_clusters)
 
     if (length(skipped_clusters) >= 1) {
@@ -937,7 +1000,7 @@ cnaCalling <- function(
         x@cnacalling[["clusters"]] <- clusters
         x@cnacalling[["skipped_clusters"]] <- skipped_clusters
     }
-
+    # ==========================================================================
 
     # Add cluster column to output "out" table
     oo_list <- lapply(oo_list, function(x) {
@@ -946,7 +1009,7 @@ cnaCalling <- function(
     })
     # Bind "out" table of segments from all clusters
     out_full <- lapply(oo_list, function(x) {
-        x$out[,c(1:6,13)]
+        x$out[ , c(1:6, 13)]
     })
     out_full <- do.call(rbind, out_full)
     # Rename segments with unique number
@@ -981,7 +1044,7 @@ cnaCalling <- function(
                                   outclust_full[, c("seg", "segclust")],
                                   by = "seg")
 
-
+    # ==========================================================================
     # FIND DIPLOID Log ratio ---------------------------------------------------
 
     oo_full <- findDiploidLogR(outclust_full, jseg_full$cnlr)
@@ -992,9 +1055,10 @@ cnaCalling <- function(
         dipLogR <- oo_full$dipLogR
 
     }
-    msg("Diploid log R ratio = ", dipLogR)
+    msg("Diploid log R ratio = ", round(dipLogR, 3))
 
 
+    # ==========================================================================
     # COMPUTE CF, TCN, LCN -----------------------------------------------------
 
     msg("Computing cell fractions and copy numbers on clusters...")
@@ -1034,6 +1098,7 @@ cnaCalling <- function(
     jseg_full$chrom[jseg_full$chrom == 23] <- "X"
 
 
+    # ==========================================================================
     # CF THRESHOLD -------------------------------------------------------------
 
     if (!is.null(cf.thresh)) {
@@ -1045,43 +1110,85 @@ cnaCalling <- function(
             cf.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 1, .default = .data$cf.em))
     }
 
-    # 2. ON ALL CELLS ----------------------------------------------------------
 
-    # Gather all cluster data
-    rcmat_allcells <- rcmat %>%
+    # ==========================================================================
+    # 2. ALL CELLS ANALYSIS ----------------------------------------------------
+    # ==========================================================================
+
+    msg("- Analysis on all cells -")
+
+    # ==========================================================================
+    # Process allelic counts
+
+    msg("Aggregating allelic counts of all cells...")
+
+    allelic_raw_allcells <- allelic_raw %>%
         dplyr::group_by(.data$Chromosome, .data$Position, .data$signal) %>%
-        dplyr::mutate(TUM.DP = sum(.data$TUM.DP, na.rm = T),
-                      TUM.RD = sum(.data$TUM.RD, na.rm = T)) %>%
+        dplyr::summarise(
+            NOR.DP = sum(.data$NOR.DP, na.rm = TRUE),
+            NOR.RD = sum(.data$NOR.RD, na.rm = TRUE),
+            TUM.DP = sum(.data$TUM.DP, na.rm = TRUE),
+            TUM.RD = sum(.data$TUM.RD, na.rm = TRUE),
+            .groups = "drop"
+        ) %>%
         dplyr::mutate(cluster = "allcells") %>%
-        dplyr::ungroup() %>%
-        unique()
-    rcmat_allcells <- rcmat_allcells %>% dplyr::arrange(.data$Chromosome, .data$Position)
+        dplyr::relocate(signal, .after = cluster)
 
-    x@cnacalling[["combined.counts.allcells"]] <- rcmat_allcells
+    msg("Filtering allelic positions: tumor depth ≥ ", depthmin.a.allcells, " reads")
+
+    allelic_rcmat_allcells <- allelic_raw_allcells %>%
+        dplyr::filter(.data$TUM.DP >= depthmin.a.allcells) %>%
+        dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
+
+    allelic_rcmat_allcells <- na.omit(allelic_rcmat_allcells)
+
+    msg("Allelic positions kept: ", nrow(allelic_rcmat_allcells))
+
+    # ==========================================================================
+    # Process coverage counts
+
+    msg("Aggregating coverage counts of all cells...")
+
+    coverage_raw_allcells <- coverage_raw %>%
+        dplyr::group_by(.data$Chromosome, .data$Position, .data$signal) %>%
+        dplyr::summarise(
+            NOR.DP = sum(.data$NOR.DP, na.rm = TRUE),
+            NOR.RD = sum(.data$NOR.RD, na.rm = TRUE),
+            TUM.DP = sum(.data$TUM.DP, na.rm = TRUE),
+            TUM.RD = sum(.data$TUM.RD, na.rm = TRUE),
+            .groups = "drop"
+        ) %>%
+        dplyr::mutate(cluster = "allcells") %>%
+        dplyr::relocate(cluster, .after = TUM.RD) %>%
+        dplyr::relocate(signal, .after = cluster)
+
+    msg("Filtering coverage positions: tumor depth ≥ ", depthmin.c.allcells, " reads")
+    msg("Filtering coverage positions: normal depth ≥ ", depthmin.c.nor, " reads")
+
+    coverage_rcmat_allcells <- coverage_raw_allcells %>%
+        dplyr::filter(
+            .data$TUM.DP >= depthmin.c.allcells,
+            .data$NOR.DP >= depthmin.c.nor
+        ) %>%
+        dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
 
 
-    # FILTER POSITIONS ---------------------------------------------------------
+    coverage_rcmat_allcells <- na.omit(coverage_rcmat_allcells)
 
-    msg("Filtering positions on all cells based on provided filters...")
+    msg("Coverage positions kept: ", nrow(coverage_rcmat_allcells))
 
-    # Filter positions based on counts for all cells
-    rcmat_allcells_filtered <- subset(
-        rcmat_allcells,
-        (rcmat_allcells$signal == "allelic" &
-             rcmat_allcells$TUM.DP >= depthmin.a.allcells) |
-            (rcmat_allcells$signal == "coverage" &
-                 rcmat_allcells$TUM.DP >= depthmin.c.allcells &
-                 rcmat_allcells$NOR.DP >= depthmin.c.nor)
-    )
+    # ==========================================================================
+    # Recombine counts
 
-    msg("Filtering allelic positions: tumor depth >= ", depthmin.a.allcells, " reads")
-    msg("Filtering coverage positions: tumor depth >= ", depthmin.c.allcells, " reads")
-    msg("Filtering coverage positions: normal depth >= ", depthmin.c.nor, " reads")
-    msg("From ", nrow(rcmat_allcells), " positions to ", nrow(rcmat_allcells_filtered), " positions")
+    rcmat_allcells_filtered <- dplyr::bind_rows(allelic_rcmat_allcells, coverage_rcmat_allcells) %>%
+        dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
+
+    msg("Final number of positions: ", nrow(rcmat_allcells_filtered))
 
     x@cnacalling[["combined.counts.allcells.filtered"]] <- rcmat_allcells_filtered
 
 
+    # ==========================================================================
     # GET SEGMENTS AND ASSOCIATED DATA -----------------------------------------
 
     msg("Performing segmentation on all cells...")
@@ -1098,6 +1205,7 @@ cnaCalling <- function(
                                       min.nhet = min.nhet,
                                       dipLogR = NULL)
 
+    # ==========================================================================
     # COMPUTE CF, TCN, LCN -----------------------------------------------------
 
     msg("Computing cell fractions and copy numbers on all cells...")
@@ -1121,6 +1229,7 @@ cnaCalling <- function(
     out_allcells$chrom[out_allcells$chrom == 23] <- "X"
     jseg_allcells$chrom[jseg_allcells$chrom == 23] <- "X"
 
+    # ==========================================================================
     # CF THRESHOLD -------------------------------------------------------------
 
     if (!is.null(cf.thresh)) {
@@ -1132,6 +1241,7 @@ cnaCalling <- function(
             cf.em = dplyr::case_when(!is.na(.data$cf.em) & .data$cf.em < cf.thresh ~ 1, .default = .data$cf.em))
     }
 
+    # ==========================================================================
     # GET VARIANT ALLELE FREQUENCIES -------------------------------------------
 
     # Get vafT from allcells to set colors for variant positions depending on all cells frequency
@@ -1161,7 +1271,7 @@ cnaCalling <- function(
                                       pmat_allcells_filtered[, c("chrom", "maploc", "signal", "vafT.allcells", "colVAR")],
                                       by = c("chrom", "maploc", "signal"))
 
-
+    # ==========================================================================
     # SAVE OBJECTS -------------------------------------------------------------
 
     x@cnacalling[["positions"]] <- jseg_full
@@ -1171,7 +1281,9 @@ cnaCalling <- function(
     x@cnacalling[["segments.allcells"]] <- out_allcells
 
 
+    # ==========================================================================
     # 3. GET CONSENSUS SEGMENTS ------------------------------------------------
+    # ==========================================================================
 
     msg("Finding consensus segments between clusters...")
 
@@ -1179,7 +1291,7 @@ cnaCalling <- function(
                                       ncells = ncells,
                                       dist.breakpoints = dist.breakpoints)
 
-
+    # ==========================================================================
     # DEFINE PLOIDY ------------------------------------------------------------
 
     if(ploidy == "median") { ploidy <- round(median(out_full$tcn.em)) }
@@ -1191,6 +1303,7 @@ cnaCalling <- function(
         if (diploid < tetraploid) ploidy <- 4
     }
 
+    # ==========================================================================
     # ANNOTATE SEGMENTS --------------------------------------------------------
 
     table <- annotateSegments(
@@ -1211,6 +1324,7 @@ cnaCalling <- function(
         dplyr::mutate(cna_clonal = any(.data$cna_clonal)) %>%
         unique()
 
+    # ==========================================================================
     # SAVE OBJECTS -------------------------------------------------------------
 
     x@cnacalling[["consensus.segs"]] <- consensus_segs
