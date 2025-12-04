@@ -153,7 +153,7 @@ assignClusters <- function(x,
         # Remove cells missing data that needs to go through cluster imputation (cleaner)
         clusters_vec <- clusters_vec[intersect(names(clusters_vec), common_cells)]
 
-        mat_list <- lapply(muscadet::matLogRatio(x), t)
+        mat_list <- matLogRatio(x)
 
         imputeClusters(mat_list, clusters_vec, knn_imp = knn_imp)
     }
@@ -213,7 +213,7 @@ assignClusters <- function(x,
 }
 
 
-#' Merge counts for `muscadet` objects
+#' Aggregate counts for `muscadet` objects
 #'
 #' This function combines allelic (counts at variant positions, either common
 #' SNPs or individual-specific heterozygous positions) and coverage counts
@@ -229,9 +229,10 @@ assignClusters <- function(x,
 #' @param nor.het A logical value to specify if normal reference allele counts
 #'   are modified to: total normal depth counts divided by 2, to force these
 #'   positions to be heterozygous in the normal reference in allelic data (e.g.
-#'   when heterozygous positions are retrieve based on matched bulk sequencing
-#'   data, and are thereby assumed to be heterozygous) before combining coverage
-#'   and allelic data. Default is `TRUE`.
+#'   when reference cells are from a different individual but
+#'   individual-specific heterozygous positions based on matched bulk sequencing
+#'   data are used and thereby assumed to be heterozygous) before combining coverage and
+#'   allelic data. Default is `TRUE`.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
@@ -249,12 +250,10 @@ assignClusters <- function(x,
 #' - DP = Total read depth
 #' - TUM = tumor sample
 #' - NOR = normal reference
-#' - omic = omic specific (`omic` column)
-#' - all = for all omics
 #'
-#' @import dplyr
-#' @importFrom data.table rbindlist
-#' @importFrom rlang .data
+#' @import data.table
+#' @importFrom Matrix sparseMatrix colSums
+#' @importFrom dplyr left_join
 #'
 #' @export
 #'
@@ -263,13 +262,14 @@ assignClusters <- function(x,
 #' # data("muscadet_obj")
 #' # data("muscadet_obj_ref")
 #'
-#' # Merge counts from all omics from both sample and reference
-#' muscadet_obj <- mergeCounts(muscadet_obj, muscadet_obj_ref)
+#' # Aggregate counts from all omics from both sample and reference
+#' muscadet_obj <- aggregateCounts(muscadet_obj, muscadet_obj_ref)
 #'
-mergeCounts <- function(x,
-                        reference,
-                        nor.het = TRUE,
-                        quiet = FALSE) {
+aggregateCounts <- function(x,
+                            reference,
+                            nor.het = TRUE,
+                            quiet = FALSE) {
+
 
     # Validate input: x and reference must be muscadet objects
     stopifnot("Input object 'x' must be of class 'muscadet'." = inherits(x, "muscadet"))
@@ -285,112 +285,260 @@ mergeCounts <- function(x,
     stopifnot(
         "Input object 'x' must contain allele counts data in the 'allelic' slot of omics. Use 'addAlleleCounts()' to add them."
         = all(unlist(lapply(x@omics, function(omic) {
-            !is.null(omic@allelic$table.counts)
+            !is.null(omic@allelic$mat.RD)
         })))
     )
     stopifnot(
         "Input object 'reference' must contain allele counts data in the 'allelic' slot of omics. Use 'addAlleleCounts()' to add them."
         = all(unlist(lapply(reference@omics, function(omic) {
-            !is.null(omic@allelic$table.counts)
+            !is.null(omic@allelic$mat.RD)
         })))
     )
 
     # Reset CNA calling results to avoid discordant outputs
     x@cnacalling <- list(clusters = x@cnacalling$clusters)
 
+    # Helper functions ---------------------------------------------------------
+
+    ## Aggregate counts from cells to clusters counts in sparse matrices ---
+    aggregate_sparse_counts <- function(mat, cells, clusters) {
+
+        # Get integer row indices directly
+        row_idx <- match(names(clusters), cells)
+        row_idx <- row_idx[!is.na(row_idx)]  # keep valid rows
+
+        # Cluster assignments in correct order
+        cl <- clusters[cells[row_idx]]
+
+        # Unique cluster labels
+        ucl <- unique(cl)
+
+        # Build cluster × cell indicator matrix
+        I <- Matrix::sparseMatrix(
+            i = match(cl, ucl),
+            j = seq_along(cl),
+            x = 1L,
+            dims = c(length(ucl), length(cl))
+        )
+
+        # Multiplication
+        out <- I %*% mat[row_idx, , drop = FALSE]
+
+        rownames(out) <- ucl
+
+        return(out)
+    }
+
+    ## Extract per-cluster allelic counts for sample cells ---
+    extract_allelic_for_sample <- function(x) {
+
+        clusters <- x@cnacalling$clusters
+
+        res <- data.table::rbindlist(lapply(names(x@omics), function(omic_name) {
+            allelic <- x@omics[[omic_name]]@allelic
+            RD <- allelic$mat.RD
+            AD <- allelic$mat.AD
+            cells <- rownames(RD)
+            coord.vars <- allelic$coord.vars
+
+            # Keep only tumor cells with cluster assignments
+            keep_cells <- cells %in% names(clusters)
+            cells <- cells[keep_cells]
+
+            # Keep only loci with information
+            keep_loci <- which(colSums(RD != 0) > 0 | colSums(AD != 0) > 0)
+            coord.vars <- coord.vars[keep_loci, ]
+
+            RD <- RD[keep_cells, keep_loci, drop = FALSE]
+            AD <- AD[keep_cells, keep_loci, drop = FALSE]
+
+
+            # aggregate sparse
+            agg_RD <- aggregate_sparse_counts(RD, cells, clusters)
+            agg_AD <- aggregate_sparse_counts(AD, cells, clusters)
+
+            # DP
+            agg_DP <- agg_RD + agg_AD
+
+            # convert to long format
+            ncl <- nrow(agg_DP)
+            nloci <- ncol(agg_DP)
+
+            dt <- data.table::data.table(
+                cluster = rep(rownames(agg_DP), each = nloci),
+                id = rep(coord.vars$id, times = ncl),
+                CHROM = rep(coord.vars$CHROM, times = ncl),
+                POS = rep(coord.vars$POS, times = ncl),
+                omic = omic_name,
+                RD.omic = as.vector(t(agg_RD)),
+                AD.omic = as.vector(t(agg_AD)),
+                DP.omic = as.vector(t(agg_DP))
+            )
+            dt[DP.omic > 0]
+            return(dt)
+        }))
+
+        # Sum across omics
+        res <- res[, .(
+            RD = sum(RD.omic, na.rm = TRUE),
+            AD = sum(AD.omic, na.rm = TRUE),
+            DP = sum(DP.omic, na.rm = TRUE)
+        ), by = .(cluster, id, omic, CHROM, POS)][DP > 0]
+
+        # Sort data
+        res <- res[order(res$CHROM, res$POS), ]
+
+        return(as.data.frame(res))
+    }
+
+    ## Extract allelic counts for reference cells ---
+    extract_allelic_for_ref <- function(reference) {
+        res <- data.table::rbindlist(lapply(names(reference@omics), function(omic_name) {
+
+            allelic <- reference@omics[[omic_name]]@allelic
+            coord.vars <- allelic$coord.vars
+
+            # sum across all cells (vectorized)
+            RD.omic <- colSums(allelic$mat.RD)
+            AD.omic <- colSums(allelic$mat.AD)
+            DP.omic <- RD.omic + AD.omic
+
+            data.table::data.table(
+                id = coord.vars$id,
+                CHROM = coord.vars$CHROM,
+                POS = coord.vars$POS,
+                omic = omic_name,
+                RD.omic = RD.omic,
+                AD.omic = AD.omic,
+                DP.omic = DP.omic
+            )
+        }))
+
+        # Sum across omics
+        res <- res[, .(
+            RD = sum(RD.omic, na.rm = TRUE),
+            AD = sum(AD.omic, na.rm = TRUE),
+            DP = sum(DP.omic, na.rm = TRUE)
+        ), by = .(id, omic, CHROM, POS)]
+
+        # Sort data
+        res <- res[order(res$CHROM, res$POS), ]
+
+        return(as.data.frame(res))
+    }
+
+    ## Extract per-cluster coverage counts for sample cells ---
+    extract_coverage_for_sample <- function(x) {
+
+        clusters <- x@cnacalling$clusters
+
+        res <- data.table::rbindlist(lapply(names(x@omics), function(omic_name) {
+
+            coverage <- x@omics[[omic_name]]@coverage
+            mat <- coverage$counts$mat
+            cells <- rownames(mat)
+            coord <- coverage$counts$coord.features
+
+            ## Keep only tumor cells with clusters
+            keep_cells <- cells %in% names(clusters)
+            cells <- cells[keep_cells]
+
+            ## Remove features with zero coverage across cells
+            keep_loci <- which(colSums(mat != 0) > 0)
+            coord <- coord[keep_loci, ]
+
+            mat <- mat[keep_cells, keep_loci, drop = FALSE]
+
+            ## Aggregate counts by cluster
+            agg_DP <- aggregate_sparse_counts(mat, cells, clusters)
+
+            ncl <- nrow(agg_DP)
+            nloci <- ncol(agg_DP)
+
+            ## Build long table
+            dt <- data.table::data.table(
+                cluster = rep(rownames(agg_DP), each = nloci),
+                id      = rep(coord$id, times = ncl),
+                CHROM   = rep(coord$CHROM, times = ncl),
+                POS     = rep(round((coord$start + coord$end)/2), times = ncl),
+                omic    = omic_name,
+                DP.omic  = as.vector(t(agg_DP))   # row-major flattening
+            )
+
+            dt[DP.omic > 0]
+            return(dt)
+
+        }))
+
+        # Sum across omics
+        res <- res[, .(
+            DP = sum(DP.omic, na.rm = TRUE)
+        ), by = .(cluster, id, omic, CHROM, POS)][DP > 0]
+
+        # Sort data
+        res <- res[order(res$CHROM, res$POS, res$cluster), ]
+
+        return(as.data.frame(res))
+    }
+
+    ## Extract coverage counts for reference cells ---
+    extract_coverage_for_ref <- function(reference) {
+
+        res <- data.table::rbindlist(lapply(names(reference@omics), function(omic_name) {
+
+            coverage <- reference@omics[[omic_name]]@coverage
+            mat <- coverage$counts$mat
+            coord <- coverage$counts$coord.features
+
+            # filter features
+            coord <- coord[coord$id %in% colnames(mat), ]
+            mat <- mat[, coord$id]
+
+            dt <- data.table::data.table(
+                id = coord$id,
+                CHROM = coord$CHROM,
+                POS = round((coord$start + coord$end) / 2),
+                omic = omic_name,
+                DP.omic = colSums(mat)
+            )
+            return(dt)
+        }))
+
+        # Sum across omics
+        res <- res[, .(DP = sum(DP.omic, na.rm = TRUE)), by = .( id, omic, CHROM, POS)]
+
+        # Sort data
+        res <- res[order(res$CHROM, res$POS), ]
+
+        return(as.data.frame(res))
+    }
+
+
     # Allelic Data Processing --------------------------------------------------
     if (!quiet) {
         message("Allelic data processing...")
     }
-    # Extract allelic counts for all omics in both sample and reference
-    allele_sample <- data.table::rbindlist(lapply(x@omics, function(omic) {
-        omic@allelic$table.counts
-    }), use.names = TRUE)
-    allele_ref <- data.table::rbindlist(lapply(reference@omics, function(omic) {
-        omic@allelic$table.counts
-    }), use.names = TRUE)
 
+    # Extract allele counts for all omics in both sample and reference
+    allele_sample <- extract_allelic_for_sample(x)
+    allele_ref <- extract_allelic_for_ref(reference)
 
-    # Compute per-omic and total counts for the sample
-    # Filter for cells with valid cluster assignments
-    allele_sample <- allele_sample[allele_sample$cell %in% names(x@cnacalling$clusters),]
-    # Add cluster assignments to table
-    allele_sample$cluster <- x@cnacalling$clusters[match(allele_sample$cell, names(x@cnacalling$clusters))]
-    # Compute per-omi counts
-    summed_sample_omic <- allele_sample %>%
-        dplyr::group_by(.data$cluster, .data$id, .data$omic)%>%
-        dplyr::summarise(
-            RD.omic = sum(.data$RD, na.rm = TRUE),
-            AD.omic = sum(.data$AD, na.rm = TRUE),
-            DP.omic = sum(.data$DP, na.rm = TRUE),
-            .groups = "drop"
-        ) %>%
-        dplyr::mutate(AF.omic = round(.data$AD.omic / .data$DP.omic, 2))
-    # Compute total counts
-    summed_sample_all <- allele_sample %>%
-        dplyr::group_by(.data$cluster, .data$id)%>%
-        dplyr::summarise(
-            RD.all = sum(.data$RD, na.rm = T),
-            AD.all = sum(.data$AD, na.rm = T),
-            DP.all = sum(.data$DP, na.rm = T),
-            .groups = "drop"
-        ) %>%
-        dplyr::mutate(AF.all = round(.data$AD.all / .data$DP.all, 2))
-    # Join data
-    allele_sample_full <- {
-        allele_sample %>%
-            dplyr::select(!dplyr::any_of(c("cell", "RD", "AD", "DP"))) %>%
-            dplyr::left_join(summed_sample_omic, by = c("cluster", "id", "omic")) %>%
-            dplyr::left_join(summed_sample_all, by = c("cluster", "id")) %>%
-            dplyr::distinct()
-    }
-
-    # Compute per-omic and total counts for the reference
-    # Compute per-omi counts
-    summed_ref_omic <- allele_ref %>%
-        dplyr::group_by(.data$id, .data$omic)%>%
-        dplyr::summarise(
-            RD.omic = sum(.data$RD, na.rm = TRUE),
-            AD.omic = sum(.data$AD, na.rm = TRUE),
-            DP.omic = sum(.data$DP, na.rm = TRUE),
-            .groups = "drop"
-        ) %>%
-        dplyr::mutate(AF.omic = round(.data$AD.omic / .data$DP.omic, 2))
-    # Compute total counts
-    summed_ref_all <- allele_ref %>%
-        dplyr::group_by(.data$id)%>%
-        dplyr::summarise(
-            RD.all = sum(.data$RD, na.rm = T),
-            AD.all = sum(.data$AD, na.rm = T),
-            DP.all = sum(.data$DP, na.rm = T),
-            .groups = "drop"
-        ) %>%
-        dplyr::mutate(AF.all = round(.data$AD.all / .data$DP.all, 2))
-    # Join data
-    allele_ref_full <- {
-        allele_ref %>%
-            dplyr::select(!dplyr::any_of(c("cell", "RD", "AD", "DP"))) %>%
-            dplyr::left_join(summed_ref_omic, by = c("id", "omic")) %>%
-            dplyr::left_join(summed_ref_all, by = "id") %>%
-            dplyr::distinct()
-    }
-
-    # Merge sample and reference allelic data
+    # Join sample and reference allelic data
     var <- dplyr::left_join(
-        allele_sample_full,
-        allele_ref_full,
-        by = c("CHROM", "POS", "REF", "ALT", "id", "GT", "omic"),
+        allele_sample,
+        allele_ref,
+        by = c("CHROM", "POS", "id", "omic"),
         suffix = c(".TUM", ".NOR")
-    ) %>%
-        dplyr::arrange(.data$CHROM, .data$POS, .data$cluster) %>%
-        dplyr::mutate(signal = "allelic")
+    )
+    var <- var[order(var$CHROM, var$POS, var$cluster), ]
+    var$signal <- "allelic"
+    var <- var[, c("id", "CHROM", "POS", "cluster", "signal", "omic", "RD.NOR", "AD.NOR", "DP.NOR", "RD.TUM", "AD.TUM", "DP.TUM")]
 
     x@cnacalling[["allelic.counts"]] <- as.data.frame(var)
 
-
     # Auto set normal variant positions as heterozygous before combining
     if(nor.het == TRUE) {
-        var[, "RD.all.NOR"] <- round(var[, "DP.all.NOR"] / 2, 0)
+        var[, "RD.NOR"] <- round(var[, "DP.NOR"] / 2, 0)
     }
 
 
@@ -398,53 +546,23 @@ mergeCounts <- function(x,
     if (!quiet) {
         message("Coverage data processing...")
     }
+
     # Extract coverage counts for all omics in both sample and reference
-    coverage_sample <- data.table::rbindlist(lapply(x@omics, function(omic) {
-        omic@coverage$table.counts
-    }), use.names = TRUE)
-    coverage_ref <- data.table::rbindlist(lapply(reference@omics, function(omic) {
-        omic@coverage$table.counts
-    }), use.names = TRUE)
+    coverage_sample <- extract_coverage_for_sample(x)
+    coverage_ref <- extract_coverage_for_ref(reference)
 
-    # Compute total counts for the sample
-    # Filter for cells with valid cluster assignments
-    coverage_sample <- coverage_sample[coverage_sample$cell %in% names(x@cnacalling$clusters),]
-    # Add cluster assignments to table
-    coverage_sample$cluster <- x@cnacalling$clusters[match(coverage_sample$cell, names(x@cnacalling$clusters))]
-    summed_sample <- coverage_sample %>%
-        dplyr::group_by(.data$cluster, .data$id) %>%
-        dplyr::summarise(DP = sum(.data$DP),
-                         .groups = "drop")
-    coverage_sample_full <- {
-        coverage_sample %>%
-            dplyr::select(!dplyr::any_of(c("cell", "DP"))) %>%
-            dplyr::left_join(summed_sample, by = c("cluster", "id")) %>%
-            dplyr::distinct()
-    }
-
-
-    # Compute total counts for the reference
-    summed_ref <- coverage_ref %>%
-        dplyr::group_by(.data$id) %>%
-        dplyr::summarise(DP = sum(.data$DP),
-                         .groups = "drop")
-    coverage_ref_full <- {
-        coverage_ref %>%
-            dplyr::select(!dplyr::any_of(c("cell", "DP"))) %>%
-            dplyr::left_join(summed_ref, by = "id") %>%
-            dplyr::distinct()
-    }
-
-    # Merge sample and reference coverage data
+    # Join sample and reference coverage data
     cov <- dplyr::left_join(
-        coverage_sample_full,
-        coverage_ref_full,
+        coverage_sample,
+        coverage_ref,
         by = c("CHROM", "POS", "id", "omic"),
         suffix = c(".TUM", ".NOR")
-    ) %>%
-        dplyr::arrange(.data$CHROM, .data$POS, .data$cluster) %>%
-        dplyr::select("omic", "id", "CHROM", "POS", "DP.NOR", "DP.TUM", "cluster") %>%
-        dplyr::mutate(signal = "coverage")
+    )
+    cov <- cov[order(cov$CHROM, cov$POS, cov$cluster), ]
+    cov$signal <- "coverage"
+    cov$RD.NOR <- cov$DP.NOR
+    cov$RD.TUM <- cov$DP.TUM
+    cov <- cov[, c("id", "CHROM", "POS", "cluster", "signal", "omic", "RD.NOR", "DP.NOR", "RD.TUM", "DP.TUM")]
 
     x@cnacalling[["coverage.counts"]] <- as.data.frame(cov)
 
@@ -455,11 +573,11 @@ mergeCounts <- function(x,
     }
 
     # Format data
-    var <- var[, c("CHROM", "POS", "DP.all.NOR", "RD.all.NOR", "DP.all.TUM", "RD.all.TUM", "cluster", "signal", "omic", "id")]
+    cols <- c("CHROM", "POS", "DP.NOR", "RD.NOR", "DP.TUM", "RD.TUM", "cluster", "signal", "omic", "id")
+    var <- var[, cols]
     var <- unique(var)
-    cov <- cov[, c("CHROM", "POS", "DP.NOR", "DP.NOR", "DP.TUM", "DP.TUM", "cluster", "signal", "omic", "id")]
+    cov <- cov[, cols]
     cov <- unique(cov)
-
     colnames(var) <- c("Chromosome", "Position", "NOR.DP", "NOR.RD", "TUM.DP", "TUM.RD", "cluster", "signal", "omic", "id")
     colnames(cov) <- colnames(var)
 
@@ -468,8 +586,9 @@ mergeCounts <- function(x,
     levels(cov$Chromosome) <- union(levels(var$Chromosome), levels(cov$Chromosome))
 
     # Combine both data
-    combined <- rbind(var, cov) %>%
-        arrange(.data$Chromosome, .data$Position)
+    combined <- rbind(var, cov)
+    combined <- combined[order(combined$Chromosome, combined$Position), ]
+    rownames(combined) <- NULL
 
     x@cnacalling[["combined.counts"]] <- as.data.frame(combined)
 

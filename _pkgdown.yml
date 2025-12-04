@@ -57,7 +57,7 @@ reference:
   desc: >
     Functions to identify Copy Number Alterations
   contents:
-  - mergeCounts
+  - aggregateCounts
   - cnaCalling
   - preProcSample2
   - getSegConsensus
