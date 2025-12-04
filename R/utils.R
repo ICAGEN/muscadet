@@ -160,19 +160,25 @@ makeAllelicSparse <- function(allele_counts) {
 addAlleleCounts <- function(x, allele_counts) {
 
     # Check that x is a muscadet object
-    stopifnot("The argument 'x' must be a muscadet object." = inherits(x, "muscadet"))
+    stopifnot("The argument `x` must be a muscadet object." = inherits(x, "muscadet"))
 
     # Check that allele_counts is a list of dataframes
-    stopifnot("The argument 'allele_counts' must be a list." = inherits(allele_counts, "list"))
-    stopifnot("The argument 'allele_counts' must be a list of data frames." = all(unlist(
+    stopifnot("The argument `allele_counts` must be a list." = inherits(allele_counts, "list"))
+    stopifnot("The argument `allele_counts` must be a list of data frames." = all(unlist(
         lapply(allele_counts, function(x)
             inherits(x, "data.frame"))
     )))
 
     # Ensure allele_counts list matches the number of omics in x
     if (length(allele_counts) != length(x@omics)) {
-        stop("The 'allele_counts' list must have the same length as the number of omics in 'x'.")
+        stop("The 'allele_counts' list must have the same length as the number of omics in `x`.")
     }
+
+    required_cols <- c("cell", "CHROM", "POS", "REF", "ALT", "RD", "AD")
+    stopifnot(
+        "The data frame(s) in `allele_counts` must contain the required columns: cell, CHROM, POS, REF, ALT, RD, AD." =
+            all(sapply(allele_counts, function(x) all(required_cols %in% colnames(x))))
+    )
 
     # Assign names to allele_counts based on omics names in x
     names(allele_counts) <- names(x@omics)
@@ -180,20 +186,18 @@ addAlleleCounts <- function(x, allele_counts) {
     type.omic <- unlist(lapply(x@omics, function(x) x$type))
 
     # Format allele count data frames
-    allele_counts <- lapply(allele_counts, function(allele_df) {
-        # Remove "chr" if necessary
-        allele_df$CHROM <- stringr::str_remove(allele_df$CHROM, "chr")
-        # Ordered chromosomes
-        allele_df$CHROM <- ordered(allele_df$CHROM, levels = gtools::mixedsort(unique(allele_df$CHROM)))
-        # Reorder data
-        allele_df <- allele_df[order(allele_df$CHROM, allele_df$POS), ]
-        return(allele_df)
+    allelic_list <- lapply(allele_counts, function(allele_df) {
+        # Remove potential NAs
+        allele_df <- allele_df[complete.cases(allele_df), ]
+        # Transform to sparse matrices
+        allelic <- makeAllelicSparse(allele_df)
 
+        return(allelic)
     })
 
     # Add allele counts to each omic in the muscadet object
     for (i in names(x@omics)) {
-        slot(x@omics[[i]], "allelic") <- list(table.counts = data.frame(omic = type.omic[[i]], allele_counts[[i]]))
+        x@omics[[i]]@allelic <- allelic_list[[i]]
     }
 
     return(x)
