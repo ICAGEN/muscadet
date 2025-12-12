@@ -4,29 +4,29 @@
 
 #' Example data: Feature coordinates
 #'
-#' @description
-#' Data frames of features (peaks, genes...) coordinates on genome.
+#' Data frames of features (peaks, genes...) coordinates on genome. Only
+#' chromosomes 3, 4 and 8 are present in the `exdata` example dataset.
 #'
-#' @name features
-#' @rdname features
+#' @name exdata_features
+#' @rdname exdata_features
 #'
 #' @format
 #' A data frame with the following columns:
 #' \describe{
-#'   \item{`CHROM`}{Chromosome names in character format, e.g. "15", "X" (`character`).}
-#'   \item{`start`}{Start positions (`integer`).}
-#'   \item{`end`}{End positions (`character`).}
+#'   \item{`CHROM`}{Chromosome names, e.g. "3", "X".}
+#'   \item{`start`}{Start positions.}
+#'   \item{`end`}{End positions.}
 #'   \item{`id`}{Unique identifiers, e.g. gene name "CDH1" or peak identifier
-#'   CHROM_start_end "1_1600338_1600838" (`character`).}
+#'   CHROM_start_end "1_1600338_1600838".}
 #' }
 #'
-"genes"
+"exdata_genes"
 
-#' @name features
-#' @rdname features
+#' @name exdata_features
+#' @rdname exdata_features
 #' @format NULL
 #'
-"peaks"
+"exdata_peaks"
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,53 +35,53 @@
 
 #' Example data: Matrices of raw counts
 #'
-#' @description Matrices of raw read counts *features x cells* in
+#' Matrices of raw read counts *features x cells* in
 #' [`dgCMatrix`][Matrix::dgCMatrix-class] format.
 #'
-#' @name mat_counts
-#' @rdname mat_counts
+#' @name exdata_mat_counts
+#' @rdname exdata_mat_counts
 #'
 #' @format
 #' A [`dgCMatrix`][Matrix::dgCMatrix-class] of numeric values with the following
 #' dimensions:
 #' \describe{
-#'   \item{`rows`}{Features (peaks, genes).}
+#'   \item{`rows`}{Features (peaks, genes, ...).}
 #'   \item{`columns`}{Cell barcodes.}
 #' }
 #'
-"mat_counts_atac_tumor"
+"exdata_mat_counts_atac_tumor"
 
-#' @name mat_counts
-#' @rdname mat_counts
+#' @name exdata_mat_counts
+#' @rdname exdata_mat_counts
 #' @format NULL
 #'
-"mat_counts_atac_ref"
+"exdata_mat_counts_atac_ref"
 
-#' @name mat_counts
-#' @rdname mat_counts
+#' @name exdata_mat_counts
+#' @rdname exdata_mat_counts
 #' @format NULL
 #'
-"mat_counts_rna_tumor"
+"exdata_mat_counts_rna_tumor"
 
-#' @name mat_counts
-#' @rdname mat_counts
+#' @name exdata_mat_counts
+#' @rdname exdata_mat_counts
 #' @format NULL
 #'
-"mat_counts_rna_ref"
+"exdata_mat_counts_rna_ref"
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Allele counts ----------------------------------------------------------------
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#' Example data: Allele counts at variation positions
+#' Example data: Allele counts at variant positions
 #'
-#' @description
 #' Data frames of allele counts at variant positions per cell. Variant positions
 #' can be either common single nucleotide polymorphisms (SNPs) positions or
-#' individual-specific heterozygous positions retrieved by bulk sequencing.
+#' individual-specific heterozygous positions retrieved using bulk sequencing.
+#' Only chromosomes 3, 4 and 8 are present in the `exdata` example dataset.
 #'
-#' @name allele_counts
-#' @rdname allele_counts
+#' @name exdata_allele_counts
+#' @rdname exdata_allele_counts
 #'
 #' @seealso
 #' - [process_allele()]
@@ -91,39 +91,38 @@
 #' (VCF)](https://en.wikipedia.org/wiki/Variant_Call_Format) columns. It
 #' contains the following columns:
 #' \describe{
-#'   \item{`cell`}{Barcodes of cells (`character`).}
+#'   \item{`cell`}{Barcodes of cells.}
 #'   \item{`id`}{Variant unique identifier defined as
-#'   CHROM_POS_REF_ALT, e.g. "1_920949_C_G" (`character`).}
-#'   \item{`CHROM`}{Chromosome in integer format, e.g. 15 (X and Y chromosomes
-#'   are not included) (`integer`).}
-#'   \item{`POS`}{Position of the variant (1-base positions) (`integer`).}
-#'   \item{`REF`}{Reference allele base, "A" "C" "G" or "T" (`character`).}
-#'   \item{`ALT`}{Alternative allele base, "A" "C" "G" or "T" (`character`).}
-#'   \item{`RD`}{Reference allele depth/count (`integer`).}
-#'   \item{`AD`}{Alternative allele depth/count (`integer`).}
-#'   \item{`DP`}{Total depth/count (`integer`).}
-#'   \item{`GT`}{Genotype: "0/1" or "1/0" if unphased; "0|1" or "1|0" if phased. (`character`).}
+#'   CHROM_POS_REF_ALT, e.g. "3_3126620_T_G".}
+#'   \item{`CHROM`}{Chromosome names, e.g. "3", "X".}
+#'   \item{`POS`}{Position of the variant (1-base positions).}
+#'   \item{`REF`}{Reference allele base, "A" "C" "G" or "T".}
+#'   \item{`ALT`}{Alternative allele base, "A" "C" "G" or "T".}
+#'   \item{`RD`}{Reference allele depth/count.}
+#'   \item{`AD`}{Alternative allele depth/count.}
+#'   \item{`DP`}{Total depth/count.}
+#'   \item{`GT`}{Genotype: "0/1" or "1/0" if unphased; "0|1" or "1|0" if phased.}
 #' }
 #'
-"allele_counts_atac_tumor"
+"exdata_allele_counts_atac_tumor"
 
-#' @name allele_counts
-#' @rdname allele_counts
+#' @name exdata_allele_counts
+#' @rdname exdata_allele_counts
 #' @format NULL
 #'
-"allele_counts_atac_ref"
+"exdata_allele_counts_atac_ref"
 
-#' @name allele_counts
-#' @rdname allele_counts
+#' @name exdata_allele_counts
+#' @rdname exdata_allele_counts
 #' @format NULL
 #'
-"allele_counts_rna_tumor"
+"exdata_allele_counts_rna_tumor"
 
-#' @name allele_counts
-#' @rdname allele_counts
+#' @name exdata_allele_counts
+#' @rdname exdata_allele_counts
 #' @format NULL
 #'
-"allele_counts_rna_ref"
+"exdata_allele_counts_rna_ref"
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,16 +131,17 @@
 
 #' Example data: Log R ratio from bulk sequencing data
 #'
-#' @description Data frame containing log R ratio values per genomic segments
-#' from bulk sequencing data.
+#' Data frame containing log R ratio values per genomic segments from bulk
+#' sequencing data. Only chromosomes 3, 4 and 8 are present in the `exdata`
+#' example dataset.
 #'
 #' @format A data frame with the following columns:
 #' \describe{
-#'   \item{`CHROM`}{Chromosome in integer format, e.g. 15, 23 (for X chromosome) (`character`).}
-#'   \item{`start`}{Start position of the segment (`integer`).}
-#'   \item{`end`}{End position of the segment (`character`).}
+#'   \item{`CHROM`}{Chromosome names, e.g. "3", "X".}
+#'   \item{`start`}{Start position of the segment.}
+#'   \item{`end`}{End position of the segment.}
 #'   \item{`lrr`}{Log R ratio of the segment ("cnlr.median" column from
-#'   [facets::fitcncf()] `$cncf` data frame) (`numeric`).}
+#'   [facets::fitcncf()] `$cncf` data frame).}
 #' }
 #'
 #' @note Data obtained from whole genome sequencing (WGS) after using
@@ -158,7 +158,7 @@
 #'   27270079; PMCID: PMC5027494.}
 #' }
 #'
-"bulk_lrr"
+"exdata_bulk_lrr"
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -190,7 +190,7 @@
 #' - `BSgenome.Mmusculus.UCSC.mm10` version 1.4.3 - `GRCm38.p6`
 #'
 #'
-#' #' @references
+#' @references
 #' \describe{
 #'   \item{BSgenome package}{Pagès H (2024). BSgenome: Software infrastructure
 #'   for efficient representation of full genomes and their SNPs.
@@ -210,14 +210,13 @@ NULL
 
 #' Example data: muscadet objects
 #'
-#' @name muscadet_obj
-#' @rdname muscadet_obj
-#'
-#' @description [`muscadet`][muscadet-class] objects, containing two
+#' [`muscadet`][muscadet-class] objects, containing two
 #'   single-cell omic datasets: scATAC-seq and scRNA-seq.
-#' - `muscadet_obj` with tumor cells data: sample cells
-#' - `muscadet_obj_ref` with normal cells data: reference cells
+#' - `exdata_muscadet` with tumor cells data: sample cells
+#' - `exdata_muscadet_ref` with normal cells data: reference cells
 #'
+#' @name exdata_muscadet
+#' @rdname exdata_muscadet
 #'
 #' @format [`muscadet`][muscadet-class] objects with the following slots:
 #' \describe{
@@ -231,12 +230,12 @@ NULL
 #'   \item{`genome`}{Reference genome name among: "hg38", "hg19" and "mm10" (`character`).}
 #' }
 #'
-"muscadet_obj"
+"exdata_muscadet"
 
-#' @name muscadet_obj_ref
-#' @rdname muscadet_obj
+#' @name exdata_muscadet_ref
+#' @rdname exdata_muscadet
 #' @format NULL
 #'
-"muscadet_obj_ref"
+"exdata_muscadet_ref"
 
 
