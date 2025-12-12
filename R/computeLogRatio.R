@@ -533,10 +533,10 @@ computeLogRatioATAC <- function(matTumor,
     windowsDF$nPeaks[!win] <- 0
     windowsDF$sumReads.tum[win] <- Matrix::colSums(matTumor, na.rm = TRUE)
     windowsDF$meanReads.tum[win] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-    windowsDF$sdReads.tum[win] <- matrixStats::colSds(as.matrix(matTumor), na.rm = TRUE)
+    windowsDF$sdReads.tum[win] <- sparseMatrixStats::colSds(as.matrix(matTumor), na.rm = TRUE)
     windowsDF$sumReads.ref[win] <- Matrix::colSums(matRef, na.rm = TRUE)
     windowsDF$meanReads.ref[win] <- Matrix::colMeans(matRef, na.rm = TRUE)
-    windowsDF$sdReads.ref[win] <- matrixStats::colSds(as.matrix(matRef), na.rm = TRUE)
+    windowsDF$sdReads.ref[win] <- sparseMatrixStats::colSds(as.matrix(matRef), na.rm = TRUE)
 
     # Add filtering information 'keep' in window coordinates data frame
     windowsDF <- dplyr::mutate(windowsDF, keep = windowsDF$meanReads.ref >= minReads &
@@ -576,9 +576,9 @@ computeLogRatioATAC <- function(matTumor,
     }
 
     windowsDF$meanReads.norm.tum[windowsDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-    windowsDF$sdReads.norm.tum[windowsDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+    windowsDF$sdReads.norm.tum[windowsDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
     windowsDF$meanReads.norm.ref[windowsDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-    windowsDF$sdReads.norm.ref[windowsDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+    windowsDF$sdReads.norm.ref[windowsDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
     ## Step 04: Log transformation and normalization by reference data: log R ratio ----------
     msg("Step 04 - Log transformation and normalization by reference data: log R ratio")
@@ -601,9 +601,9 @@ computeLogRatioATAC <- function(matTumor,
     }
 
     windowsDF$meanLRR.raw.tum[windowsDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-    windowsDF$sdLRR.raw.tum[windowsDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.raw.tum[windowsDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
     windowsDF$meanLRR.raw.ref[windowsDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-    windowsDF$sdLRR.raw.ref[windowsDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.raw.ref[windowsDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
 
     ## Step 05: Capping the range of values --------------------------------------
@@ -624,9 +624,9 @@ computeLogRatioATAC <- function(matTumor,
     }
 
     windowsDF$meanLRR.cap.tum[windowsDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-    windowsDF$sdLRR.cap.tum[windowsDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.cap.tum[windowsDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
     windowsDF$meanLRR.cap.ref[windowsDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-    windowsDF$sdLRR.cap.ref[windowsDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.cap.ref[windowsDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
     ## Step 06 - [No step 06 for scATAC-seq] -------------------------------------
     msg("Step 06 - [No step 06 for scATAC-seq]")
@@ -650,15 +650,15 @@ computeLogRatioATAC <- function(matTumor,
     }
 
     windowsDF$meanLRR.cent.tum[windowsDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-    windowsDF$sdLRR.cent.tum[windowsDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.cent.tum[windowsDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
     windowsDF$meanLRR.cent.ref[windowsDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-    windowsDF$sdLRR.cent.ref[windowsDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.cent.ref[windowsDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
 
     ## Step 08: Correcting by reference variability ------------------------------
     msg("Step 08 - Correcting by reference variability")
 
-    sd.ref <- matrixStats::colSds(matRef, na.rm = TRUE)
+    sd.ref <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
     mean.ref <- Matrix::colMeans(matRef, na.rm = TRUE)
 
     matTumor <- sweep(matTumor, 2, mean.ref, FUN = "-")
@@ -676,9 +676,9 @@ computeLogRatioATAC <- function(matTumor,
     }
 
     windowsDF$meanLRR.corr.tum[windowsDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-    windowsDF$sdLRR.corr.tum[windowsDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+    windowsDF$sdLRR.corr.tum[windowsDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
     windowsDF$meanLRR.corr.ref[windowsDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-    windowsDF$sdLRR.corr.ref[windowsDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+    windowsDF$sdLRR.corr.ref[windowsDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
     if (all_steps == TRUE) {
         obj$params <- params
@@ -759,7 +759,6 @@ computeLogRatioATAC <- function(matTumor,
 #' @importFrom Matrix colSums colMeans
 #' @importFrom stats na.omit sd
 #' @importFrom sparseMatrixStats colSds
-#' @importFrom matrixStats colSds
 #' @importFrom caTools runmean
 #'
 #' @export
@@ -980,9 +979,9 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   genesDF$meanLRR.raw.tum[genesDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-  genesDF$sdLRR.raw.tum[genesDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+  genesDF$sdLRR.raw.tum[genesDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
   genesDF$meanLRR.raw.ref[genesDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-  genesDF$sdLRR.raw.ref[genesDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+  genesDF$sdLRR.raw.ref[genesDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
 
   ## Step 05: Capping the range of values --------------------------------------
@@ -1003,9 +1002,9 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   genesDF$meanLRR.cap.tum[genesDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-  genesDF$sdLRR.cap.tum[genesDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+  genesDF$sdLRR.cap.tum[genesDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
   genesDF$meanLRR.cap.ref[genesDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-  genesDF$sdLRR.cap.ref[genesDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+  genesDF$sdLRR.cap.ref[genesDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
 
   ## Step 06: Smoothing on genes windows ---------------------------------------
@@ -1053,9 +1052,9 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   genesDF$meanLRR.smoo.tum[genesDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-  genesDF$sdLRR.smoo.tum[genesDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+  genesDF$sdLRR.smoo.tum[genesDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
   genesDF$meanLRR.smoo.ref[genesDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-  genesDF$sdLRR.smoo.ref[genesDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+  genesDF$sdLRR.smoo.ref[genesDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
 
   ## Step 07: Centering of cells ------------------------------
@@ -1077,15 +1076,15 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   genesDF$meanLRR.cent.tum[genesDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-  genesDF$sdLRR.cent.tum[genesDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+  genesDF$sdLRR.cent.tum[genesDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
   genesDF$meanLRR.cent.ref[genesDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-  genesDF$sdLRR.cent.ref[genesDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+  genesDF$sdLRR.cent.ref[genesDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
 
   ## Step 08: Correcting by reference variability ------------------------------
   msg("Step 08 - Correcting by reference variability")
 
-  sd.ref <- matrixStats::colSds(matRef, na.rm = TRUE)
+  sd.ref <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
   mean.ref <- Matrix::colMeans(matRef, na.rm = TRUE)
 
   matTumor <- sweep(matTumor, 2, mean.ref, FUN = "-")
@@ -1103,9 +1102,9 @@ computeLogRatioRNA <- function(matTumor,
   }
 
   genesDF$meanLRR.corr.tum[genesDF$keep] <- Matrix::colMeans(matTumor, na.rm = TRUE)
-  genesDF$sdLRR.corr.tum[genesDF$keep] <- matrixStats::colSds(matTumor, na.rm = TRUE)
+  genesDF$sdLRR.corr.tum[genesDF$keep] <- sparseMatrixStats::colSds(matTumor, na.rm = TRUE)
   genesDF$meanLRR.corr.ref[genesDF$keep] <- Matrix::colMeans(matRef, na.rm = TRUE)
-  genesDF$sdLRR.corr.ref[genesDF$keep] <- matrixStats::colSds(matRef, na.rm = TRUE)
+  genesDF$sdLRR.corr.ref[genesDF$keep] <- sparseMatrixStats::colSds(matRef, na.rm = TRUE)
 
   if (all_steps == TRUE) {
     obj$params <- params

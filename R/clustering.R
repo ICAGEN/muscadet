@@ -148,7 +148,7 @@ clusterMuscadet <- function(x,
         }
 
         # Clustering
-        res_clust <- cluster_seurat(mat_list[omics], ...)
+        res_clust <- cluster_seurat(mat_list[omics], quiet = quiet, ...)
     }
 
     # Method 2: Using hclust
@@ -159,7 +159,7 @@ clusterMuscadet <- function(x,
         }
 
         # Clustering
-        res_clust <- cluster_hclust(mat_list[omics], ...)
+        res_clust <- cluster_hclust(mat_list[omics], quiet = quiet, ...)
     }
 
     slot(x, "clustering") <- res_clust

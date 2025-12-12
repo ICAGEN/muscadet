@@ -251,19 +251,19 @@ assignClusters <- function(x,
 #' - TUM = tumor sample
 #' - NOR = normal reference
 #'
-#' @import data.table
-#' @importFrom Matrix sparseMatrix colSums
+#' @importFrom data.table data.table rbindlist :=
+#' @importFrom Matrix sparseMatrix colSums t
 #' @importFrom dplyr left_join
 #'
 #' @export
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
-#' # data("muscadet_obj_ref")
+#' # data("exdata_muscadet")
+#' # data("exdata_muscadet_ref")
 #'
 #' # Aggregate counts from all omics from both sample and reference
-#' muscadet_obj <- aggregateCounts(muscadet_obj, muscadet_obj_ref)
+#' exdata_muscadet <- aggregateCounts(exdata_muscadet, exdata_muscadet_ref)
 #'
 aggregateCounts <- function(x,
                             reference,
@@ -370,9 +370,9 @@ aggregateCounts <- function(x,
                 CHROM = rep(coord.vars$CHROM, times = ncl),
                 POS = rep(coord.vars$POS, times = ncl),
                 omic = omic_name,
-                RD.omic = as.vector(t(agg_RD)),
-                AD.omic = as.vector(t(agg_AD)),
-                DP.omic = as.vector(t(agg_DP))
+                RD.omic = as.vector(Matrix::t(agg_RD)),
+                AD.omic = as.vector(Matrix::t(agg_AD)),
+                DP.omic = as.vector(Matrix::t(agg_DP))
             )
             dt[DP.omic > 0]
             return(dt)
@@ -462,7 +462,7 @@ aggregateCounts <- function(x,
                 CHROM   = rep(coord$CHROM, times = ncl),
                 POS     = rep(round((coord$start + coord$end)/2), times = ncl),
                 omic    = omic_name,
-                DP.omic  = as.vector(t(agg_DP))   # row-major flattening
+                DP.omic  = as.vector(Matrix::t(agg_DP))   # row-major flattening
             )
 
             dt[DP.omic > 0]
@@ -972,7 +972,7 @@ cnaCalling <- function(
                 cval = cval1,
                 snp.nbhd = snp.nbhd,
                 gbuild = gbuild,
-                ndepth = 0,
+                ndepth = 1,
                 ndepthmax = depthmax.nor
             )
             oo <- facets::procSample(xx,
@@ -1198,7 +1198,7 @@ cnaCalling <- function(
         cval = cval1,
         snp.nbhd = snp.nbhd,
         gbuild = gbuild,
-        ndepth = 0,
+        ndepth = 1,
         ndepthmax = depthmax.nor)
     oo_allcells <- facets::procSample(xx_allcells,
                                       cval = cval2,
@@ -1249,7 +1249,7 @@ cnaCalling <- function(
         rcmat_allcells_filtered,
         snp.nbhd = snp.nbhd,
         nX = nX,
-        ndepth = 0,
+        ndepth = 1,
         ndepthmax = depthmax.nor)
     colnames(pmat_allcells_filtered)[7:8] <- c("cluster", "signal")  # Rename columns
 
@@ -1434,7 +1434,7 @@ preProcSample2 <- function(
         cval = 25,
         gbuild = "hg38",
         hetscale = TRUE,
-        ndepth = 5,
+        ndepth = 1,
         ndepthmax = 1000
 ) {
 
