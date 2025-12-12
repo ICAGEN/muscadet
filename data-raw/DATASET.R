@@ -1,213 +1,15 @@
-# Preparation of data for muscadet
 
-# directory of files: dir
+# Preparation of data for muscadet package - example dataset exdata
 
 library(usethis)
-library(Matrix)
-library(SeuratObject)
-library(facets)
+library(muscadet)
 library(BSgenome)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(BSgenome.Mmusculus.UCSC.mm10)
 library(GenomeInfoDb)
 library(GenomicRanges)
-
-set.seed(123)
-
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Input count matrices ---------------------------------------------------------
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-# Access dgCMatrix from RangedSummarizedExperiment object with SummarizedExperiment::assay(se)
-
-mat_counts_atac_tumor <- readRDS(file.path(dir, "sample.atac.peak-matrix.Rds"))
-rownames(mat_counts_atac_tumor) <- 1:nrow(mat_counts_atac_tumor)
-
-mat_counts_atac_ref <- readRDS(file.path(dir, "reference.atac.peak-matrix.Rds"))
-rownames(mat_counts_atac_ref) <- 1:nrow(mat_counts_atac_ref)
-
-seurat_tumor <- readRDS(file.path(dir, "sample.rna.filtered.seurat-object.Rds"))
-mat_counts_rna_tumor <- seurat_tumor[["RNA"]]$counts
-rownames(mat_counts_rna_tumor) <- Features(seurat_tumor)
-colnames(mat_counts_rna_tumor) <- paste("samplename", colnames(mat_counts_rna_tumor), sep = "_")
-
-seurat_ref <- readRDS(file.path(dir, "reference.rna.filtered.seurat-object.Rds"))
-mat_counts_rna_ref <- seurat_ref[["RNA"]]$counts
-rownames(mat_counts_rna_ref) <- Features(seurat_ref)
-colnames(mat_counts_rna_ref) <- gsub("refname.", "refname", colnames(mat_counts_rna_ref))
-mat_counts_rna_ref <- mat_counts_rna_ref[, !duplicated(colnames(mat_counts_rna_ref))]
-
-
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Subsampling cells and features -----------------------------------------------
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-## lists of barcodes -----------------------------------------------------------
-
-# tumor
-barcodes_atac_tumor <- scan(file.path(dir, "sample.atac.barcodes.txt"), what = "character")
-barcodes_rna_tumor <- scan(file.path(dir, "sample.rna.barcodes.txt"), what = "character")
-
-barcodes_atac_tumor <- barcodes_atac_tumor[which(barcodes_atac_tumor %in% colnames(mat_counts_atac_tumor))]
-barcodes_rna_tumor <- barcodes_rna_tumor[which(barcodes_rna_tumor %in% colnames(mat_counts_rna_tumor))]
-
-common_barcodes_tumor <- intersect(barcodes_atac_tumor, barcodes_rna_tumor)
-common_barcodes_tumor_sub <- sort(sample(common_barcodes_tumor, 84))
-
-barcodes_atac_tumor <- sort(c(common_barcodes_tumor_sub, sample(
-  setdiff(barcodes_atac_tumor, common_barcodes_tumor), 28
-)))
-barcodes_rna_tumor <- sort(c(common_barcodes_tumor_sub, sample(
-  setdiff(barcodes_rna_tumor, common_barcodes_tumor), 35
-)))
-
-
-# reference
-barcodes_atac_ref <- scan(file.path(dir, "reference.atac.barcodes.txt"), what = "character")
-barcodes_rna_ref <- scan(file.path(dir, "reference.rna.barcodes.txt"), what = "character")
-
-barcodes_atac_ref <- barcodes_atac_ref[which(barcodes_atac_ref %in% colnames(mat_counts_atac_ref))]
-barcodes_rna_ref <- barcodes_rna_ref[which(barcodes_rna_ref %in% colnames(mat_counts_rna_ref))]
-
-common_barcodes_ref <- intersect(barcodes_atac_ref, barcodes_rna_ref)
-common_barcodes_ref_sub <- sort(sample(common_barcodes_ref, 78))
-
-barcodes_atac_ref <- sort(c(common_barcodes_ref_sub, sample(
-  setdiff(barcodes_atac_ref, common_barcodes_ref), 21
-)))
-barcodes_rna_ref <- sort(c(common_barcodes_ref_sub, sample(
-  setdiff(barcodes_rna_ref, common_barcodes_ref), 19
-)))
-
-
-
-
-## features coordinates --------------------------------------------------------
-
-# from peak calling
-peaks <- read.delim(
-  file.path(dir, "peaks_coordinates.tsv"),
-  header = F,
-  col.names = c("CHROM", "start", "end", "id")
-)
-peaks <- peaks[sort(sample(as.integer(rownames(peaks)), 1000)), ]
-rownames(peaks) <- NULL
-
-# from gtf file corresponding to genome
-genes <- read.delim(
-  file.path(dir, "genes_coordinates.tsv"),
-  header = F,
-  col.names = c("CHROM", "start", "end", "id")
-)
-genes <- genes[which(genes[, "id"] %in% intersect(
-  rownames(mat_counts_rna_tumor),
-  rownames(mat_counts_rna_ref)
-)), ]
-rownames(genes) <- NULL
-genes <- genes[sort(sample(as.integer(rownames(genes)), 500)), ]
-
-usethis::use_data(peaks, overwrite = TRUE)
-usethis::use_data(genes, overwrite = TRUE)
-
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Subsampling raw count matrices -----------------------------------------------
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-mat_counts_atac_tumor <- mat_counts_atac_tumor[rownames(peaks), barcodes_atac_tumor]
-mat_counts_atac_ref <- mat_counts_atac_ref[rownames(peaks), barcodes_atac_ref]
-rownames(mat_counts_atac_tumor) <- peaks[, "id"]
-rownames(mat_counts_atac_ref) <- peaks[, "id"]
-
-mat_counts_rna_tumor <- mat_counts_rna_tumor[genes[, "id"], barcodes_rna_tumor]
-mat_counts_rna_ref <- mat_counts_rna_ref[genes[, "id"], barcodes_rna_ref]
-
-usethis::use_data(mat_counts_atac_tumor, overwrite = TRUE)
-usethis::use_data(mat_counts_atac_ref, overwrite = TRUE)
-
-usethis::use_data(mat_counts_rna_tumor, overwrite = TRUE)
-usethis::use_data(mat_counts_rna_ref, overwrite = TRUE)
-
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Subsampling allele count tables ----------------------------------------------
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-# The variants REF and ALT alleles have been previously randomized for example data
-allele_counts_atac_tumor <- read.delim(file.path(dir, "sample.atac.allele_counts.tsv"))
-allele_counts_atac_ref <- read.delim(file.path(dir, "reference.atac.allele_counts.tsv"))
-allele_counts_rna_tumor <- read.delim(file.path(dir, "sample.rna.allele_counts.tsv"))
-allele_counts_rna_ref <- read.delim(file.path(dir, "reference.rna.allele_counts.tsv"))
-
-colnames(allele_counts_atac_tumor)[which(colnames(allele_counts_atac_tumor) == "snp_id")] <- "id"
-colnames(allele_counts_atac_ref)[which(colnames(allele_counts_atac_ref) == "snp_id")] <- "id"
-colnames(allele_counts_rna_tumor)[which(colnames(allele_counts_rna_tumor) == "snp_id")] <- "id"
-colnames(allele_counts_rna_ref)[which(colnames(allele_counts_rna_ref) == "snp_id")] <- "id"
-
-# subsampling by cell barcodes
-allele_counts_atac_tumor <- allele_counts_atac_tumor[which(allele_counts_atac_tumor[, "cell"] %in% barcodes_atac_tumor), ]
-allele_counts_atac_ref <- allele_counts_atac_ref[which(allele_counts_atac_ref[, "cell"] %in% barcodes_atac_ref), ]
-
-allele_counts_rna_tumor <- allele_counts_rna_tumor[which(allele_counts_rna_tumor[, "cell"] %in% barcodes_rna_tumor), ]
-allele_counts_rna_ref <- allele_counts_rna_ref[which(allele_counts_rna_ref[, "cell"] %in% barcodes_rna_ref), ]
-
-
-# subsampling by common variant identifiers
-
-var_atac <- intersect(unique(allele_counts_atac_tumor[, "id"]),
-                      unique(allele_counts_atac_ref[, "id"]))
-
-var_atac_tumor <- c(var_atac, sample(
-    setdiff(unique(allele_counts_atac_tumor[, "id"]), var_atac), 100))
-
-var_atac_ref <- c(var_atac, sample(
-    setdiff(unique(allele_counts_atac_ref[, "id"]), var_atac), 100))
-
-var_rna <- intersect(unique(allele_counts_rna_tumor[, "id"]),
-                      unique(allele_counts_rna_ref[, "id"]))
-
-var_rna_tumor <- c(var_rna, sample(
-    setdiff(unique(allele_counts_rna_tumor[, "id"]), var_rna), 100))
-
-var_rna_ref <- c(var_rna, sample(
-    setdiff(unique(allele_counts_rna_ref[, "id"]), var_rna), 100))
-
-allele_counts_atac_tumor <- allele_counts_atac_tumor[which(allele_counts_atac_tumor[, "id"] %in% var_atac_tumor), ]
-allele_counts_atac_tumor <- allele_counts_atac_tumor[order(allele_counts_atac_tumor[, "POS"]), ]
-allele_counts_atac_tumor <- allele_counts_atac_tumor[order(allele_counts_atac_tumor[, "CHROM"]), ]
-
-allele_counts_rna_tumor <- allele_counts_rna_tumor[which(allele_counts_rna_tumor[, "id"] %in% var_rna_tumor), ]
-allele_counts_rna_tumor <- allele_counts_rna_tumor[order(allele_counts_rna_tumor[, "POS"]), ]
-allele_counts_rna_tumor <- allele_counts_rna_tumor[order(allele_counts_atac_tumor[, "CHROM"]), ]
-
-allele_counts_atac_ref <- allele_counts_atac_ref[which(allele_counts_atac_ref[, "id"] %in% var_atac_ref), ]
-allele_counts_atac_ref <- allele_counts_atac_ref[order(allele_counts_atac_ref[, "POS"]), ]
-allele_counts_atac_ref <- allele_counts_atac_ref[order(allele_counts_atac_ref[, "CHROM"]), ]
-
-allele_counts_rna_ref <- allele_counts_rna_ref[which(allele_counts_rna_ref[, "id"] %in% var_rna_ref), ]
-allele_counts_rna_ref <- allele_counts_rna_ref[order(allele_counts_rna_ref[, "POS"]), ]
-allele_counts_rna_ref <- allele_counts_rna_ref[order(allele_counts_atac_ref[, "CHROM"]), ]
-
-usethis::use_data(allele_counts_atac_tumor, overwrite = TRUE)
-usethis::use_data(allele_counts_atac_ref, overwrite = TRUE)
-
-usethis::use_data(allele_counts_rna_tumor, overwrite = TRUE)
-usethis::use_data(allele_counts_rna_ref, overwrite = TRUE)
-
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# Bulk log ratio result --------------------------------------------------------
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-# result after fitcncf() from FACETS 0.6.2 "Cellular Fraction and Copy Numbers from Tumor Sequencing"
-wgs <- readRDS(file.path(dir, "sample.wgs.facets_result.Rds"))
-bulk_lrr <- wgs$cncf[, c("chrom", "start", "end", "cnlr.median")]
-colnames(bulk_lrr) <- c("CHROM", "start", "end", "lrr")
-
-usethis::use_data(bulk_lrr, overwrite = TRUE)
+library(clustree)
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,7 +22,7 @@ for (genome in c("hg38", "hg19", "mm10")) {
     bs <- BSgenome::getBSgenome(genome)
     genome_chrom <- GenomicRanges::GRanges(names(seqlengths(bs)), IRanges(1, seqlengths(bs)))
     genome_chrom <- GenomeInfoDb::keepStandardChromosomes(genome_chrom, pruning.mode = "coarse")
-    seqlevels(genome_chrom) <- stringr::str_remove(seqlevels(genome_chrom), "chr")
+    seqlevels(genome_chrom) <- gsub("chr", "", seqlevels(genome_chrom))
     genome_chrom <- GenomeInfoDb::dropSeqlevels(genome_chrom, "M", pruning.mode = "coarse")
 
     genome_list[[genome]] <- genome_chrom
@@ -233,100 +35,343 @@ mm10_chrom <- genome_list[["mm10"]]
 usethis::use_data(hg38_chrom, hg19_chrom, mm10_chrom, overwrite = TRUE, internal = TRUE)
 
 
+
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# exdata -----------------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+# Set directory of files: dir <- "path/path"
+
+set.seed(123)
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Inputs -----------------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# Matrices of raw counts -------------------------------------------------------
+
+# Access dgCMatrix from RangedSummarizedExperiment object with SummarizedExperiment::assay(se)
+mat_counts_atac_tumor <- t(readRDS(file.path(dir, "sample.atac.peak-matrix.Rds")))
+colnames(mat_counts_atac_tumor) <- 1:ncol(mat_counts_atac_tumor)
+
+mat_counts_atac_ref <- t(readRDS(file.path(dir, "reference.atac.peak-matrix.Rds")))
+colnames(mat_counts_atac_ref) <- 1:ncol(mat_counts_atac_ref)
+
+seurat_tumor <- readRDS(file.path(dir, "sample.rna.filtered.seurat-object.Rds"))
+mat_counts_rna_tumor <- t(seurat_tumor[["RNA"]]$counts)
+colnames(mat_counts_rna_tumor) <- Features(seurat_tumor)
+rownames(mat_counts_rna_tumor) <- paste("samplename", rownames(mat_counts_rna_tumor), sep = "_")
+
+seurat_ref <- readRDS(file.path(dir, "reference.rna.filtered.seurat-object.Rds"))
+mat_counts_rna_ref <- t(seurat_ref[["RNA"]]$counts)
+colnames(mat_counts_rna_ref) <- Features(seurat_ref)
+rownames(mat_counts_rna_ref) <- gsub("refname.", "refname", rownames(mat_counts_rna_ref))
+mat_counts_rna_ref <- mat_counts_rna_ref[, !duplicated(rownames(mat_counts_rna_ref))]
+
+rm(seurat_tumor, seurat_ref)
+
+# Allele counts ----------------------------------------------------------------
+
+# (variants positions have been previously randomized for example data)
+allele_counts_atac_tumor <- read.delim(file.path(dir, "sample.atac.allele_counts.tsv"))
+allele_counts_atac_ref <- read.delim(file.path(dir, "reference.atac.allele_counts.tsv"))
+allele_counts_rna_tumor <- read.delim(file.path(dir, "sample.rna.allele_counts.tsv"))
+allele_counts_rna_ref <- read.delim(file.path(dir, "reference.rna.allele_counts.tsv"))
+
+## Features coordinates --------------------------------------------------------
+
+# from peak calling
+peaks <- read.delim(
+    file.path(dir, "peaks_coordinates.tsv"),
+    header = F,
+    col.names = c("CHROM", "start", "end", "id")
+)
+
+# from gtf file corresponding to genome
+genes <- read.delim(
+    file.path(dir, "genes_coordinates.tsv"),
+    header = F,
+    col.names = c("CHROM", "start", "end", "id")
+)
+# remove genes not in matrices
+genes <- genes[genes[, "id"] %in% intersect(colnames(mat_counts_rna_tumor),
+                                            colnames(mat_counts_rna_ref)), ]
+
+## Barcodes --------------------------------------------------------------------
+
+b_atac_tumor <- scan(file.path(dir, "sample.atac.barcodes.txt"), what = "character")
+b_rna_tumor <- scan(file.path(dir, "sample.rna.barcodes.txt"), what = "character")
+b_atac_ref <- scan(file.path(dir, "reference.atac.barcodes.txt"), what = "character")
+b_rna_ref <- scan(file.path(dir, "reference.rna.barcodes.txt"), what = "character")
+
+# filter barcodes to match cells in matrices
+b_atac_tumor <- b_atac_tumor[b_atac_tumor %in% rownames(mat_counts_atac_tumor)]
+b_rna_tumor <- b_rna_tumor[b_rna_tumor %in% rownames(mat_counts_rna_tumor)]
+b_atac_ref <- b_atac_ref[b_atac_ref %in% rownames(mat_counts_atac_ref)]
+b_rna_ref <- b_rna_ref[b_rna_ref %in% rownames(mat_counts_rna_ref)]
+
+
+# Bulk log ratio result --------------------------------------------------------
+
+wgs <- readRDS(file.path(dir, "sample.wgs.facets_result.Rds"))
+bulk_lrr <- wgs$cncf[, c("chrom", "start", "end", "cnlr.median")]
+colnames(bulk_lrr) <- c("CHROM", "start", "end", "lrr")
+
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Subsampling cells and features -----------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# Select features from chromosomes 3, 4 and 8 for the example
+chroms <- c(3, 4, 8)
+
+allele_counts_atac_tumor <- allele_counts_atac_tumor[allele_counts_atac_tumor$cell %in% b_atac_tumor, ]
+allele_counts_rna_tumor <- allele_counts_rna_tumor[allele_counts_rna_tumor$cell %in% b_rna_tumor, ]
+allele_counts_atac_ref <- allele_counts_atac_ref[allele_counts_atac_ref$cell %in% b_atac_ref, ]
+allele_counts_rna_ref <- allele_counts_rna_ref[allele_counts_rna_ref$cell %in% b_rna_ref, ]
+
+# Filter cells with allele counts data in selected chromosomes
+allele_counts_tum <- lapply(list(
+    allele_counts_atac_tumor,
+    allele_counts_rna_tumor
+), function(x) {
+    x[x$CHROM %in% chroms, ]
+})
+
+allele_counts_ref <- lapply(list(
+    allele_counts_atac_ref,
+    allele_counts_rna_ref
+), function(x) {
+    x[x$CHROM %in% chroms, ]
+})
+
+tum_cells = Reduce(intersect, lapply(allele_counts_tum, `[[`, "cell"))
+length(tum_cells)
+ref_cells = Reduce(intersect, lapply(allele_counts_ref, `[[`, "cell"))
+length(ref_cells)
+
+# tumor
+# random sample of cells
+tum_cells_sub <- sort(sample(tum_cells, 63))
+# add non-common cells
+barcodes_atac_tumor <- sort(c(tum_cells_sub, sample(
+    setdiff(b_atac_tumor, tum_cells), 8
+)))
+length(barcodes_atac_tumor)
+barcodes_rna_tumor <- sort(c(tum_cells_sub, sample(
+    setdiff(b_rna_tumor, tum_cells), 6
+)))
+length(barcodes_rna_tumor)
+
+# reference
+# random sample of cells
+ref_cells_sub <- sort(sample(ref_cells, 85))
+# add non-common cells
+barcodes_atac_ref <- sort(c(ref_cells_sub, sample(
+    setdiff(b_atac_ref, ref_cells), 10
+)))
+length(barcodes_atac_ref)
+barcodes_rna_ref <- sort(c(ref_cells_sub, sample(
+    setdiff(b_rna_ref, ref_cells), 8
+)))
+length(barcodes_rna_ref)
+
+# Filter features
+exdata_peaks <- rbind(
+    peaks[peaks$id %in% sample(peaks[peaks$CHROM %in% chroms[1], "id"], 400), ],
+    peaks[peaks$id %in% sample(peaks[peaks$CHROM %in% chroms[2], "id"], 400), ],
+    peaks[peaks$id %in% sample(peaks[peaks$CHROM %in% chroms[3], "id"], 400), ]
+)
+
+exdata_genes <- rbind(
+    genes[genes$id %in% sample(genes[genes$CHROM %in% chroms[1], "id"], 100), ],
+    genes[genes$id %in% sample(genes[genes$CHROM %in% chroms[2], "id"], 100), ],
+    genes[genes$id %in% sample(genes[genes$CHROM %in% chroms[3], "id"], 100), ]
+)
+
+# Filter bulk
+exdata_bulk_lrr <- bulk_lrr[bulk_lrr$CHROM %in% chroms, ]
+
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Subsampling raw count matrices -----------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+exdata_mat_counts_atac_tumor <- mat_counts_atac_tumor[barcodes_atac_tumor, rownames(exdata_peaks)]
+exdata_mat_counts_atac_ref <- mat_counts_atac_ref[barcodes_atac_ref, rownames(exdata_peaks)]
+colnames(exdata_mat_counts_atac_tumor) <- exdata_peaks$id
+colnames(exdata_mat_counts_atac_ref) <- exdata_peaks$id
+
+exdata_mat_counts_rna_tumor <- mat_counts_rna_tumor[barcodes_rna_tumor, exdata_genes$id]
+exdata_mat_counts_rna_ref <- mat_counts_rna_ref[barcodes_rna_ref, exdata_genes$id]
+
+rownames(exdata_peaks) <- NULL
+rownames(exdata_genes) <- NULL
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Subsampling allele count tables ----------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+exdata_allele_counts_atac_tumor <- allele_counts_tum[[1]][allele_counts_tum[[1]][, "cell"] %in% barcodes_atac_tumor, ]
+exdata_allele_counts_rna_tumor <- allele_counts_tum[[2]][allele_counts_tum[[2]][, "cell"] %in% barcodes_rna_tumor, ]
+
+exdata_allele_counts_atac_ref <- allele_counts_ref[[1]][allele_counts_ref[[1]][, "cell"] %in% barcodes_atac_ref, ]
+exdata_allele_counts_rna_ref <- allele_counts_ref[[2]][allele_counts_ref[[2]][, "cell"] %in% barcodes_rna_ref, ]
+
+
+# subsampling by common variant identifiers
+
+var_atac <- intersect(unique(exdata_allele_counts_atac_tumor[, "id"]), unique(exdata_allele_counts_atac_ref[, "id"]))
+var_atac_tumor <- c(var_atac, sample(setdiff(unique(exdata_allele_counts_atac_tumor[, "id"]), var_atac), 10))
+var_atac_ref <- c(var_atac, sample(setdiff(unique(exdata_allele_counts_atac_ref[, "id"]), var_atac), 10))
+
+var_rna <- intersect(unique(exdata_allele_counts_rna_tumor[, "id"]), unique(exdata_allele_counts_rna_ref[, "id"]))
+var_rna_tumor <- c(var_rna, sample(setdiff(unique(exdata_allele_counts_rna_tumor[, "id"]), var_rna), 10))
+var_rna_ref <- c(var_rna, sample(setdiff(unique(exdata_allele_counts_rna_ref[, "id"]), var_rna), 10))
+
+exdata_allele_counts_atac_tumor <- exdata_allele_counts_atac_tumor[exdata_allele_counts_atac_tumor[, "id"] %in% var_atac_tumor, ]
+exdata_allele_counts_atac_tumor <- exdata_allele_counts_atac_tumor[order(exdata_allele_counts_atac_tumor$CHROM, exdata_allele_counts_atac_tumor$POS), ]
+
+exdata_allele_counts_rna_tumor <- exdata_allele_counts_rna_tumor[exdata_allele_counts_rna_tumor[, "id"] %in% var_rna_tumor, ]
+exdata_allele_counts_rna_tumor <- exdata_allele_counts_rna_tumor[order(exdata_allele_counts_rna_tumor$CHROM, exdata_allele_counts_rna_tumor$POS), ]
+
+exdata_allele_counts_atac_ref <- exdata_allele_counts_atac_ref[exdata_allele_counts_atac_ref[, "id"] %in% var_atac_ref, ]
+exdata_allele_counts_atac_ref <- exdata_allele_counts_atac_ref[order(exdata_allele_counts_atac_ref$CHROM, exdata_allele_counts_atac_ref$POS), ]
+
+exdata_allele_counts_rna_ref <- exdata_allele_counts_rna_ref[exdata_allele_counts_rna_ref[, "id"] %in% var_rna_ref, ]
+exdata_allele_counts_rna_ref <- exdata_allele_counts_rna_ref[order(exdata_allele_counts_rna_ref$CHROM, exdata_allele_counts_rna_ref$POS), ]
+
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # muscadet object --------------------------------------------------------------
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-library("muscadet")
-
 # muscomic objects
-atac <- CreateMuscomicObject(
-  type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+exdata_atac <- CreateMuscomicObject(
+    type = "ATAC",
+    mat_counts = exdata_mat_counts_atac_tumor,
+    allele_counts = exdata_allele_counts_atac_tumor,
+    features = exdata_peaks
 )
-rna <- CreateMuscomicObject(
-  type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
+exdata_rna <- CreateMuscomicObject(
+    type = "RNA",
+    mat_counts = exdata_mat_counts_rna_tumor,
+    allele_counts = exdata_allele_counts_rna_tumor,
+    features = exdata_genes
 )
-atac_ref <- CreateMuscomicObject(
-  type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
+exdata_atac_ref <- CreateMuscomicObject(
+    type = "ATAC",
+    mat_counts = exdata_mat_counts_atac_ref,
+    allele_counts = exdata_allele_counts_atac_ref,
+    features = exdata_peaks
 )
-rna_ref <- CreateMuscomicObject(
-  type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
+exdata_rna_ref <- CreateMuscomicObject(
+    type = "RNA",
+    mat_counts = exdata_mat_counts_rna_ref,
+    allele_counts = exdata_allele_counts_rna_ref,
+    features = exdata_genes
 )
 
 # raw muscadet objects
-muscadet <- CreateMuscadetObject(
-    omics = list(atac, rna),
-    bulk.lrr = bulk_lrr,
+exdata_muscadet <- CreateMuscadetObject(
+    omics = list(exdata_atac, exdata_rna),
+    bulk.lrr = exdata_bulk_lrr,
     bulk.label = "WGS",
     genome = "hg38"
 )
-muscadet_ref <- CreateMuscadetObject(
-    omics = list(atac_ref, rna_ref),
+exdata_muscadet_ref <- CreateMuscadetObject(
+    omics = list(exdata_atac_ref, exdata_rna_ref),
     genome = "hg38"
 )
 
 # compute log R ratios for ATAC
-muscadet <- computeLogRatio(
-    x = muscadet,
-    reference = muscadet_ref,
+exdata_muscadet <- computeLogRatio(
+    x = exdata_muscadet,
+    reference = exdata_muscadet_ref,
     omic = "ATAC",
     method = "ATAC",
-    minReads = 1,
-    minPeaks = 1,
-    remove.raw = F
+    minReads = 0.5,
+    minPeaks = 1
 )
 # compute log R ratios for RNA
-muscadet <- computeLogRatio(
-    x = muscadet,
-    reference = muscadet_ref,
+exdata_muscadet <- computeLogRatio(
+    x = exdata_muscadet,
+    reference = exdata_muscadet_ref,
     omic = "RNA",
     method = "RNA",
-    refReads = 2,
-    remove.raw = F
+    refReads = 2
 )
 
 # clustering
 set.seed(123)
-muscadet <- clusterMuscadet(
-    muscadet,
+exdata_muscadet <- clusterMuscadet(
+    exdata_muscadet,
     method = "seurat",
-    res_range = c(0.6, 0.8, 1),
+    res_range = c(0.1, 0.3, 0.5),
     dims_list = list(1:10, 1:10),
     knn_seurat = 10,
     knn_range_seurat = 30
 )
 
-# assign clusters for partition res=0.6
-muscadet <- assignClusters(muscadet, partition = 0.6)
+# clustree
+partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
+partitions <- do.call(cbind, partitions)
+colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
+clustree(partitions, prefix = "res_")
+# heatmap
+heatmapMuscadet(exdata_muscadet, "exdata_heatmap_res0.3.png", partition = "0.3")
+
+# assign clusters for partition
+exdata_muscadet <- assignClusters(exdata_muscadet, partition = 0.3)
 
 # merge counts
-muscadet <- mergeCounts(muscadet, muscadet_ref)
+exdata_muscadet <- aggregateCounts(exdata_muscadet, exdata_muscadet_ref)
 
 # CNA calling
-muscadet <- cnaCalling(
-    muscadet,
-    omics.coverage = "ATAC",
+exdata_muscadet <- cnaCalling(
+    exdata_muscadet,
     depthmin.a.clusters = 3,
     depthmin.c.clusters = 5,
     depthmin.a.allcells = 3,
     depthmin.c.allcells = 5,
-    depthmin.c.nor = 0
+    depthmin.c.nor = 1
 )
 
+# plots
+plotProfile(exdata_muscadet, data = 1, title = "Cluster 1 profile", point.cex = 0.8)
+plotProfile(exdata_muscadet, data = 2, title = "Cluster 2 profile", point.cex = 0.8)
+plotProfile(exdata_muscadet, data = "allcells", title = "All cells profile", point.cex = 0.8)
 
-muscadet_obj <- muscadet
-usethis::use_data(muscadet_obj, compress = "xz", overwrite = TRUE)
-muscadet_obj_ref <- muscadet_ref
-usethis::use_data(muscadet_obj_ref, compress = "xz", overwrite = TRUE)
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Save objects -----------------------------------------------------------------
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# mat_counts
+usethis::use_data(exdata_mat_counts_atac_tumor, overwrite = TRUE)
+usethis::use_data(exdata_mat_counts_atac_ref, overwrite = TRUE)
+usethis::use_data(exdata_mat_counts_rna_tumor, overwrite = TRUE)
+usethis::use_data(exdata_mat_counts_rna_ref, overwrite = TRUE)
+
+# allele_counts
+usethis::use_data(exdata_allele_counts_atac_tumor, overwrite = TRUE)
+usethis::use_data(exdata_allele_counts_atac_ref, overwrite = TRUE)
+usethis::use_data(exdata_allele_counts_rna_tumor, overwrite = TRUE)
+usethis::use_data(exdata_allele_counts_rna_ref, overwrite = TRUE)
+
+# features
+usethis::use_data(exdata_peaks, overwrite = TRUE)
+usethis::use_data(exdata_genes, overwrite = TRUE)
+
+# bulk data
+usethis::use_data(exdata_bulk_lrr, overwrite = TRUE)
+
+# muscadet objects
+usethis::use_data(exdata_muscadet, compress = "xz", overwrite = TRUE)
+usethis::use_data(exdata_muscadet_ref, compress = "xz", overwrite = TRUE)
+
+
+
+
