@@ -25,12 +25,12 @@ individual-specific heterozygous positions) (\code{list}).}
 
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-muscadet_obj$ATAC
-muscadet_obj$RNA
+exdata_muscadet$ATAC
+exdata_muscadet$RNA
 
-str(muscadet_obj$ATAC, max.level = 2)
+str(exdata_muscadet$ATAC, max.level = 2)
 
 }
 \seealso{

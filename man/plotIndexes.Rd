@@ -64,14 +64,14 @@ which the mean of indexes is maximal is highlighted with a dot.
 library(ggplot2)
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Plot all indexes
-plotIndexes(muscadet_obj)
+plotIndexes(exdata_muscadet)
 ggsave("plot_indexes.png", width = 8, height = 4)
 
 # Plot a specific index
-plotIndexes(muscadet_obj, index = "silhouette")
+plotIndexes(exdata_muscadet, index = "silhouette")
 ggsave("plot_indexes_sil.png", width = 7, height = 4)
 }
 

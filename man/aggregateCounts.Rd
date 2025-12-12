@@ -51,10 +51,10 @@ the sample \code{\link[=muscadet-class]{muscadet}} object.
 }
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
-# data("muscadet_obj_ref")
+# data("exdata_muscadet")
+# data("exdata_muscadet_ref")
 
 # Aggregate counts from all omics from both sample and reference
-muscadet_obj <- aggregateCounts(muscadet_obj, muscadet_obj_ref)
+exdata_muscadet <- aggregateCounts(exdata_muscadet, exdata_muscadet_ref)
 
 }

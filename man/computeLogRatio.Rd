@@ -98,33 +98,33 @@ Log R ratios computation steps are described in functions:
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_tumor,
+  allele_counts = exdata_allele_counts_rna_tumor,
+  features = exdata_genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_ref,
+  allele_counts = exdata_allele_counts_atac_ref,
+  features = exdata_peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_ref,
+  allele_counts = exdata_allele_counts_rna_ref,
+  features = exdata_genes
 )
 
 # Create muscadet objects
 muscadet <- CreateMuscadetObject(
   omics = list(atac, rna),
-  bulk.lrr = bulk_lrr,
+  bulk.lrr = exdata_bulk_lrr,
   bulk.label = "WGS",
   genome = "hg38"
 )

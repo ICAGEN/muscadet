@@ -59,33 +59,33 @@
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = mat_counts_atac_tumor,
-#'   allele_counts = allele_counts_atac_tumor,
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   allele_counts = exdata_allele_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = mat_counts_rna_tumor,
-#'   allele_counts = allele_counts_rna_tumor,
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_tumor,
+#'   allele_counts = exdata_allele_counts_rna_tumor,
+#'   features = exdata_genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = mat_counts_atac_ref,
-#'   allele_counts = allele_counts_atac_ref,
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_ref,
+#'   allele_counts = exdata_allele_counts_atac_ref,
+#'   features = exdata_peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = mat_counts_rna_ref,
-#'   allele_counts = allele_counts_rna_ref,
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_ref,
+#'   allele_counts = exdata_allele_counts_rna_ref,
+#'   features = exdata_genes
 #' )
 #'
 #' # Create muscadet objects
 #' muscadet <- CreateMuscadetObject(
 #'   omics = list(atac, rna),
-#'   bulk.lrr = bulk_lrr,
+#'   bulk.lrr = exdata_bulk_lrr,
 #'   bulk.label = "WGS",
 #'   genome = "hg38"
 #' )
@@ -331,7 +331,7 @@ computeLogRatio <- function(x,
 #' @importClassesFrom Matrix dgCMatrix
 #' @importFrom GenomicRanges GRanges slidingWindows findOverlaps
 #' @importFrom Matrix colSums rowSums colMeans
-#' @importFrom matrixStats colSds
+#' @importFrom sparseMatrixStats colSds
 #' @importFrom stats sd
 #'
 #' @export
@@ -351,29 +351,29 @@ computeLogRatio <- function(x,
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_tumor),
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = t(mat_counts_rna_tumor),
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_tumor,
+#'   features = exdata_genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_ref),
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_ref,
+#'   features = exdata_peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = t(mat_counts_rna_ref),
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_ref,
+#'   features = exdata_genes
 #' )
 #'
 #' # Create muscadet objects
 #' muscadet <- CreateMuscadetObject(
 #'   omics = list(atac, rna),
-#'   bulk.lrr = bulk_lrr,
+#'   bulk.lrr = exdata_bulk_lrr,
 #'   bulk.label = "WGS",
 #'   genome = "hg38"
 #' )
@@ -779,29 +779,29 @@ computeLogRatioATAC <- function(matTumor,
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_tumor),
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = t(mat_counts_rna_tumor),
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_tumor,
+#'   features = exdata_genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_ref),
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_ref,
+#'   features = exdata_peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = t(mat_counts_rna_ref),
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_ref,
+#'   features = exdata_genes
 #' )
 #'
 #' # Create muscadet objects
 #' muscadet <- CreateMuscadetObject(
 #'   omics = list(atac, rna),
-#'   bulk.lrr = bulk_lrr,
+#'   bulk.lrr = exdata_bulk_lrr,
 #'   bulk.label = "WGS",
 #'   genome = "hg38"
 #' )
@@ -1147,15 +1147,18 @@ computeLogRatioRNA <- function(matTumor,
 #' @export
 #'
 #' @examples
+#' # Load example muscadet object
+#' # data("exdata_muscadet")
+#'
 #' # muscomic object inside a muscadet object
-#' muscadet_obj$ATAC
+#' exdata_muscadet$ATAC
 #'
 #' # Bulk Log R ratio data
-#' head(muscadet_obj$bulk.data$logratio)
+#' head(exdata_muscadet$bulk.data$logratio)
 #'
 #' features_bulk_lrr <- getLogRatioBulk(
-#'   x = muscadet_obj$ATAC,
-#'   bulk.lrr = muscadet_obj$bulk.data$logratio
+#'   x = exdata_muscadet$ATAC,
+#'   bulk.lrr = exdata_muscadet$bulk.data$logratio
 #' )
 #' head(features_bulk_lrr)
 #'

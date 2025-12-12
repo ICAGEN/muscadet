@@ -115,30 +115,30 @@ layer, they return the corresponding data instead of the raw counts.
 library("SeuratObject")
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-Cells(muscadet_obj) # list of 2 cell names vectors for the 2 omics
-Cells(muscadet_obj)$ATAC # cell names vector from the omic ATAC
-Cells(muscadet_obj$ATAC) # cell names vector from the ATAC muscomic object
-length(Cells(muscadet_obj))
-length(Cells(muscadet_obj)$ATAC)
-length(Cells(muscadet_obj$ATAC))
+Cells(exdata_muscadet) # list of 2 cell names vectors for the 2 omics
+Cells(exdata_muscadet)$ATAC # cell names vector from the omic ATAC
+Cells(exdata_muscadet$ATAC) # cell names vector from the ATAC muscomic object
+length(Cells(exdata_muscadet))
+length(Cells(exdata_muscadet)$ATAC)
+length(Cells(exdata_muscadet$ATAC))
 
-Features(muscadet_obj)
-Features(muscadet_obj)$ATAC
-Features(muscadet_obj$ATAC)
+Features(exdata_muscadet)
+Features(exdata_muscadet)$ATAC
+Features(exdata_muscadet$ATAC)
 
-coordFeatures(muscadet_obj)
-coordFeatures(muscadet_obj)$ATAC
-coordFeatures(muscadet_obj$ATAC)
+coordFeatures(exdata_muscadet)
+coordFeatures(exdata_muscadet)$ATAC
+coordFeatures(exdata_muscadet$ATAC)
 
-matCounts(muscadet_obj)
-matCounts(muscadet_obj)$ATAC
-matCounts(muscadet_obj$ATAC)
+matCounts(exdata_muscadet)
+matCounts(exdata_muscadet)$ATAC
+matCounts(exdata_muscadet$ATAC)
 
-matLogRatio(muscadet_obj)
-matLogRatio(muscadet_obj)$ATAC
-matLogRatio(muscadet_obj$ATAC)
+matLogRatio(exdata_muscadet)
+matLogRatio(exdata_muscadet)$ATAC
+matLogRatio(exdata_muscadet$ATAC)
 
 }
 \seealso{

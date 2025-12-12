@@ -110,32 +110,32 @@
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #'
 #' # --- Method "seurat" ---
 #'
-#' print(muscadet_obj$clustering$params$method)
+#' print(exdata_muscadet$clustering$params$method)
 #'
 #' # Perform clustering if not already done
-#' # muscadet_obj <- clusterMuscadet(
-#' #     x = muscadet_obj,
+#' # exdata_muscadet <- clusterMuscadet(
+#' #     x = exdata_muscadet,
 #' #     method = "seurat",
-#' #     res_range = c(0.6, 0.8),
-#' #     dims_list = list(1:10, 1:10),
+#' #     res_range = c(0.1, 0.3),
+#' #     dims_list = list(1:8, 1:8),
 #' #     knn_seurat = 10, # adapted for low number of cells in example data
 #' #     knn_range_seurat = 30 # adapted for low number of cells in example data
 #' # )
 #'
 #' # Plot a single partition
-#' heatmapMuscadet(muscadet_obj,
-#'                 filename = file.path("heatmap_res0.6.png"),
-#'                 partition = 0.6,
+#' heatmapMuscadet(exdata_muscadet,
+#'                 filename = file.path("heatmap_res0.3.png"),
+#'                 partition = 0.3,
 #'                 show_missing = FALSE) # only displaying cells without missing data
 #'
-#' ht <- heatmapMuscadet(muscadet_obj, partition = 0.6)
+#' ht <- heatmapMuscadet(exdata_muscadet, partition = 0.3)
 #' pdf(
-#'     file = file.path("heatmap_res0.6.pdf"),
+#'     file = file.path("heatmap_res0.3.pdf"),
 #'     width = ht$width * 0.0393701, # convert to inches
 #'     height = ht$height * 0.0393701, # convert to inches
 #' )
@@ -144,23 +144,23 @@
 #'
 #'
 #' # Loop over partitions
-#' for (p in names(muscadet_obj$clustering$clusters)) {
+#' for (p in names(exdata_muscadet$clustering$clusters)) {
 #'     filename <- paste0("heatmap_res", p, ".png")
 #'     title <- paste(
 #'         "Example |",
-#'         paste0("method=", muscadet_obj$clustering$params[["method"]]), "|",
-#'         paste0("omics=", paste0(muscadet_obj$clustering$params[["omics"]], collapse = ",")), "|",
+#'         paste0("method=", exdata_muscadet$clustering$params[["method"]]), "|",
+#'         paste0("omics=", paste0(exdata_muscadet$clustering$params[["omics"]], collapse = ",")), "|",
 #'         paste0("dims=", "1:10,1:10"), "|",
 #'         paste0("res=", p)
 #'     )
-#'     heatmapMuscadet(muscadet_obj, filename, partition = p, title = title)
+#'     heatmapMuscadet(exdata_muscadet, filename, partition = p, title = title)
 #' }
 #'
 #' # --- Plot Averages per Clusters ---
 #'
-#' heatmapMuscadet(muscadet_obj,
-#'                 filename = file.path("heatmap_res0.6_averages.png"),
-#'                 partition = 0.6,
+#' heatmapMuscadet(exdata_muscadet,
+#'                 filename = file.path("heatmap_res0.3_averages.png"),
+#'                 partition = 0.3,
 #'                 averages = TRUE,
 #'                 add_bulk_lrr = FALSE)
 #'
@@ -170,7 +170,7 @@
 #' library("grid")
 #'
 #' # Define example cell annotation
-#' muscadet_cells <- Reduce(union, SeuratObject::Cells(muscadet_obj))
+#' muscadet_cells <- Reduce(union, SeuratObject::Cells(exdata_muscadet))
 #' cells_origin <- setNames(c(
 #'     rep("sample1", ceiling(length(muscadet_cells) / 2)),
 #'     rep("sample2", floor(length(muscadet_cells) / 2))
@@ -192,9 +192,9 @@
 #' )
 #'
 #' # Plot heatmap with supplementary row annotation
-#' heatmapMuscadet(muscadet_obj,
-#'                 filename = file.path("heatmap_res0.6_annot.png"),
-#'                 partition = 0.6,
+#' heatmapMuscadet(exdata_muscadet,
+#'                 filename = file.path("heatmap_res0.3_annot.png"),
+#'                 partition = 0.3,
 #'                 row_annots = list(ha))
 #'
 #' # --- Add Row Annotation for averages ---
@@ -216,48 +216,48 @@
 #'     annotation_label = "annot", # label displayed on heatmap
 #'     annotation_name_gp = gpar(fontsize = 10) # change font size
 #' )
-#' heatmapMuscadet(muscadet_obj,
+#' heatmapMuscadet(exdata_muscadet,
 #'                 averages = TRUE,
-#'                 filename = file.path("heatmap_res0.6_annot_averages.png"),
-#'                 partition = 0.6,
+#'                 filename = file.path("heatmap_res0.3_annot_averages.png"),
+#'                 partition = 0.3,
 #'                 row_annots = list(ha2))
 #'
 #'
 #' # --- Method "hclust" ---
 #'
 #' # Perform clustering if not already done
-#' muscadet_obj2 <- clusterMuscadet(
-#'     x = muscadet_obj,
+#' exdata_muscadet2 <- clusterMuscadet(
+#'     x = exdata_muscadet,
 #'     method = "hclust",
-#'     k_range = 3:5,
+#'     k_range = 2:4,
 #'     dist_method = "euclidean",
 #'     hclust_method = "ward.D"
 #' )
 #'
-#' print(muscadet_obj2$clustering$params$method)
+#' print(exdata_muscadet2$clustering$params$method)
 #'
 #' # Plot a single partition
-#' heatmapMuscadet(muscadet_obj2,
-#'                 filename = file.path("heatmap_k3.png"),
-#'                 partition = 3,
+#' heatmapMuscadet(exdata_muscadet2,
+#'                 filename = file.path("heatmap_k2.png"),
+#'                 partition = 2,
 #'                 show_missing = FALSE)
 #'
 #' # Loop over partitions
-#' for (p in names(muscadet_obj2$clustering$clusters)) {
+#' for (p in names(exdata_muscadet2$clustering$clusters)) {
 #'
 #'     filename <- paste0("heatmap_k", p, ".png")
 #'     title <- paste(
 #'         "Example |",
-#'         paste0("method=", muscadet_obj2$clustering$params[["method"]]), "|",
-#'         muscadet_obj2$clustering$params[["dist_method"]],
-#'         muscadet_obj2$clustering$params[["hclust_method"]], "|",
+#'         paste0("method=", exdata_muscadet2$clustering$params[["method"]]), "|",
+#'         exdata_muscadet2$clustering$params[["dist_method"]],
+#'         exdata_muscadet2$clustering$params[["hclust_method"]], "|",
 #'         paste0("weights=",
-#'                paste0(muscadet_obj2$clustering$params[["weights"]], collapse = ",")),
+#'                paste0(exdata_muscadet2$clustering$params[["weights"]], collapse = ",")),
 #'         "|",
 #'         paste0("k=", p)
 #'     )
 #'
-#'     heatmapMuscadet(muscadet_obj2, filename, partition = p, title = title)
+#'     heatmapMuscadet(exdata_muscadet2, filename, partition = p, title = title)
 #' }
 #' }
 #'
@@ -945,12 +945,12 @@ heatmapMuscadet <- function(x,
 #' library("ggplot2")
 #'
 #' # Load example muscadet object
-#' # data("muscadet_obj")
-#' plotSil(muscadet_obj, partition = 0.6)
+#' # data("exdata_muscadet")
+#' plotSil(exdata_muscadet, partition = 0.3)
 #'
 #' # Loop over partitions
-#' for (p in names(muscadet_obj$clustering$clusters)) {
-#'     plot <- plotSil(muscadet_obj, p)
+#' for (p in names(exdata_muscadet$clustering$clusters)) {
+#'     plot <- plotSil(exdata_muscadet, p)
 #'     ggsave(paste0("plot_silhouette_", p, ".png"), plot)
 #' }
 #' }
@@ -1164,14 +1164,14 @@ plotSil <- function(x,
 #' library(ggplot2)
 #'
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Plot all indexes
-#' plotIndexes(muscadet_obj)
+#' plotIndexes(exdata_muscadet)
 #' ggsave("plot_indexes.png", width = 8, height = 4)
 #'
 #' # Plot a specific index
-#' plotIndexes(muscadet_obj, index = "silhouette")
+#' plotIndexes(exdata_muscadet, index = "silhouette")
 #' ggsave("plot_indexes_sil.png", width = 7, height = 4)
 #' }
 #'
@@ -1399,11 +1399,11 @@ plotIndexes <- function(x,
 #' @examples
 #' \dontrun{
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Plot profile for all cells
 #' pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
-#' plotProfile(muscadet_obj, data = "allcells", title = "Example data - all cells")
+#' plotProfile(exdata_muscadet, data = "allcells", title = "Example dataset - all cells")
 #' dev.off()
 #' }
 #'
@@ -1746,10 +1746,10 @@ plotProfile <- function(x,
 #' library("ggplot2")
 #'
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Plot CNA segments
-#' p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
+#' p <- plotCNA(exdata_muscadet, title = "Copy Number Alterations in Example Data")
 #' p
 #' ggsave(
 #'     filename = file.path("CNAplot.png"),
@@ -1964,11 +1964,14 @@ plotCNA <- function(x,
 #'
 #' @examples
 #' \dontrun{
-#'   p <- plotUMAP(muscadet_obj,
-#'                 partition = 0.6,
-#'                 title = "UMAP copy-number clusters")
-#'   print(p)
+#'
+#' # Load example muscadet object
+#' # data("exdata_muscadet")
+#'
+#' p <- plotUMAP(exdata_muscadet, partition = 0.3, title = "UMAP copy-number clusters")
+#' print(p)
 #' }
+#'
 plotUMAP <- function(x,
                      partition = NULL,
                      clusters = NULL,
@@ -2131,6 +2134,8 @@ plotUMAP <- function(x,
 #' @import ggplot2
 #' @import ggrepel
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
@@ -2168,8 +2173,6 @@ plotUMAP <- function(x,
 #' )
 #' p4
 #' }
-#'
-#' @export
 #'
 add_labels <- function(
         p,
@@ -2297,29 +2300,29 @@ add_labels <- function(
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'     type = "ATAC",
-#'     mat_counts = t(mat_counts_atac_tumor),
-#'     features = peaks
+#'     mat_counts = exdata_mat_counts_atac_tumor,
+#'     features = exdata_peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'     type = "RNA",
-#'     mat_counts = t(mat_counts_rna_tumor),
-#'     features = genes
+#'     mat_counts = exdata_mat_counts_rna_tumor,
+#'     features = exdata_genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'     type = "ATAC",
-#'     mat_counts = t(mat_counts_atac_ref),
-#'     features = peaks
+#'     mat_counts = exdata_mat_counts_atac_ref,
+#'     features = exdata_peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'     type = "RNA",
-#'     mat_counts = t(mat_counts_rna_ref),
-#'     features = genes
+#'     mat_counts = exdata_mat_counts_rna_ref,
+#'     features = exdata_genes
 #' )
 #'
 #' # Create muscadet objects
 #' muscadet <- CreateMuscadetObject(
 #'     omics = list(atac, rna),
-#'     bulk.lrr = bulk_lrr,
+#'     bulk.lrr = exdata_bulk_lrr,
 #'     bulk.label = "WGS",
 #'     genome = "hg38"
 #' )
@@ -2344,7 +2347,7 @@ add_labels <- function(
 #' heatmapStep(obj = obj_atac_all,
 #'             step = "step01",
 #'             filename = file.path(tempdir(), "step01.png"),
-#'             title = "Example data - Step 01")
+#'             title = "Example dataset - Step 01")
 #'
 #' # Plot heatmap and distribution of values for all steps
 #' for (step in grep("step", names(obj_atac_all), value = TRUE)) {

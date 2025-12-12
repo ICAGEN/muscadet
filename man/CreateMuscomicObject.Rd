@@ -92,17 +92,17 @@ muscomic <- CreateMuscomicObject(
 # On the example dataset
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = t(mat_counts_atac_tumor),
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 atac
 
 # without allele counts data (not required for clustering step)
 atac2 <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = t(mat_counts_atac_tumor),
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  features = exdata_peaks
 )
 atac2
 

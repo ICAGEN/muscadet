@@ -18,16 +18,16 @@ Overview of a \code{\link[=muscadet-class]{muscadet}} object.
 }
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Overview of the muscadet object
-show(muscadet_obj)
+show(exdata_muscadet)
 
 # Overview of the muscomic objects within
-show(slot(muscadet_obj, "omics"))
+show(slot(exdata_muscadet, "omics"))
 
 # Overview of the first muscomic objects within
-show(slot(muscadet_obj, "omics")[[1]])
+show(slot(exdata_muscadet, "omics")[[1]])
 
 }
 \seealso{

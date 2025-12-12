@@ -103,21 +103,21 @@ help identify the optimal clustering partition.
 }
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Perform clustering with "seurat" method
-muscadet_obj <- clusterMuscadet(
-  x = muscadet_obj,
+exdata_muscadet <- clusterMuscadet(
+  x = exdata_muscadet,
   method = "seurat",
-  res_range = c(0.5, 0.8),
+  res_range = c(0.1, 0.3),
   dims_list = list(1:8, 1:8),
   knn_seurat = 10, # adapted to low number of cells in example data
   knn_range_seurat = 30 # adapted to low number of cells in example data
 )
 
 # Perform clustering with "hclust" method
-muscadet_obj <- clusterMuscadet(
-  x = muscadet_obj,
+exdata_muscadet2 <- clusterMuscadet(
+  x = exdata_muscadet,
   k_range = 2:4,
   method = "hclust",
   dist_method = "euclidean",
@@ -126,8 +126,15 @@ muscadet_obj <- clusterMuscadet(
 )
 
 # Retrieve cluster assignments
-clusters <- muscadet_obj$clustering$clusters
+clusters <- exdata_muscadet$clustering$clusters
 lapply(clusters, table)
+
+# Plot clustree
+library(clustree)
+partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
+partitions <- do.call(cbind, partitions)
+colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
+clustree(partitions, prefix = "res_")
 
 }
 \seealso{

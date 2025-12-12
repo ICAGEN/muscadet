@@ -19,9 +19,9 @@ Overview of a \code{\link[=muscomic-class]{muscomic}} object.
 \examples{
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = t(mat_counts_atac_tumor),
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 atac
 }

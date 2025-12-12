@@ -28,15 +28,18 @@ corresponding genomic features from the single-cell omic data and returns a
 table of single-cell features with the corresponding bulk LRR values.
 }
 \examples{
+# Load example muscadet object
+# data("exdata_muscadet")
+
 # muscomic object inside a muscadet object
-muscadet_obj$ATAC
+exdata_muscadet$ATAC
 
 # Bulk Log R ratio data
-head(muscadet_obj$bulk.data$logratio)
+head(exdata_muscadet$bulk.data$logratio)
 
 features_bulk_lrr <- getLogRatioBulk(
-  x = muscadet_obj$ATAC,
-  bulk.lrr = muscadet_obj$bulk.data$logratio
+  x = exdata_muscadet$ATAC,
+  bulk.lrr = exdata_muscadet$bulk.data$logratio
 )
 head(features_bulk_lrr)
 

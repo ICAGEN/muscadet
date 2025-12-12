@@ -30,11 +30,11 @@ of copy number alterations (CNAs) (\code{list}).}
 
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-muscadet_obj
+exdata_muscadet
 
-str(muscadet_obj, max.level = 2)
+str(exdata_muscadet, max.level = 2)
 
 
 }

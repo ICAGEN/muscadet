@@ -59,29 +59,29 @@ input object corresponds to the output of \code{\link[=computeLogRatioATAC]{comp
 # Create muscomic objects
 atac <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = t(mat_counts_atac_tumor),
-    features = peaks
+    mat_counts = exdata_mat_counts_atac_tumor,
+    features = exdata_peaks
 )
 rna <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = t(mat_counts_rna_tumor),
-    features = genes
+    mat_counts = exdata_mat_counts_rna_tumor,
+    features = exdata_genes
 )
 atac_ref <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = t(mat_counts_atac_ref),
-    features = peaks
+    mat_counts = exdata_mat_counts_atac_ref,
+    features = exdata_peaks
 )
 rna_ref <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = t(mat_counts_rna_ref),
-    features = genes
+    mat_counts = exdata_mat_counts_rna_ref,
+    features = exdata_genes
 )
 
 # Create muscadet objects
 muscadet <- CreateMuscadetObject(
     omics = list(atac, rna),
-    bulk.lrr = bulk_lrr,
+    bulk.lrr = exdata_bulk_lrr,
     bulk.label = "WGS",
     genome = "hg38"
 )
@@ -106,7 +106,7 @@ names(obj_atac_all)
 heatmapStep(obj = obj_atac_all,
             step = "step01",
             filename = file.path(tempdir(), "step01.png"),
-            title = "Example data - Step 01")
+            title = "Example dataset - Step 01")
 
 # Plot heatmap and distribution of values for all steps
 for (step in grep("step", names(obj_atac_all), value = TRUE)) {

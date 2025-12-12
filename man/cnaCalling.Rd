@@ -199,15 +199,17 @@ across clusters and evaluating cell fractions and copy numbers.
 library("facets")
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-muscadet_obj <- cnaCalling(muscadet_obj,
-                           omics.coverage = "ATAC",
-                           depthmin.a.clusters = 3, # set low thresholds for example data
-                           depthmin.c.clusters = 5,
-                           depthmin.a.allcells = 3,
-                           depthmin.c.allcells = 5,
-                           depthmin.c.nor = 0)
+exdata_muscadet <- cnaCalling(
+    exdata_muscadet,
+    omics.coverage = "ATAC",
+    depthmin.a.clusters = 3, # set low thresholds for example data
+    depthmin.c.clusters = 5,
+    depthmin.a.allcells = 3,
+    depthmin.c.allcells = 5,
+    depthmin.c.nor = 0
+)
 
 }
 \references{

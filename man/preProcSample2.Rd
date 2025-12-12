@@ -18,7 +18,7 @@ preProcSample2(
   cval = 25,
   gbuild = "hg38",
   hetscale = TRUE,
-  ndepth = 5,
+  ndepth = 1,
   ndepthmax = 1000
 )
 }
@@ -81,12 +81,12 @@ SNPs (or variants) in a genome are not evenly spaced, and loci are sampled
 within the specified window (\code{snp.nbhd}) to reduce serial correlation.
 }
 \examples{
-library("facets")
+library(facets)
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-counts <- muscadet_obj$cnacalling$combined.counts
+counts <- exdata_muscadet$cnacalling$combined.counts
 counts <- counts[complete.cases(counts),]
 counts_clus <- counts[which(counts$cluster == 1),]
 result <- preProcSample2(counts_clus)

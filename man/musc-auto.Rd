@@ -22,18 +22,17 @@ object.}
 Character vector of matching element names.
 }
 \description{
-Enable autocompletion for \code{$} access for
-\code{\link[=muscadet-class]{muscadet}} or \code{\link[=muscomic-class]{muscomic}} objects. For
-\code{muscadet} objects, it also lists omic datasets contained inside the
-\code{omics} slot.
+Enable autocompletion for \code{$} access for \code{\link[=muscadet-class]{muscadet}} or
+\code{\link[=muscomic-class]{muscomic}} objects. For \code{muscadet} objects, it also lists
+omic datasets contained inside the \code{omics} slot.
 }
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
-muscadet_obj$ATAC
+# data("exdata_muscadet")
+exdata_muscadet$ATAC
 
 # Load example muscadet object
-# data("muscadet_obj")
-muscadet_obj$ATAC$type
+# data("exdata_muscadet")
+exdata_muscadet$ATAC$type
 
 }

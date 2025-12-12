@@ -106,11 +106,11 @@ Explanation about igraph being the default package for Leiden implementation
 \examples{
 \dontrun{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Format input
 # transpose matrices to: cells x features matrices
-mat_list <- matLogRatio(muscadet_obj)
+mat_list <- matLogRatio(exdata_muscadet)
 
 # Run integration & clustering
 result <- cluster_seurat(

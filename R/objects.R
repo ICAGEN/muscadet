@@ -28,12 +28,12 @@
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
-#' muscadet_obj$ATAC
-#' muscadet_obj$RNA
+#' exdata_muscadet$ATAC
+#' exdata_muscadet$RNA
 #'
-#' str(muscadet_obj$ATAC, max.level = 2)
+#' str(exdata_muscadet$ATAC, max.level = 2)
 #'
 methods::setClass(
     "muscomic",
@@ -76,11 +76,11 @@ methods::setClass(
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
-#' muscadet_obj
+#' exdata_muscadet
 #'
-#' str(muscadet_obj, max.level = 2)
+#' str(exdata_muscadet, max.level = 2)
 #'
 #'
 methods::setClass(
@@ -183,17 +183,17 @@ methods::setClass(
 #' # On the example dataset
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_tumor),
-#'   allele_counts = allele_counts_atac_tumor,
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   allele_counts = exdata_allele_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' atac
 #'
 #' # without allele counts data (not required for clustering step)
 #' atac2 <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_tumor),
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' atac2
 #'
@@ -365,33 +365,33 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 #' # Create muscomic objects
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_tumor),
-#'   allele_counts = allele_counts_atac_tumor,
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   allele_counts = exdata_allele_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' rna <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = t(mat_counts_rna_tumor),
-#'   allele_counts = allele_counts_rna_tumor,
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_tumor,
+#'   allele_counts = exdata_allele_counts_rna_tumor,
+#'   features = exdata_genes
 #' )
 #' atac_ref <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_ref),
-#'   allele_counts = allele_counts_atac_ref,
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_ref,
+#'   allele_counts = exdata_allele_counts_atac_ref,
+#'   features = exdata_peaks
 #' )
 #' rna_ref <- CreateMuscomicObject(
 #'   type = "RNA",
-#'   mat_counts = t(mat_counts_rna_ref),
-#'   allele_counts = allele_counts_rna_ref,
-#'   features = genes
+#'   mat_counts = exdata_mat_counts_rna_ref,
+#'   allele_counts = exdata_allele_counts_rna_ref,
+#'   features = exdata_genes
 #' )
 #'
 #' # Create muscadet objects
 #' muscadet <- CreateMuscadetObject(
 #'   omics = list(atac, rna),
-#'   bulk.lrr = bulk_lrr,
+#'   bulk.lrr = exdata_bulk_lrr,
 #'   bulk.label = "WGS",
 #'   genome = "hg38"
 #' )
@@ -480,8 +480,6 @@ CreateMuscadetObject <- function(omics,
       bulk.lrr <- bulk.lrr[order(bulk.lrr$CHROM, bulk.lrr$start), ]
   }
 
-
-
   # Add bulk log R ratio data
   bulk.data <- list(logratio = bulk.lrr, label = bulk.label)
 
@@ -500,12 +498,11 @@ CreateMuscadetObject <- function(omics,
 # Methods to access objects ----------------------------------------------------
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#' @title Autocompletion for `$` access on `muscadet` or `muscomic` objects
+#' Autocompletion for `$` access on `muscadet` or `muscomic` objects
 #'
-#' @description Enable autocompletion for `$` access for
-#'   [`muscadet`][muscadet-class] or [`muscomic`][muscomic-class] objects. For
-#'   `muscadet` objects, it also lists omic datasets contained inside the
-#'   `omics` slot.
+#' Enable autocompletion for `$` access for [`muscadet`][muscadet-class] or
+#' [`muscomic`][muscomic-class] objects. For `muscadet` objects, it also lists
+#' omic datasets contained inside the `omics` slot.
 #'
 #' @aliases muscadet-auto
 #' @rdname musc-auto
@@ -526,8 +523,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
-#' muscadet_obj$ATAC
+#' # data("exdata_muscadet")
+#' exdata_muscadet$ATAC
 #'
 ".DollarNames.muscadet" <- function(x, pattern = "") {
     # Combine available omics names and slot names
@@ -547,8 +544,8 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
-#' muscadet_obj$ATAC$type
+#' # data("exdata_muscadet")
+#' exdata_muscadet$ATAC$type
 #'
 ".DollarNames.muscomic" <- function(x, pattern = "") {
     available <- c(slotNames(x))
@@ -579,11 +576,11 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Access to muscadet omics or slots
-#' muscadet_obj["ATAC"]
-#' muscadet_obj["genome"]
+#' exdata_muscadet["ATAC"]
+#' exdata_muscadet["genome"]
 #'
 "[.muscadet" <- function(x, i, ...) {
     if (i %in% names(x@omics)) {
@@ -605,10 +602,10 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Access to muscomic slots
-#' muscadet_obj["ATAC"]["label.omic"]
+#' exdata_muscadet["ATAC"]["label.omic"]
 #'
 "[.muscomic" <- function(x, i, ...) {
     if (i %in% slotNames(x)) {
@@ -631,11 +628,11 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Access to muscadet omics or slots
-#' muscadet_obj$ATAC
-#' muscadet_obj$genome
+#' exdata_muscadet$ATAC
+#' exdata_muscadet$genome
 #'
 "$.muscadet" <- function(x, name) {
     if (name %in% names(x@omics)) {
@@ -657,10 +654,10 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Access to muscomic slots
-#' muscadet_obj$ATAC$label.omic
+#' exdata_muscadet$ATAC$label.omic
 #'
 "$.muscomic" <- function(x, name) {
     if (name %in% slotNames(x)) {
@@ -689,10 +686,10 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Assign new data in muscadet object
-#' muscadet_obj["genome"] <- "hg38"
+#' exdata_muscadet["genome"] <- "hg38"
 #'
 "[<-.muscadet" <- function(x, i, value) {
     if (i %in% names(x@omics)) {
@@ -716,10 +713,10 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Assign new data in muscomic object
-#' muscadet_obj["ATAC"]["label.omic"] <- "scATAC-seq"
+#' exdata_muscadet["ATAC"]["label.omic"] <- "scATAC-seq"
 #'
 "[<-.muscomic" <- function(x, i, value) {
     if (i %in% slotNames(x)) {
@@ -737,10 +734,10 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Assign new data in muscadet object
-#' muscadet_obj$genome <- "hg38"
+#' exdata_muscadet$genome <- "hg38"
 #'
 "$<-.muscadet" <- function(x, i, value) {
     # Use the [<- method for assignment
@@ -755,18 +752,16 @@ CreateMuscadetObject <- function(omics,
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Assign new data in muscomic object
-#' muscadet_obj$ATAC$label.omic <- "scATAC-seq"
+#' exdata_muscadet$ATAC$label.omic <- "scATAC-seq"
 #'
 "$<-.muscomic" <- function(x, i, value) {
     # Use the [<- method for assignment
     x <- `[<-.muscomic`(x, i, value)
     return(x)
 }
-
-
 
 
 
@@ -793,9 +788,9 @@ CreateMuscadetObject <- function(omics,
 #' @examples
 #' atac <- CreateMuscomicObject(
 #'   type = "ATAC",
-#'   mat_counts = t(mat_counts_atac_tumor),
-#'   allele_counts = allele_counts_atac_tumor,
-#'   features = peaks
+#'   mat_counts = exdata_mat_counts_atac_tumor,
+#'   allele_counts = exdata_allele_counts_atac_tumor,
+#'   features = exdata_peaks
 #' )
 #' atac
 setMethod(
@@ -873,16 +868,16 @@ setMethod(
 #'
 #' @examples
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
 #' # Overview of the muscadet object
-#' show(muscadet_obj)
+#' show(exdata_muscadet)
 #'
 #' # Overview of the muscomic objects within
-#' show(slot(muscadet_obj, "omics"))
+#' show(slot(exdata_muscadet, "omics"))
 #'
 #' # Overview of the first muscomic objects within
-#' show(slot(muscadet_obj, "omics")[[1]])
+#' show(slot(exdata_muscadet, "omics")[[1]])
 #'
 setMethod(
     f = "show",
@@ -1026,30 +1021,30 @@ setMethod(
 #' library("SeuratObject")
 #'
 #' # Load example muscadet object
-#' # data("muscadet_obj")
+#' # data("exdata_muscadet")
 #'
-#' Cells(muscadet_obj) # list of 2 cell names vectors for the 2 omics
-#' Cells(muscadet_obj)$ATAC # cell names vector from the omic ATAC
-#' Cells(muscadet_obj$ATAC) # cell names vector from the ATAC muscomic object
-#' length(Cells(muscadet_obj))
-#' length(Cells(muscadet_obj)$ATAC)
-#' length(Cells(muscadet_obj$ATAC))
+#' Cells(exdata_muscadet) # list of 2 cell names vectors for the 2 omics
+#' Cells(exdata_muscadet)$ATAC # cell names vector from the omic ATAC
+#' Cells(exdata_muscadet$ATAC) # cell names vector from the ATAC muscomic object
+#' length(Cells(exdata_muscadet))
+#' length(Cells(exdata_muscadet)$ATAC)
+#' length(Cells(exdata_muscadet$ATAC))
 #'
-#' Features(muscadet_obj)
-#' Features(muscadet_obj)$ATAC
-#' Features(muscadet_obj$ATAC)
+#' Features(exdata_muscadet)
+#' Features(exdata_muscadet)$ATAC
+#' Features(exdata_muscadet$ATAC)
 #'
-#' coordFeatures(muscadet_obj)
-#' coordFeatures(muscadet_obj)$ATAC
-#' coordFeatures(muscadet_obj$ATAC)
+#' coordFeatures(exdata_muscadet)
+#' coordFeatures(exdata_muscadet)$ATAC
+#' coordFeatures(exdata_muscadet$ATAC)
 #'
-#' matCounts(muscadet_obj)
-#' matCounts(muscadet_obj)$ATAC
-#' matCounts(muscadet_obj$ATAC)
+#' matCounts(exdata_muscadet)
+#' matCounts(exdata_muscadet)$ATAC
+#' matCounts(exdata_muscadet$ATAC)
 #'
-#' matLogRatio(muscadet_obj)
-#' matLogRatio(muscadet_obj)$ATAC
-#' matLogRatio(muscadet_obj$ATAC)
+#' matLogRatio(exdata_muscadet)
+#' matLogRatio(exdata_muscadet)$ATAC
+#' matLogRatio(exdata_muscadet$ATAC)
 #'
 NULL
 

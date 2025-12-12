@@ -41,16 +41,16 @@ sequencing) before Copy Number Alterations (CNAs) calling.
 }
 \examples{
 # Load example muscadet object
-# data("muscadet_obj")
-# data("muscadet_obj_ref")
+# data("exdata_muscadet")
+# data("exdata_muscadet_ref")
 
 # Add allele counts data frames to muscadet objects
-muscadet_obj <- addAlleleCounts(
-    muscadet_obj,
-    allele_counts = list(allele_counts_atac_tumor, allele_counts_rna_tumor))
-muscadet_obj_ref <- addAlleleCounts(
-    muscadet_obj_ref,
-    allele_counts = list(allele_counts_atac_ref, allele_counts_rna_ref))
+exdata_muscadet <- addAlleleCounts(
+    exdata_muscadet,
+    allele_counts = list(exdata_allele_counts_atac_tumor, exdata_allele_counts_rna_tumor))
+exdata_muscadet_ref <- addAlleleCounts(
+    exdata_muscadet_ref,
+    allele_counts = list(exdata_allele_counts_atac_ref, exdata_allele_counts_rna_ref))
 
 }
 \seealso{
