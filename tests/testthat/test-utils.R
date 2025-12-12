@@ -43,33 +43,33 @@ test_that("addAlleleCounts() returns a muscadet object with allele table counts,
     # Create muscomic objects
     atac <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_tumor,
-        allele_counts = allele_counts_atac_tumor,
-        features = peaks
+        mat_counts = exdata_mat_counts_atac_tumor,
+        allele_counts = exdata_allele_counts_atac_tumor,
+        features = exdata_peaks
     )
     rna <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_tumor,
-        allele_counts = allele_counts_rna_tumor,
-        features = genes
+        mat_counts = exdata_mat_counts_rna_tumor,
+        allele_counts = exdata_allele_counts_rna_tumor,
+        features = exdata_genes
     )
     atac_ref <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_ref,
-        allele_counts = allele_counts_atac_ref,
-        features = peaks
+        mat_counts = exdata_mat_counts_atac_ref,
+        allele_counts = exdata_allele_counts_atac_ref,
+        features = exdata_peaks
     )
     rna_ref <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_ref,
-        allele_counts = allele_counts_rna_ref,
-        features = genes
+        mat_counts = exdata_mat_counts_rna_ref,
+        allele_counts = exdata_allele_counts_rna_ref,
+        features = exdata_genes
     )
 
     # Create muscadet objects
     muscadet <- CreateMuscadetObject(
         omics = list(atac, rna),
-        bulk.lrr = bulk_lrr,
+        bulk.lrr = exdata_bulk_lrr,
         bulk.label = "WGS",
         genome = "hg38"
     )
@@ -81,29 +81,29 @@ test_that("addAlleleCounts() returns a muscadet object with allele table counts,
     # Create muscomic objects without allele data
     atac2 <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_tumor,
-        features = peaks
+        mat_counts = exdata_mat_counts_atac_tumor,
+        features = exdata_peaks
     )
     rna2 <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_tumor,
-        features = genes
+        mat_counts = exdata_mat_counts_rna_tumor,
+        features = exdata_genes
     )
     atac2_ref <- CreateMuscomicObject(
         type = "ATAC",
-        mat_counts = mat_counts_atac_ref,
-        features = peaks
+        mat_counts = exdata_mat_counts_atac_ref,
+        features = exdata_peaks
     )
     rna2_ref <- CreateMuscomicObject(
         type = "RNA",
-        mat_counts = mat_counts_rna_ref,
-        features = genes
+        mat_counts = exdata_mat_counts_rna_ref,
+        features = exdata_genes
     )
 
     # Create muscadet objects without allele data
     muscadet2 <- CreateMuscadetObject(
         omics = list(atac2, rna2),
-        bulk.lrr = bulk_lrr,
+        bulk.lrr = exdata_bulk_lrr,
         bulk.label = "WGS",
         genome = "hg38"
     )
@@ -115,16 +115,16 @@ test_that("addAlleleCounts() returns a muscadet object with allele table counts,
     # Add allele data
     obj <- addAlleleCounts(
         muscadet2,
-        allele_counts = list(allele_counts_atac_tumor, allele_counts_rna_tumor))
+        allele_counts = list(exdata_allele_counts_atac_tumor, exdata_allele_counts_rna_tumor))
     obj_ref <- addAlleleCounts(
         muscadet2_ref,
-        allele_counts = list(allele_counts_atac_ref, allele_counts_rna_ref))
+        allele_counts = list(exdata_allele_counts_atac_ref, exdata_allele_counts_rna_ref))
 
     # Check slot added
-    expect_true(!is.null(obj@omics$ATAC@allelic$table.counts))
-    expect_true(!is.null(obj_ref@omics$ATAC@allelic$table.counts))
-    expect_true(!is.null(obj@omics$RNA@allelic$table.counts))
-    expect_true(!is.null(obj_ref@omics$RNA@allelic$table.counts))
+    expect_true(!is.null(obj@omics$ATAC@allelic))
+    expect_true(!is.null(obj_ref@omics$ATAC@allelic))
+    expect_true(!is.null(obj@omics$RNA@allelic))
+    expect_true(!is.null(obj_ref@omics$RNA@allelic))
 
     # Compare with objects with allele data
     expect_identical(obj, muscadet)

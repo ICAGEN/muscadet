@@ -1,22 +1,22 @@
 
 test_that("clusterMuscadet() returns an updated muscadet object", {
     # remove clustering result
-    muscadet_obj@clustering <- list()
+    exdata_muscadet@clustering <- list()
 
     obj <- clusterMuscadet(
-        muscadet_obj,
+        exdata_muscadet,
         method = "seurat",
-        res_range = c(0.6, 0.8),
+        res_range = c(0.1, 0.3),
         knn_seurat = 10,
         knn_range_seurat = 30,
         quiet = TRUE
     )
     obj2 <- clusterMuscadet(
-        muscadet_obj,
+        exdata_muscadet,
         method = "hclust",
         dist_method = "euclidean",
         hclust_method = "ward.D",
-        k_range = 2:5,
+        k_range = 2:4,
         quiet = TRUE
     )
     expect_s4_class(obj, "muscadet")
@@ -27,24 +27,24 @@ test_that("clusterMuscadet() returns an updated muscadet object", {
 
 test_that("clusterMuscadet() returns an updated muscadet object (case with one omic)", {
     # remove one muscomic
-    muscadet_obj$ATAC <- NULL
+    exdata_muscadet$ATAC <- NULL
     # remove clustering result
-    muscadet_obj@clustering <- list()
+    exdata_muscadet@clustering <- list()
 
     obj <- clusterMuscadet(
-        muscadet_obj,
+        exdata_muscadet,
         method = "seurat",
-        res_range = c(0.6, 0.8),
+        res_range = c(0.1, 0.3),
         knn_seurat = 10,
         knn_range_seurat = 30,
         quiet = TRUE
     )
     obj2 <- clusterMuscadet(
-        muscadet_obj,
+        exdata_muscadet,
         method = "hclust",
         dist_method = "euclidean",
         hclust_method = "ward.D",
-        k_range = 2:5,
+        k_range = 2:4,
         quiet = TRUE
     )
     expect_s4_class(obj, "muscadet")

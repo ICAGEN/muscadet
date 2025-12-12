@@ -2,33 +2,33 @@
 
 atac <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = t(mat_counts_atac_tumor),
-    allele_counts = allele_counts_atac_tumor,
-    features = peaks
+    mat_counts = exdata_mat_counts_atac_tumor,
+    allele_counts = exdata_allele_counts_atac_tumor,
+    features = exdata_peaks
 )
 rna <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = t(mat_counts_rna_tumor),
-    allele_counts = allele_counts_rna_tumor,
-    features = genes
+    mat_counts = exdata_mat_counts_rna_tumor,
+    allele_counts = exdata_allele_counts_rna_tumor,
+    features = exdata_genes
 )
 
 atac_ref <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = t(mat_counts_atac_ref),
-    allele_counts = allele_counts_atac_ref,
-    features = peaks
+    mat_counts = exdata_mat_counts_atac_ref,
+    allele_counts = exdata_allele_counts_atac_ref,
+    features = exdata_peaks
 )
 rna_ref <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = t(mat_counts_rna_ref),
-    allele_counts = allele_counts_rna_ref,
-    features = genes
+    mat_counts = exdata_mat_counts_rna_ref,
+    allele_counts = exdata_allele_counts_rna_ref,
+    features = exdata_genes
 )
 
 muscadet <- CreateMuscadetObject(
     omics = list(atac, rna),
-    bulk.lrr = bulk_lrr,
+    bulk.lrr = exdata_bulk_lrr,
     bulk.label = "WGS",
     genome = "hg38"
 )
@@ -126,8 +126,8 @@ test_that("ComputeLogRatio gives a correct muscadet object as output", {
 test_that("getLogRatioBulk gives a correct output", {
 
     features_bulk_lrr <- getLogRatioBulk(
-      x = muscadet_obj$ATAC,
-      bulk.lrr = muscadet_obj$bulk.data$logratio
+      x = exdata_muscadet$ATAC,
+      bulk.lrr = exdata_muscadet$bulk.data$logratio
     )
     expect_equal(ncol(features_bulk_lrr), 4)
     expect_true(is.data.frame(features_bulk_lrr))

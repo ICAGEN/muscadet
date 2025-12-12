@@ -4,7 +4,7 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=FALSE", {
     skip_on_cran()
     skip_if_not_installed("ComplexHeatmap")
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
     # Create a temp file for saving the heatmap
     out_file <- tempfile(fileext = ".png")
@@ -12,37 +12,37 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=FALSE", {
 
     # show_missing = FALSE
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        partition = 0.6,
+                        partition = 0.3,
                         show_missing = FALSE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        clusters = muscadet_obj$clustering$clusters[["0.8"]],
+                        clusters = exdata_muscadet$clustering$clusters[["0.3"]],
                         show_missing = FALSE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
-                        filename = out_file,
-                        show_missing = FALSE)
-    )
-    expect_true(file.exists(out_file))
-
-    expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
                         show_missing = FALSE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
+                        filename = out_file,
+                        show_missing = FALSE)
+    )
+    expect_true(file.exists(out_file))
+
+    expect_no_error(
+        heatmapMuscadet(exdata_muscadet,
                         averages = TRUE,
                         filename = out_file,
                         show_missing = FALSE)
@@ -57,7 +57,7 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=TRUE", {
     skip_on_cran()
     skip_if_not_installed("ComplexHeatmap")
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
     # Create a temp file for saving the heatmap
     out_file <- tempfile(fileext = ".png")
@@ -65,37 +65,37 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=TRUE", {
 
     # show_missing = TRUE
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        partition = 0.6,
+                        partition = 0.3,
                         show_missing = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        clusters = muscadet_obj$clustering$clusters[["0.8"]],
+                        clusters = exdata_muscadet$clustering$clusters[["0.3"]],
                         show_missing = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
-                        filename = out_file,
-                        show_missing = TRUE)
-    )
-    expect_true(file.exists(out_file))
-
-    expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
                         show_missing = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
-        heatmapMuscadet(muscadet_obj,
+        heatmapMuscadet(exdata_muscadet,
+                        filename = out_file,
+                        show_missing = TRUE)
+    )
+    expect_true(file.exists(out_file))
+
+    expect_no_error(
+        heatmapMuscadet(exdata_muscadet,
                         averages = TRUE,
                         filename = out_file,
                         show_missing = TRUE)
@@ -109,9 +109,9 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=TRUE", {
 test_that("heatmapMuscadet() errors if partition not found", {
     skip_on_cran()
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
-    expect_error(heatmapMuscadet(muscadet_obj, partition = "a"))
+    expect_error(heatmapMuscadet(exdata_muscadet, partition = "a"))
 })
 
 test_that("heatmapMuscadet() errors with invalid muscadet input", {
@@ -125,24 +125,24 @@ test_that("plotSil() returns a ggplot object for valid input", {
     skip_on_cran()
     skip_if_not_installed("ggplot2")
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
-    expect_no_error(p <- plotSil(muscadet_obj, partition = 0.6, title = "Silhouette Test"))
+    expect_no_error(p <- plotSil(exdata_muscadet, partition = 0.3, title = "Silhouette Test"))
 
     expect_s3_class(p, "ggplot")
 })
 
 test_that("plotSil() errors for wrong inputs", {
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
     expect_error(plotSil(list()))
-    expect_error(plotSil(muscadet_obj))
+    expect_error(plotSil(exdata_muscadet))
 })
 
 test_that("plotSil() errors when silhouette data is missing", {
 
-    data("muscadet_obj", package = "muscadet")
-    dummy <- muscadet_obj
+    data("exdata_muscadet", package = "muscadet")
+    dummy <- exdata_muscadet
     dummy@clustering$silhouette <- list()
 
     expect_error(plotSil(dummy))
@@ -155,17 +155,17 @@ test_that("plotIndexes() returns a ggplot object", {
     skip_on_cran()
     skip_if_not_installed("ggplot2")
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
     expect_no_error(p <- plotIndexes(
-        muscadet_obj,
+        exdata_muscadet,
         title = "Test Plot"
     ))
 
     expect_s3_class(p, "ggplot")
 
     expect_no_error(p <- plotIndexes(
-        muscadet_obj,
+        exdata_muscadet,
         index = c("silhouette", "dunn2", "c"),
         title = "Test Plot"
     ))
@@ -173,7 +173,7 @@ test_that("plotIndexes() returns a ggplot object", {
     expect_s3_class(p, "ggplot")
 
     expect_no_error(p <- plotIndexes(
-        muscadet_obj,
+        exdata_muscadet,
         index = c("pearsongamma"),
         title = "Test Plot"
     ))
@@ -186,8 +186,8 @@ test_that("plotIndexes() errors with invalid muscadet object", {
 })
 
 test_that("plotIndexes() errors with muscadet object missing clustering", {
-    data("muscadet_obj", package = "muscadet")
-    dummy <- muscadet_obj
+    data("exdata_muscadet", package = "muscadet")
+    dummy <- exdata_muscadet
     dummy@clustering <- list()
     expect_error(plotIndexes(dummy))
 })
@@ -197,20 +197,20 @@ test_that("plotIndexes() errors with muscadet object missing clustering", {
 test_that("plotProfile() runs without error for all cells", {
     skip_on_cran()
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
     tmpfile <- tempfile(fileext = ".pdf")
 
     # all cells
     pdf(tmpfile, width = 6, height = 3)
-    expect_no_error(plotProfile(muscadet_obj, data = "allcells", title = "Test plot"))
+    expect_no_error(plotProfile(exdata_muscadet, data = "allcells", title = "Test plot"))
     dev.off()
     # Check file is not empty
     expect_gt(file.info(tmpfile)$size, 1000)
 
     # cluster 1
     pdf(tmpfile, width = 6, height = 3)
-    expect_no_error(plotProfile(muscadet_obj, data = 1, title = "Test plot"))
+    expect_no_error(plotProfile(exdata_muscadet, data = 1, title = "Test plot"))
     dev.off()
     # Check file is not empty
     expect_gt(file.info(tmpfile)$size, 1000)
@@ -219,11 +219,11 @@ test_that("plotProfile() runs without error for all cells", {
 })
 
 test_that("plotProfile() errors with wrong inputs", {
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
     expect_error(plotProfile(list()))
-    expect_error(plotProfile(muscadet_obj))
-    expect_error(plotProfile(muscadet_obj, data = 17))
+    expect_error(plotProfile(exdata_muscadet))
+    expect_error(plotProfile(exdata_muscadet, data = 17))
 })
 
 
@@ -232,9 +232,9 @@ test_that("plotProfile() errors with wrong inputs", {
 test_that("plotCNA() returns a ggplot object and runs without error", {
     skip_on_cran()
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
-    expect_no_error(p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Test Data"))
+    expect_no_error(p <- plotCNA(exdata_muscadet, title = "Copy Number Alterations in Test Data"))
 
     # Check that it returns a ggplot object
     expect_s3_class(p, "ggplot")
@@ -247,12 +247,12 @@ test_that("plotCNA() returns a ggplot object and runs without error", {
 test_that("plotUMAP returns a ggplot object", {
     skip_on_cran()
 
-    data("muscadet_obj", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
 
-    expect_true(!is.null(muscadet_obj@clustering$umap))
-    expect_true(length(muscadet_obj@clustering$clusters) > 0)
+    expect_true(!is.null(exdata_muscadet@clustering$umap))
+    expect_true(length(exdata_muscadet@clustering$clusters) > 0)
 
-    p <- plotUMAP(muscadet_obj, partition = 0.6)
+    p <- plotUMAP(exdata_muscadet, partition = 0.3)
     expect_s3_class(p, "ggplot")
 })
 
@@ -261,7 +261,7 @@ test_that("plotUMAP errors with wrong class", {
 })
 
 test_that("plotUMAP detects missing clustering", {
-    dummy <- muscadet_obj
+    dummy <- exdata_muscadet
     dummy@clustering$umap <- NULL
     expect_error(plotUMAP(dummy))
 })
@@ -291,17 +291,17 @@ test_that("add_labels() adds text layers to ggplot", {
 test_that("heatmapStep() generates a PNG heatmap", {
     skip_on_cran()
 
-    data("muscadet_obj", package = "muscadet")
-    data("muscadet_obj_ref", package = "muscadet")
-    data("peaks", package = "muscadet")
+    data("exdata_muscadet", package = "muscadet")
+    data("exdata_muscadet_ref", package = "muscadet")
+    data("exdata_peaks", package = "muscadet")
 
     # Example data
     expect_no_error(
         obj_atac_all <- computeLogRatioATAC(
-            matTumor = matCounts(muscadet_obj)$ATAC,
-            matRef = matCounts(muscadet_obj_ref)$ATAC,
-            peaksCoord = peaks,
-            genome = slot(muscadet_obj, "genome"),
+            matTumor = matCounts(exdata_muscadet)$ATAC,
+            matRef = matCounts(exdata_muscadet_ref)$ATAC,
+            peaksCoord = exdata_peaks,
+            genome = slot(exdata_muscadet, "genome"),
             minReads = 1,
             minPeaks = 1,
             all_steps = TRUE,
