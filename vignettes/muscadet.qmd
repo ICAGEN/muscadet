@@ -13,6 +13,8 @@ format:
     link-external-icon: true
     link-external-newwindow: true
     embed-resources: true
+depends:
+  - clustree
 knitr:
   opts_chunk:
     collapse: true
@@ -27,14 +29,17 @@ library(SeuratObject)
 library(knitr)
 library(dplyr)
 library(ggplot2)
+library(clustree)
 ```
 
 
-`muscadet` (**mu**ltiomics **s**ingle-cell **c**opy number **a**lterations **det**ection) is an R package for identifying copy number alterations (CNAs) in cancer cells from single-cell multiomics data.
+`muscadet` (**mu**ltiomics **s**ingle-cell **c**opy number **a**lterations **det**ection) is an R package designed to identify somatic copy number alterations (CNAs) in cancer cells using single-cell multiomics data. 
+The package supports analyses ranging from a single omics layer to multiple omics measured on the same cells, and is designed to accommodate partially missing-modality scenarios. `muscadet` enables the identification of tumor subclones through multi-omic cell clustering and provides downstream tools for CNA inference within a unified and reproducible workflow.
+
 
 # Installation
 
-Install the latest version directly from GitHub.
+The latest version of muscadet can be installed directly from GitHub:
 
 ```{r}
 #| label: installation
@@ -46,14 +51,19 @@ devtools::install_github("ICAGEN/muscadet")
 
 # Inputs and objects creation
 
+::: {.callout-important}
+## Important note on example data
+The example dataset included in `muscadet` is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.
+:::
+
 ## muscomic
 
-The `muscomic` objects (see `?muscomic`) are primary objects for the muscadet analysis, created using the `CreateMuscomicObject()` function with the following inputs:
+The `muscomic` objects (see `?muscomic`) are the primary objects used throughout the muscadet workflow. Each `muscomic` object represents a single omics layer and serves as the basic building block for downstream multi-omic integration, clustering, and copy-number analysis in muscadet. They are created using the `CreateMuscomicObject()` function and encapsulate all information related to a single omics modality. The function requires the following inputs:
 
-* `type`: a type of omic, `"RNA"` and `"ATAC"` being the ones currently supported. Note that for other DNA types omics, the `"ATAC"` type can be used.
-* `mat_counts`: a raw count matrix (see `?mat_counts`).
-* `allele_counts`: a table of raw counts per allele (see `?allele_counts`) *(optional, can be added later during analysis)*.
-* `features`: a table of features coordinates (see `?features`).
+* `type`: the type of omic modality, currently `"RNA"` and `"ATAC"` are supported. Other DNA-based modalities can be provided using the `"ATAC"` type.
+* `mat_counts`: a raw count matrix with cells as rows and features as columns (see `?exdata_mat_counts`).
+* `allele_counts`: a data frame of raw allele-specific counts (see `?exdata_allele_counts`) *(optional, can be added later in the analysis workflow)*.
+* `features`: a data frame containing genomic coordinates of features (see `?exdata_features`).
 
 ```{r}
 #| label: muscomic objs tumor
@@ -61,23 +71,23 @@ library(muscadet)
 
 # Load example dataset inputs:
 # Matrices of raw counts per features
-data("mat_counts_atac_tumor", "mat_counts_rna_tumor")
+data("exdata_mat_counts_atac_tumor", "exdata_mat_counts_rna_tumor")
 # Table of raw counts per allele
-data("allele_counts_atac_tumor", "allele_counts_rna_tumor")
+data("exdata_allele_counts_atac_tumor", "exdata_allele_counts_rna_tumor")
 # Table of feature coordinates
-data("peaks", "genes")
+data("exdata_peaks", "exdata_genes")
 
 # Create individual omic objects
 atac <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = mat_counts_atac_tumor, 
-    allele_counts = allele_counts_atac_tumor, 
-    features = peaks)
+    mat_counts = exdata_mat_counts_atac_tumor, 
+    allele_counts = exdata_allele_counts_atac_tumor, 
+    features = exdata_peaks)
 rna <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = mat_counts_rna_tumor,
-    allele_counts = allele_counts_rna_tumor,
-    features = genes)
+    mat_counts = exdata_mat_counts_rna_tumor,
+    allele_counts = exdata_allele_counts_rna_tumor,
+    features = exdata_genes)
 
 atac
 
@@ -86,52 +96,55 @@ rna
 
 ## muscadet
 
-The `muscadet` objects (see `?muscadet`) consists of one or several `muscomic` objects, along with additional information and it will store downstream analysis results. They can be created using the `CreateMuscadetObject()` function with a list of `muscomic` objects as input as well as bulk coverage information (see `?bulk_lrr`) and the genome assembly to use.
+The `muscadet` objects (see `?muscadet`) are higher-level containers that group one or more `muscomic` objects together with additional metadata and analysis results. They are used to store and manage the outputs of downstream steps, including clustering, and CNA calling.
+
+A `muscadet` object is created using the `CreateMuscadetObject()` function, which takes as input a list of `muscomic` objects, optional bulk coverage information (see `?exdata_bulk_lrr`), and the genome assembly to be used for the analysis.
+
 
 ```{r}
 #| label: muscadet obj tumor
 # Table of coverage information (log ratio) from bulk data (i.e. WGS)
-data("bulk_lrr")
+data("exdata_bulk_lrr")
 
 # Create multiomic muscadet object
 muscadet <- CreateMuscadetObject(
     omics = list(ATAC = atac, RNA = rna),
-    bulk.lrr = bulk_lrr,
+    bulk.lrr = exdata_bulk_lrr,
     bulk.label = "WGS",
     genome = "hg38")
 muscadet
 ```
 
-
-An example of a complete `muscadet` object with a demo dataset is included in the package.
-```{r}
-#| label: muscadet_obj
-# Example muscadet object
-data("muscadet_obj")
-muscadet_obj
-```
-
-Create another `muscadet` object with reference cells data.
+The reference cells data must be stored in its own `muscadet` object
 ```{r}
 #| label: muscomic objs ref
 
-data("mat_counts_atac_ref", "mat_counts_rna_ref")
-data("allele_counts_atac_ref", "allele_counts_rna_ref")
+data("exdata_mat_counts_atac_ref", "exdata_mat_counts_rna_ref")
+data("exdata_allele_counts_atac_ref", "exdata_allele_counts_rna_ref")
 
 atac_ref <- CreateMuscomicObject(
     type = "ATAC",
-    mat_counts = mat_counts_atac_ref,
-    allele_counts = allele_counts_atac_ref,
-    features = peaks)
+    mat_counts = exdata_mat_counts_atac_ref,
+    allele_counts = exdata_allele_counts_atac_ref,
+    features = exdata_peaks)
 rna_ref <- CreateMuscomicObject(
     type = "RNA",
-    mat_counts = mat_counts_rna_ref,
-    allele_counts = allele_counts_rna_ref,
-    features = genes)
+    mat_counts = exdata_mat_counts_rna_ref,
+    allele_counts = exdata_allele_counts_rna_ref,
+    features = exdata_genes)
 muscadet_ref <- CreateMuscadetObject(
     omics = list(ATAC = atac_ref, RNA = rna_ref),
     genome = "hg38")
 muscadet_ref
+```
+
+Examples of complete `muscadet` objects are included in the example dataset of the package.
+```{r}
+#| label: muscadet object
+# Example of muscadet object
+data("exdata_muscadet", "exdata_muscadet_ref")
+exdata_muscadet
+exdata_muscadet_ref
 ```
 
 ## Methods
@@ -143,27 +156,27 @@ Several method functions are available to access data within `muscadet`/`muscomi
 library(SeuratObject) # Cells() and Features() methods imported from SeuratObject
 
 # Cell names
-Cells(muscadet_obj) # list of cells, one element per omic
-Cells(muscadet_obj)$ATAC # element of the list
-Cells(muscadet_obj$ATAC) # cells for muscomic object
-Reduce(union, Cells(muscadet_obj)) # all cells
-Reduce(intersect, Cells(muscadet_obj)) # common cells
+Cells(exdata_muscadet) # list of cells, one element per omic
+Cells(exdata_muscadet)$ATAC # element of the list
+Cells(exdata_muscadet$ATAC) # cells for muscomic object
+Reduce(union, Cells(exdata_muscadet)) # all cells
+Reduce(intersect, Cells(exdata_muscadet)) # common cells
 
 # Feature names
-Features(muscadet_obj) # list, one element per omic
-Features(muscadet_obj)$ATAC
+Features(exdata_muscadet) # list, one element per omic
+Features(exdata_muscadet)$ATAC
 
 # Matrix of raw counts
-matCounts(muscadet_obj) # list, one element per omic
-matCounts(muscadet_obj$ATAC)
+matCounts(exdata_muscadet) # list, one element per omic
+matCounts(exdata_muscadet$ATAC)
 
 # Matrix of log ratios
-matLogRatio(muscadet_obj) # list, one element per omic
-matLogRatio(muscadet_obj)$ATAC
+matLogRatio(exdata_muscadet) # list, one element per omic
+matLogRatio(exdata_muscadet)$ATAC
 
 # Table of feature coordinates
-coordFeatures(muscadet_obj) # list, one element per omic
-coordFeatures(muscadet_obj)$RNA
+coordFeatures(exdata_muscadet) # list, one element per omic
+coordFeatures(exdata_muscadet)$RNA
 ```
 
 
@@ -172,59 +185,62 @@ coordFeatures(muscadet_obj)$RNA
 library(SeuratObject) # Cells() and Features() methods imported from SeuratObject
 
 # number of cells in total
-length(Reduce(union, Cells(muscadet_obj)))
+length(Reduce(union, Cells(exdata_muscadet)))
 # number of common cells
-length(Reduce(intersect, Cells(muscadet_obj)))
+length(Reduce(intersect, Cells(exdata_muscadet)))
 # number of cells per omic
-lapply(Cells(muscadet_obj), length)
+lapply(Cells(exdata_muscadet), length)
 # number of features per omic
-lapply(Features(muscadet_obj), length)
+lapply(Features(exdata_muscadet), length)
 ```
 
 
 # Compute log ratios
 
-Compute genome-wide coverage profiles as log ratio (LRR) matrices with `computeLogRatio()` for every omic present in the muscadet object. 
+Genome-wide coverage profiles are computed as log R ratio (LRR) matrices using the `computeLogRatio()` function for each omics modality contained in the muscadet object. This step transforms raw count data into normalized coverage profiles along the genome, which are used for downstream clustering analysis.
+
 ```{r}
 #| label: compute LRR
 #| eval: false
 
 # Compute log R ratios from scATAC-seq read counts
-muscadet <- computeLogRatio(
-    x = muscadet,
-    reference = muscadet_ref,
+exdata_muscadet <- computeLogRatio(
+    x = exdata_muscadet,
+    reference = exdata_muscadet_ref,
     omic = "ATAC",
     method = "ATAC",
-    minReads = 1, # low value for small example dataset
+    minReads = 0.5, # low value for small example dataset
     minPeaks = 1) # low value for small example dataset
 
 # Compute log R ratios from scRNA-seq read counts
-muscadet <- computeLogRatio(
-    x = muscadet,
-    reference = muscadet_ref,
+exdata_muscadet <- computeLogRatio(
+    x = exdata_muscadet,
+    reference = exdata_muscadet_ref,
     omic = "RNA",
     method = "RNA",
     refReads = 2, # low value for small example dataset
     refMeanReads = 0.01) 
 ```
 
-To adjust filters applied to features by `computeLogRatio()`, you can check distribution of data and filter status of features.
+To customize or refine the feature filtering applied by `computeLogRatio()`, users can inspect the data distributions and review the filter status of individual features before proceeding with downstream analyses.
 
 ```{r}
 #| label: check features filters
 
-ATAC_features <- coordFeatures(muscadet_obj)$ATAC
+library(ggplot2)
+
+ATAC_features <- coordFeatures(exdata_muscadet)$ATAC
 
 ggplot(ATAC_features, aes(x = nPeaks, y = meanReads.ref, color = keep)) +
     geom_point() +
     geom_vline(xintercept = 1 , linetype = "dashed", color = "red") + # minPeaks threshold
-    geom_hline(yintercept = 1, linetype = "dashed", color = "red") + # minReads threshold
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") + # minReads threshold
     scale_y_log10() +
     labs(x = "Number of peaks (minPeaks)", y = "Mean of reads in reference cells (minReads)",
          title = "ATAC features (windows of peaks) filtered by thresholds") +
     theme_minimal()
 
-RNA_features <- coordFeatures(muscadet_obj)$RNA  
+RNA_features <- coordFeatures(exdata_muscadet)$RNA
 
 ggplot(RNA_features, aes(x = sumReads.ref, y = meanReads.ref, color = keep)) +
     geom_point() +
@@ -240,100 +256,122 @@ ggplot(RNA_features, aes(x = sumReads.ref, y = meanReads.ref, color = keep)) +
 
 # Multimodal integrated clustering
 
-The cells are clustered based on log ratio profiles with `clusterMuscadet()`, two methods are available:
+Cells are clustered based on their log ratio profiles using the `clusterMuscadet()` function. Two clustering strategies are currently available:
 
-* `method = "seurat"`: Seurat's graph-based clustering. It consists of a nearest neighbors graph construction on a weighted combination of two modalities from selected dimensions of PCA and cluster determination (see `cluster_seurat()`).
-* `method = "hclust"`: Integration by Similarity Network Fusion (SNF) followed by hierarchical clustering (see `cluster_hclust()`).
+* **`method = "seurat"`**: Graph-based clustering using the [`Seurat`](https://satijalab.org/seurat/) package. This approach constructs a nearest-neighbor graph from a weighted combination of multiple modalities, using selected principal components from each modality, followed by community detection to identify clusters (see `cluster_seurat()`).
+
+* **`method = "hclust"`**: Multi-omic integration via Similarity Network Fusion (SNF), followed by hierarchical clustering of the fused similarity matrix to identify cell clusters (see `cluster_hclust()`).
+
 
 ```{r}
 #| label: clustering 1
-#| eval: false
-set.seed(123)
+#| eval: true
+
+# Set seed for clustering reproducibility
+set.seed(123) 
 
 # Perform clustering with "seurat" method
-muscadet_obj <- clusterMuscadet(
-  x = muscadet_obj,
-  method = "seurat",
-  res_range = c(0.5, 0.8),
-  dims_list = list(1:8, 1:8),
-  knn_seurat = 10, # adapted to low number of cells in example data
-  knn_range_seurat = 30 # adapted to low number of cells in example data
+exdata_muscadet <- clusterMuscadet(
+    x = exdata_muscadet,
+    method = "seurat",
+    res_range = c(0.1, 0.3, 0.5),
+    dims_list = list(1:10, 1:10),
+    knn_seurat = 10, # adapted to low number of cells in example data
+    knn_range_seurat = 30 # adapted to low number of cells in example data
 )
 ```
 
 ```{r}
 #| label: clustering 2
 #| eval: false
+
+# Set seed for clustering reproducibility
 set.seed(123)
 
 # Perform clustering with "hclust" method
-muscadet_obj2 <- clusterMuscadet(
-  x = muscadet_obj,
+exdata_muscadet2 <- clusterMuscadet(
+  x = exdata_muscadet,
   k_range = 2:4,
   method = "hclust",
   dist_method = "euclidean",
   hclust_method = "ward.D",
-  weights = c(1, 1)
+  weights = c(1, 1),
+  quiet = TRUE
 )
 ```
 
 ```{r}
 #| label: clustering 3
 # Number of cells per cluster per partition
-lapply(muscadet_obj$clustering$clusters, table)
+lapply(exdata_muscadet$clustering$clusters, table)
 ```
 
 # Clustering visualization
 
-The genome-wide coverage profiles and clusters are visualized as a heatmap using `heatmapMuscadet()` on a chosen clustering partition stored in the `muscadet` object. 
+The distribution of cells across clustering partitions at different resolutions can be explored using `clustree()`. 
+
+```{r}
+#| label: clustree
+library(clustree)
+# Build clustree
+partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
+partitions <- do.call(cbind, partitions)
+colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
+clustree(partitions, prefix = "res_")
+```
+
+Genome-wide coverage profiles, along with the identified clusters, can be visualized as a heatmap with `heatmapMuscadet()`, on a selected clustering partition stored in the `muscadet` object. 
+
 
 ```{r}
 #| label: heatmap 1
 #| output: false
 # Plot heatmap 
 heatmapMuscadet(
-    muscadet_obj,
-    filename = file.path("figures", "heatmap_res0.6.png"),
-    partition = 0.6,
-    title = "Example | res=0.6"
+    exdata_muscadet,
+    filename = file.path("figures", "heatmap_res0.3.png"),
+    partition = 0.3,
+    title = "Example | res=0.3"
 )
 ```
 
-![Heatmap of log ratios](figures/heatmap_res0.6.png){#fig-ht width=100% fig-align="center"}
-An heatmap of log ratio averages per clusters can also be plotted.
+![Heatmap of log ratios](figures/heatmap_res0.3.png){#fig-ht width=100% fig-align="center"}
+Additionally, an aggregated heatmap showing the average log ratio values per cluster can be plotted to summarize copy-number patterns across subclonal populations.
 
 ```{r}
 #| label: heatmap 2
 #| output: false
 # Plot heatmap of log ratio averages per cluster
 heatmapMuscadet(
-    muscadet_obj,
-    filename = file.path("figures", "heatmap_res0.6_averages.png"),
-    partition = 0.6,
+    exdata_muscadet,
+    filename = file.path("figures", "heatmap_res0.3_averages.png"),
+    partition = 0.3,
     averages = TRUE,
-    title = "Example | res=0.6 | Averages per cluster"
+    title = "Example | res=0.3 | Averages per cluster"
 )
 ```
 
-![Heatmap of log ratios averages per cluster](figures/heatmap_res0.6_averages.png){#fig-htavg width=100% fig-align="center"}
+![Heatmap of log ratios averages per cluster](figures/heatmap_res0.3_averages.png){#fig-htavg width=100% fig-align="center"}
 
-The integrated genome-wide coverage profiles are projected into a low-dimensional space using Uniform Manifold Approximation and Projection (UMAP).
+To visualize the integrated genome-wide coverage profiles, the data can be projected into a low-dimensional space using Uniform Manifold Approximation and Projection (UMAP). This projection provides an intuitive view of cell relationships, allowing users to explore subclonal structure and similarity between cells based on their multi-omic copy-number profiles.
 
 ```{r}
 #| label: umap
 
-plotUMAP(muscadet_obj, partition = 0.6)
+plotUMAP(exdata_muscadet, partition = 0.3)
 ```
 
 
 # Clustering validation
 
-To validate and select the clustering partition, Silhouette scores are stored in the `muscadet` object and are visualized using `plotSil()` and other clustering validation indexes with `plotIndexes()`.
+To assess the quality of the clustering partitions, Silhouette scores are computed and stored in the `muscadet` object. These scores can be visualized using `plotSil()`. 
+Additional clustering validation metrics are also available and can be explored with `plotIndexes()`. Together, these tools help guide the selection of the most appropriate clustering partition for downstream analyses.
+
 
 ```{r}
 #| label: silhouette
 # View stored silhouette average widths per partition
-muscadet_obj$clustering$silhouette$sil.w.avg
+exdata_muscadet$clustering$silhouette$sil.w.avg
 ```
 
 
@@ -341,7 +379,7 @@ muscadet_obj$clustering$silhouette$sil.w.avg
 #| label: fig-sil
 #| fig-cap: "Silhouette plot for a clustering partition"
 # Silhouette plot for individual clustering partition
-plotSil(muscadet_obj, partition = 0.6)
+plotSil(exdata_muscadet, partition = 0.3)
 ```
 
 
@@ -349,92 +387,85 @@ plotSil(muscadet_obj, partition = 0.6)
 #| label: fig-sil2
 #| fig-cap: "Plot of Silhouette scores across partitions"
 # Plot clustering indexes for every stored partitions
-plotIndexes(muscadet_obj, index = "silhouette")
+
+plotIndexes(exdata_muscadet)
 ```
 
-
-```{r}
-#| label: fig-indexes
-#| fig-cap: "Plot of clustering validation indexes across partitions"
-# Plot clustering indexes for every stored partitions
-plotIndexes(muscadet_obj)
-```
 
 # CNA calling
 
-First, a clustering partition must be selected using `assignClusters()`.
+Before calling CNAs, a clustering partition must be selected using `assignClusters()`.  
+
 ```{r}
 #| label: assign clusters
-#| eval: false
-muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
+#| eval: true
+exdata_muscadet <- assignClusters(exdata_muscadet, partition = 0.3)
 ```
 
 ```{r}
 #| label: show table clusters
-table(muscadet_obj$cnacalling$clusters)
+table(exdata_muscadet$cnacalling$clusters)
 ```
 
-
-Then, run `mergeCounts()` using both the sample (tumor cells) and reference (normal cells) `muscadet` objects, to combine counts per cluster from multiple omics from both.
+Next, use `aggregateCounts()` with both the sample (tumor cells) and reference (normal cells) `muscadet` objects to combine counts per cluster across all omics. 
 
 ```{r}
-#| label: merge counts
-#| eval: false
-# Merge counts per cluster from all omics from both sample and reference
-muscadet_obj <- mergeCounts(muscadet_obj, muscadet_obj_ref)
+#| label: aggregate counts
+#| eval: true
+# Aggregate counts per cluster from all omics from both sample and reference
+exdata_muscadet <- aggregateCounts(exdata_muscadet, exdata_muscadet_ref)
 ```
 
-Finally, run `cnaCalling()` to call CNA segments
+Finally, run `cnaCalling()` to infer CNA segments for each cluster.
 ```{r}
 #| label: CNA-calling
-#| eval: false
-muscadet_obj <- cnaCalling(
-    muscadet_obj,
-    omics.coverage = "ATAC", # only ATAC coverage used
+#| eval: true
+exdata_muscadet <- cnaCalling(
+    exdata_muscadet,
     depthmin.a.clusters = 3, # set low thresholds for example data
     depthmin.c.clusters = 5,
     depthmin.a.allcells = 3,
     depthmin.c.allcells = 5,
-    depthmin.c.nor = 0
+    depthmin.c.nor = 1
 )
 ```
 
-:::{.callout-note}
-Filters `depthmin[...]` set by default might not be suited on your data, adapting them is recommended.
+::: {.callout-note}
+The default minimum depth (`depthmin.[...]`) filters may not be suitable for all datasets. It is recommended to inspect your data and adjust these parameters accordingly.
 :::
 
-:::{.callout-note}
-The `omics.coverage` can be set to `"ATAC"` to only use ATAC coverage for CNA detection as DNA signal tends to be less noisy than RNA.
+::: {.callout-note}
+The `omics.coverage` parameter can be set to one or more specific omics types (e.g., `"ATAC"` or `"RNA"`). This allows the CNA calling procedure to prioritize coverage from the selected omics, which can be useful when the signal from other modalities is noisy or less reliable.
 :::
 
 
 # CNA profiles
 
-The resulting CNA calls are visualized using `plotProfile()` that generates a multi-panel profile plot per cluster summarizing:
+The resulting CNA calls can be visualized using `plotProfile()`, which generates a multi-panel profile per cluster summarizing:
 
-* Coverage per feature: log R ratios values of genes/peaks, segment medians and diploid log ratio (purple line) - deviations from 0 indicate gains (positive) or losses (negative) in coverage.
-* Allele data: log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians - deviation from 0 suggests allelic imbalance, useful to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.
-* Copy number calls at each segment - total and minor copy numbers.
-* CNA status classification of each segment - gain, loss or copy-neutral LOH.
-* Fraction of cells estimated to harbor the CNA at each segment.
+* Coverage per feature: log ratios values of genes/peaks, segment medians and diploid log ratio (purple line). Deviations from 0 indicate gains (positive) or losses (negative) in coverage.
+* Allele data: log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians. Deviation from 0 suggests allelic imbalance, used to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.
+* Copy number calls: total and minor copy numbers per segment.
+* CNA status classification: gain, loss or copy-neutral LOH statuses per segment.
+* Cellular fraction: proportion of cells estimated to harbor the CNA at each segment.
 
 
 ```{r}
 #| label: plot profile 1
-plotProfile(muscadet_obj, data = 1, title = "Cluster 1 profile", point.cex = 0.8)
+plotProfile(exdata_muscadet, data = "1", title = "Cluster 1 profile", point.cex = 0.8)
 ```
 
 ```{r}
 #| label: plot profile allcells
-plotProfile(muscadet_obj, data = "allcells", title = "Profile for all cells", point.cex = 0.8)
+plotProfile(exdata_muscadet, data = "allcells", title = "Profile for all cells", point.cex = 0.8)
 ```
 
-The complete CNA profile of the sample across clusters is visualized using `plotCNA()`.
+To view the complete CNA profile of the sample across clusters, use `plotCNA()`.
 
 ```{r}
 #| label: plot CNA
-plotCNA(muscadet_obj)
-plotCNA(muscadet_obj, cf.gradient = FALSE)
+#| warning: false
+plotCNA(exdata_muscadet, cf.gradient = FALSE)
 ```
 
 

@@ -29,6 +29,17 @@ library(dplyr)
 ```
 
 
+Documentation on example data inputs:
+
+* Count matrices: [`?exdata_mat_counts`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.html)
+* Allele counts data frames: [`?exdata_allele_counts`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.html)
+* Features coordinate data frames: [`?exdata_features`](https://icagen.github.io/muscadet/reference/exdata_features.html)
+* Matched bulk coverage (log R ratio): [`?exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.html)
+
+::: {.callout-important}
+## Important note on example data
+The example dataset included in `muscadet` is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.
+:::
 
 # Count matrices {#sec-mat-counts}
 
@@ -36,14 +47,14 @@ The `mat_counts` input is required for muscadet analysis and must be provided wi
 
 This input should be a matrix (sparse `dgCMatrix` or not) of raw read counts with features as rows and cells as columns (@tbl-mat-counts).
 
-See `?mat_counts` for full documentation.
+See `?exdata_mat_counts` for full documentation.
 
 ```{r}
 #| label: tbl-mat-counts
 #| tbl-cap: "Allele counts table example"
 
-data("mat_counts_atac_tumor")
-kable(mat_counts_atac_tumor[698:700,34:36])
+data("exdata_mat_counts_atac_tumor")
+kable(exdata_mat_counts_atac_tumor[1:8, 30:34])
 ```
 
 
@@ -88,33 +99,35 @@ The format follows a Variant Calling Format (VCF)-like structure and should incl
 * `id`: variant identifier (e.g. CHROM_POS_REF_ALT)
 * `CHROM`: chromosome
 * `POS`: position
-* `REF` / `ALT`: reference and alternate alleles
-* `RD` / `AD`: counts for reference and alternate alleles
+* `REF`: reference allele
+* `ALT`: alternate allele
+* `RD`: count for reference allele
+* `AD`: count for alternate allele
 * `DP`: total depth
 * `GT`: genotype *(optional)*
 
-See `?allele_counts` for full documentation.
+See `?exdata_allele_counts` for full documentation.
 
 ```{r}
 #| label: tbl-allele-counts
 #| tbl-cap: "Allele counts table example"
 
-data("allele_counts_atac_tumor")
-kable(head(allele_counts_atac_tumor))
+data("exdata_allele_counts_atac_tumor")
+rownames(exdata_allele_counts_atac_tumor) <- NULL
+kable(head(exdata_allele_counts_atac_tumor))
 ```
-
 
 
 ## Variant positions
 
-Variant positions can be derived from:
+Single variant positions can be derived from:
 
 * Matched bulk sequencing to identify individual-specific heterozygous SNPs, or
 * Reference panels of common SNPs (e.g. gnomAD, 1000G).
 
 ### Individual-specific heterozygous positions from bulk data
 
-Positions can be retrieved by running [FACETS](https://github.com/mskcc/facets)[^1] on matched WGS/WES normal samples. 
+Single heterozygous positions can be retrieved by running [FACETS](https://github.com/mskcc/facets)[^1] on matched WGS/WES normal samples. 
 
 Use `snp-pileup` to extract allele counts from bulk BAM files at known sites (VCF of common SNPs from the [NCBI database](https://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/00-common_all.vcf.gz)). 
 The output of `snp-pileup` can be filtered on depth and allele frequency to keep only heterozygous positions well covered.
@@ -123,15 +136,16 @@ See [FACETS snp-pileup documentation](https://github.com/mskcc/facets/blob/maste
 
 ### Panels of common SNPs
 
-* [gnomAD](https://gnomad.broadinstitute.org/) database (4,099 SNPs): [data here](https://cloud.google.com/life-sciences/docs/resources/public-datasets/gnomad?hl=en)
-* [1000G](https://www.internationalgenome.org/) database (2,548 SNPs): [data here](https://sourceforge.net/projects/cellsnp/files/SNPlist)
+* [gnomAD](https://gnomad.broadinstitute.org/) database: [data here](https://gnomad.broadinstitute.org/downloads)
+* [1000G](https://www.internationalgenome.org/) database: [data here](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
 
 ## Count reads from single cells
 
 [SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)[^2] is used to get read counts per allele from single cell BAM files.
 
+> *From [SCReadCounts documentation](https://horvathlab.github.io/NGS/SCReadCounts/)*:
 > The program `scReadCounts` manages the sequential execution of programs `readCounts` and `readCountsMatrix`, collects the necessary arguments for successful execution, and avoids unnecessary execution of the expensive `readCounts` tool if possible. `readCounts` requires three input files: a pooled single cell alignment, a list of genomic positions of interest, and the barcodes file (barcodes.tsv) . Optionally, `readCounts` can be user-configured for *read filtering* and *cell-barcode handling*, including restriction to barcodes of interest (achieved through specifying barcodes file - barcodes.tsv). `readCounts` utilizes the barcode information from the pooled single cell alignments and **outputs the variant and reference read counts (nvar and nref, respectively), for each barcode (cell), restricted to those present in the barcodes file, in a tab separated text file**. This file is then used as an input for the second program - `readCountsMatrix` - which, upon providing an output prefix, generates two outputs: (1) a cell-position matrix with absolute nvar and nref counts, and (2) a cell-position matrix with the expressed VAFRNA. VAFRNA is estimated at a user-defined threshold of minimum required sequencing reads (minR); default minR = 5. `readCountsMatrix` is time-efficient and can be re-run multiple times at various minR thresholds. Together, these tools facilitate single-cell level assessment of read counts. 
-*From [https://horvathlab.github.io/NGS/SCReadCounts/](https://horvathlab.github.io/NGS/SCReadCounts/)*
+
 
 As the desired output is the tab separated text file with variant and reference read counts for each barcode, the command [`readCounts`](https://horvathlab.github.io/NGS/ReadCounts/) is preferred to avoid unnecessary large matrix outputs from `readCountsMatrix`.
 
@@ -195,14 +209,14 @@ kable(process_allele(readcounts))
 
 A table of features coordinates with 4 columns (`CHROM`, `start`, `end`, `id`) matching features of count matrices (section @sec-mat-counts) is required (@tbl-features).
 
-See `?features` for full documentation.
+See `?exdata_features` for full documentation.
 
 ```{r}
 #| label: tbl-features
 #| tbl-cap: "Features coordinates table example"
 
-data("peaks")
-kable(head(peaks))
+data("exdata_peaks")
+kable(head(exdata_peaks))
 ```
 
 
@@ -261,7 +275,7 @@ colnames(genes_coord) <- c("CHROM", "start", "end", "id")
 library(EnsDb.Hsapiens.v86) # for human
 library(AnnotationDbi)
 
-genes <- rownames(mat_counts_RNA)
+genes <- rownames(exdata_mat_counts_RNA)
 genes_coord <- genes(EnsDb.Hsapiens.v86, filter = GeneNameFilter(genes))
 genes_coord <- as.data.frame(genes_coord)
 genes_coord <- genes_coord[genes_coord$seqnames %in% c(1:22, "X", "Y"), ]
@@ -271,25 +285,25 @@ rownames(genes_coord) <- NULL
 ```
 
 
-## Match cells and features 
-
 :::{.callout-important}
-Cell names (columns) and features names (rows) must match between assays and features coordinates table ids.
-:::
+## Important note: Match cells and features 
 
+Cell names of matrices (rows) must match between assays.
+Features names of matrices (columns) must match with the ids in the features coordinates data frames.
 ```{r}
 #| label: match-ids
 #| eval: false
 
-# Make sure row names of mat_counts match features ids
-identical(rownames(mat_counts_ATAC), peaks_coord[, "id"])
-rownames(mat_counts_ATAC) <- peaks_coord[, "id"]
-
-table(rownames(mat_counts_RNA) %in% genes_coord[, "id"])
-
 # Cell names format must match between different assays
-intersect(colnames(mat_counts_ATAC), colnames(mat_counts_RNA))
+intersect(rownames(mat_counts_ATAC), rownames(mat_counts_RNA))
+
+# Make sure columns names of mat_counts match features ids
+identical(colnames(mat_counts_ATAC), peaks_coord[, "id"])
+colnames(mat_counts_ATAC) <- peaks_coord[, "id"]
+
+table(colnames(mat_counts_RNA) %in% genes_coord[, "id"])
 ```
+:::
 
 
 
@@ -299,14 +313,14 @@ A table of log ratios computed from matched bulk sequencing (e.g. Whole Genome S
 
 Log ratios for bulk sequencing can be obtained through [FACETS](https://github.com/mskcc/facets)[^1] analysis.
 
-See `?bulk_lrr` for full documentation.
+See `?exdata_bulk_lrr` for full documentation.
 
 ```{r}
 #| label: tbl-bulk-lrr
 #| tbl-cap: "Bulk log ratios table example"
 
-data("bulk_lrr")
-kable(head(bulk_lrr))
+data("exdata_bulk_lrr")
+kable(head(exdata_bulk_lrr))
 ```
 
 
