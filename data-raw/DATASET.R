@@ -193,6 +193,7 @@ exdata_genes <- rbind(
 
 # Filter bulk
 exdata_bulk_lrr <- bulk_lrr[bulk_lrr$CHROM %in% chroms, ]
+rownames(exdata_bulk_lrr) <- NULL
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -243,6 +244,10 @@ exdata_allele_counts_atac_ref <- exdata_allele_counts_atac_ref[order(exdata_alle
 exdata_allele_counts_rna_ref <- exdata_allele_counts_rna_ref[exdata_allele_counts_rna_ref[, "id"] %in% var_rna_ref, ]
 exdata_allele_counts_rna_ref <- exdata_allele_counts_rna_ref[order(exdata_allele_counts_rna_ref$CHROM, exdata_allele_counts_rna_ref$POS), ]
 
+rownames(exdata_allele_counts_atac_tumor) <- NULL
+rownames(exdata_allele_counts_rna_tumor) <- NULL
+rownames(exdata_allele_counts_atac_ref) <- NULL
+rownames(exdata_allele_counts_rna_ref) <- NULL
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # muscadet object --------------------------------------------------------------
@@ -343,6 +348,7 @@ exdata_muscadet <- cnaCalling(
 plotProfile(exdata_muscadet, data = 1, title = "Cluster 1 profile", point.cex = 0.8)
 plotProfile(exdata_muscadet, data = 2, title = "Cluster 2 profile", point.cex = 0.8)
 plotProfile(exdata_muscadet, data = "allcells", title = "All cells profile", point.cex = 0.8)
+plotCNA(exdata_muscadet)
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
