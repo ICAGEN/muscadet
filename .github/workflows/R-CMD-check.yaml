@@ -44,6 +44,11 @@ jobs:
         with:
           extra-packages: any::rcmdcheck, any::sessioninfo
           needs: check
+        env:
+          ANY_CRAN_MIRROR: "https://cran.rstudio.com"
+          PKGCACHE_HTTP_RETRIES: "10"
+          options: |
+            list(pkg.type = "both")
 
       - uses: r-lib/actions/check-r-package@v2
         with:
