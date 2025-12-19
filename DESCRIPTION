@@ -37,6 +37,7 @@ Imports:
     dplyr,
     facets (>= 0.6.2),
     fastcluster,
+    GenomeInfoDb,
     GenomicRanges,
     ggplot2,
     grDevices,
