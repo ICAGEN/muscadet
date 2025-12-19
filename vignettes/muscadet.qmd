@@ -29,7 +29,10 @@ library(SeuratObject)
 library(knitr)
 library(dplyr)
 library(ggplot2)
-library(clustree)
+if (requireNamespace("clustree", quietly = TRUE)) {
+  library(clustree)
+}
+has_clustree <- requireNamespace("clustree", quietly = TRUE)
 ```
 
 
@@ -308,10 +311,12 @@ lapply(exdata_muscadet$clustering$clusters, table)
 
 # Clustering visualization
 
-The distribution of cells across clustering partitions at different resolutions can be explored using `clustree()`. 
+The distribution of cells across clustering partitions at different resolutions can be explored using `clustree()` from the [`clustree`](https://lazappi.github.io/clustree/index.html) package. 
 
 ```{r}
 #| label: clustree
+#| eval: !expr has_clustree
+
 library(clustree)
 # Build clustree
 partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
