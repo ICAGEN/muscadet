@@ -227,7 +227,14 @@ and associated data, and <code>params</code> list of parameters used for the fun
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -- computeLogRatio: Method 'ATAC' using computeLogRatioATAC().</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Step 01 - Group peaks in windows: window size set at 10 Mb, sliding by 2 Mb</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: GenomeInfoDb</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .requirePackage(package):</span> unable to load required package ‘GenomeInfoDb’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 02 - Filtering windows: Minimum of 1 peaks per window with a minimum average of 1 read(s)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 03 - Normalization for sequencing depth: Normalized counts per million</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 04 - Log transformation and normalization by reference data: log R ratio</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 05 - Capping the range of values: threshold = 3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 06 - [No step 06 for scATAC-seq]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 07 - Centering of cells</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 08 - Correcting by reference variability</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Done.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># compute log R ratios for RNA</span></span></span>
 <span class="r-in"><span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu">computeLogRatio</span><span class="op">(</span></span></span>

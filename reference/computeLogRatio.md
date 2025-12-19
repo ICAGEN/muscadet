@@ -210,7 +210,14 @@ muscadet <- computeLogRatio(
 #> -- computeLogRatio: Method 'ATAC' using computeLogRatioATAC().
 #> Step 01 - Group peaks in windows: window size set at 10 Mb, sliding by 2 Mb
 #> Loading required namespace: GenomeInfoDb
-#> Error in .requirePackage(package): unable to load required package ‘GenomeInfoDb’
+#> Step 02 - Filtering windows: Minimum of 1 peaks per window with a minimum average of 1 read(s)
+#> Step 03 - Normalization for sequencing depth: Normalized counts per million
+#> Step 04 - Log transformation and normalization by reference data: log R ratio
+#> Step 05 - Capping the range of values: threshold = 3
+#> Step 06 - [No step 06 for scATAC-seq]
+#> Step 07 - Centering of cells
+#> Step 08 - Correcting by reference variability
+#> Done.
 
 # compute log R ratios for RNA
 muscadet <- computeLogRatio(

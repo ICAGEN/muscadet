@@ -210,10 +210,17 @@ obj_atac <- computeLogRatioATAC(
   minPeaks = 1 # low value for example subsampled datasets
 )
 #> Step 01 - Group peaks in windows: window size set at 10 Mb, sliding by 2 Mb
-#> Loading required namespace: GenomeInfoDb
-#> Error in .requirePackage(package): unable to load required package ‘GenomeInfoDb’
+#> Step 02 - Filtering windows: Minimum of 1 peaks per window with a minimum average of 1 read(s)
+#> Step 03 - Normalization for sequencing depth: Normalized counts per million
+#> Step 04 - Log transformation and normalization by reference data: log R ratio
+#> Step 05 - Capping the range of values: threshold = 3
+#> Step 06 - [No step 06 for scATAC-seq]
+#> Step 07 - Centering of cells
+#> Step 08 - Correcting by reference variability
 table(obj_atac$coord$keep)
-#> Error: object 'obj_atac' not found
+#> 
+#> FALSE  TRUE 
+#>   102   155 
 
 # With results form every step when `all_steps = TRUE`
 obj_atac_all <- computeLogRatioATAC(
@@ -226,12 +233,20 @@ obj_atac_all <- computeLogRatioATAC(
   all_steps = TRUE
 )
 #> Step 01 - Group peaks in windows: window size set at 10 Mb, sliding by 2 Mb
-#> Loading required namespace: GenomeInfoDb
-#> Error in .requirePackage(package): unable to load required package ‘GenomeInfoDb’
+#> Step 02 - Filtering windows: Minimum of 1 peaks per window with a minimum average of 1 read(s)
+#> Step 03 - Normalization for sequencing depth: Normalized counts per million
+#> Step 04 - Log transformation and normalization by reference data: log R ratio
+#> Step 05 - Capping the range of values: threshold = 3
+#> Step 06 - [No step 06 for scATAC-seq]
+#> Step 07 - Centering of cells
+#> Step 08 - Correcting by reference variability
 names(obj_atac_all)
-#> Error: object 'obj_atac_all' not found
+#> [1] "step01" "step02" "step03" "step04" "step05" "step07" "step08" "params"
+#> [9] "coord" 
 table(obj_atac_all$coord$keep)
-#> Error: object 'obj_atac_all' not found
+#> 
+#> FALSE  TRUE 
+#>   102   155 
 nrow(obj_atac_all$step08$matTumor)
-#> Error: object 'obj_atac_all' not found
+#> [1] 71
 ```
