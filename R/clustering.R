@@ -80,7 +80,7 @@
 #'   x = exdata_muscadet,
 #'   method = "seurat",
 #'   res_range = c(0.1, 0.3),
-#'   dims_list = list(1:8, 1:8),
+#'   dims_list = list(1:10, 1:10),
 #'   knn_seurat = 10, # adapted to low number of cells in example data
 #'   knn_range_seurat = 30 # adapted to low number of cells in example data
 #' )
@@ -99,12 +99,15 @@
 #' clusters <- exdata_muscadet$clustering$clusters
 #' lapply(clusters, table)
 #'
+#' \dontrun{
+#'
 #' # Plot clustree
 #' library(clustree)
 #' partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
 #' partitions <- do.call(cbind, partitions)
 #' colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
 #' clustree(partitions, prefix = "res_")
+#' }
 #'
 clusterMuscadet <- function(x,
                             method = c("seurat", "hclust"),

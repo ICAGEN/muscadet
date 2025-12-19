@@ -38,7 +38,7 @@ nucleotide polymorphisms (SNPs) positions or individual-specific
 heterozygous positions retrieved from bulk sequencing. The data frame format
 is based on the Variant Calling Format (VCF), thereby it must contain the
 following columns : \code{cell}, \code{CHROM}, \code{POS}, \code{REF}, \code{ALT}, \code{RD}, \code{AD}. See
-\code{\link[=allele_counts]{allele_counts()}} for details.}
+\code{\link[=exdata_allele_counts]{exdata_allele_counts()}} for details.}
 
 \item{label.omic}{Label for the single cell omic (\code{character} string). By
 default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"

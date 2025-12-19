@@ -116,7 +116,7 @@ makeAllelicSparse <- function(allele_counts) {
 #'   allele counts for a specific omic (`list`). The list must have the same
 #'   length and order as the number of omics in the `x` object. Each data frames
 #'   must contain the following columns : `cell`, `id`, `CHROM`, `POS`, `REF`,
-#'   `ALT`, `RD`, `AD`, `DP`, `GT`. See [allele_counts] for details.
+#'   `ALT`, `RD`, `AD`, `DP`, `GT`. See [exdata_allele_counts] for details.
 #'
 #' @return
 #' A modified [`muscadet`][muscadet-class] object with updated allele counts in the
@@ -127,7 +127,7 @@ makeAllelicSparse <- function(allele_counts) {
 #' ratios and cell clustering, they are not mandatory at the creation of
 #' `muscomic` and `muscadet` objects. The allele counts data can be added to
 #' objects later with this `addAlleleCounts` function, before using the
-#' [mergeCounts()] function.
+#' [aggregateCounts()] function.
 #'
 #' This function is also useful to add allele counts for individual-specific
 #' variant positions to a common `muscadet` object, for example for the
@@ -137,10 +137,7 @@ makeAllelicSparse <- function(allele_counts) {
 #' counts at individual-specific variant positions (e.g. found by bulk
 #' sequencing) before Copy Number Alterations (CNAs) calling.
 #'
-#' @seealso [CreateMuscomicObject()], [mergeCounts()]
-#'
-#' @importFrom stringr str_remove
-#' @importFrom gtools mixedsort
+#' @seealso [CreateMuscomicObject()], [aggregateCounts()]
 #'
 #' @export
 #'

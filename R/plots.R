@@ -1401,6 +1401,11 @@ plotIndexes <- function(x,
 #' # Load example muscadet object
 #' # data("exdata_muscadet")
 #'
+#' # Plot profile for first cluster
+#' pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
+#' plotProfile(exdata_muscadet, data = "1", title = "Example dataset - cluster 1")
+#' dev.off()
+#'
 #' # Plot profile for all cells
 #' pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
 #' plotProfile(exdata_muscadet, data = "allcells", title = "Example dataset - all cells")

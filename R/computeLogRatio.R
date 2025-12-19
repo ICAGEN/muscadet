@@ -723,7 +723,7 @@ computeLogRatioATAC <- function(matTumor,
 #'  reference cells (`matrix`).}
 #'  \item{`params`}{List of parameters set for the `genesPerWindow`, `refMeans`,
 #'  `refMeanReads` and `thresh_capping` arguments (`list`).}
-#'  \item{`coord`}{Data frame of coordinates for windows of peaks and associated
+#'  \item{`coord`}{Data frame of coordinates for genes and associated
 #'  data along the different steps (`data.frame`).
 #'  Columns :
 #'  - `CHROM`, `start`, `end`, `id`: coordinates and name of genes.
@@ -1139,7 +1139,7 @@ computeLogRatioRNA <- function(matTumor,
 #' coordinates.
 #'
 #' @seealso
-#' - example data: \code{\link{bulk_lrr}}
+#' - example data: \code{\link{exdata_bulk_lrr}}
 #' - functions: \code{\link{muscomic}}, \code{\link{muscadet}}
 #'
 #' @importFrom GenomicRanges GRanges findOverlaps

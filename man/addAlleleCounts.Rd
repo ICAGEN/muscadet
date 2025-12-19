@@ -13,7 +13,7 @@ addAlleleCounts(x, allele_counts)
 allele counts for a specific omic (\code{list}). The list must have the same
 length and order as the number of omics in the \code{x} object. Each data frames
 must contain the following columns : \code{cell}, \code{id}, \code{CHROM}, \code{POS}, \code{REF},
-\code{ALT}, \code{RD}, \code{AD}, \code{DP}, \code{GT}. See \link{allele_counts} for details.}
+\code{ALT}, \code{RD}, \code{AD}, \code{DP}, \code{GT}. See \link{exdata_allele_counts} for details.}
 }
 \value{
 A modified \code{\link[=muscadet-class]{muscadet}} object with updated allele counts in the
@@ -29,7 +29,7 @@ As the allele counts are not used for computing log R
 ratios and cell clustering, they are not mandatory at the creation of
 \code{muscomic} and \code{muscadet} objects. The allele counts data can be added to
 objects later with this \code{addAlleleCounts} function, before using the
-\code{\link[=mergeCounts]{mergeCounts()}} function.
+\code{\link[=aggregateCounts]{aggregateCounts()}} function.
 
 This function is also useful to add allele counts for individual-specific
 variant positions to a common \code{muscadet} object, for example for the
@@ -54,5 +54,5 @@ exdata_muscadet_ref <- addAlleleCounts(
 
 }
 \seealso{
-\code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}, \code{\link[=mergeCounts]{mergeCounts()}}
+\code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}, \code{\link[=aggregateCounts]{aggregateCounts()}}
 }

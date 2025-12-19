@@ -57,7 +57,7 @@ tumor/sample cells (\code{matrix}).}
 reference cells (\code{matrix}).}
 \item{\code{params}}{List of parameters set for the \code{genesPerWindow}, \code{refMeans},
 \code{refMeanReads} and \code{thresh_capping} arguments (\code{list}).}
-\item{\code{coord}}{Data frame of coordinates for windows of peaks and associated
+\item{\code{coord}}{Data frame of coordinates for genes and associated
 data along the different steps (\code{data.frame}).
 Columns :
 \itemize{

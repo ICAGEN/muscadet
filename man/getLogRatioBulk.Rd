@@ -47,7 +47,7 @@ head(features_bulk_lrr)
 }
 \seealso{
 \itemize{
-\item example data: \code{\link{bulk_lrr}}
+\item example data: \code{\link{exdata_bulk_lrr}}
 \item functions: \code{\link{muscomic}}, \code{\link{muscadet}}
 }
 }

@@ -51,7 +51,7 @@ cnaCalling(
 \item Clustering assignments in the \code{cnacalling$clusters} slot
 (use \code{\link[=assignClusters]{assignClusters()}}).
 \item Combined allelic and coverage counts per cluster in the
-\code{cnacalling$combined.counts} slot (use \code{\link[=mergeCounts]{mergeCounts()}}).
+\code{cnacalling$combined.counts} slot (use \code{\link[=aggregateCounts]{aggregateCounts()}}).
 }}
 
 \item{omics.coverage}{A vector of omics names to select for coverage log R
@@ -222,5 +222,5 @@ doi: \href{https://www.doi.org/10.1093/nar/gkw520}{10.1093/nar/gkw520}. PMID:
 }
 }
 \seealso{
-\code{\link[=assignClusters]{assignClusters()}}, \code{\link[=mergeCounts]{mergeCounts()}},\code{\link[=preProcSample2]{preProcSample2()}}
+\code{\link[=assignClusters]{assignClusters()}}, \code{\link[=aggregateCounts]{aggregateCounts()}},\code{\link[=preProcSample2]{preProcSample2()}}
 }

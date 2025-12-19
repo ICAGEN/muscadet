@@ -313,7 +313,7 @@ aggregateCounts <- function(x,
         # Unique cluster labels
         ucl <- unique(cl)
 
-        # Build cluster × cell indicator matrix
+        # Build cluster x cell indicator matrix
         I <- Matrix::sparseMatrix(
             i = match(cl, ucl),
             j = seq_along(cl),
@@ -606,7 +606,7 @@ aggregateCounts <- function(x,
 #'   - Clustering assignments in the `cnacalling$clusters` slot
 #'   (use [assignClusters()]).
 #'   - Combined allelic and coverage counts per cluster in the
-#'   `cnacalling$combined.counts` slot (use [mergeCounts()]).
+#'   `cnacalling$combined.counts` slot (use [aggregateCounts()]).
 #' @param omics.coverage A vector of omics names to select for coverage log R
 #'   ratio data. RECOMMENDED: select "ATAC" when ATAC and RNA omics are
 #'   available, the ATAC coverage (DNA) signal is less noisy than RNA signal. By
@@ -724,7 +724,7 @@ aggregateCounts <- function(x,
 #'   \item \code{ploidy}: Ploidy used for the CNA analysis.
 #' }
 #'
-#' @seealso [assignClusters()], [mergeCounts()],[preProcSample2()]
+#' @seealso [assignClusters()], [aggregateCounts()],[preProcSample2()]
 #'
 #' @source This function uses several functions from the
 #'   [`facets`][facets::facets-package] package, including:

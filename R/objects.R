@@ -124,7 +124,7 @@ methods::setClass(
 #'   heterozygous positions retrieved from bulk sequencing. The data frame format
 #'   is based on the Variant Calling Format (VCF), thereby it must contain the
 #'   following columns : `cell`, `CHROM`, `POS`, `REF`, `ALT`, `RD`, `AD`. See
-#'   [allele_counts()] for details.
+#'   [exdata_allele_counts()] for details.
 #' @param label.omic Label for the single cell omic (`character` string). By
 #'   default "scATAC-seq" is used for "ATAC" type and "scRNA-seq" for "RNA"
 #'   type.
