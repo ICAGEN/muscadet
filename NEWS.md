@@ -1,3 +1,37 @@
+# muscadet 0.2.0
+
+### Additions
+- Changes in `muscomic` objects to optimize storage and computation, by avoiding long-format tables in favors of sparse matrices and by reworking the object structure. **muscadet and muscomic objects from previous versions are not supported by this version.**
+	- `CreateMuscomicObject()` now expects input `mat_counts` as **cells x features** (instead of features x cells).
+	- `muscomic` object new structure:
+		- **coverage slot** now contains `counts` and `logratio` layers, each with:
+			- `mat`: matrix of counts or log ratio *cells × features* (sparse or dense depending on data type).
+			- `coord.features`: coordinates of features matching the matrix.
+			- `label.features`: feature type labels matching counts or log ratio.
+		- **allelic slot** now contains 3 elements:
+			- `mat.RD`: sparse matrix of reference allele counts *cells x features*.
+			- `mat.AD`: sparse matrix of alternate allele counts *cells x features*.
+			- `coord.vars`: coordinates of variant positions matching the matrices.
+	Implemented new function `makeAllellicSparse()` to transform of long-format table (input) into sparse matrices. Updated `addAlleleCounts()` `CreateMuscomicObject()` for sparse format.
+	- All package functions have been updated consequently to support the new format.
+	- Implemented `aggregateCounts()` to replace `mergeCounts()` and support the new format.
+	- Updated function examples, tests, and documentation consequently.
+- `clusterMuscadet()` with Seurat-based clustering now supports `leiden_method` argument:
+    - Default `"igraph"` implementation; `"leidenbase"` also available.
+    - Seurat dependency set to **v5.3.1**.
+    - Added `random.seed` argument for reproducible clustering (default set to 1).
+- Updated example dataset objects `exdata`: subset of cells and subset of features/variant on 3 chromosomes for object size optimization. Updated function examples and vignettes consequently.
+
+### Deprecated and Defunct
+- `mergeCounts()` removed in favor of `aggregateCounts()`.
+
+### Bug Fixes, Minor Updates
+- `cnaCalling()` refactored to handle separate aggregation and filtering of allelic and coverage counts.
+- Fixed handling of clusters in character format for `aggregateCounts()` outputs.
+- `cnaCalling()` `ndepth` argument default set to 1 to remove zero-depth allelic positions.
+- `quiet` argument is now correctly propagated in `clusterMuscadet()`.
+- Fix, move (from Imports to Suggests) and remove some dependencies.
+
 # muscadet 0.1.3
 
 ### Bug Fixes

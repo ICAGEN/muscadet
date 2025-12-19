@@ -45,7 +45,7 @@ To cite the `muscadet` package in publications, use:
 
 > Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2025). _muscadet:
 Multiomics Single-Cell Copy Number Alterations Detection_. R package version
-0.1.3, https://icagen.github.io/muscadet/, <https://github.com/ICAGEN/muscadet>.
+0.2.0, https://icagen.github.io/muscadet/, <https://github.com/ICAGEN/muscadet>.
 
 
 ### Communications
