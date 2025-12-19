@@ -44,6 +44,9 @@
 #' @export
 makeAllelicSparse <- function(allele_counts) {
 
+    # Bind variables (for data.table use)
+    CHROM <- POS <- REF <- ALT <- NULL
+
     # Check input columns
     required_cols <- c("cell", "CHROM", "POS", "REF", "ALT", "RD", "AD")
     stopifnot(
@@ -91,7 +94,7 @@ makeAllelicSparse <- function(allele_counts) {
     )
 
     # Extract variant coordinates and metadata
-    coord.vars <- dt[match(loci, id), .(id, CHROM, POS, REF, ALT)]
+    coord.vars <- dt[match(loci, id), list(id, CHROM, POS, REF, ALT)]
 
     # Correct types and reorder
     coord.vars[, CHROM := ordered(CHROM, levels = chromorder[chromorder %in% unique(CHROM)])]

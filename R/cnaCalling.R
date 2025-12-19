@@ -298,6 +298,11 @@ aggregateCounts <- function(x,
     # Reset CNA calling results to avoid discordant outputs
     x@cnacalling <- list(clusters = x@cnacalling$clusters)
 
+    if (!quiet) {
+        table <- table(x@cnacalling$clusters)
+        message(paste("Clusters used:", paste(names(table), paste0("(", table, " cells", ")"), collapse = ", ")))
+    }
+
     # Helper functions ---------------------------------------------------------
 
     ## Aggregate counts from cells to clusters counts in sparse matrices ---
@@ -332,32 +337,34 @@ aggregateCounts <- function(x,
     ## Extract per-cluster allelic counts for sample cells ---
     extract_allelic_for_sample <- function(x) {
 
+        # Bind variables (for data.table use)
+        RD.omic <- AD.omic <- DP.omic <- NULL
+        cluster <- omic <- CHROM <- POS <- DP <- NULL
+
+        # Extract clusters
         clusters <- x@cnacalling$clusters
 
+        # Sum across cells per cluster and per omic
         res <- data.table::rbindlist(lapply(names(x@omics), function(omic_name) {
             allelic <- x@omics[[omic_name]]@allelic
             RD <- allelic$mat.RD
             AD <- allelic$mat.AD
             cells <- rownames(RD)
-            coord.vars <- allelic$coord.vars
+            coord <- allelic$coord.vars
 
             # Keep only tumor cells with cluster assignments
             keep_cells <- cells %in% names(clusters)
-            cells <- cells[keep_cells]
 
             # Keep only loci with information
             keep_loci <- which(colSums(RD != 0) > 0 | colSums(AD != 0) > 0)
-            coord.vars <- coord.vars[keep_loci, ]
 
             RD <- RD[keep_cells, keep_loci, drop = FALSE]
             AD <- AD[keep_cells, keep_loci, drop = FALSE]
-
+            coord <- coord[keep_loci, ]
 
             # aggregate sparse
-            agg_RD <- aggregate_sparse_counts(RD, cells, clusters)
-            agg_AD <- aggregate_sparse_counts(AD, cells, clusters)
-
-            # DP
+            agg_RD <- aggregate_sparse_counts(RD, cells[keep_cells], clusters)
+            agg_AD <- aggregate_sparse_counts(AD, cells[keep_cells], clusters)
             agg_DP <- agg_RD + agg_AD
 
             # convert to long format
@@ -366,9 +373,9 @@ aggregateCounts <- function(x,
 
             dt <- data.table::data.table(
                 cluster = rep(rownames(agg_DP), each = nloci),
-                id = rep(coord.vars$id, times = ncl),
-                CHROM = rep(coord.vars$CHROM, times = ncl),
-                POS = rep(coord.vars$POS, times = ncl),
+                id = rep(coord$id, times = ncl),
+                CHROM = rep(coord$CHROM, times = ncl),
+                POS = rep(coord$POS, times = ncl),
                 omic = omic_name,
                 RD.omic = as.vector(Matrix::t(agg_RD)),
                 AD.omic = as.vector(Matrix::t(agg_AD)),
@@ -379,47 +386,48 @@ aggregateCounts <- function(x,
         }))
 
         # Sum across omics
-        res <- res[, .(
+        res <- res[, list(
             RD = sum(RD.omic, na.rm = TRUE),
             AD = sum(AD.omic, na.rm = TRUE),
             DP = sum(DP.omic, na.rm = TRUE)
-        ), by = .(cluster, id, omic, CHROM, POS)][DP > 0]
+        ), by = list(cluster, id, omic, CHROM, POS)][DP > 0]
 
         # Sort data
-        res <- res[order(res$CHROM, res$POS), ]
+        res <- res[order(res$CHROM, res$POS, res$cluster), ]
 
         return(as.data.frame(res))
     }
 
     ## Extract allelic counts for reference cells ---
     extract_allelic_for_ref <- function(reference) {
+
+        # Bind variables (for data.table use)
+        RD.omic <- AD.omic <- DP.omic <- NULL
+        omic <- CHROM <- POS <- DP <- NULL
+
+        # Sum across cells per omic
         res <- data.table::rbindlist(lapply(names(reference@omics), function(omic_name) {
 
             allelic <- reference@omics[[omic_name]]@allelic
-            coord.vars <- allelic$coord.vars
-
-            # sum across all cells (vectorized)
-            RD.omic <- colSums(allelic$mat.RD)
-            AD.omic <- colSums(allelic$mat.AD)
-            DP.omic <- RD.omic + AD.omic
+            coord <- allelic$coord.vars
 
             data.table::data.table(
-                id = coord.vars$id,
-                CHROM = coord.vars$CHROM,
-                POS = coord.vars$POS,
+                id = coord$id,
+                CHROM = coord$CHROM,
+                POS = coord$POS,
                 omic = omic_name,
-                RD.omic = RD.omic,
-                AD.omic = AD.omic,
-                DP.omic = DP.omic
+                RD.omic = colSums(allelic$mat.RD),
+                AD.omic = colSums(allelic$mat.AD),
+                DP.omic = colSums(allelic$mat.RD + allelic$mat.AD)
             )
         }))
 
         # Sum across omics
-        res <- res[, .(
+        res <- res[, list(
             RD = sum(RD.omic, na.rm = TRUE),
             AD = sum(AD.omic, na.rm = TRUE),
             DP = sum(DP.omic, na.rm = TRUE)
-        ), by = .(id, omic, CHROM, POS)]
+        ), by = list(id, omic, CHROM, POS)]
 
         # Sort data
         res <- res[order(res$CHROM, res$POS), ]
@@ -430,8 +438,13 @@ aggregateCounts <- function(x,
     ## Extract per-cluster coverage counts for sample cells ---
     extract_coverage_for_sample <- function(x) {
 
+        # Bind variables (for data.table use)
+        DP.omic <- cluster <- omic <- CHROM <- POS <- DP <- NULL
+
+        # Extract clusters
         clusters <- x@cnacalling$clusters
 
+        # Sum across cells per cluster and per omic
         res <- data.table::rbindlist(lapply(names(x@omics), function(omic_name) {
 
             coverage <- x@omics[[omic_name]]@coverage
@@ -441,16 +454,15 @@ aggregateCounts <- function(x,
 
             ## Keep only tumor cells with clusters
             keep_cells <- cells %in% names(clusters)
-            cells <- cells[keep_cells]
 
             ## Remove features with zero coverage across cells
             keep_loci <- which(colSums(mat != 0) > 0)
-            coord <- coord[keep_loci, ]
 
             mat <- mat[keep_cells, keep_loci, drop = FALSE]
+            coord <- coord[keep_loci, ]
 
             ## Aggregate counts by cluster
-            agg_DP <- aggregate_sparse_counts(mat, cells, clusters)
+            agg_DP <- aggregate_sparse_counts(mat, cells[keep_cells], clusters)
 
             ncl <- nrow(agg_DP)
             nloci <- ncol(agg_DP)
@@ -458,10 +470,10 @@ aggregateCounts <- function(x,
             ## Build long table
             dt <- data.table::data.table(
                 cluster = rep(rownames(agg_DP), each = nloci),
-                id      = rep(coord$id, times = ncl),
-                CHROM   = rep(coord$CHROM, times = ncl),
-                POS     = rep(round((coord$start + coord$end)/2), times = ncl),
-                omic    = omic_name,
+                id = rep(coord$id, times = ncl),
+                CHROM = rep(coord$CHROM, times = ncl),
+                POS = rep(round((coord$start + coord$end)/2), times = ncl),
+                omic = omic_name,
                 DP.omic  = as.vector(Matrix::t(agg_DP))   # row-major flattening
             )
 
@@ -471,9 +483,9 @@ aggregateCounts <- function(x,
         }))
 
         # Sum across omics
-        res <- res[, .(
+        res <- res[, list(
             DP = sum(DP.omic, na.rm = TRUE)
-        ), by = .(cluster, id, omic, CHROM, POS)][DP > 0]
+        ), by = list(cluster, id, omic, CHROM, POS)][DP > 0]
 
         # Sort data
         res <- res[order(res$CHROM, res$POS, res$cluster), ]
@@ -484,6 +496,10 @@ aggregateCounts <- function(x,
     ## Extract coverage counts for reference cells ---
     extract_coverage_for_ref <- function(reference) {
 
+        # Bind variables (for data.table use)
+        DP.omic <- cluster <- omic <- CHROM <- POS <- DP <- NULL
+
+        # Sum across cells per omic
         res <- data.table::rbindlist(lapply(names(reference@omics), function(omic_name) {
 
             coverage <- reference@omics[[omic_name]]@coverage
@@ -505,7 +521,7 @@ aggregateCounts <- function(x,
         }))
 
         # Sum across omics
-        res <- res[, .(DP = sum(DP.omic, na.rm = TRUE)), by = .( id, omic, CHROM, POS)]
+        res <- res[, list(DP = sum(DP.omic, na.rm = TRUE)), by = list( id, omic, CHROM, POS)]
 
         # Sort data
         res <- res[order(res$CHROM, res$POS), ]
@@ -878,7 +894,7 @@ cnaCalling <- function(
 
     msg("Initial number of positions: ", nrow(rcmat))
 
-    allelic_raw  <- dplyr::filter(rcmat, .data$signal == "allelic", omic == "ATAC")
+    allelic_raw  <- dplyr::filter(rcmat, .data$signal == "allelic")
     coverage_raw <- dplyr::filter(rcmat, .data$signal == "coverage")
 
     msg("Initial number of allelic positions: ", nrow(allelic_raw))
@@ -891,6 +907,7 @@ cnaCalling <- function(
 
         msg("Integrating omics...")
 
+        cols <- colnames(allelic_raw)[1:8]
         allelic_raw <- allelic_raw %>%
             dplyr::group_by(.data$Chromosome, .data$Position, .data$cluster, .data$signal) %>%
             dplyr::summarise(
@@ -899,15 +916,14 @@ cnaCalling <- function(
                 TUM.DP = sum(.data$TUM.DP, na.rm = TRUE),
                 TUM.RD = sum(.data$TUM.RD, na.rm = TRUE),
                 .groups = "drop"
-            ) %>%
-            dplyr::relocate(signal, .after = TUM.RD) %>%
-            dplyr::relocate(cluster, .after = signal)
+            )
+        allelic_raw <- allelic_raw[, cols] # reorder columns
     } else {
-        allelic_raw <- allelic_raw %>% dplyr::select(-omic, -id)
+        allelic_raw <- allelic_raw %>% dplyr::select(-"omic", -"id")
     }
 
     # Filter allelic counts
-    msg("Filtering allelic positions: tumor depth ≥ ", depthmin.a.clusters, " reads")
+    msg("Filtering allelic positions: tumor depth >= ", depthmin.a.clusters, " reads")
 
     allelic_rcmat <- allelic_raw %>%
         dplyr::filter(.data$TUM.DP >= depthmin.a.clusters) %>%
@@ -932,15 +948,15 @@ cnaCalling <- function(
     }
 
     # Filter coverage counts
-    msg("Filtering coverage positions: tumor depth ≥ ", depthmin.c.clusters, " reads")
-    msg("Filtering coverage positions: normal depth ≥ ", depthmin.c.nor, " reads")
+    msg("Filtering coverage positions: tumor depth >= ", depthmin.c.clusters, " reads")
+    msg("Filtering coverage positions: normal depth >= ", depthmin.c.nor, " reads")
 
     coverage_rcmat <- coverage_raw %>%
         dplyr::filter(
             .data$TUM.DP >= depthmin.c.clusters,
             .data$NOR.DP >= depthmin.c.nor
         ) %>%
-        dplyr::select(-c(omic, id)) %>%
+        dplyr::select(-c("omic", "id")) %>%
         dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
 
     coverage_rcmat <- na.omit(coverage_rcmat)
@@ -1124,6 +1140,7 @@ cnaCalling <- function(
 
     msg("Aggregating allelic counts of all cells...")
 
+    cols <- colnames(allelic_raw)[1:8]
     allelic_raw_allcells <- allelic_raw %>%
         dplyr::group_by(.data$Chromosome, .data$Position, .data$signal) %>%
         dplyr::summarise(
@@ -1133,10 +1150,10 @@ cnaCalling <- function(
             TUM.RD = sum(.data$TUM.RD, na.rm = TRUE),
             .groups = "drop"
         ) %>%
-        dplyr::mutate(cluster = "allcells") %>%
-        dplyr::relocate(signal, .after = cluster)
+        dplyr::mutate(cluster = "allcells")
+    allelic_raw_allcells <- allelic_raw_allcells[, cols] # reorder columns
 
-    msg("Filtering allelic positions: tumor depth ≥ ", depthmin.a.allcells, " reads")
+    msg("Filtering allelic positions: tumor depth >= ", depthmin.a.allcells, " reads")
 
     allelic_rcmat_allcells <- allelic_raw_allcells %>%
         dplyr::filter(.data$TUM.DP >= depthmin.a.allcells) %>%
@@ -1151,6 +1168,7 @@ cnaCalling <- function(
 
     msg("Aggregating coverage counts of all cells...")
 
+    cols <- colnames(coverage_raw)[1:8]
     coverage_raw_allcells <- coverage_raw %>%
         dplyr::group_by(.data$Chromosome, .data$Position, .data$signal) %>%
         dplyr::summarise(
@@ -1160,12 +1178,11 @@ cnaCalling <- function(
             TUM.RD = sum(.data$TUM.RD, na.rm = TRUE),
             .groups = "drop"
         ) %>%
-        dplyr::mutate(cluster = "allcells") %>%
-        dplyr::relocate(cluster, .after = TUM.RD) %>%
-        dplyr::relocate(signal, .after = cluster)
+        dplyr::mutate(cluster = "allcells")
+    coverage_raw_allcells <- coverage_raw_allcells[, cols] # reorder columns
 
-    msg("Filtering coverage positions: tumor depth ≥ ", depthmin.c.allcells, " reads")
-    msg("Filtering coverage positions: normal depth ≥ ", depthmin.c.nor, " reads")
+    msg("Filtering coverage positions: tumor depth >= ", depthmin.c.allcells, " reads")
+    msg("Filtering coverage positions: normal depth >= ", depthmin.c.nor, " reads")
 
     coverage_rcmat_allcells <- coverage_raw_allcells %>%
         dplyr::filter(
@@ -1287,7 +1304,8 @@ cnaCalling <- function(
     # 3. GET CONSENSUS SEGMENTS ------------------------------------------------
     # ==========================================================================
 
-    msg("Finding consensus segments between clusters...")
+    msg("- Consensus segments accross clusters -")
+    msg("Finding consensus segments...")
 
     consensus_segs <- getSegConsensus(out_full,
                                       ncells = ncells,
@@ -1326,6 +1344,8 @@ cnaCalling <- function(
         dplyr::mutate(cna_clonal = any(.data$cna_clonal)) %>%
         unique()
 
+    msg(paste(nrow(consensus_segs), "consensus segments identified,", sum(consensus_segs$cna), "CNA segments identified"))
+
     # ==========================================================================
     # SAVE OBJECTS -------------------------------------------------------------
 
@@ -1340,6 +1360,8 @@ cnaCalling <- function(
     x@cnacalling[["ploidy.clusters"]] <- fit_full$ploidy
     x@cnacalling[["ploidy.allcells"]] <- fit_allcells$ploidy
     x@cnacalling[["ploidy"]] <- ploidy
+
+    msg("Done.")
 
     return(x)
 }
@@ -1425,7 +1447,7 @@ cnaCalling <- function(
 #' # data("exdata_muscadet")
 #'
 #' counts <- exdata_muscadet$cnacalling$combined.counts
-#' counts <- counts[complete.cases(counts),]
+#' counts <- counts[complete.cases(counts), 1:8]
 #' counts_clus <- counts[which(counts$cluster == 1),]
 #' result <- preProcSample2(counts_clus)
 #'
@@ -1442,6 +1464,12 @@ preProcSample2 <- function(
 
     # rcmat correct format
     rcmat <- as.data.frame(rcmat)
+
+    cols <- c("Chromosome", "Position", "NOR.DP", "NOR.RD", "TUM.DP", "TUM.RD", "cluster", "signal")
+    stopifnot(
+        "The `rcmat` must contain the required columns in the correct order." =
+            all(colnames(rcmat) == cols)
+    )
 
     gbuild <- match.arg(gbuild, c("hg19", "hg38", "mm10"))
 
@@ -1568,10 +1596,7 @@ preProcSample2 <- function(
 #'   - `end`: End position of the consensus segment.
 #'
 #' @import dplyr
-#' @importFrom GenomicRanges GRanges
-#' @importFrom GenomicRanges findOverlaps
-#' @importFrom GenomicRanges reduce
-#' @importFrom S4Vectors subjectHits
+#' @importFrom GenomicRanges GRanges findOverlaps reduce
 #' @importFrom rlang .data
 #'
 #' @export
@@ -1636,11 +1661,12 @@ getSegConsensus <- function(x, ncells, dist.breakpoints = 1e6) {
     ))
 
     # Find clusters of breakpoints (named "group" here to distinguish from the clusters of cells)
-    breakpoints$group <- S4Vectors::subjectHits(GenomicRanges::findOverlaps(
+    hits <- GenomicRanges::findOverlaps(
         breakpoints,
         GenomicRanges::reduce(breakpoints, min.gapwidth = dist.breakpoints)
-    ))
+    )
     breakpoints <- as.data.frame(breakpoints)
+    breakpoints$group <- hits@to
 
     # Order clusters of cells from the smallest to the largest
     breakpoints$cluster <- factor(breakpoints$cluster,
@@ -1786,11 +1812,14 @@ annotateSegments <- function(
 
     # Annotate consensus segments data for each cluster
     out.segs <- Map(function(cluster) {
-        clusGR <- GenomicRanges::GRanges(segs[segs$cluster == cluster, ])
+
+        segs_clus <- segs[segs$cluster == cluster, ]
+        segsGR <- GenomicRanges::GRanges(segs_clus[, c("chrom", "start", "end")])
+        consensGR <- GenomicRanges::GRanges(consensus_segs[, c("chrom", "start", "end")])
 
         idx_segs <- GenomicRanges::findOverlaps(
-            GenomicRanges::GRanges(consensus_segs),
-            clusGR,
+            consensGR,
+            segsGR,
             minoverlap = minoverlap,
             select = "first"
         )
@@ -1798,8 +1827,10 @@ annotateSegments <- function(
 
         cbind(consensus_segs[valid_idx, ],
               data.frame(id = which(valid_idx)),
-              as.data.frame(clusGR)[idx_segs[valid_idx], -c(1:5)])
-    }, unique(sort(segs$cluster)))
+              segs_clus[idx_segs[valid_idx], -c(1:3)])
+    },
+    unique(sort(segs$cluster))
+    )
 
     out.segs <- Reduce(rbind, out.segs)
 

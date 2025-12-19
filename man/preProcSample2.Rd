@@ -87,7 +87,7 @@ library(facets)
 # data("exdata_muscadet")
 
 counts <- exdata_muscadet$cnacalling$combined.counts
-counts <- counts[complete.cases(counts),]
+counts <- counts[complete.cases(counts), 1:8]
 counts_clus <- counts[which(counts$cluster == 1),]
 result <- preProcSample2(counts_clus)
 

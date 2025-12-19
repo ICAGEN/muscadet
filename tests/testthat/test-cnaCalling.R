@@ -84,7 +84,7 @@ test_that("preProcSample2() returns a correct ouput", {
     data("exdata_muscadet", package = "muscadet")
 
     counts <- exdata_muscadet$cnacalling$combined.counts
-    counts <- counts[complete.cases(counts),]
+    counts <- counts[complete.cases(counts), 1:8]
     counts_clus <- counts[which(counts$cluster == 1),]
 
     result <- preProcSample2(counts_clus)

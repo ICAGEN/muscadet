@@ -387,6 +387,13 @@ cluster_seurat <- function(mat_list,
         stop("`knn_range_seurat` must be an integer >= 2.")
     }
 
+    if (!quiet) {
+        message(paste("Resolutions to compute:", paste(res_range, collapse = ", ")))
+        message(paste("Number of selected dimensions:",paste(lapply(dims_list, max), collapse = ", ")))
+        algos <- c("Original Louvain", "Louvain multilevel", "SLM", "Leiden")
+        message(paste("Clustering algorithm selected:", algorithm, paste0("(", algos[algorithm], ")")))
+    }
+
     # Initialize output
     out <- list()
 
@@ -703,6 +710,12 @@ cluster_hclust <- function(mat_list,
     stopifnot("Length of `weights` must match the number of omics in `mat_list`." = length(weights) == length(mat_list))
     if (!is.numeric(k_range) || any(k_range < 1) || any(k_range != as.integer(k_range))) {
         stop("`k_range` must be a numeric vector of integers greater than or equal to 2.")
+    }
+
+    if (!quiet) {
+        message(paste("Partitions k to compute:", paste(k_range, collapse = ", ")))
+        message(paste("Distance method selected:", dist_method))
+        message(paste("Hierarchical clustering method selected:", hclust_method))
     }
 
     # Initialize output

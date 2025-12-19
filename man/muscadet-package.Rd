@@ -3,11 +3,11 @@
 \docType{package}
 \name{muscadet-package}
 \alias{muscadet-package}
-\title{muscadet: Multiomics Single-cell Copy number Alterations Detection}
+\title{muscadet: Multiomics Single-Cell Copy Number Alterations Detection}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.
+Copy number alterations (CNAs) inference in cancer cells from single-cell multiomics data.
 }
 \seealso{
 Useful links:
@@ -24,9 +24,9 @@ Useful links:
 Authors:
 \itemize{
   \item Nils Giordano \email{nils.giordano@univ-nantes.fr} (\href{https://orcid.org/0000-0003-2549-6631}{ORCID})
-  \item Eric Letouzé \email{eric.letouze@gmail.com} (\href{https://orcid.org/0000-0002-6369-2839}{ORCID})
-  \item Céline Vallot \email{celine.vallot@curie.fr} (\href{https://orcid.org/0000-0003-1601-2359}{ORCID})
   \item Stéphane Minvielle \email{stephane.minvielle@univ-nantes.fr} (\href{https://orcid.org/0000-0003-1389-312X}{ORCID})
+  \item Céline Vallot \email{celine.vallot@curie.fr} (\href{https://orcid.org/0000-0003-1601-2359}{ORCID})
+  \item Eric Letouzé \email{eric.letouze@gmail.com} (\href{https://orcid.org/0000-0002-6369-2839}{ORCID})
 }
 
 Other contributors:

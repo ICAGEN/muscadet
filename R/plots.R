@@ -1152,9 +1152,6 @@ plotSil <- function(x,
 #' @import ggplot2
 #' @importFrom stats as.dist
 #' @importFrom cluster silhouette
-#' @importFrom fpc cluster.stats
-#' @importFrom clusterSim index.DB index.C
-#' @importFrom tidyr pivot_longer
 #' @importFrom rlang .data
 #'
 #' @export
@@ -1176,7 +1173,7 @@ plotSil <- function(x,
 #' }
 #'
 plotIndexes <- function(x,
-                        index = NULL,
+                        index = "silhouette",
                         colors = NULL,
                         title = NULL) {
     # Validate input: x must be a muscadet object
@@ -1232,28 +1229,35 @@ plotIndexes <- function(x,
     for (p in partitions) {
         # Extract cluster assignments for the current partition
         clusters <- x@clustering$clusters[[as.character(p)]]
-        clusters <- clusters[names(dist)] # Restrict to common cells in dist
+        clusters <- clusters[labels(dist)] # Restrict to common cells in dist
 
         # Compute each index if selected
         if ("silhouette" %in% index) {
-            df_indexes[df_indexes$partition == p, "silhouette"] <-
-                summary(cluster::silhouette(as.integer(clusters), dist))[["avg.width"]]
+            df_indexes[df_indexes$partition == p, "silhouette"] <- summary(cluster::silhouette(as.integer(clusters), dist))[["avg.width"]]
         }
         if ("dunn2" %in% index) {
-            df_indexes[df_indexes$partition == p, "dunn2"] <-
-                fpc::cluster.stats(dist, as.integer(clusters))$dunn2
+            if (!requireNamespace("fpc", quietly = TRUE)) {
+                stop("Package 'fpc' is required to compute 'dunn2' index. Install it with install.packages('fpc').")
+            }
+            df_indexes[df_indexes$partition == p, "dunn2"] <- fpc::cluster.stats(dist, as.integer(clusters))$dunn2
         }
         if ("daviesbouldin" %in% index) {
-            df_indexes[df_indexes$partition == p, "daviesbouldin"] <-
-                clusterSim::index.DB(dist, as.integer(clusters))$DB
+            if (!requireNamespace("clusterSim", quietly = TRUE)) {
+                stop("Package 'clusterSim' is required to compute 'daviesbouldin' index. Install it with install.packages('clusterSim').")
+            }
+            df_indexes[df_indexes$partition == p, "daviesbouldin"] <- clusterSim::index.DB(dist, as.integer(clusters))$DB
         }
         if ("pearsongamma" %in% index) {
-            df_indexes[df_indexes$partition == p, "pearsongamma"] <-
-                fpc::cluster.stats(dist, as.integer(clusters))$pearsongamma
+            if (!requireNamespace("fpc", quietly = TRUE)) {
+                stop("Package 'fpc' is required to compute 'pearsongamma' index. Install it with install.packages('fpc').")
+            }
+            df_indexes[df_indexes$partition == p, "pearsongamma"] <- fpc::cluster.stats(dist, as.integer(clusters))$pearsongamma
         }
         if ("c" %in% index) {
-            df_indexes[df_indexes$partition == p, "c"] <-
-                clusterSim::index.C(dist, as.integer(clusters))
+            if (!requireNamespace("clusterSim", quietly = TRUE)) {
+                stop("Package 'clusterSim' is required to compute 'c' index. Install it with install.packages('clusterSim').")
+            }
+            df_indexes[df_indexes$partition == p, "c"] <- clusterSim::index.C(dist, as.integer(clusters))
         }
     }
 
@@ -1287,7 +1291,15 @@ plotIndexes <- function(x,
     }
 
     # Transform the data frame for plotting
-    df_plot <- tidyr::pivot_longer(df_indexes, -"partition", names_to = "Index", values_to = "Value")
+    df_plot <- stats::reshape(
+        df_indexes,
+        varying = setdiff(names(df_indexes), "partition"),
+        v.names = "Value",
+        timevar = "Index",
+        times = setdiff(names(df_indexes), "partition"),
+        direction = "long"
+    )
+    row.names(df_plot) <- NULL
     df_plot$Index <- factor(df_plot$Index, levels = index) # Maintain order of indexes
 
     # Labels
@@ -2137,7 +2149,6 @@ plotUMAP <- function(x,
 #' @importFrom rlang enquo as_label
 #' @import dplyr
 #' @import ggplot2
-#' @import ggrepel
 #'
 #' @export
 #'
@@ -2194,7 +2205,7 @@ add_labels <- function(
 
     # Check for ggrepel if repel is TRUE
     if (repel && !requireNamespace("ggrepel", quietly = TRUE)) {
-        warning("Package 'ggrepel' is required for `repel` = TRUE. Please install it with install.packages('ggrepel').")
+        warning("Package 'ggrepel' is required for `repel` = TRUE. Install it with install.packages('ggrepel').")
         repel <- FALSE
     }
 
@@ -2295,7 +2306,6 @@ add_labels <- function(
 #' @importFrom ComplexHeatmap Heatmap draw
 #' @importFrom circlize colorRamp2
 #' @importFrom grid unit grid.grab
-#' @importFrom patchwork wrap_plots plot_layout plot_annotation
 #' @importFrom grDevices png pdf svg
 #'
 #' @export
@@ -2372,6 +2382,11 @@ heatmapStep <- function(obj,
                         col_quantiles = c(0.1, 0.4, 0.6, 0.9),
                         col_breaks = NULL,
                         colors = c("#00008E", "white", "white", "#630000")) {
+
+    if (!requireNamespace("patchwork", quietly = TRUE)) {
+        stop("Package 'patchwork' is required for this function. Install it with install.packages('patchwork').")
+    }
+
     # Argument checks
 
     # obj
@@ -2600,8 +2615,8 @@ heatmapStep <- function(obj,
 
     # Combine heatmap and histogram plots
     final_plot <- patchwork::wrap_plots(c(list(ht_Tum_grob, hist_Tum), list(ht_Ref_grob, hist_Ref)), ncol = 2) +
-        plot_layout(ncol = 2, widths = c(2, 1)) +
-        plot_annotation(title = title,
+        patchwork::plot_layout(ncol = 2, widths = c(2, 1)) +
+        patchwork::plot_annotation(title = title,
                         theme = theme(plot.title = element_text(size = 16)))
 
     # Output to file

@@ -4,7 +4,7 @@
 \alias{plotIndexes}
 \title{Plot clustering validation indexes for a \code{muscadet} object}
 \usage{
-plotIndexes(x, index = NULL, colors = NULL, title = NULL)
+plotIndexes(x, index = "silhouette", colors = NULL, title = NULL)
 }
 \arguments{
 \item{x}{A \code{\link[=muscadet-class]{muscadet}} object containing clustering data

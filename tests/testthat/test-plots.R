@@ -15,7 +15,8 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=FALSE", {
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
                         partition = 0.3,
-                        show_missing = FALSE)
+                        show_missing = FALSE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
@@ -23,21 +24,24 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=FALSE", {
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
                         clusters = exdata_muscadet$clustering$clusters[["0.3"]],
-                        show_missing = FALSE)
+                        show_missing = FALSE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        show_missing = FALSE)
+                        show_missing = FALSE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        show_missing = FALSE)
+                        show_missing = FALSE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
@@ -45,7 +49,8 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=FALSE", {
         heatmapMuscadet(exdata_muscadet,
                         averages = TRUE,
                         filename = out_file,
-                        show_missing = FALSE)
+                        show_missing = FALSE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
@@ -68,7 +73,8 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=TRUE", {
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
                         partition = 0.3,
-                        show_missing = TRUE)
+                        show_missing = TRUE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
@@ -76,21 +82,24 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=TRUE", {
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
                         clusters = exdata_muscadet$clustering$clusters[["0.3"]],
-                        show_missing = TRUE)
+                        show_missing = TRUE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        show_missing = TRUE)
+                        show_missing = TRUE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
     expect_no_error(
         heatmapMuscadet(exdata_muscadet,
                         filename = out_file,
-                        show_missing = TRUE)
+                        show_missing = TRUE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
@@ -98,7 +107,8 @@ test_that("heatmapMuscadet() generates a heatmap with show_missing=TRUE", {
         heatmapMuscadet(exdata_muscadet,
                         averages = TRUE,
                         filename = out_file,
-                        show_missing = TRUE)
+                        show_missing = TRUE,
+                        quiet = TRUE)
     )
     expect_true(file.exists(out_file))
 
@@ -151,7 +161,7 @@ test_that("plotSil() errors when silhouette data is missing", {
 
 
 # plotIndexes() ----------------------------------------------------------------
-test_that("plotIndexes() returns a ggplot object", {
+test_that("plotIndexes() returns a ggplot object - silhouette", {
     skip_on_cran()
     skip_if_not_installed("ggplot2")
 
@@ -159,12 +169,21 @@ test_that("plotIndexes() returns a ggplot object", {
 
     expect_no_error(p <- plotIndexes(
         exdata_muscadet,
+        index = "silhouette",
         title = "Test Plot"
     ))
 
     expect_s3_class(p, "ggplot")
+})
 
-    expect_no_error(p <- plotIndexes(
+test_that("plotIndexes() returns a ggplot object - other indexes", {
+    skip_on_cran()
+    skip_if_not_installed("ggplot2")
+    testthat::skip_if_not_installed("fpc")
+
+    data("exdata_muscadet", package = "muscadet")
+
+        expect_no_error(p <- plotIndexes(
         exdata_muscadet,
         index = c("silhouette", "dunn2", "c"),
         title = "Test Plot"
@@ -180,6 +199,7 @@ test_that("plotIndexes() returns a ggplot object", {
 
     expect_s3_class(p, "ggplot")
 })
+
 
 test_that("plotIndexes() errors with invalid muscadet object", {
     expect_error(plotIndexes(data.frame(a = 1)))
@@ -290,6 +310,7 @@ test_that("add_labels() adds text layers to ggplot", {
 
 test_that("heatmapStep() generates a PNG heatmap", {
     skip_on_cran()
+    skip_if_not_installed("patchwork")
 
     data("exdata_muscadet", package = "muscadet")
     data("exdata_muscadet_ref", package = "muscadet")
