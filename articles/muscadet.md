@@ -420,7 +420,9 @@ lapply(exdata_muscadet$clustering$clusters, table)
 
 The distribution of cells across clustering partitions at different
 resolutions can be explored using
-[`clustree()`](https://lazappi.github.io/clustree/reference/clustree.html).
+[`clustree()`](https://lazappi.github.io/clustree/reference/clustree.html)
+from the [`clustree`](https://lazappi.github.io/clustree/index.html)
+package.
 
 ``` r
 library(clustree)
