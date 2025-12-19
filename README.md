@@ -50,13 +50,12 @@ Multiomics Single-Cell Copy Number Alterations Detection_. R package version
 
 ### Communications
 
-> [Poster] **Detection of Somatic Copy Number Alterations from Single-cell
+- [Poster] **Detection of Somatic Copy Number Alterations from Single-cell
 Multiomics Data with the R Package muscadet** Marie Denoulet, Nils Giordano, Mia
 Cherkaoui, Elise Douillard, Magali Devic, Florence Magrangeas, Stéphane
 Minvielle, Céline Vallot, Eric Letouzé. *Journées Ouvertes en Biologie, Informatique et Mathématiques (JOBIM 2025)*, 
 Jul 2025, Bordeaux, France. [⟨hal-05150254⟩](https://nantes-universite.hal.science/hal-05150254v1)
-
-> [Poster] **Detection of Somatic Copy Number Alterations from Single-cell
+- [Poster] **Detection of Somatic Copy Number Alterations from Single-cell
 Multiomics Data** Marie Denoulet, Nils Giordano, Mia Cherkaoui, Elise Douillard,
 Magali Devic, Florence Magrangeas, Stéphane Minvielle, Céline Vallot, Eric
 Letouzé. *23rd European Conference on Computational Biology (ECCB2024)*, 
