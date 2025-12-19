@@ -19,11 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: macos-latest, r: 'release', http-user-agent: 'default'}
+          - {os: windows-latest, r: 'release', http-user-agent: 'default'}
+          - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest, r: 'release', http-user-agent: 'default'}
+          - {os: ubuntu-latest, r: 'oldrel-1', http-user-agent: 'default'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -42,9 +42,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, local::. # Force install the package itself
+          extra-packages: any::rcmdcheck, any::sessioninfo
           needs: check
-          cache: false
 
       - uses: r-lib/actions/check-r-package@v2
         with:
