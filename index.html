@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Multiomics Single-cell Copy number Alterations Detection • muscadet</title>
+<title>Multiomics Single-Cell Copy Number Alterations Detection • muscadet</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -15,9 +15,9 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Multiomics Single-cell Copy number Alterations Detection">
-<meta name="description" content="Identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.">
-<meta property="og:description" content="Identification of copy number alterations (CNAs) in cancer cells from single-cell multiomics data.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Multiomics Single-Cell Copy Number Alterations Detection">
+<meta name="description" content="Copy number alterations (CNAs) inference in cancer cells from single-cell multiomics data.">
+<meta property="og:description" content="Copy number alterations (CNAs) inference in cancer cells from single-cell multiomics data.">
 <meta property="og:image" content="https://icagen.github.io/muscadet/logo.png">
 </head>
 <body>
@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,16 +94,38 @@
 <div class="section level3">
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
-<p>You can install the development version of <code>muscadet</code> from GitHub:</p>
+<p>You can install the latest version of <code>muscadet</code> from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ICAGEN/muscadet"</span><span class="op">)</span></span></code></pre></div>
-<p>To get started, read the <a href="https://icagen.github.io/muscadet/articles/muscadet.html">Get Started vignette</a> to learn about the <code>muscadet</code> workflow and function usage on demo example data.</p>
+<ul>
+<li>To get started, read the <a href="https://icagen.github.io/muscadet/articles/muscadet.html">Get Started vignette</a> to learn about the <code>muscadet</code> workflow and function usage on demo example data.</li>
+<li>To prepare inputs, read the <a href="https://icagen.github.io/muscadet/articles/data-prep.html">Preparation of input data vignette</a> to get details on the inputs for <code>muscadet</code> and how to prepare them.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h3>
+<p>To cite the <code>muscadet</code> package in publications, use:</p>
+<blockquote>
+<p>Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2025). <em>muscadet: Multiomics Single-Cell Copy Number Alterations Detection</em>. R package version 0.2.0, <a href="https://icagen.github.io/muscadet/" class="uri">https://icagen.github.io/muscadet/</a>, <a href="https://github.com/ICAGEN/muscadet" class="external-link uri">https://github.com/ICAGEN/muscadet</a>.</p>
+</blockquote>
+</div>
+<div class="section level3">
+<h3 id="communications">Communications<a class="anchor" aria-label="anchor" href="#communications"></a>
+</h3>
+<ul>
+<li>[Poster] <strong>Detection of Somatic Copy Number Alterations from Single-cell Multiomics Data with the R Package muscadet</strong> Marie Denoulet, Nils Giordano, Mia Cherkaoui, Elise Douillard, Magali Devic, Florence Magrangeas, Stéphane Minvielle, Céline Vallot, Eric Letouzé. <em>Journées Ouvertes en Biologie, Informatique et Mathématiques (JOBIM 2025)</em>, Jul 2025, Bordeaux, France. <a href="https://nantes-universite.hal.science/hal-05150254v1" class="external-link">⟨hal-05150254⟩</a>
+</li>
+<li>[Poster] <strong>Detection of Somatic Copy Number Alterations from Single-cell Multiomics Data</strong> Marie Denoulet, Nils Giordano, Mia Cherkaoui, Elise Douillard, Magali Devic, Florence Magrangeas, Stéphane Minvielle, Céline Vallot, Eric Letouzé. <em>23rd European Conference on Computational Biology (ECCB2024)</em>, Sep 2024, Turku, Finland. <a href="https://nantes-universite.hal.science/hal-05150254v1" class="external-link">⟨hal-05150028⟩</a>
+</li>
+</ul>
 <p><br></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="detection-of-somatic-copy-number-alterations-from-single-cell-multiomics-data">Detection of Somatic Copy Number Alterations from Single-Cell Multiomics Data<a class="anchor" aria-label="anchor" href="#detection-of-somatic-copy-number-alterations-from-single-cell-multiomics-data"></a>
+<h3 id="detection-of-somatic-copy-number-alterations-from-single-cell-multiomics-data-with-the-r-package-muscadet">Detection of Somatic Copy Number Alterations from Single-Cell Multiomics Data with the R Package <code>muscadet</code>
+<a class="anchor" aria-label="anchor" href="#detection-of-somatic-copy-number-alterations-from-single-cell-multiomics-data-with-the-r-package-muscadet"></a>
 </h3>
 <blockquote>
 <p>Marie Denoulet<sup>1</sup>, Mia Cherkaoui<sup>1</sup>, Nils Giordano<sup>1</sup>, Robin Lanée<sup>1</sup>, Elise Douillard<sup>1,2</sup>, Magali Devic<sup>1,2</sup>, Florence Magrangeas<sup>1,2</sup>, Stéphane Minvielle<sup>1,2</sup>, Céline Vallot<sup>3,4</sup>, Eric Letouzé<sup>1,2</sup></p>
@@ -111,7 +133,9 @@
 <blockquote>
 <p><sup>1</sup>Nantes Université, INSERM, CNRS, Université d’Angers, CRCI2NA, Nantes, France. <sup>2</sup>University Hospital Hôtel-Dieu, Nantes, France. <sup>3</sup>CNRS UMR3244, Institut Curie, PSL University, Paris, France. <sup>4</sup>Translational Research Department, Institut Curie, PSL University, Paris, France</p>
 </blockquote>
-<p>The identification of somatic copy number alterations (CNAs) in cancer cells is crucial for understanding tumor evolution, including clonal dynamics causing relapse, and identifying potential therapeutic targets. While existing tools provide valuable insights into subclonal CNAs, they are typically limited to analyzing one type of omics data. In response to the growing use of cutting-edge technologies enabling simultaneous sequencing of multiple omics from individual cells, there emerges a need for new approaches that leverage multiomics data integration to improve the detection of CNAs. Addressing this need, we developed an R package, <em>muscadet</em>, that integrates multiple single-cell datasets across different omics modalities to enhance the accuracy and resolution of CNA detection within tumoral subclones. We demonstrated the potency of our approach through the analysis of single-cell Multiome data, integrating both single-cell RNA-seq and single-cell ATAC-seq datasets from a common pool of cells, across several multiple myeloma samples. <em>muscadet</em> outperformed existing copy number analysis tools for both scRNA-seq and scATAC-seq data, revealing accurate CNA profiles and subclones, validated by matched whole genome sequencing data. By providing a unified CNA analysis framework applicable to any combination of single-cell omics data, <em>muscadet</em> empowers researchers to unravel the clonal structure of tumor samples and uncover complex genomic alterations driving cancer progression.</p>
+<p>The identification of somatic copy number alterations (CNAs) in cancer cells is crucial for understanding tumor evolution, including clonal dynamics causing relapse, and identifying potential therapeutic targets. While existing tools provide valuable insights into subclonal CNAs, they are typically limited to analyzing one type of omics data. In response to the growing use of cutting-edge technologies enabling simultaneous sequencing of multiple omics from individual cells, there emerges a need for new approaches that leverage multiomics data integration to improve the detection of CNAs.</p>
+<p>Addressing this need, we developed an R package, <em>muscadet</em>, that integrates multiple single-cell datasets across different omics modalities to enhance the accuracy and resolution of CNA detection within tumoral subclones. The <em>muscadet</em> framework enables integration of joint multiomics data, such as single-cell transcriptomics (scRNA-seq) and chromatin accessibility (scATAC-seq), captured from the same cells. Cells are initially clustered by relative coverage (log ratio of read counts) integrated across multiple omics layers. CNA calling is then performed on aggregated coverage and allelic (read counts per allele) data at the cluster level, leveraging combined signals from omics and cells. Lastly, <em>muscadet</em> includes visualization tools for genome-wide coverage assessment, subclone identification, and comprehensive CNA profiling.</p>
+<p>By providing a unified CNA analysis framework applicable to any combination of single-cell omics data, <em>muscadet</em> empowers researchers to unravel the clonal structure of tumor samples and uncover complex genomic alterations driving cancer progression.</p>
 <hr>
 </div>
 </div>
@@ -144,9 +168,9 @@
 <ul class="list-unstyled">
 <li>Marie Denoulet <br><small class="roles"> Maintainer, author </small> <a href="https://orcid.org/0000-0002-9668-0439" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Nils Giordano <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-2549-6631" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Eric Letouzé <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-6369-2839" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Céline Vallot <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1601-2359" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Stéphane Minvielle <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1389-312X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Céline Vallot <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1601-2359" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Eric Letouzé <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-6369-2839" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
@@ -163,7 +187,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

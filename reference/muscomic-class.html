@@ -9,7 +9,7 @@ single-cell omic dataset used as primary input for muscadet analysis."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@ single-cell omic dataset used as primary input for muscadet analysis."><meta pro
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>The muscomic class</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/objects.R" class="external-link"><code>R/objects.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/objects.R" class="external-link"><code>R/objects.R</code></a></small>
       <div class="d-none name"><code>muscomic-class.Rd</code></div>
     </div>
 
@@ -80,27 +80,31 @@ individual-specific heterozygous positions) (<code>list</code>).</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">ATAC</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A muscomic object of type ATAC labelled scATAC-seq containing: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  log.ratio coverage data matrix </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  112 cells </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  133 features: windows of peaks </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  691 variant positions </span>
-<span class="r-in"><span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">RNA</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A muscomic object of type RNA labelled scRNA-seq containing: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  log.ratio coverage data matrix </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  119 cells </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  349 features: genes </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  373 variant positions </span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">ATAC</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A muscomic object </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  type: ATAC </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  label: scATAC-seq </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cells: 71 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  counts: 71 cells x 1200 features (peaks)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  logratio: 71 cells x 213 features (windows of peaks)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variant positions: 681</span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">RNA</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A muscomic object </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  type: RNA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  label: scRNA-seq </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cells: 69 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  counts: 69 cells x 300 features (genes)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  logratio: 69 cells x 212 features (genes)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variant positions: 359</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">ATAC</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">ATAC</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formal class 'muscomic' [package "muscadet"] with 4 slots</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ type      : chr "ATAC"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ label.omic: chr "scATAC-seq"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ coverage  :List of 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ allelic   :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ coverage  :List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ allelic   :List of 3</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -109,7 +113,7 @@ individual-specific heterozygous positions) (<code>list</code>).</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

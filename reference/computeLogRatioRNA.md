@@ -78,12 +78,12 @@ If `all_steps` is set to `FALSE`, a list containing:
 
 - `matTumor`:
 
-  Matrix of log R ratio values *features x cells* for the tumor/sample
+  Matrix of log R ratio values *cells x features* for the tumor/sample
   cells (`matrix`).
 
 - `matRef`:
 
-  Matrix of log R ratio values *features x cells* for the reference
+  Matrix of log R ratio values *cells x features* for the reference
   cells (`matrix`).
 
 - `params`:
@@ -93,8 +93,8 @@ If `all_steps` is set to `FALSE`, a list containing:
 
 - `coord`:
 
-  Data frame of coordinates for windows of peaks and associated data
-  along the different steps (`data.frame`). Columns :
+  Data frame of coordinates for genes and associated data along the
+  different steps (`data.frame`). Columns :
 
   - `CHROM`, `start`, `end`, `id`: coordinates and name of genes.
 
@@ -163,33 +163,29 @@ Other computeLogRatio:
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  features = exdata_peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_tumor,
+  features = exdata_genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_ref,
+  features = exdata_peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_ref,
+  features = exdata_genes
 )
 
 # Create muscadet objects
 muscadet <- CreateMuscadetObject(
   omics = list(atac, rna),
-  bulk.lrr = bulk_lrr,
+  bulk.lrr = exdata_bulk_lrr,
   bulk.label = "WGS",
   genome = "hg38"
 )
@@ -203,7 +199,7 @@ obj_rna <- computeLogRatioRNA(
   matTumor = matCounts(muscadet)$RNA,
   matRef = matCounts(muscadet_ref)$RNA,
   genesCoord = coordFeatures(muscadet)$RNA,
-  genome = slot(muscadet, "genome"),
+  genome = muscadet$genome,
   refReads = 2 # low value for example subsampled datasets
 )
 #> Step 01 - Match genes in count matrix with coordinates
@@ -217,14 +213,14 @@ obj_rna <- computeLogRatioRNA(
 table(obj_rna$coord$keep)
 #> 
 #> FALSE  TRUE 
-#>   151   349 
+#>    88   212 
 
 # With results form every step when `all_steps = TRUE`
 obj_rna_all <- computeLogRatioRNA(
   matTumor = matCounts(muscadet)$RNA,
   matRef = matCounts(muscadet_ref)$RNA,
   genesCoord = coordFeatures(muscadet)$RNA,
-  genome = slot(muscadet, "genome"),
+  genome = muscadet$genome,
   refReads = 2, # low value for example subsampled datasets
   all_steps = TRUE
 )
@@ -242,7 +238,7 @@ names(obj_rna_all)
 table(obj_rna_all$coord$keep)
 #> 
 #> FALSE  TRUE 
-#>   151   349 
+#>    88   212 
 nrow(obj_rna_all$step08$matTumor)
-#> [1] 349
+#> [1] 69
 ```

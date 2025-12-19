@@ -112,9 +112,11 @@ A `ggplot` object.
 
 ``` r
 if (FALSE) { # \dontrun{
-  p <- plotUMAP(muscadet_obj,
-                partition = 0.6,
-                title = "UMAP copy-number clusters")
-  print(p)
+
+# Load example muscadet object
+# data("exdata_muscadet")
+
+p <- plotUMAP(exdata_muscadet, partition = 0.3, title = "UMAP copy-number clusters")
+print(p)
 } # }
 ```

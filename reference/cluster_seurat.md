@@ -23,10 +23,12 @@ cluster_seurat(
   mat_list,
   res_range = seq(0.1, 0.5, 0.1),
   dims_list = rep(list(1:8), length(mat_list)),
-  algorithm = 1,
+  algorithm = 4,
+  leiden_method = "igraph",
   knn_seurat = 20,
   knn_range_seurat = 200,
   max_dim = 200,
+  random.seed = 1,
   quiet = FALSE
 )
 ```
@@ -58,8 +60,14 @@ cluster_seurat(
   [`Seurat::FindClusters()`](https://satijalab.org/seurat/reference/FindClusters.html)
   (`1` = original Louvain algorithm; `2` = Louvain algorithm with
   multilevel refinement; `3` = SLM algorithm; `4` = Leiden algorithm).
-  Default is `1`. RECOMMENDED: `4` for Leiden algorithm see
+  Default is `4` for Leiden algorithm as recommended, see
   `cluster_seurat()` Details section.
+
+- leiden_method:
+
+  Character string to choose from which package for running leiden
+  algorithm, either leidenbase ("leidenbase") or igraph ("igraph")
+  packages (`character`). Default is "igraph".
 
 - knn_seurat:
 
@@ -85,6 +93,11 @@ cluster_seurat(
   used for PCA computation with
   [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) (`integer`).
   Default is `200`.
+
+- random.seed:
+
+  Integer specifying the seed of the random number generator, must be
+  greater than 0 for Leiden algorithm. (`integer`). Default is `1`.
 
 - quiet:
 
@@ -141,6 +154,10 @@ work and best-practice guidelines:
   <https://doi.org/10.1038/s41576-023-00586-w>
   <https://www.sc-best-practices.org/cellular_structure/clustering.html>
 
+Explanation about igraph being the default package for Leiden
+implementation (`leiden_method = "igraph"`) here:
+https://github.com/satijalab/seurat/issues/9800
+
 ## See also
 
 [Weighted Nearest Neighbor Analysis Vignette from
@@ -151,14 +168,19 @@ Seurat](https://satijalab.org/seurat/articles/weighted_nearest_neighbor_analysis
 ``` r
 if (FALSE) { # \dontrun{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Format input
 # transpose matrices to: cells x features matrices
-mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+mat_list <- matLogRatio(exdata_muscadet)
 
 # Run integration & clustering
-result <- cluster_seurat(mat_list, res_range = c(0.1, 0.3, 0.5))
+result <- cluster_seurat(
+    mat_list,
+    res_range = c(0.1, 0.3, 0.5),
+    knn_seurat = 10,
+    knn_range_seurat = 30
+)
 
 # View results
 lapply(result$clusters, table)

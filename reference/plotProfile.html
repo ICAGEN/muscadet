@@ -13,7 +13,7 @@ status and cell fractions."><meta property="og:image" content="https://icagen.gi
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@ status and cell fractions."><meta property="og:image" content="https://icagen.gi
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot CNA profiles from muscadet object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/plots.R" class="external-link"><code>R/plots.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/plots.R" class="external-link"><code>R/plots.R</code></a></small>
       <div class="d-none name"><code>plotProfile.Rd</code></div>
     </div>
 
@@ -147,11 +147,16 @@ is "brown2".</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plot profile for first cluster</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf</a></span><span class="op">(</span><span class="st">"CNAprofile_allcells.pdf"</span>, width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">7.5</span><span class="op">)</span> <span class="co"># Save as PDF</span></span></span>
+<span class="r-in"><span><span class="fu">plotProfile</span><span class="op">(</span><span class="va">exdata_muscadet</span>, data <span class="op">=</span> <span class="st">"1"</span>, title <span class="op">=</span> <span class="st">"Example dataset - cluster 1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot profile for all cells</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf</a></span><span class="op">(</span><span class="st">"CNAprofile_allcells.pdf"</span>, width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">7.5</span><span class="op">)</span> <span class="co"># Save as PDF</span></span></span>
-<span class="r-in"><span><span class="fu">plotProfile</span><span class="op">(</span><span class="va">muscadet_obj</span>, data <span class="op">=</span> <span class="st">"allcells"</span>, title <span class="op">=</span> <span class="st">"Example data - all cells"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plotProfile</span><span class="op">(</span><span class="va">exdata_muscadet</span>, data <span class="op">=</span> <span class="st">"allcells"</span>, title <span class="op">=</span> <span class="st">"Example dataset - all cells"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
@@ -162,7 +167,7 @@ is "brown2".</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

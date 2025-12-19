@@ -1,6 +1,6 @@
-# muscadet: Multiomics Single-cell Copy number Alterations Detection
+# muscadet: Multiomics Single-Cell Copy Number Alterations Detection
 
-Identification of copy number alterations (CNAs) in cancer cells from
+Copy number alterations (CNAs) inference in cancer cells from
 single-cell multiomics data.
 
 ## See also
@@ -23,14 +23,14 @@ Authors:
 - Nils Giordano <nils.giordano@univ-nantes.fr>
   ([ORCID](https://orcid.org/0000-0003-2549-6631))
 
-- Eric Letouzé <eric.letouze@gmail.com>
-  ([ORCID](https://orcid.org/0000-0002-6369-2839))
+- Stéphane Minvielle <stephane.minvielle@univ-nantes.fr>
+  ([ORCID](https://orcid.org/0000-0003-1389-312X))
 
 - Céline Vallot <celine.vallot@curie.fr>
   ([ORCID](https://orcid.org/0000-0003-1601-2359))
 
-- Stéphane Minvielle <stephane.minvielle@univ-nantes.fr>
-  ([ORCID](https://orcid.org/0000-0003-1389-312X))
+- Eric Letouzé <eric.letouze@gmail.com>
+  ([ORCID](https://orcid.org/0000-0002-6369-2839))
 
 Other contributors:
 

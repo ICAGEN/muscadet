@@ -54,6 +54,9 @@ access
 
   Autocompletion for `$` access on `muscadet` or `muscomic` objects
 
+- [`makeAllelicSparse()`](https://icagen.github.io/muscadet/reference/makeAllelicSparse.md)
+  : Construct Sparse Matrices for Allelic Data
+
 ### Object incremental additions
 
 Functions for incremental additions to muscadet objects during analysis
@@ -140,10 +143,10 @@ cells, and usefull for clustering validation
 
 Functions to identify Copy Number Alterations
 
-- [`mergeCounts()`](https://icagen.github.io/muscadet/reference/mergeCounts.md)
+- [`aggregateCounts()`](https://icagen.github.io/muscadet/reference/aggregateCounts.md)
   :
 
-  Merge counts for `muscadet` objects
+  Aggregate counts for `muscadet` objects
 
 - [`cnaCalling()`](https://icagen.github.io/muscadet/reference/cnaCalling.md)
   : Copy Number Alteration (CNA) Calling from muscadet object
@@ -180,23 +183,23 @@ Functions facilitating allelic data preparation
 
 Example data used for examples and practicing functions
 
-- [`muscadet_obj`](https://icagen.github.io/muscadet/reference/muscadet_obj.md)
-  [`muscadet_obj_ref`](https://icagen.github.io/muscadet/reference/muscadet_obj.md)
+- [`exdata_muscadet`](https://icagen.github.io/muscadet/reference/exdata_muscadet.md)
+  [`exdata_muscadet_ref`](https://icagen.github.io/muscadet/reference/exdata_muscadet.md)
   : Example data: muscadet objects
-- [`mat_counts_atac_tumor`](https://icagen.github.io/muscadet/reference/mat_counts.md)
-  [`mat_counts_atac_ref`](https://icagen.github.io/muscadet/reference/mat_counts.md)
-  [`mat_counts_rna_tumor`](https://icagen.github.io/muscadet/reference/mat_counts.md)
-  [`mat_counts_rna_ref`](https://icagen.github.io/muscadet/reference/mat_counts.md)
+- [`exdata_mat_counts_atac_tumor`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.md)
+  [`exdata_mat_counts_atac_ref`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.md)
+  [`exdata_mat_counts_rna_tumor`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.md)
+  [`exdata_mat_counts_rna_ref`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.md)
   : Example data: Matrices of raw counts
-- [`allele_counts_atac_tumor`](https://icagen.github.io/muscadet/reference/allele_counts.md)
-  [`allele_counts_atac_ref`](https://icagen.github.io/muscadet/reference/allele_counts.md)
-  [`allele_counts_rna_tumor`](https://icagen.github.io/muscadet/reference/allele_counts.md)
-  [`allele_counts_rna_ref`](https://icagen.github.io/muscadet/reference/allele_counts.md)
-  : Example data: Allele counts at variation positions
-- [`genes`](https://icagen.github.io/muscadet/reference/features.md)
-  [`peaks`](https://icagen.github.io/muscadet/reference/features.md) :
-  Example data: Feature coordinates
-- [`bulk_lrr`](https://icagen.github.io/muscadet/reference/bulk_lrr.md)
+- [`exdata_allele_counts_atac_tumor`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
+  [`exdata_allele_counts_atac_ref`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
+  [`exdata_allele_counts_rna_tumor`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
+  [`exdata_allele_counts_rna_ref`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
+  : Example data: Allele counts at variant positions
+- [`exdata_genes`](https://icagen.github.io/muscadet/reference/exdata_features.md)
+  [`exdata_peaks`](https://icagen.github.io/muscadet/reference/exdata_features.md)
+  : Example data: Feature coordinates
+- [`exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.md)
   : Example data: Log R ratio from bulk sequencing data
 
 ## Misc

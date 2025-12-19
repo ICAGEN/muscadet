@@ -17,7 +17,7 @@ matrix of log R ratios is added for the selected omic."><meta property="og:image
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@ matrix of log R ratios is added for the selected omic."><meta property="og:image
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Compute log R ratios</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/computeLogRatio.R" class="external-link"><code>R/computeLogRatio.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/computeLogRatio.R" class="external-link"><code>R/computeLogRatio.R</code></a></small>
       <div class="d-none name"><code>computeLogRatio.Rd</code></div>
     </div>
 
@@ -64,7 +64,6 @@ matrix of log R ratios is added for the selected <code>omic</code>.</p>
 <span>  <span class="va">omic</span>,</span>
 <span>  method <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  new.label.features <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  remove.raw <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  all_steps <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -101,12 +100,6 @@ method will be applied.</p></dd>
 <dd><p>New label for features (<code>character</code> string). If
 <code>NULL</code>, the label remains unchanged when using the "RNA" method and becomes
 "windows of peaks" when using the "ATAC" method.</p></dd>
-
-
-<dt id="arg-remove-raw">remove.raw<a class="anchor" aria-label="anchor" href="#arg-remove-raw"></a></dt>
-<dd><p><code>TRUE</code> or <code>FALSE</code> (<code>logical</code>). Whether to remove raw count
-matrices. <code>TRUE</code> by default to reduce object size. Setting it to <code>FALSE</code>
-will keep raw count matrices within the object.</p></dd>
 
 
 <dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
@@ -187,33 +180,33 @@ and associated data, and <code>params</code> list of parameters used for the fun
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create muscomic objects</span></span></span>
 <span class="r-in"><span><span class="va">atac</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  type <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
-<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_tumor</span>,</span></span>
-<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_tumor</span>,</span></span>
-<span class="r-in"><span>  features <span class="op">=</span> <span class="va">peaks</span></span></span>
+<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_atac_tumor</span>,</span></span>
+<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_atac_tumor</span>,</span></span>
+<span class="r-in"><span>  features <span class="op">=</span> <span class="va">exdata_peaks</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rna</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  type <span class="op">=</span> <span class="st">"RNA"</span>,</span></span>
-<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">mat_counts_rna_tumor</span>,</span></span>
-<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">allele_counts_rna_tumor</span>,</span></span>
-<span class="r-in"><span>  features <span class="op">=</span> <span class="va">genes</span></span></span>
+<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_rna_tumor</span>,</span></span>
+<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_rna_tumor</span>,</span></span>
+<span class="r-in"><span>  features <span class="op">=</span> <span class="va">exdata_genes</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">atac_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  type <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
-<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_ref</span>,</span></span>
-<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_ref</span>,</span></span>
-<span class="r-in"><span>  features <span class="op">=</span> <span class="va">peaks</span></span></span>
+<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_atac_ref</span>,</span></span>
+<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_atac_ref</span>,</span></span>
+<span class="r-in"><span>  features <span class="op">=</span> <span class="va">exdata_peaks</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rna_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  type <span class="op">=</span> <span class="st">"RNA"</span>,</span></span>
-<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">mat_counts_rna_ref</span>,</span></span>
-<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">allele_counts_rna_ref</span>,</span></span>
-<span class="r-in"><span>  features <span class="op">=</span> <span class="va">genes</span></span></span>
+<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_rna_ref</span>,</span></span>
+<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_rna_ref</span>,</span></span>
+<span class="r-in"><span>  features <span class="op">=</span> <span class="va">exdata_genes</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create muscadet objects</span></span></span>
 <span class="r-in"><span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscadetObject.html">CreateMuscadetObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  omics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">atac</span>, <span class="va">rna</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  bulk.lrr <span class="op">=</span> <span class="va">bulk_lrr</span>,</span></span>
+<span class="r-in"><span>  bulk.lrr <span class="op">=</span> <span class="va">exdata_bulk_lrr</span>,</span></span>
 <span class="r-in"><span>  bulk.label <span class="op">=</span> <span class="st">"WGS"</span>,</span></span>
 <span class="r-in"><span>  genome <span class="op">=</span> <span class="st">"hg38"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -233,14 +226,8 @@ and associated data, and <code>params</code> list of parameters used for the fun
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> -- computeLogRatio: Method 'ATAC' using computeLogRatioATAC().</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Step 01 - Group peaks in windows: window size set at 10 Mb, sliding by 2 Mb</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 02 - Filtering windows: Minimum of 1 peaks per window with a minimum average of 1 read(s)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 03 - Normalization for sequencing depth: Normalized counts per million</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 04 - Log transformation and normalization by reference data: log R ratio</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 05 - Capping the range of values: threshold = 3</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 06 - [No step 06 for scATAC-seq]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 07 - Centering of cells</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Step 08 - Correcting by reference variability</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Done.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: GenomeInfoDb</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .requirePackage(package):</span> unable to load required package ‘GenomeInfoDb’</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># compute log R ratios for RNA</span></span></span>
 <span class="r-in"><span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu">computeLogRatio</span><span class="op">(</span></span></span>
@@ -268,7 +255,7 @@ and associated data, and <code>params</code> list of parameters used for the fun
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

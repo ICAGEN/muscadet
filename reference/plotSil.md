@@ -53,12 +53,12 @@ if (FALSE) { # \dontrun{
 library("ggplot2")
 
 # Load example muscadet object
-# data("muscadet_obj")
-plotSil(muscadet_obj, partition = 0.6)
+# data("exdata_muscadet")
+plotSil(exdata_muscadet, partition = 0.3)
 
 # Loop over partitions
-for (p in names(muscadet_obj$clustering$clusters)) {
-    plot <- plotSil(muscadet_obj, p)
+for (p in names(exdata_muscadet$clustering$clusters)) {
+    plot <- plotSil(exdata_muscadet, p)
     ggsave(paste0("plot_silhouette_", p, ".png"), plot)
 }
 } # }

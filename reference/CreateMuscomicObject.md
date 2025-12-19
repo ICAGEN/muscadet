@@ -2,7 +2,8 @@
 
 Create a
 [`muscomic`](https://icagen.github.io/muscadet/reference/muscomic-class.md)
-object.
+object containing coverage and (optionally) allelic count information
+for a single-cell omic dataset.
 
 ## Usage
 
@@ -25,9 +26,9 @@ CreateMuscomicObject(
 
 - mat_counts:
 
-  Matrix of raw counts *features x cells* (`matrix` or `dgCMatrix`).
-  Rows are features (they must correspond to the id column of
-  `features`), and columns are cells.
+  Matrix of raw counts *cells x features* (`matrix` or `dgCMatrix`).
+  Rows are cells and columns are features. (they must correspond to the
+  id column of `features`)
 
 - features:
 
@@ -60,9 +61,9 @@ CreateMuscomicObject(
   nucleotide polymorphisms (SNPs) positions or individual-specific
   heterozygous positions retrieved from bulk sequencing. The data frame
   format is based on the Variant Calling Format (VCF), thereby it must
-  contain the following columns : `cell`, `id`, `CHROM`, `POS`, `REF`,
-  `ALT`, `RD`, `AD`, `DP`, (`GT`). See
-  [`allele_counts()`](https://icagen.github.io/muscadet/reference/allele_counts.md)
+  contain the following columns : `cell`, `CHROM`, `POS`, `REF`, `ALT`,
+  `RD`, `AD`. See
+  [`exdata_allele_counts()`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
   for details.
 
 - label.omic:
@@ -91,62 +92,67 @@ object.
 ## Examples
 
 ``` r
+# Minimal example
+mat <- Matrix::sparseMatrix(
+    i = c(1, 1, 2),
+    j = c(1, 2, 1),
+    x = c(5, 3, 2),
+    dims = c(2, 2),
+    dimnames = list(c("cell1", "cell2"), c("f1", "f2"))
+)
+
+features <- data.frame(
+    CHROM = c("1", "1"),
+    start = c(100, 200),
+    end   = c(150, 250),
+    id    = c("f1", "f2")
+)
+
+allele <- data.frame(
+    cell = c("cell1", "cell2"),
+    CHROM = c("1", "1"),
+    POS = c(100, 200),
+    REF = c("A", "G"),
+    ALT = c("C", "T"),
+    RD = c(10, 5),
+    AD = c(3, 1)
+)
+
+muscomic <- CreateMuscomicObject(
+    type = "ATAC",
+    mat_counts = mat,
+    features = features,
+    allele_counts = allele
+)
+
+# On the example dataset
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 atac
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  mat.counts coverage data matrix 
-#>  112 cells 
-#>  1000 features: peaks 
-#>  691 variant positions 
-
-rna <- CreateMuscomicObject(
-  type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
-)
-rna
-#> A muscomic object of type RNA labelled scRNA-seq containing: 
-#>  mat.counts coverage data matrix 
-#>  119 cells 
-#>  500 features: genes 
-#>  373 variant positions 
-
-atac_ref <- CreateMuscomicObject(
-  type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
-)
-
-rna_ref <- CreateMuscomicObject(
-  type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
-)
-rna_ref
-#> A muscomic object of type RNA labelled scRNA-seq containing: 
-#>  mat.counts coverage data matrix 
-#>  97 cells 
-#>  500 features: genes 
-#>  373 variant positions 
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: None
+#>  variant positions: 681
 
 # without allele counts data (not required for clustering step)
 atac2 <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  features = exdata_peaks
 )
 atac2
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  mat.counts coverage data matrix 
-#>  112 cells 
-#>  1000 features: peaks 
-#>  0 variant positions 
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: None
+#>  variant positions: 0
 ```

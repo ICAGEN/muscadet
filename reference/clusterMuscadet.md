@@ -90,7 +90,7 @@ clusterMuscadet(
       [`Seurat::FindClusters()`](https://satijalab.org/seurat/reference/FindClusters.html)
       (`1` = original Louvain algorithm; `2` = Louvain algorithm with
       multilevel refinement; `3` = SLM algorithm; `4` = Leiden
-      algorithm). Default is `1`. RECOMMENDED: `4` for Leiden algorithm
+      algorithm). Default is `4` for Leiden algorithm as recommended,
       see
       [`cluster_seurat()`](https://icagen.github.io/muscadet/reference/cluster_seurat.md)
       Details section.
@@ -216,18 +216,21 @@ Select clusters to continue with CNA calling:
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Perform clustering with "seurat" method
-muscadet_obj <- clusterMuscadet(
-  x = muscadet_obj,
+exdata_muscadet <- clusterMuscadet(
+  x = exdata_muscadet,
   method = "seurat",
-  res_range = c(0.5, 0.8),
-  dims_list = list(1:8, 1:8),
+  res_range = c(0.1, 0.3),
+  dims_list = list(1:10, 1:10),
   knn_seurat = 10, # adapted to low number of cells in example data
   knn_range_seurat = 30 # adapted to low number of cells in example data
 )
 #> Clustering method: 'seurat'
+#> Resolutions to compute: 0.1, 0.3
+#> Number of selected dimensions: 10, 10
+#> Clustering algorithm selected: 4 (Leiden)
 #> Performing PCA...
 #> Finding neighbors and constructing graph...
 #> Computing UMAP...
@@ -237,8 +240,8 @@ muscadet_obj <- clusterMuscadet(
 #> Done.
 
 # Perform clustering with "hclust" method
-muscadet_obj <- clusterMuscadet(
-  x = muscadet_obj,
+exdata_muscadet2 <- clusterMuscadet(
+  x = exdata_muscadet,
   k_range = 2:4,
   method = "hclust",
   dist_method = "euclidean",
@@ -246,6 +249,9 @@ muscadet_obj <- clusterMuscadet(
   weights = c(1, 1)
 )
 #> Clustering method: 'hclust'
+#> Partitions k to compute: 2, 3, 4
+#> Distance method selected: euclidean
+#> Hierarchical clustering method selected: ward.D
 #> Computing distance matrices...
 #> Computing affinity matrices...
 #> Performing SNF integration...
@@ -256,21 +262,26 @@ muscadet_obj <- clusterMuscadet(
 #> Done.
 
 # Retrieve cluster assignments
-clusters <- muscadet_obj$clustering$clusters
+clusters <- exdata_muscadet$clustering$clusters
 lapply(clusters, table)
-#> $`2`
+#> $`0.1`
+#> 
+#>  1 
+#> 77 
+#> 
+#> $`0.3`
 #> 
 #>  1  2 
-#> 56 91 
+#> 41 36 
 #> 
-#> $`3`
-#> 
-#>  1  2  3 
-#> 60 13 74 
-#> 
-#> $`4`
-#> 
-#>  1  2  3  4 
-#> 25 27 13 82 
-#> 
+
+if (FALSE) { # \dontrun{
+
+# Plot clustree
+library(clustree)
+partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
+partitions <- do.call(cbind, partitions)
+colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
+clustree(partitions, prefix = "res_")
+} # }
 ```

@@ -91,7 +91,7 @@ A cleaned data frame with VCF-like standardized columns:
 ## Examples
 
 ``` r
-# Example data
+# Generate minimal data
 sc_data <- data.frame(
   ReadGroup = c("cell1", "cell2"),
   CHROM = c(1, 1),

@@ -11,7 +11,7 @@ across clusters and evaluating cell fractions and copy numbers."><meta property=
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@ across clusters and evaluating cell fractions and copy numbers."><meta property=
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Copy Number Alteration (CNA) Calling from muscadet object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/cnaCalling.R" class="external-link"><code>R/cnaCalling.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/cnaCalling.R" class="external-link"><code>R/cnaCalling.R</code></a></small>
       <div class="d-none name"><code>cnaCalling.Rd</code></div>
     </div>
 
@@ -96,7 +96,7 @@ Tumor Sequencing</em>. R package version 0.6.2,
 <dd><p>A <code><a href="muscadet-class.html">muscadet</a></code> object. Must contain:</p><ul><li><p>Clustering assignments in the <code>cnacalling$clusters</code> slot
 (use <code><a href="assignClusters.html">assignClusters()</a></code>).</p></li>
 <li><p>Combined allelic and coverage counts per cluster in the
-<code>cnacalling$combined.counts</code> slot (use <code><a href="mergeCounts.html">mergeCounts()</a></code>).</p></li>
+<code>cnacalling$combined.counts</code> slot (use <code><a href="aggregateCounts.html">aggregateCounts()</a></code>).</p></li>
 </ul></dd>
 
 
@@ -281,7 +281,7 @@ doi: <a href="https://www.doi.org/10.1093/nar/gkw520" class="external-link">10.1
 </dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="assignClusters.html">assignClusters()</a></code>, <code><a href="mergeCounts.html">mergeCounts()</a></code>,<code><a href="preProcSample2.html">preProcSample2()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="assignClusters.html">assignClusters()</a></code>, <code><a href="aggregateCounts.html">aggregateCounts()</a></code>,<code><a href="preProcSample2.html">preProcSample2()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -290,34 +290,48 @@ doi: <a href="https://www.doi.org/10.1093/nar/gkw520" class="external-link">10.1
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: pctGCdata</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu">cnaCalling</span><span class="op">(</span><span class="va">muscadet_obj</span>,</span></span>
-<span class="r-in"><span>                           omics.coverage <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
-<span class="r-in"><span>                           depthmin.a.clusters <span class="op">=</span> <span class="fl">3</span>, <span class="co"># set low thresholds for example data</span></span></span>
-<span class="r-in"><span>                           depthmin.c.clusters <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>                           depthmin.a.allcells <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>                           depthmin.c.allcells <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>                           depthmin.c.nor <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting coverage data from omic(s): ATAC</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering positions per clusters based on provided filters...</span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu">cnaCalling</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">exdata_muscadet</span>,</span></span>
+<span class="r-in"><span>    omics.coverage <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
+<span class="r-in"><span>    depthmin.a.clusters <span class="op">=</span> <span class="fl">3</span>, <span class="co"># set low thresholds for example data</span></span></span>
+<span class="r-in"><span>    depthmin.c.clusters <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    depthmin.a.allcells <span class="op">=</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>    depthmin.c.allcells <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>    depthmin.c.nor <span class="op">=</span> <span class="fl">0</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - Analysis per cluster -</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of positions: 2455</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of allelic positions: 1313</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Initial number of coverage positions: 1142</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Integrating omics...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering allelic positions: tumor depth &gt;= 3 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Selecting coverage data from omic(s): ATAC</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: tumor depth &gt;= 5 reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: normal depth &gt;= 0 reads</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> From 1733 positions to 404 positions</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Allelic positions kept: 126</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Coverage positions kept: 154</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Final number of positions: 280</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing segmentation per cluster...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding diploid log R ratio on clusters...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Diploid log R ratio = -0.279348299298531</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Diploid log R ratio = -0.273</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing cell fractions and copy numbers on clusters...</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering positions on all cells based on provided filters...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - Analysis on all cells -</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aggregating allelic counts of all cells...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering allelic positions: tumor depth &gt;= 3 reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Allelic positions kept: 186</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Aggregating coverage counts of all cells...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: tumor depth &gt;= 5 reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering coverage positions: normal depth &gt;= 0 reads</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> From 1270 positions to 392 positions</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Coverage positions kept: 150</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Final number of positions: 336</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing segmentation on all cells...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing cell fractions and copy numbers on all cells...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding consensus segments between clusters...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> - Consensus segments accross clusters -</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Finding consensus segments...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 5 consensus segments identified, 0 CNA segments identified</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Done.</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -326,7 +340,7 @@ doi: <a href="https://www.doi.org/10.1093/nar/gkw520" class="external-link">10.1
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

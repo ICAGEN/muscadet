@@ -73,66 +73,70 @@ The updated `[muscadet::muscadet()]` or `[muscadet::muscomic()]` object.
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Access to muscadet omics or slots
-muscadet_obj["ATAC"]
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  112 cells 
-#>  133 features: windows of peaks 
-#>  691 variant positions 
-muscadet_obj["genome"]
+exdata_muscadet["ATAC"]
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
+exdata_muscadet["genome"]
 #> [1] "hg38"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Access to muscomic slots
-muscadet_obj["ATAC"]["label.omic"]
+exdata_muscadet["ATAC"]["label.omic"]
 #> [1] "scATAC-seq"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Access to muscadet omics or slots
-muscadet_obj$ATAC
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  112 cells 
-#>  133 features: windows of peaks 
-#>  691 variant positions 
-muscadet_obj$genome
+exdata_muscadet$ATAC
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
+exdata_muscadet$genome
 #> [1] "hg38"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Access to muscomic slots
-muscadet_obj$ATAC$label.omic
+exdata_muscadet$ATAC$label.omic
 #> [1] "scATAC-seq"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Assign new data in muscadet object
-muscadet_obj["genome"] <- "hg38"
+exdata_muscadet["genome"] <- "hg38"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Assign new data in muscomic object
-muscadet_obj["ATAC"]["label.omic"] <- "scATAC-seq"
+exdata_muscadet["ATAC"]["label.omic"] <- "scATAC-seq"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Assign new data in muscadet object
-muscadet_obj$genome <- "hg38"
+exdata_muscadet$genome <- "hg38"
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Assign new data in muscomic object
-muscadet_obj$ATAC$label.omic <- "scATAC-seq"
+exdata_muscadet$ATAC$label.omic <- "scATAC-seq"
 ```

@@ -35,14 +35,16 @@ returns `NULL`
 ``` r
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 atac
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  mat.counts coverage data matrix 
-#>  112 cells 
-#>  1000 features: peaks 
-#>  691 variant positions 
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: None
+#>  variant positions: 681
 ```

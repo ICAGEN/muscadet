@@ -32,7 +32,7 @@ Data obtained from assemblies provided by the `BSgenome` package.
 
 - `BSgenome.Mmusculus.UCSC.mm10` version 1.4.3 - `GRCm38.p6`
 
-\#' @references
+## References
 
 - BSgenome package:
 

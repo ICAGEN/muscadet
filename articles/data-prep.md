@@ -1,5 +1,26 @@
 # Preparation of input data
 
+Documentation on example data inputs:
+
+- Count matrices:
+  [`?exdata_mat_counts`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.html)
+- Allele counts data frames:
+  [`?exdata_allele_counts`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.html)
+- Features coordinate data frames:
+  [`?exdata_features`](https://icagen.github.io/muscadet/reference/exdata_features.html)
+- Matched bulk coverage (log R ratio):
+  [`?exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.html)
+
+> **Important note on example data**
+>
+> The example dataset included in `muscadet` is a toy dataset designed
+> for demonstration purposes only. It is deliberately minimal and
+> contains a reduced genomic representation (three chromosomes). Its
+> sole purpose is to illustrate how to run the main functions and
+> explore the package features. Because of this strong simplification,
+> the results obtained from this dataset should not be interpreted as
+> biologically meaningful or methodologically representative.
+
 ## 1 Count matrices
 
 The `mat_counts` input is required for muscadet analysis and must be
@@ -11,19 +32,24 @@ counts with features as rows and cells as columns
 ([Table 1](#tbl-mat-counts)).
 
 See
-[`?mat_counts`](https://icagen.github.io/muscadet/reference/mat_counts.md)
+[`?exdata_mat_counts`](https://icagen.github.io/muscadet/reference/exdata_mat_counts.md)
 for full documentation.
 
 ``` r
-data("mat_counts_atac_tumor")
-kable(mat_counts_atac_tumor[698:700,34:36])
+data("exdata_mat_counts_atac_tumor")
+kable(exdata_mat_counts_atac_tumor[1:8, 30:34])
 ```
 
-|                        | samplename_CCGTTGCGTGTGTCCC-1 | samplename_CCTGGATCATTCCTCG-1 | samplename_CCTTCAATCCGCCAAA-1 |
-|:-----------------------|------------------------------:|------------------------------:|------------------------------:|
-| 12_118016401_118016901 |                             1 |                             0 |                             0 |
-| 12_124564171_124564671 |                             0 |                             0 |                             0 |
-| 12_132710447_132710947 |                             2 |                             0 |                             2 |
+|                               | 3_14380209_14380709 | 3_14432174_14432674 | 3_14946687_14947187 | 3_15050333_15050833 | 3_15241296_15241796 |
+|:------------------------------|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|
+| samplename_AACTTAGTCCTCATCA-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
+| samplename_AAGAATCAGGTGTTAC-1 |                   0 |                   2 |                   0 |                   0 |                   0 |
+| samplename_AAGCCACGTTAGTACG-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
+| samplename_AATAACCGTAGTTGGC-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
+| samplename_AATCCTAAGGTCCTAG-1 |                   0 |                   1 |                   0 |                   0 |                   0 |
+| samplename_AATTTCCTCGAAGTGA-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
+| samplename_ACATCATCAGGCTTCG-1 |                   0 |                   3 |                   0 |                   0 |                   0 |
+| samplename_ACCAAACTCTAACCTT-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
 
 Table 1: Allele counts table example
 
@@ -69,34 +95,37 @@ Format (VCF)-like structure and should include:
 - `id`: variant identifier (e.g. CHROM_POS_REF_ALT)
 - `CHROM`: chromosome
 - `POS`: position
-- `REF` / `ALT`: reference and alternate alleles
-- `RD` / `AD`: counts for reference and alternate alleles
+- `REF`: reference allele
+- `ALT`: alternate allele
+- `RD`: count for reference allele
+- `AD`: count for alternate allele
 - `DP`: total depth
 - `GT`: genotype *(optional)*
 
 See
-[`?allele_counts`](https://icagen.github.io/muscadet/reference/allele_counts.md)
+[`?exdata_allele_counts`](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
 for full documentation.
 
 ``` r
-data("allele_counts_atac_tumor")
-kable(head(allele_counts_atac_tumor))
+data("exdata_allele_counts_atac_tumor")
+rownames(exdata_allele_counts_atac_tumor) <- NULL
+kable(head(exdata_allele_counts_atac_tumor))
 ```
 
-|       | cell                          | id             | CHROM |      POS | REF | ALT |  RD |  AD |  DP | GT   |
-|:------|:------------------------------|:---------------|------:|---------:|:----|:----|----:|----:|----:|:-----|
-| 4694  | samplename_GAAAGGCTCTAAGTGC-1 | 1_2323263_T_G  |     1 |  2323263 | T   | G   |   1 |   0 |   1 | 1\|0 |
-| 13631 | samplename_ACTTACAAGTAAGGGC-1 | 1_4007524_T_C  |     1 |  4007524 | T   | C   |   1 |   0 |   1 | 1\|0 |
-| 24816 | samplename_GTAGCGCTCCTTTACG-1 | 1_6599445_C_A  |     1 |  6599445 | C   | A   |   0 |   1 |   1 | 1\|0 |
-| 31038 | samplename_GTACTTCGTTGTGACA-1 | 1_8201062_C_T  |     1 |  8201062 | C   | T   |   0 |   1 |   1 | 0\|1 |
-| 34534 | samplename_AAGCTCCCAACCCTCC-1 | 1_9491207_C_A  |     1 |  9491207 | C   | A   |   0 |   1 |   1 | 0\|1 |
-| 49929 | samplename_ATGGTTATCCAAATCA-1 | 1_15417791_C_A |     1 | 15417791 | C   | A   |   0 |   1 |   1 | 0\|1 |
+| cell                          | id            | CHROM |     POS | REF | ALT |  RD |  AD |  DP | GT   |
+|:------------------------------|:--------------|------:|--------:|:----|:----|----:|----:|----:|:-----|
+| samplename_CCGGTTAAGGAGCAAC-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   1 |   0 |   1 | 0\|1 |
+| samplename_CTTGCTCAGTTAGCCG-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   0 |   1 |   1 | 0\|1 |
+| samplename_CTTTAGTTCTAGCTAA-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   1 |   0 |   1 | 0\|1 |
+| samplename_GCGCCTTGTTCCGGGA-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   0 |   1 |   1 | 0\|1 |
+| samplename_GGTCTTGAGCAAGGGT-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   0 |   1 |   1 | 0\|1 |
+| samplename_GTCAAACTCTAGCGTG-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   1 |   0 |   1 | 0\|1 |
 
 Table 2: Allele counts table example
 
 ### 2.1 Variant positions
 
-Variant positions can be derived from:
+Single variant positions can be derived from:
 
 - Matched bulk sequencing to identify individual-specific heterozygous
   SNPs, or
@@ -104,7 +133,7 @@ Variant positions can be derived from:
 
 #### 2.1.1 Individual-specific heterozygous positions from bulk data
 
-Positions can be retrieved by running
+Single heterozygous positions can be retrieved by running
 [FACETS](https://github.com/mskcc/facets)[¹](#fn1) on matched WGS/WES
 normal samples.
 
@@ -119,22 +148,23 @@ documentation](https://github.com/mskcc/facets/blob/master/inst/extcode/README.t
 
 #### 2.1.2 Panels of common SNPs
 
-- [gnomAD](https://gnomad.broadinstitute.org/) database (4,099 SNPs):
-  [data
-  here](https://cloud.google.com/life-sciences/docs/resources/public-datasets/gnomad?hl=en)
-- [1000G](https://www.internationalgenome.org/) database (2,548 SNPs):
-  [data here](https://sourceforge.net/projects/cellsnp/files/SNPlist)
+- [gnomAD](https://gnomad.broadinstitute.org/) database: [data
+  here](https://gnomad.broadinstitute.org/downloads)
+- [1000G](https://www.internationalgenome.org/) database: [data
+  here](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
 
 ### 2.2 Count reads from single cells
 
 [SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)[²](#fn2)
 is used to get read counts per allele from single cell BAM files.
 
-> The program `scReadCounts` manages the sequential execution of
-> programs `readCounts` and `readCountsMatrix`, collects the necessary
-> arguments for successful execution, and avoids unnecessary execution
-> of the expensive `readCounts` tool if possible. `readCounts` requires
-> three input files: a pooled single cell alignment, a list of genomic
+> *From [SCReadCounts
+> documentation](https://horvathlab.github.io/NGS/SCReadCounts/)*: The
+> program `scReadCounts` manages the sequential execution of programs
+> `readCounts` and `readCountsMatrix`, collects the necessary arguments
+> for successful execution, and avoids unnecessary execution of the
+> expensive `readCounts` tool if possible. `readCounts` requires three
+> input files: a pooled single cell alignment, a list of genomic
 > positions of interest, and the barcodes file (barcodes.tsv) .
 > Optionally, `readCounts` can be user-configured for *read filtering*
 > and *cell-barcode handling*, including restriction to barcodes of
@@ -151,8 +181,7 @@ is used to get read counts per allele from single cell BAM files.
 > sequencing reads (minR); default minR = 5. `readCountsMatrix` is
 > time-efficient and can be re-run multiple times at various minR
 > thresholds. Together, these tools facilitate single-cell level
-> assessment of read counts. *From
-> <https://horvathlab.github.io/NGS/SCReadCounts/>*
+> assessment of read counts.
 
 As the desired output is the tab separated text file with variant and
 reference read counts for each barcode, the command
@@ -238,22 +267,22 @@ A table of features coordinates with 4 columns (`CHROM`, `start`, `end`,
 [Section 1](#sec-mat-counts)) is required ([Table 5](#tbl-features)).
 
 See
-[`?features`](https://icagen.github.io/muscadet/reference/features.md)
+[`?exdata_features`](https://icagen.github.io/muscadet/reference/exdata_features.md)
 for full documentation.
 
 ``` r
-data("peaks")
-kable(head(peaks))
+data("exdata_peaks")
+kable(head(exdata_peaks))
 ```
 
-| CHROM |    start |      end | id                  |
-|:------|---------:|---------:|:--------------------|
-| 1     |   941542 |   942042 | 1_941542_942042     |
-| 1     |  3976396 |  3976896 | 1_3976396_3976896   |
-| 1     |  6465944 |  6466444 | 1_6465944_6466444   |
-| 1     |  6901466 |  6901966 | 1_6901466_6901966   |
-| 1     |  7402483 |  7402983 | 1_7402483_7402983   |
-| 1     | 10794813 | 10795313 | 1_10794813_10795313 |
+| CHROM |   start |     end | id                |
+|:------|--------:|--------:|:------------------|
+| 3     | 1535287 | 1535787 | 3_1535287_1535787 |
+| 3     | 1594942 | 1595442 | 3_1594942_1595442 |
+| 3     | 1632524 | 1633024 | 3_1632524_1633024 |
+| 3     | 1964186 | 1964686 | 3_1964186_1964686 |
+| 3     | 2793516 | 2794016 | 3_2793516_2794016 |
+| 3     | 2970389 | 2970889 | 3_2970389_2970889 |
 
 Table 5: Features coordinates table example
 
@@ -304,7 +333,7 @@ colnames(genes_coord) <- c("CHROM", "start", "end", "id")
 library(EnsDb.Hsapiens.v86) # for human
 library(AnnotationDbi)
 
-genes <- rownames(mat_counts_RNA)
+genes <- rownames(exdata_mat_counts_RNA)
 genes_coord <- genes(EnsDb.Hsapiens.v86, filter = GeneNameFilter(genes))
 genes_coord <- as.data.frame(genes_coord)
 genes_coord <- genes_coord[genes_coord$seqnames %in% c(1:22, "X", "Y"), ]
@@ -313,23 +342,22 @@ colnames(genes_coord) <- c("CHROM", "start", "end", "id")
 rownames(genes_coord) <- NULL
 ```
 
-### 3.3 Match cells and features
-
-> **Important**
+> **Important note: Match cells and features**
 >
-> Cell names (columns) and features names (rows) must match between
-> assays and features coordinates table ids.
-
-``` r
-# Make sure row names of mat_counts match features ids
-identical(rownames(mat_counts_ATAC), peaks_coord[, "id"])
-rownames(mat_counts_ATAC) <- peaks_coord[, "id"]
-
-table(rownames(mat_counts_RNA) %in% genes_coord[, "id"])
-
-# Cell names format must match between different assays
-intersect(colnames(mat_counts_ATAC), colnames(mat_counts_RNA))
-```
+> Cell names of matrices (rows) must match between assays. Features
+> names of matrices (columns) must match with the ids in the features
+> coordinates data frames.
+>
+> ``` r
+> # Cell names format must match between different assays
+> intersect(rownames(mat_counts_ATAC), rownames(mat_counts_RNA))
+>
+> # Make sure columns names of mat_counts match features ids
+> identical(colnames(mat_counts_ATAC), peaks_coord[, "id"])
+> colnames(mat_counts_ATAC) <- peaks_coord[, "id"]
+>
+> table(colnames(mat_counts_RNA) %in% genes_coord[, "id"])
+> ```
 
 ## 4 Bulk log-ratios
 
@@ -343,22 +371,22 @@ Log ratios for bulk sequencing can be obtained through
 [FACETS](https://github.com/mskcc/facets)[³](#fn3) analysis.
 
 See
-[`?bulk_lrr`](https://icagen.github.io/muscadet/reference/bulk_lrr.md)
+[`?exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.md)
 for full documentation.
 
 ``` r
-data("bulk_lrr")
-kable(head(bulk_lrr))
+data("exdata_bulk_lrr")
+kable(head(exdata_bulk_lrr))
 ```
 
 | CHROM |     start |       end |        lrr |
 |------:|----------:|----------:|-----------:|
-|     1 |     16100 |  78558400 | -0.1742290 |
-|     1 |  78558700 |  80533900 | -0.8500686 |
-|     1 |  80534279 |  80603200 | -0.1721919 |
-|     1 |  80603500 |  99964900 | -0.8668536 |
-|     1 |  99965200 | 122514900 | -0.1599042 |
-|     1 | 122520400 | 124588600 |  0.0511974 |
+|     3 |     11900 |  64709600 |  0.1229632 |
+|     3 |  64710100 |  65331100 | -0.1631371 |
+|     3 |  65331200 |  93784800 |  0.1271516 |
+|     3 |  93784900 | 165334700 |  0.1507467 |
+|     3 | 165335000 | 165426322 | -0.2682795 |
+|     3 | 165426671 | 197495900 |  0.1484524 |
 
 Table 6: Bulk log ratios table example
 

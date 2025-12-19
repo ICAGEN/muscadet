@@ -21,7 +21,6 @@ computeLogRatio(
   omic,
   method = NULL,
   new.label.features = NULL,
-  remove.raw = TRUE,
   quiet = FALSE,
   all_steps = FALSE,
   ...
@@ -67,12 +66,6 @@ computeLogRatio(
   New label for features (`character` string). If `NULL`, the label
   remains unchanged when using the "RNA" method and becomes "windows of
   peaks" when using the "ATAC" method.
-
-- remove.raw:
-
-  `TRUE` or `FALSE` (`logical`). Whether to remove raw count matrices.
-  `TRUE` by default to reduce object size. Setting it to `FALSE` will
-  keep raw count matrices within the object.
 
 - quiet:
 
@@ -170,33 +163,33 @@ Other computeLogRatio:
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_tumor,
+  allele_counts = exdata_allele_counts_rna_tumor,
+  features = exdata_genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_ref,
+  allele_counts = exdata_allele_counts_atac_ref,
+  features = exdata_peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_ref,
+  allele_counts = exdata_allele_counts_rna_ref,
+  features = exdata_genes
 )
 
 # Create muscadet objects
 muscadet <- CreateMuscadetObject(
   omics = list(atac, rna),
-  bulk.lrr = bulk_lrr,
+  bulk.lrr = exdata_bulk_lrr,
   bulk.label = "WGS",
   genome = "hg38"
 )
@@ -216,14 +209,8 @@ muscadet <- computeLogRatio(
 )
 #> -- computeLogRatio: Method 'ATAC' using computeLogRatioATAC().
 #> Step 01 - Group peaks in windows: window size set at 10 Mb, sliding by 2 Mb
-#> Step 02 - Filtering windows: Minimum of 1 peaks per window with a minimum average of 1 read(s)
-#> Step 03 - Normalization for sequencing depth: Normalized counts per million
-#> Step 04 - Log transformation and normalization by reference data: log R ratio
-#> Step 05 - Capping the range of values: threshold = 3
-#> Step 06 - [No step 06 for scATAC-seq]
-#> Step 07 - Centering of cells
-#> Step 08 - Correcting by reference variability
-#> Done.
+#> Loading required namespace: GenomeInfoDb
+#> Error in .requirePackage(package): unable to load required package ‘GenomeInfoDb’
 
 # compute log R ratios for RNA
 muscadet <- computeLogRatio(

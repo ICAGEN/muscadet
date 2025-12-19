@@ -91,51 +91,51 @@ object updated with the user chosen cluster assignments in
 ``` r
 if (FALSE) { # \dontrun{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Select clustering result for partition = 0.6
-muscadet_obj <- assignClusters(muscadet_obj, partition = 0.6)
-table(muscadet_obj$cnacalling$clusters)
+exdata_muscadet<- assignClusters(exdata_muscadet, partition = 0.6)
+table(exdata_muscadet$cnacalling$clusters)
 
 # Assign custom clusters
 set.seed(42)
-cell_names <- Reduce(union, SeuratObject::Cells(muscadet_obj))
+cell_names <- Reduce(union, SeuratObject::Cells(exdata_muscadet))
 n1 <- sample(1:length(cell_names), 1)
 n2 <- length(cell_names) - n1
 custom_clusters <- setNames(c(rep.int(1, n1), rep.int(2, n2)), cell_names)
 table(custom_clusters)
-muscadet_obj <- assignClusters(muscadet_obj, clusters = custom_clusters)
-table(muscadet_obj$cnacalling$clusters)
+exdata_muscadet <- assignClusters(exdata_muscadet, clusters = custom_clusters)
+table(exdata_muscadet$cnacalling$clusters)
 
 # Assign clusters with remapping
 # example to remap from partition=0.8 with merging of clusters 2 and 3
-clusters <- muscadet_obj$clustering$clusters[["0.8"]]
+clusters <- exdata_muscadet$clustering$clusters[["0.8"]]
 table(clusters) # 3 clusters
 mapping <- c("1" = 1, "2" = 2, "3" = 2) # remap to 2 clusters
 
-muscadet_obj <- assignClusters(muscadet_obj, clusters = clusters, mapping = mapping)
-table(muscadet_obj$cnacalling$clusters)
+exdata_muscadet <- assignClusters(exdata_muscadet, clusters = clusters, mapping = mapping)
+table(exdata_muscadet$cnacalling$clusters)
 # check original and remapped clusters
-table(clusters, muscadet_obj$cnacalling$clusters)
+table(clusters, exdata_muscadet$cnacalling$clusters)
 
-muscadet_obj <- assignClusters(muscadet_obj, partition = 0.8, mapping = mapping)
-table(muscadet_obj$cnacalling$clusters)
+exdata_muscadet <- assignClusters(exdata_muscadet, partition = 0.8, mapping = mapping)
+table(exdata_muscadet$cnacalling$clusters)
 # check original and remapped clusters
-table(muscadet_obj$clustering$clusters[["0.8"]],
-      muscadet_obj$cnacalling$clusters)
+table(exdata_muscadet$clustering$clusters[["0.8"]],
+      exdata_muscadet$cnacalling$clusters)
 
 # Visualize clusters on heatmap
 heatmapMuscadet(
-    muscadet_obj,
+    exdata_muscadet,
     partition = 0.8,
     filename = file.path("heatmap_muscadet_res0.8.png"),
-    title = "Example sample | res=0.8"
+    title = "Example dataset | res=0.8"
 )
 heatmapMuscadet(
-    muscadet_obj,
-    clusters = muscadet_obj$cnacalling$clusters,
+    exdata_muscadet,
+    clusters = exdata_muscadet$cnacalling$clusters,
     filename = file.path("heatmap_muscadet_custom_res0.8.png"),
-    title = "Example sample | rearranged clusters from res=0.8"
+    title = "Example dataset | rearranged clusters from res=0.8"
 )
 } # }
 ```

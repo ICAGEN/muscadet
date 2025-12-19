@@ -11,7 +11,7 @@ after clustering and CNA calling."><meta property="og:image" content="https://ic
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@ after clustering and CNA calling."><meta property="og:image" content="https://ic
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>The muscadet class</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/objects.R" class="external-link"><code>R/objects.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/objects.R" class="external-link"><code>R/objects.R</code></a></small>
       <div class="d-none name"><code>muscadet-class.Rd</code></div>
     </div>
 
@@ -89,29 +89,28 @@ of copy number alterations (CNAs) (<code>list</code>).</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj</span></span></span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> A muscadet object </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2 omics: ATAC, RNA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  types: ATAC, RNA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  labels: scATAC-seq, scRNA-seq </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  coverage data matrix: log.ratio, log.ratio </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cells: 112, 119 (common: 84, total: 147) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  features: 133, 349 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  feature labels: windows of peaks, genes </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  variant positions: 691, 373 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  data from paired bulk sequencing: WGS </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  clustering: partitions = 0.6, 0.8, 1 ; optimal partition = 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  CNA calling: 2 clusters ; 47 consensus segments including 1 CNA segments </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cells: 71, 69 (common: 63, total: 77) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  logratio: 71 cells x 213 features (windows of peaks), 69 cells x 212 features (genes) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variant positions: 681, 359 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  bulk data: WGS </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  clustering: partitions = 0.1, 0.3, 0.5 ; optimal partition = 0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  CNA calling: 2 clusters ; 3 consensus segments including 0 CNA segments </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  genome: hg38 </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formal class 'muscadet' [package "muscadet"] with 5 slots</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ omics     :List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ bulk.data :List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ clustering:List of 9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ cnacalling:List of 21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ cnacalling:List of 20</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..@ genome    : chr "hg38"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -122,7 +121,7 @@ of copy number alterations (CNAs) (<code>list</code>).</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

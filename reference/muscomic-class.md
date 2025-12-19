@@ -43,25 +43,29 @@ Functions related to `muscomic` objects:
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-muscadet_obj$ATAC
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  112 cells 
-#>  133 features: windows of peaks 
-#>  691 variant positions 
-muscadet_obj$RNA
-#> A muscomic object of type RNA labelled scRNA-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  119 cells 
-#>  349 features: genes 
-#>  373 variant positions 
+exdata_muscadet$ATAC
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
+exdata_muscadet$RNA
+#> A muscomic object 
+#>  type: RNA 
+#>  label: scRNA-seq 
+#>  cells: 69 
+#>  counts: 69 cells x 300 features (genes)
+#>  logratio: 69 cells x 212 features (genes)
+#>  variant positions: 359
 
-str(muscadet_obj$ATAC, max.level = 2)
+str(exdata_muscadet$ATAC, max.level = 2)
 #> Formal class 'muscomic' [package "muscadet"] with 4 slots
 #>   ..@ type      : chr "ATAC"
 #>   ..@ label.omic: chr "scATAC-seq"
-#>   ..@ coverage  :List of 6
-#>   ..@ allelic   :List of 1
+#>   ..@ coverage  :List of 2
+#>   ..@ allelic   :List of 3
 ```

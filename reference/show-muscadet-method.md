@@ -34,46 +34,51 @@ returns `NULL`
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Overview of the muscadet object
-show(muscadet_obj)
+show(exdata_muscadet)
 #> A muscadet object 
 #>  2 omics: ATAC, RNA 
 #>  types: ATAC, RNA 
 #>  labels: scATAC-seq, scRNA-seq 
-#>  coverage data matrix: log.ratio, log.ratio 
-#>  cells: 112, 119 (common: 84, total: 147) 
-#>  features: 133, 349 
-#>  feature labels: windows of peaks, genes 
-#>  variant positions: 691, 373 
-#>  data from paired bulk sequencing: WGS 
-#>  clustering: partitions = 0.6, 0.8, 1 ; optimal partition = 1 
-#>  CNA calling: 2 clusters ; 47 consensus segments including 1 CNA segments 
+#>  cells: 71, 69 (common: 63, total: 77) 
+#>  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) 
+#>  logratio: 71 cells x 213 features (windows of peaks), 69 cells x 212 features (genes) 
+#>  variant positions: 681, 359 
+#>  bulk data: WGS 
+#>  clustering: partitions = 0.1, 0.3, 0.5 ; optimal partition = 0.5 
+#>  CNA calling: 2 clusters ; 3 consensus segments including 0 CNA segments 
 #>  genome: hg38 
 
 # Overview of the muscomic objects within
-show(slot(muscadet_obj, "omics"))
+show(slot(exdata_muscadet, "omics"))
 #> $ATAC
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  112 cells 
-#>  133 features: windows of peaks 
-#>  691 variant positions 
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
 #> 
 #> $RNA
-#> A muscomic object of type RNA labelled scRNA-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  119 cells 
-#>  349 features: genes 
-#>  373 variant positions 
+#> A muscomic object 
+#>  type: RNA 
+#>  label: scRNA-seq 
+#>  cells: 69 
+#>  counts: 69 cells x 300 features (genes)
+#>  logratio: 69 cells x 212 features (genes)
+#>  variant positions: 359
 #> 
 
 # Overview of the first muscomic objects within
-show(slot(muscadet_obj, "omics")[[1]])
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  112 cells 
-#>  133 features: windows of peaks 
-#>  691 variant positions 
+show(slot(exdata_muscadet, "omics")[[1]])
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
 ```

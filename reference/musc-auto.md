@@ -39,16 +39,18 @@ Character vector of matching element names.
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
-muscadet_obj$ATAC
-#> A muscomic object of type ATAC labelled scATAC-seq containing: 
-#>  log.ratio coverage data matrix 
-#>  112 cells 
-#>  133 features: windows of peaks 
-#>  691 variant positions 
+# data("exdata_muscadet")
+exdata_muscadet$ATAC
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
 
 # Load example muscadet object
-# data("muscadet_obj")
-muscadet_obj$ATAC$type
+# data("exdata_muscadet")
+exdata_muscadet$ATAC$type
 #> [1] "ATAC"
 ```

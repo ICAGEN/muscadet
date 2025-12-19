@@ -160,11 +160,11 @@ Similarity Network Fusion:
 ``` r
 if (FALSE) { # \dontrun{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Format input
 # transpose matrices to: cells x features matrices
-mat_list <- lapply(muscadet::matLogRatio(muscadet_obj), t)
+mat_list <- matLogRatio(exdata_muscadet)
 
 # Run integration & clustering
 result <- cluster_hclust(mat_list, k_range = 2:4)

@@ -26,7 +26,7 @@ addAlleleCounts(x, allele_counts)
   as the number of omics in the `x` object. Each data frames must
   contain the following columns : `cell`, `id`, `CHROM`, `POS`, `REF`,
   `ALT`, `RD`, `AD`, `DP`, `GT`. See
-  [allele_counts](https://icagen.github.io/muscadet/reference/allele_counts.md)
+  [exdata_allele_counts](https://icagen.github.io/muscadet/reference/exdata_allele_counts.md)
   for details.
 
 ## Value
@@ -42,7 +42,7 @@ As the allele counts are not used for computing log R ratios and cell
 clustering, they are not mandatory at the creation of `muscomic` and
 `muscadet` objects. The allele counts data can be added to objects later
 with this `addAlleleCounts` function, before using the
-[`mergeCounts()`](https://icagen.github.io/muscadet/reference/mergeCounts.md)
+[`aggregateCounts()`](https://icagen.github.io/muscadet/reference/aggregateCounts.md)
 function.
 
 This function is also useful to add allele counts for
@@ -57,20 +57,20 @@ calling.
 ## See also
 
 [`CreateMuscomicObject()`](https://icagen.github.io/muscadet/reference/CreateMuscomicObject.md),
-[`mergeCounts()`](https://icagen.github.io/muscadet/reference/mergeCounts.md)
+[`aggregateCounts()`](https://icagen.github.io/muscadet/reference/aggregateCounts.md)
 
 ## Examples
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
-# data("muscadet_obj_ref")
+# data("exdata_muscadet")
+# data("exdata_muscadet_ref")
 
 # Add allele counts data frames to muscadet objects
-muscadet_obj <- addAlleleCounts(
-    muscadet_obj,
-    allele_counts = list(allele_counts_atac_tumor, allele_counts_rna_tumor))
-muscadet_obj_ref <- addAlleleCounts(
-    muscadet_obj_ref,
-    allele_counts = list(allele_counts_atac_ref, allele_counts_rna_ref))
+exdata_muscadet <- addAlleleCounts(
+    exdata_muscadet,
+    allele_counts = list(exdata_allele_counts_atac_tumor, exdata_allele_counts_rna_tumor))
+exdata_muscadet_ref <- addAlleleCounts(
+    exdata_muscadet_ref,
+    allele_counts = list(exdata_allele_counts_atac_ref, exdata_allele_counts_rna_ref))
 ```

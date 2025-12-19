@@ -71,7 +71,7 @@ from Tumor Sequencing*. R package version 0.6.2,
 
   - Combined allelic and coverage counts per cluster in the
     `cnacalling$combined.counts` slot (use
-    [`mergeCounts()`](https://icagen.github.io/muscadet/reference/mergeCounts.md)).
+    [`aggregateCounts()`](https://icagen.github.io/muscadet/reference/aggregateCounts.md)).
 
 - omics.coverage:
 
@@ -289,7 +289,7 @@ Details of the cnacalling slot:
 ## See also
 
 [`assignClusters()`](https://icagen.github.io/muscadet/reference/assignClusters.md),
-[`mergeCounts()`](https://icagen.github.io/muscadet/reference/mergeCounts.md),[`preProcSample2()`](https://icagen.github.io/muscadet/reference/preProcSample2.md)
+[`aggregateCounts()`](https://icagen.github.io/muscadet/reference/aggregateCounts.md),[`preProcSample2()`](https://icagen.github.io/muscadet/reference/preProcSample2.md)
 
 ## Examples
 
@@ -298,32 +298,46 @@ library("facets")
 #> Loading required package: pctGCdata
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-muscadet_obj <- cnaCalling(muscadet_obj,
-                           omics.coverage = "ATAC",
-                           depthmin.a.clusters = 3, # set low thresholds for example data
-                           depthmin.c.clusters = 5,
-                           depthmin.a.allcells = 3,
-                           depthmin.c.allcells = 5,
-                           depthmin.c.nor = 0)
-#> Selecting coverage data from omic(s): ATAC
-#> Filtering positions per clusters based on provided filters...
+exdata_muscadet <- cnaCalling(
+    exdata_muscadet,
+    omics.coverage = "ATAC",
+    depthmin.a.clusters = 3, # set low thresholds for example data
+    depthmin.c.clusters = 5,
+    depthmin.a.allcells = 3,
+    depthmin.c.allcells = 5,
+    depthmin.c.nor = 0
+)
+#> - Analysis per cluster -
+#> Initial number of positions: 2455
+#> Initial number of allelic positions: 1313
+#> Initial number of coverage positions: 1142
+#> Integrating omics...
 #> Filtering allelic positions: tumor depth >= 3 reads
+#> Selecting coverage data from omic(s): ATAC
 #> Filtering coverage positions: tumor depth >= 5 reads
 #> Filtering coverage positions: normal depth >= 0 reads
-#> From 1733 positions to 404 positions
+#> Allelic positions kept: 126
+#> Coverage positions kept: 154
+#> Final number of positions: 280
 #> Performing segmentation per cluster...
 #> Finding diploid log R ratio on clusters...
-#> Diploid log R ratio = -0.279348299298531
+#> Diploid log R ratio = -0.273
 #> Computing cell fractions and copy numbers on clusters...
-#> Warning: no non-missing arguments to max; returning -Inf
-#> Filtering positions on all cells based on provided filters...
+#> - Analysis on all cells -
+#> Aggregating allelic counts of all cells...
 #> Filtering allelic positions: tumor depth >= 3 reads
+#> Allelic positions kept: 186
+#> Aggregating coverage counts of all cells...
 #> Filtering coverage positions: tumor depth >= 5 reads
 #> Filtering coverage positions: normal depth >= 0 reads
-#> From 1270 positions to 392 positions
+#> Coverage positions kept: 150
+#> Final number of positions: 336
 #> Performing segmentation on all cells...
 #> Computing cell fractions and copy numbers on all cells...
-#> Finding consensus segments between clusters...
+#> - Consensus segments accross clusters -
+#> Finding consensus segments...
+#> 5 consensus segments identified, 0 CNA segments identified
+#> Done.
 ```

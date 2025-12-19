@@ -105,11 +105,16 @@ A multi-panel plot of CNA profiles is produced.
 ``` r
 if (FALSE) { # \dontrun{
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
+
+# Plot profile for first cluster
+pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
+plotProfile(exdata_muscadet, data = "1", title = "Example dataset - cluster 1")
+dev.off()
 
 # Plot profile for all cells
 pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
-plotProfile(muscadet_obj, data = "allcells", title = "Example data - all cells")
+plotProfile(exdata_muscadet, data = "allcells", title = "Example dataset - all cells")
 dev.off()
 } # }
 ```

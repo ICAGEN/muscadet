@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/vignettes/data-prep.qmd" class="external-link"><code>vignettes/data-prep.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/vignettes/data-prep.qmd" class="external-link"><code>vignettes/data-prep.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -74,16 +74,33 @@
 
 
 
-    <section class="section level2" data-number="1"><h2 data-number="1" id="sec-mat-counts">
+    <p>Documentation on example data inputs:</p>
+<ul>
+<li>Count matrices: <a href="https://icagen.github.io/muscadet/reference/exdata_mat_counts.html"><code>?exdata_mat_counts</code></a>
+</li>
+<li>Allele counts data frames: <a href="https://icagen.github.io/muscadet/reference/exdata_allele_counts.html"><code>?exdata_allele_counts</code></a>
+</li>
+<li>Features coordinate data frames: <a href="https://icagen.github.io/muscadet/reference/exdata_features.html"><code>?exdata_features</code></a>
+</li>
+<li>Matched bulk coverage (log R ratio): <a href="https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.html"><code>?exdata_bulk_lrr</code></a>
+</li>
+</ul>
+<div>
+<blockquote>
+<p><strong>Important note on example data</strong></p>
+<p>The example dataset included in <code>muscadet</code> is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.</p>
+</blockquote>
+</div>
+<section class="section level2" data-number="1"><h2 data-number="1" id="sec-mat-counts">
 <span class="header-section-number">1</span> Count matrices<a class="anchor" aria-label="anchor" href="#sec-mat-counts"></a>
 </h2>
 <p>The <code>mat_counts</code> input is required for muscadet analysis and must be provided with <code><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject()</a></code>.</p>
 <p>This input should be a matrix (sparse <code>dgCMatrix</code> or not) of raw read counts with features as rows and cells as columns (<a href="#tbl-mat-counts" class="quarto-xref">Table 1</a>).</p>
-<p>See <code><a href="../reference/mat_counts.html">?mat_counts</a></code> for full documentation.</p>
+<p>See <code><a href="../reference/exdata_mat_counts.html">?exdata_mat_counts</a></code> for full documentation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mat_counts_atac_tumor"</span><span class="op">)</span></span>
-<span><span class="fu">kable</span><span class="op">(</span><span class="va">mat_counts_atac_tumor</span><span class="op">[</span><span class="fl">698</span><span class="op">:</span><span class="fl">700</span>,<span class="fl">34</span><span class="op">:</span><span class="fl">36</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_mat_counts_atac_tumor"</span><span class="op">)</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="va">exdata_mat_counts_atac_tumor</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">30</span><span class="op">:</span><span class="fl">34</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-mat-counts" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-mat-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table 1: Allele counts table example
@@ -91,35 +108,85 @@ Table 1: Allele counts table example
 <div class="cell-output-display">
 <table class="table do-not-create-environment cell caption-top">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 26%">
-<col style="width: 26%">
-<col style="width: 26%">
+<col style="width: 23%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
 </colgroup>
 <thead><tr class="header">
 <th style="text-align: left;"></th>
-<th style="text-align: right;">samplename_CCGTTGCGTGTGTCCC-1</th>
-<th style="text-align: right;">samplename_CCTGGATCATTCCTCG-1</th>
-<th style="text-align: right;">samplename_CCTTCAATCCGCCAAA-1</th>
+<th style="text-align: right;">3_14380209_14380709</th>
+<th style="text-align: right;">3_14432174_14432674</th>
+<th style="text-align: right;">3_14946687_14947187</th>
+<th style="text-align: right;">3_15050333_15050833</th>
+<th style="text-align: right;">3_15241296_15241796</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">12_118016401_118016901</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: left;">samplename_AACTTAGTCCTCATCA-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">12_124564171_124564671</td>
+<td style="text-align: left;">samplename_AAGAATCAGGTGTTAC-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">12_132710447_132710947</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: left;">samplename_AAGCCACGTTAGTACG-1</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">samplename_AATAACCGTAGTTGGC-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">samplename_AATCCTAAGGTCCTAG-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">samplename_AATTTCCTCGAAGTGA-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">samplename_ACATCATCAGGCTTCG-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">samplename_ACCAAACTCTAACCTT-1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
 </tr>
 </tbody>
 </table>
@@ -169,20 +236,25 @@ Table 1: Allele counts table example
 <li>
 <code>POS</code>: position</li>
 <li>
-<code>REF</code> / <code>ALT</code>: reference and alternate alleles</li>
+<code>REF</code>: reference allele</li>
 <li>
-<code>RD</code> / <code>AD</code>: counts for reference and alternate alleles</li>
+<code>ALT</code>: alternate allele</li>
+<li>
+<code>RD</code>: count for reference allele</li>
+<li>
+<code>AD</code>: count for alternate allele</li>
 <li>
 <code>DP</code>: total depth</li>
 <li>
 <code>GT</code>: genotype <em>(optional)</em>
 </li>
 </ul>
-<p>See <code><a href="../reference/allele_counts.html">?allele_counts</a></code> for full documentation.</p>
+<p>See <code><a href="../reference/exdata_allele_counts.html">?exdata_allele_counts</a></code> for full documentation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"allele_counts_atac_tumor"</span><span class="op">)</span></span>
-<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">allele_counts_atac_tumor</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_allele_counts_atac_tumor"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">exdata_allele_counts_atac_tumor</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">exdata_allele_counts_atac_tumor</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-allele-counts" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-allele-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table 2: Allele counts table example
@@ -190,20 +262,18 @@ Table 2: Allele counts table example
 <div class="cell-output-display">
 <table class="table do-not-create-environment cell caption-top">
 <colgroup>
-<col style="width: 6%">
-<col style="width: 32%">
+<col style="width: 35%">
 <col style="width: 16%">
-<col style="width: 6%">
+<col style="width: 7%">
 <col style="width: 9%">
 <col style="width: 4%">
 <col style="width: 4%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 3%">
-<col style="width: 9%">
+<col style="width: 10%">
 </colgroup>
 <thead><tr class="header">
-<th style="text-align: left;"></th>
 <th style="text-align: left;">cell</th>
 <th style="text-align: left;">id</th>
 <th style="text-align: right;">CHROM</th>
@@ -217,80 +287,74 @@ Table 2: Allele counts table example
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">4694</td>
-<td style="text-align: left;">samplename_GAAAGGCTCTAAGTGC-1</td>
-<td style="text-align: left;">1_2323263_T_G</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">2323263</td>
+<td style="text-align: left;">samplename_CCGGTTAAGGAGCAAC-1</td>
+<td style="text-align: left;">3_3126620_T_G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3126620</td>
 <td style="text-align: left;">T</td>
 <td style="text-align: left;">G</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: left;">1|0</td>
+<td style="text-align: left;">0|1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">13631</td>
-<td style="text-align: left;">samplename_ACTTACAAGTAAGGGC-1</td>
-<td style="text-align: left;">1_4007524_T_C</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">4007524</td>
+<td style="text-align: left;">samplename_CTTGCTCAGTTAGCCG-1</td>
+<td style="text-align: left;">3_3126620_T_G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3126620</td>
 <td style="text-align: left;">T</td>
-<td style="text-align: left;">C</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">1|0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">24816</td>
-<td style="text-align: left;">samplename_GTAGCGCTCCTTTACG-1</td>
-<td style="text-align: left;">1_6599445_C_A</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">6599445</td>
-<td style="text-align: left;">C</td>
-<td style="text-align: left;">A</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">1|0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">31038</td>
-<td style="text-align: left;">samplename_GTACTTCGTTGTGACA-1</td>
-<td style="text-align: left;">1_8201062_C_T</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">8201062</td>
-<td style="text-align: left;">C</td>
-<td style="text-align: left;">T</td>
+<td style="text-align: left;">G</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">0|1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">34534</td>
-<td style="text-align: left;">samplename_AAGCTCCCAACCCTCC-1</td>
-<td style="text-align: left;">1_9491207_C_A</td>
+<td style="text-align: left;">samplename_CTTTAGTTCTAGCTAA-1</td>
+<td style="text-align: left;">3_3126620_T_G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3126620</td>
+<td style="text-align: left;">T</td>
+<td style="text-align: left;">G</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">9491207</td>
-<td style="text-align: left;">C</td>
-<td style="text-align: left;">A</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">0|1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">samplename_GCGCCTTGTTCCGGGA-1</td>
+<td style="text-align: left;">3_3126620_T_G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3126620</td>
+<td style="text-align: left;">T</td>
+<td style="text-align: left;">G</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">0|1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">samplename_GGTCTTGAGCAAGGGT-1</td>
+<td style="text-align: left;">3_3126620_T_G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3126620</td>
+<td style="text-align: left;">T</td>
+<td style="text-align: left;">G</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">0|1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">49929</td>
-<td style="text-align: left;">samplename_ATGGTTATCCAAATCA-1</td>
-<td style="text-align: left;">1_15417791_C_A</td>
+<td style="text-align: left;">samplename_GTCAAACTCTAGCGTG-1</td>
+<td style="text-align: left;">3_3126620_T_G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3126620</td>
+<td style="text-align: left;">T</td>
+<td style="text-align: left;">G</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">15417791</td>
-<td style="text-align: left;">C</td>
-<td style="text-align: left;">A</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">0|1</td>
 </tr>
@@ -304,7 +368,7 @@ Table 2: Allele counts table example
 <section class="level2" data-number="2.1"><h3 data-number="2.1" id="variant-positions">
 <span class="header-section-number">2.1</span> Variant positions<a class="anchor" aria-label="anchor" href="#variant-positions"></a>
 </h3>
-<p>Variant positions can be derived from:</p>
+<p>Single variant positions can be derived from:</p>
 <ul>
 <li>Matched bulk sequencing to identify individual-specific heterozygous SNPs, or</li>
 <li>Reference panels of common SNPs (e.g. gnomAD, 1000G).</li>
@@ -312,7 +376,7 @@ Table 2: Allele counts table example
 <section class="level3" data-number="2.1.1"><h4 data-number="2.1.1" id="individual-specific-heterozygous-positions-from-bulk-data">
 <span class="header-section-number">2.1.1</span> Individual-specific heterozygous positions from bulk data<a class="anchor" aria-label="anchor" href="#individual-specific-heterozygous-positions-from-bulk-data"></a>
 </h4>
-<p>Positions can be retrieved by running <a href="https://github.com/mskcc/facets" class="external-link">FACETS</a><a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Shen R, Seshan VE. &lt;strong&gt;FACETS: allele-specific copy number and clonal heterogeneity analysis tool for high-throughput DNA sequencing. &lt;/strong&gt; &lt;em&gt;Nucleic Acids Res&lt;/em&gt; (2016). &lt;a href="https://www.doi.org/10.1093/nar/gkw520" class="external-link"&gt;https://www.doi.org/10.1093/nar/gkw520&lt;/a&gt;&lt;/p&gt;'><sup>1</sup></a> on matched WGS/WES normal samples.</p>
+<p>Single heterozygous positions can be retrieved by running <a href="https://github.com/mskcc/facets" class="external-link">FACETS</a><a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Shen R, Seshan VE. &lt;strong&gt;FACETS: allele-specific copy number and clonal heterogeneity analysis tool for high-throughput DNA sequencing. &lt;/strong&gt; &lt;em&gt;Nucleic Acids Res&lt;/em&gt; (2016). &lt;a href="https://www.doi.org/10.1093/nar/gkw520" class="external-link"&gt;https://www.doi.org/10.1093/nar/gkw520&lt;/a&gt;&lt;/p&gt;'><sup>1</sup></a> on matched WGS/WES normal samples.</p>
 <p>Use <code>snp-pileup</code> to extract allele counts from bulk BAM files at known sites (VCF of common SNPs from the <a href="https://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/00-common_all.vcf.gz" class="external-link">NCBI database</a>). The output of <code>snp-pileup</code> can be filtered on depth and allele frequency to keep only heterozygous positions well covered.</p>
 <p>See <a href="https://github.com/mskcc/facets/blob/master/inst/extcode/README.txt" class="external-link">FACETS snp-pileup documentation</a>.</p>
 </section><section class="level3" data-number="2.1.2"><h4 data-number="2.1.2" id="panels-of-common-snps">
@@ -320,17 +384,17 @@ Table 2: Allele counts table example
 </h4>
 <ul>
 <li>
-<a href="https://gnomad.broadinstitute.org/" class="external-link">gnomAD</a> database (4,099 SNPs): <a href="https://cloud.google.com/life-sciences/docs/resources/public-datasets/gnomad?hl=en" class="external-link">data here</a>
+<a href="https://gnomad.broadinstitute.org/" class="external-link">gnomAD</a> database: <a href="https://gnomad.broadinstitute.org/downloads" class="external-link">data here</a>
 </li>
 <li>
-<a href="https://www.internationalgenome.org/" class="external-link">1000G</a> database (2,548 SNPs): <a href="https://sourceforge.net/projects/cellsnp/files/SNPlist" class="external-link">data here</a>
+<a href="https://www.internationalgenome.org/" class="external-link">1000G</a> database: <a href="https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/" class="external-link">data here</a>
 </li>
 </ul></section></section><section class="level2" data-number="2.2"><h3 data-number="2.2" id="count-reads-from-single-cells">
 <span class="header-section-number">2.2</span> Count reads from single cells<a class="anchor" aria-label="anchor" href="#count-reads-from-single-cells"></a>
 </h3>
 <p><a href="https://horvathlab.github.io/NGS/SCReadCounts/" class="external-link">SCReadCounts</a><a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Prashant, N.M., Alomran, N., Chen, Y. et al. &lt;strong&gt;SCReadCounts: estimation of cell-level SNVs expression from scRNA-seq data.&lt;/strong&gt; &lt;em&gt;BMC Genomics&lt;/em&gt; (2021). &lt;a href="https://doi.org/10.1186/s12864-021-07974-8" class="external-link"&gt;https://doi.org/10.1186/s12864-021-07974-8&lt;/a&gt;&lt;/p&gt;'><sup>2</sup></a> is used to get read counts per allele from single cell BAM files.</p>
 <blockquote>
-<p>The program <code>scReadCounts</code> manages the sequential execution of programs <code>readCounts</code> and <code>readCountsMatrix</code>, collects the necessary arguments for successful execution, and avoids unnecessary execution of the expensive <code>readCounts</code> tool if possible. <code>readCounts</code> requires three input files: a pooled single cell alignment, a list of genomic positions of interest, and the barcodes file (barcodes.tsv) . Optionally, <code>readCounts</code> can be user-configured for <em>read filtering</em> and <em>cell-barcode handling</em>, including restriction to barcodes of interest (achieved through specifying barcodes file - barcodes.tsv). <code>readCounts</code> utilizes the barcode information from the pooled single cell alignments and <strong>outputs the variant and reference read counts (nvar and nref, respectively), for each barcode (cell), restricted to those present in the barcodes file, in a tab separated text file</strong>. This file is then used as an input for the second program - <code>readCountsMatrix</code> - which, upon providing an output prefix, generates two outputs: (1) a cell-position matrix with absolute nvar and nref counts, and (2) a cell-position matrix with the expressed VAFRNA. VAFRNA is estimated at a user-defined threshold of minimum required sequencing reads (minR); default minR = 5. <code>readCountsMatrix</code> is time-efficient and can be re-run multiple times at various minR thresholds. Together, these tools facilitate single-cell level assessment of read counts. <em>From <a href="https://horvathlab.github.io/NGS/SCReadCounts/" class="external-link">https://horvathlab.github.io/NGS/SCReadCounts/</a></em></p>
+<p><em>From <a href="https://horvathlab.github.io/NGS/SCReadCounts/" class="external-link">SCReadCounts documentation</a></em>: The program <code>scReadCounts</code> manages the sequential execution of programs <code>readCounts</code> and <code>readCountsMatrix</code>, collects the necessary arguments for successful execution, and avoids unnecessary execution of the expensive <code>readCounts</code> tool if possible. <code>readCounts</code> requires three input files: a pooled single cell alignment, a list of genomic positions of interest, and the barcodes file (barcodes.tsv) . Optionally, <code>readCounts</code> can be user-configured for <em>read filtering</em> and <em>cell-barcode handling</em>, including restriction to barcodes of interest (achieved through specifying barcodes file - barcodes.tsv). <code>readCounts</code> utilizes the barcode information from the pooled single cell alignments and <strong>outputs the variant and reference read counts (nvar and nref, respectively), for each barcode (cell), restricted to those present in the barcodes file, in a tab separated text file</strong>. This file is then used as an input for the second program - <code>readCountsMatrix</code> - which, upon providing an output prefix, generates two outputs: (1) a cell-position matrix with absolute nvar and nref counts, and (2) a cell-position matrix with the expressed VAFRNA. VAFRNA is estimated at a user-defined threshold of minimum required sequencing reads (minR); default minR = 5. <code>readCountsMatrix</code> is time-efficient and can be re-run multiple times at various minR thresholds. Together, these tools facilitate single-cell level assessment of read counts.</p>
 </blockquote>
 <p>As the desired output is the tab separated text file with variant and reference read counts for each barcode, the command <a href="https://horvathlab.github.io/NGS/ReadCounts/" class="external-link"><code>readCounts</code></a> is preferred to avoid unnecessary large matrix outputs from <code>readCountsMatrix</code>.</p>
 <ul>
@@ -537,11 +601,11 @@ Table 4: Formatted table of allele counts
 <span class="header-section-number">3</span> Feature coordinates<a class="anchor" aria-label="anchor" href="#sec-features"></a>
 </h2>
 <p>A table of features coordinates with 4 columns (<code>CHROM</code>, <code>start</code>, <code>end</code>, <code>id</code>) matching features of count matrices (section <a href="#sec-mat-counts" class="quarto-xref">Section 1</a>) is required (<a href="#tbl-features" class="quarto-xref">Table 5</a>).</p>
-<p>See <code><a href="../reference/features.html">?features</a></code> for full documentation.</p>
+<p>See <code><a href="../reference/exdata_features.html">?exdata_features</a></code> for full documentation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"peaks"</span><span class="op">)</span></span>
-<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">peaks</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_peaks"</span><span class="op">)</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">exdata_peaks</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-features" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-features-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table 5: Features coordinates table example
@@ -556,40 +620,40 @@ Table 5: Features coordinates table example
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">941542</td>
-<td style="text-align: right;">942042</td>
-<td style="text-align: left;">1_941542_942042</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">1535287</td>
+<td style="text-align: right;">1535787</td>
+<td style="text-align: left;">3_1535287_1535787</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">3976396</td>
-<td style="text-align: right;">3976896</td>
-<td style="text-align: left;">1_3976396_3976896</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">1594942</td>
+<td style="text-align: right;">1595442</td>
+<td style="text-align: left;">3_1594942_1595442</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">6465944</td>
-<td style="text-align: right;">6466444</td>
-<td style="text-align: left;">1_6465944_6466444</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">1632524</td>
+<td style="text-align: right;">1633024</td>
+<td style="text-align: left;">3_1632524_1633024</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">6901466</td>
-<td style="text-align: right;">6901966</td>
-<td style="text-align: left;">1_6901466_6901966</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">1964186</td>
+<td style="text-align: right;">1964686</td>
+<td style="text-align: left;">3_1964186_1964686</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">7402483</td>
-<td style="text-align: right;">7402983</td>
-<td style="text-align: left;">1_7402483_7402983</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">2793516</td>
+<td style="text-align: right;">2794016</td>
+<td style="text-align: left;">3_2793516_2794016</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">10794813</td>
-<td style="text-align: right;">10795313</td>
-<td style="text-align: left;">1_10794813_10795313</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">2970389</td>
+<td style="text-align: right;">2970889</td>
+<td style="text-align: left;">3_2970389_2970889</td>
 </tr>
 </tbody>
 </table>
@@ -650,44 +714,41 @@ Table 5: Features coordinates table example
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span> <span class="co"># for human</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">AnnotationDbi</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mat_counts_RNA</span><span class="op">)</span></span>
-<span><span class="va">genes_coord</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/features.html">genes</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="va">genes</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">exdata_mat_counts_RNA</span><span class="op">)</span></span>
+<span><span class="va">genes_coord</span> <span class="op">&lt;-</span> <span class="fu">genes</span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="va">genes</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">genes_coord</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">genes_coord</span><span class="op">)</span></span>
 <span><span class="va">genes_coord</span> <span class="op">&lt;-</span> <span class="va">genes_coord</span><span class="op">[</span><span class="va">genes_coord</span><span class="op">$</span><span class="va">seqnames</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">22</span>, <span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">genes_coord</span> <span class="op">&lt;-</span> <span class="va">genes_coord</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"seqnames"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"gene_name"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">genes_coord</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CHROM"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"id"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">genes_coord</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
 </div>
-</section><section class="level2" data-number="3.3"><h3 data-number="3.3" id="match-cells-and-features">
-<span class="header-section-number">3.3</span> Match cells and features<a class="anchor" aria-label="anchor" href="#match-cells-and-features"></a>
-</h3>
 <div>
 <blockquote>
-<p><strong>Important</strong></p>
-<p>Cell names (columns) and features names (rows) must match between assays and features coordinates table ids.</p>
-</blockquote>
-</div>
+<p><strong>Important note: Match cells and features</strong></p>
+<p>Cell names of matrices (rows) must match between assays. Features names of matrices (columns) must match with the ids in the features coordinates data frames.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Make sure row names of mat_counts match features ids</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mat_counts_ATAC</span><span class="op">)</span>, <span class="va">peaks_coord</span><span class="op">[</span>, <span class="st">"id"</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mat_counts_ATAC</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">peaks_coord</span><span class="op">[</span>, <span class="st">"id"</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="co"># Cell names format must match between different assays</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mat_counts_ATAC</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mat_counts_RNA</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mat_counts_RNA</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">genes_coord</span><span class="op">[</span>, <span class="st">"id"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co"># Make sure columns names of mat_counts match features ids</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mat_counts_ATAC</span><span class="op">)</span>, <span class="va">peaks_coord</span><span class="op">[</span>, <span class="st">"id"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mat_counts_ATAC</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">peaks_coord</span><span class="op">[</span>, <span class="st">"id"</span><span class="op">]</span></span>
 <span></span>
-<span><span class="co"># Cell names format must match between different assays</span></span>
-<span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mat_counts_ATAC</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mat_counts_RNA</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mat_counts_RNA</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">genes_coord</span><span class="op">[</span>, <span class="st">"id"</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+</div>
+</blockquote>
 </div>
 </section></section><section class="section level2" data-number="4"><h2 data-number="4" id="bulk-log-ratios">
 <span class="header-section-number">4</span> Bulk log-ratios<a class="anchor" aria-label="anchor" href="#bulk-log-ratios"></a>
 </h2>
 <p>A table of log ratios computed from matched bulk sequencing (e.g. Whole Genome Sequencing) can optionally be provided to <code><a href="../reference/CreateMuscadetObject.html">CreateMuscadetObject()</a></code> and will be displayed at the bottom of log ratio heatmaps for validation purposes (<a href="#tbl-bulk-lrr" class="quarto-xref">Table 6</a>).</p>
 <p>Log ratios for bulk sequencing can be obtained through <a href="https://github.com/mskcc/facets" class="external-link">FACETS</a><a class="footnote-ref" role="doc-noteref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Shen R, Seshan VE. &lt;strong&gt;FACETS: allele-specific copy number and clonal heterogeneity analysis tool for high-throughput DNA sequencing. &lt;/strong&gt; &lt;em&gt;Nucleic Acids Res&lt;/em&gt; (2016). &lt;a href="https://www.doi.org/10.1093/nar/gkw520" class="external-link"&gt;https://www.doi.org/10.1093/nar/gkw520&lt;/a&gt;&lt;/p&gt;'><sup>3</sup></a> analysis.</p>
-<p>See <code><a href="../reference/bulk_lrr.html">?bulk_lrr</a></code> for full documentation.</p>
+<p>See <code><a href="../reference/exdata_bulk_lrr.html">?exdata_bulk_lrr</a></code> for full documentation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"bulk_lrr"</span><span class="op">)</span></span>
-<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bulk_lrr</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_bulk_lrr"</span><span class="op">)</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">exdata_bulk_lrr</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div id="tbl-bulk-lrr" class="cell quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bulk-lrr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table 6: Bulk log ratios table example
@@ -702,40 +763,40 @@ Table 6: Bulk log ratios table example
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">16100</td>
-<td style="text-align: right;">78558400</td>
-<td style="text-align: right;">-0.1742290</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">11900</td>
+<td style="text-align: right;">64709600</td>
+<td style="text-align: right;">0.1229632</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">78558700</td>
-<td style="text-align: right;">80533900</td>
-<td style="text-align: right;">-0.8500686</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">64710100</td>
+<td style="text-align: right;">65331100</td>
+<td style="text-align: right;">-0.1631371</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">80534279</td>
-<td style="text-align: right;">80603200</td>
-<td style="text-align: right;">-0.1721919</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">65331200</td>
+<td style="text-align: right;">93784800</td>
+<td style="text-align: right;">0.1271516</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">80603500</td>
-<td style="text-align: right;">99964900</td>
-<td style="text-align: right;">-0.8668536</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">93784900</td>
+<td style="text-align: right;">165334700</td>
+<td style="text-align: right;">0.1507467</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">99965200</td>
-<td style="text-align: right;">122514900</td>
-<td style="text-align: right;">-0.1599042</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">165335000</td>
+<td style="text-align: right;">165426322</td>
+<td style="text-align: right;">-0.2682795</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">122520400</td>
-<td style="text-align: right;">124588600</td>
-<td style="text-align: right;">0.0511974</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">165426671</td>
+<td style="text-align: right;">197495900</td>
+<td style="text-align: right;">0.1484524</td>
 </tr>
 </tbody>
 </table>
@@ -840,7 +901,7 @@ Table 6: Bulk log ratios table example
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

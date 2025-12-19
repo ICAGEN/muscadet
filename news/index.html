@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,9 +33,66 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="muscadet-020">muscadet 0.2.0<a class="anchor" aria-label="anchor" href="#muscadet-020"></a></h2>
+<div class="section level4">
+<h4 id="additions-0-2-0">Additions<a class="anchor" aria-label="anchor" href="#additions-0-2-0"></a></h4>
+<ul><li>Changes in <code>muscomic</code> objects to optimize storage and computation, by avoiding long-format tables in favors of sparse matrices and by reworking the object structure. <strong>muscadet and muscomic objects from previous versions are not supported by this version.</strong>
+<ul><li>
+<code><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject()</a></code> now expects input <code>mat_counts</code> as <strong>cells x features</strong> (instead of features x cells).</li>
+<li>
+<code>muscomic</code> object new structure:
+<ul><li>
+<strong>coverage slot</strong> now contains <code>counts</code> and <code>logratio</code> layers, each with:
+<ul><li>
+<code>mat</code>: matrix of counts or log ratio <em>cells × features</em> (sparse or dense depending on data type).</li>
+<li>
+<code>coord.features</code>: coordinates of features matching the matrix.</li>
+<li>
+<code>label.features</code>: feature type labels matching counts or log ratio.</li>
+</ul></li>
+<li>
+<strong>allelic slot</strong> now contains 3 elements:
+<ul><li>
+<code>mat.RD</code>: sparse matrix of reference allele counts <em>cells x features</em>.</li>
+<li>
+<code>mat.AD</code>: sparse matrix of alternate allele counts <em>cells x features</em>.</li>
+<li>
+<code>coord.vars</code>: coordinates of variant positions matching the matrices. Implemented new function <code>makeAllellicSparse()</code> to transform of long-format table (input) into sparse matrices. Updated <code><a href="../reference/addAlleleCounts.html">addAlleleCounts()</a></code> <code><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject()</a></code> for sparse format.</li>
+</ul></li>
+</ul></li>
+<li>All package functions have been updated consequently to support the new format.</li>
+<li>Implemented <code><a href="../reference/aggregateCounts.html">aggregateCounts()</a></code> to replace <code>mergeCounts()</code> and support the new format.</li>
+<li>Updated function examples, tests, and documentation consequently.</li>
+</ul></li>
+<li>
+<code><a href="../reference/clusterMuscadet.html">clusterMuscadet()</a></code> with Seurat-based clustering now supports <code>leiden_method</code> argument:
+<ul><li>Default <code>"igraph"</code> implementation; <code>"leidenbase"</code> also available.</li>
+<li>Seurat dependency set to <strong>v5.3.1</strong>.</li>
+<li>Added <code>random.seed</code> argument for reproducible clustering (default set to 1).</li>
+</ul></li>
+<li>Updated example dataset objects <code>exdata</code>: subset of cells and subset of features/variant on 3 chromosomes for object size optimization. Updated function examples and vignettes consequently.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="deprecated-and-defunct-0-2-0">Deprecated and Defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-0-2-0"></a></h4>
+<ul><li>
+<code>mergeCounts()</code> removed in favor of <code><a href="../reference/aggregateCounts.html">aggregateCounts()</a></code>.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-minor-updates-0-2-0">Bug Fixes, Minor Updates<a class="anchor" aria-label="anchor" href="#bug-fixes-minor-updates-0-2-0"></a></h4>
+<ul><li>
+<code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> refactored to handle separate aggregation and filtering of allelic and coverage counts.</li>
+<li>Fixed handling of clusters in character format for <code><a href="../reference/aggregateCounts.html">aggregateCounts()</a></code> outputs.</li>
+<li>
+<code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> <code>ndepth</code> argument default set to 1 to remove zero-depth allelic positions.</li>
+<li>
+<code>quiet</code> argument is now correctly propagated in <code><a href="../reference/clusterMuscadet.html">clusterMuscadet()</a></code>.</li>
+<li>Fix, move (from Imports to Suggests) and remove some dependencies.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.3" id="muscadet-013">muscadet 0.1.3<a class="anchor" aria-label="anchor" href="#muscadet-013"></a></h2>
 <div class="section level4">
@@ -51,7 +108,7 @@
 <h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>
 <ul><li>Seurat dependency set to <code>5.3.0</code> at minimum to avoid the installation of <code>leidenalg</code> python package when selecting the Leiden method for clustering.</li>
 <li>The <code>clusters</code> and <code>ncells</code> elements of the <code>@cnacalling</code> slot in muscadet objects are now updated during the <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> function right after some clusters need to be skipped due to not enough data. This resolves discordance between <code>clusters</code> and <code>ncells</code> elements with other <code>@cnacalling</code> elements, and avoids issues in plotting functions.</li>
-<li>The CNA calling functions (<code><a href="../reference/assignClusters.html">assignClusters()</a></code>, <code><a href="../reference/mergeCounts.html">mergeCounts()</a></code> and <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> now all in <code>cnaCalling.R</code>) now include a reset of the <code>@cnacalling</code> slot of the muscadet object, to avoid discordance between results if clusters or parameters are changed in between the different steps of the CNA calling.</li>
+<li>The CNA calling functions (<code><a href="../reference/assignClusters.html">assignClusters()</a></code>, <code>mergeCounts()</code> and <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> now all in <code>cnaCalling.R</code>) now include a reset of the <code>@cnacalling</code> slot of the muscadet object, to avoid discordance between results if clusters or parameters are changed in between the different steps of the CNA calling.</li>
 </ul></div>
 <div class="section level4">
 <h4 id="documentation-0-1-2">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-1-2"></a></h4>
@@ -80,7 +137,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -23,68 +23,63 @@ getLogRatioBulk(x, bulk.lrr)
 
   A data frame containing log R ratio per genomic segments from bulk
   sequencing data (`data.frame`). One row per segment and 4 columns
-  ordered as followed: chromosome (`integer`), start position
+  ordered as followed: chromosome (`character`), start position
   (`integer`), end position (`integer`), and Log R ratio value
   (`numeric`).
 
 ## Value
 
-A data frame of single-cell omic features, with columns: `CHROM`,
-`start`, `end`, and `bulk.lrr`, where `bulk.lrr` corresponds to the log
-R ratio values retrieved from bulk data matching the feature
+A data frame of single-cell omic features, with columns corresponding to
+`CHROM`, `start`, `end`, and `bulk.lrr`, where `bulk.lrr` corresponds to
+the log R ratio values retrieved from bulk data matching the feature
 coordinates.
 
 ## See also
 
-example data:
-[`bulk_lrr`](https://icagen.github.io/muscadet/reference/bulk_lrr.md)
-functions:
-[`muscomic`](https://icagen.github.io/muscadet/reference/muscomic-class.md),
-[`muscadet`](https://icagen.github.io/muscadet/reference/muscadet-class.md)
+- example data:
+  [`exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.md)
+
+- functions:
+  [`muscomic`](https://icagen.github.io/muscadet/reference/muscomic-class.md),
+  [`muscadet`](https://icagen.github.io/muscadet/reference/muscadet-class.md)
 
 ## Examples
 
 ``` r
-# Create a muscomic object
-atac <- CreateMuscomicObject(
-  type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
-)
-# or use a muscomic object inside a muscadet object
-atac <- slot(muscadet_obj, "omics")[["ATAC"]]
+# Load example muscadet object
+# data("exdata_muscadet")
 
-# Load bulk Log R ratio data frame
-data(bulk_lrr)
-head(bulk_lrr)
-#>   CHROM     start       end         lrr
-#> 1     1     16100  78558400 -0.17422897
-#> 2     1  78558700  80533900 -0.85006857
-#> 3     1  80534279  80603200 -0.17219191
-#> 4     1  80603500  99964900 -0.86685361
-#> 5     1  99965200 122514900 -0.15990417
-#> 6     1 122520400 124588600  0.05119736
-# or use the one inside a muscadet object
-head(slot(muscadet_obj, "bulk.data")[["log.ratio"]])
-#>   CHROM     start       end         lrr
-#> 1     1     16100  78558400 -0.17422897
-#> 2     1  78558700  80533900 -0.85006857
-#> 3     1  80534279  80603200 -0.17219191
-#> 4     1  80603500  99964900 -0.86685361
-#> 5     1  99965200 122514900 -0.15990417
-#> 6     1 122520400 124588600  0.05119736
+# muscomic object inside a muscadet object
+exdata_muscadet$ATAC
+#> A muscomic object 
+#>  type: ATAC 
+#>  label: scATAC-seq 
+#>  cells: 71 
+#>  counts: 71 cells x 1200 features (peaks)
+#>  logratio: 71 cells x 213 features (windows of peaks)
+#>  variant positions: 681
+
+# Bulk Log R ratio data
+head(exdata_muscadet$bulk.data$logratio)
+#>   CHROM     start       end        lrr
+#> 1     3     11900  64709600  0.1229632
+#> 2     3  64710100  65331100 -0.1631371
+#> 3     3  65331200  93784800  0.1271516
+#> 4     3  93784900 165334700  0.1507467
+#> 5     3 165335000 165426322 -0.2682795
+#> 6     3 165426671 197495900  0.1484524
 
 features_bulk_lrr <- getLogRatioBulk(
-  x = atac,
-  bulk.lrr = bulk_lrr # or slot(muscadet_obj, "bulk.data")[["log.ratio"]]
+  x = exdata_muscadet$ATAC,
+  bulk.lrr = exdata_muscadet$bulk.data$logratio
 )
 head(features_bulk_lrr)
-#>   CHROM     start       end   bulk.lrr
-#> 1     1 102000001 112000000 -0.1599042
-#> 2     1 104000001 114000000 -0.1599042
-#> 3     1 106000001 116000000 -0.1599042
-#> 4     1 108000001 118000000 -0.1599042
-#> 5     1 110000001 120000000 -0.1599042
-#> 6     1 228000001 238000000 -0.1641702
+#>   CHROM    start      end  bulk.lrr
+#> 1     3        1 10000000 0.1229632
+#> 2     3  2000001 12000000 0.1229632
+#> 3     3  4000001 14000000 0.1229632
+#> 4     3  6000001 16000000 0.1229632
+#> 5     3  8000001 18000000 0.1229632
+#> 6     3 10000001 20000000 0.1229632
+
 ```

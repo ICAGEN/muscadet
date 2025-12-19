@@ -53,10 +53,10 @@ if (FALSE) { # \dontrun{
 library("ggplot2")
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
 # Plot CNA segments
-p <- plotCNA(muscadet_obj, title = "Copy Number Alterations in Example Data")
+p <- plotCNA(exdata_muscadet, title = "Copy Number Alterations in Example Data")
 p
 ggsave(
     filename = file.path("CNAplot.png"),

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,6 +98,13 @@
 
         </dt>
         <dd>Autocompletion for <code>$</code> access on <code>muscadet</code> or <code>muscomic</code> objects</dd>
+
+        <dt>
+
+          <code><a href="makeAllelicSparse.html">makeAllelicSparse()</a></code>
+
+        </dt>
+        <dd>Construct Sparse Matrices for Allelic Data</dd>
       </dl></div><div class="section level2">
 
       <h3 id="object-incremental-additions">Object incremental additions<a class="anchor" aria-label="anchor" href="#object-incremental-additions"></a></h3>
@@ -265,10 +272,10 @@
 
       <dl><dt>
 
-          <code><a href="mergeCounts.html">mergeCounts()</a></code>
+          <code><a href="aggregateCounts.html">aggregateCounts()</a></code>
 
         </dt>
-        <dd>Merge counts for <code>muscadet</code> objects</dd>
+        <dd>Aggregate counts for <code>muscadet</code> objects</dd>
 
         <dt>
 
@@ -355,35 +362,35 @@
 
       <dl><dt>
 
-          <code><a href="muscadet_obj.html">muscadet_obj</a></code> <code><a href="muscadet_obj.html">muscadet_obj_ref</a></code>
+          <code><a href="exdata_muscadet.html">exdata_muscadet</a></code> <code><a href="exdata_muscadet.html">exdata_muscadet_ref</a></code>
 
         </dt>
         <dd>Example data: muscadet objects</dd>
 
         <dt>
 
-          <code><a href="mat_counts.html">mat_counts_atac_tumor</a></code> <code><a href="mat_counts.html">mat_counts_atac_ref</a></code> <code><a href="mat_counts.html">mat_counts_rna_tumor</a></code> <code><a href="mat_counts.html">mat_counts_rna_ref</a></code>
+          <code><a href="exdata_mat_counts.html">exdata_mat_counts_atac_tumor</a></code> <code><a href="exdata_mat_counts.html">exdata_mat_counts_atac_ref</a></code> <code><a href="exdata_mat_counts.html">exdata_mat_counts_rna_tumor</a></code> <code><a href="exdata_mat_counts.html">exdata_mat_counts_rna_ref</a></code>
 
         </dt>
         <dd>Example data: Matrices of raw counts</dd>
 
         <dt>
 
-          <code><a href="allele_counts.html">allele_counts_atac_tumor</a></code> <code><a href="allele_counts.html">allele_counts_atac_ref</a></code> <code><a href="allele_counts.html">allele_counts_rna_tumor</a></code> <code><a href="allele_counts.html">allele_counts_rna_ref</a></code>
+          <code><a href="exdata_allele_counts.html">exdata_allele_counts_atac_tumor</a></code> <code><a href="exdata_allele_counts.html">exdata_allele_counts_atac_ref</a></code> <code><a href="exdata_allele_counts.html">exdata_allele_counts_rna_tumor</a></code> <code><a href="exdata_allele_counts.html">exdata_allele_counts_rna_ref</a></code>
 
         </dt>
-        <dd>Example data: Allele counts at variation positions</dd>
+        <dd>Example data: Allele counts at variant positions</dd>
 
         <dt>
 
-          <code><a href="features.html">genes</a></code> <code><a href="features.html">peaks</a></code>
+          <code><a href="exdata_features.html">exdata_genes</a></code> <code><a href="exdata_features.html">exdata_peaks</a></code>
 
         </dt>
         <dd>Example data: Feature coordinates</dd>
 
         <dt>
 
-          <code><a href="bulk_lrr.html">bulk_lrr</a></code>
+          <code><a href="exdata_bulk_lrr.html">exdata_bulk_lrr</a></code>
 
         </dt>
         <dd>Example data: Log R ratio from bulk sequencing data</dd>
@@ -409,7 +416,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -33,7 +33,7 @@ help identify the optimal clustering partition.
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,7 @@ help identify the optimal clustering partition.
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Multi Omics Integration and Clustering on a <code>muscadet</code> Object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/clustering.R" class="external-link"><code>R/clustering.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/clustering.R" class="external-link"><code>R/clustering.R</code></a></small>
       <div class="d-none name"><code>clusterMuscadet.Rd</code></div>
     </div>
 
@@ -138,7 +138,7 @@ provided omic.</p></dd>
 <dd><p>Integer specifying the algorithm for modularity optimization
 by <code><a href="https://satijalab.org/seurat/reference/FindClusters.html" class="external-link">Seurat::FindClusters()</a></code> (<code>1</code> = original Louvain algorithm; <code>2</code> =
 Louvain algorithm with multilevel refinement; <code>3</code> = SLM algorithm; <code>4</code> =
-Leiden algorithm). Default is <code>1</code>. RECOMMENDED: <code>4</code> for Leiden algorithm
+Leiden algorithm). Default is <code>4</code> for Leiden algorithm as recommended,
 see <code><a href="cluster_seurat.html">cluster_seurat()</a></code> Details section.</p></dd>
 
     <dt><code>knn_seurat</code></dt>
@@ -219,18 +219,21 @@ object after cluster partition validation.</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Perform clustering with "seurat" method</span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu">clusterMuscadet</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="va">muscadet_obj</span>,</span></span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu">clusterMuscadet</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">exdata_muscadet</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"seurat"</span>,</span></span>
-<span class="r-in"><span>  res_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  dims_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  res_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  dims_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  knn_seurat <span class="op">=</span> <span class="fl">10</span>, <span class="co"># adapted to low number of cells in example data</span></span></span>
 <span class="r-in"><span>  knn_range_seurat <span class="op">=</span> <span class="fl">30</span> <span class="co"># adapted to low number of cells in example data</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Clustering method: 'seurat'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Resolutions to compute: 0.1, 0.3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Number of selected dimensions: 10, 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Clustering algorithm selected: 4 (Leiden)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing PCA...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Finding neighbors and constructing graph...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing UMAP...</span>
@@ -240,8 +243,8 @@ object after cluster partition validation.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Done.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Perform clustering with "hclust" method</span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu">clusterMuscadet</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="va">muscadet_obj</span>,</span></span>
+<span class="r-in"><span><span class="va">exdata_muscadet2</span> <span class="op">&lt;-</span> <span class="fu">clusterMuscadet</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">exdata_muscadet</span>,</span></span>
 <span class="r-in"><span>  k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"hclust"</span>,</span></span>
 <span class="r-in"><span>  dist_method <span class="op">=</span> <span class="st">"euclidean"</span>,</span></span>
@@ -249,6 +252,9 @@ object after cluster partition validation.</p></li>
 <span class="r-in"><span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Clustering method: 'hclust'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Partitions k to compute: 2, 3, 4</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Distance method selected: euclidean</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Hierarchical clustering method selected: ward.D</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing distance matrices...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing affinity matrices...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Performing SNF integration...</span>
@@ -259,23 +265,28 @@ object after cluster partition validation.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Done.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Retrieve cluster assignments</span></span></span>
-<span class="r-in"><span><span class="va">clusters</span> <span class="op">&lt;-</span> <span class="va">muscadet_obj</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span></span></span>
+<span class="r-in"><span><span class="va">clusters</span> <span class="op">&lt;-</span> <span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">clusters</span>, <span class="va">table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`2`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`0.1`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 77 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`0.3`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1  2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56 91 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41 36 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`3`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1  2  3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60 13 74 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`4`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1  2  3  4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 27 13 82 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plot clustree</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lazappi/clustree" class="external-link">clustree</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span>, <span class="va">as.data.frame</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">cbind</span>, <span class="va">partitions</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">partitions</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"res_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://lazappi.github.io/clustree/reference/clustree.html" class="external-link">clustree</a></span><span class="op">(</span><span class="va">partitions</span>, prefix <span class="op">=</span> <span class="st">"res_"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -284,7 +295,7 @@ object after cluster partition validation.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

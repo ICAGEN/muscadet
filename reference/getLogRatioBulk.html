@@ -13,7 +13,7 @@ table of single-cell features with the corresponding bulk LRR values."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@ table of single-cell features with the corresponding bulk LRR values."><meta pro
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Retrieve log R ratio from Bulk data on single-cell features (internal)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/computeLogRatio.R" class="external-link"><code>R/computeLogRatio.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/computeLogRatio.R" class="external-link"><code>R/computeLogRatio.R</code></a></small>
       <div class="d-none name"><code>getLogRatioBulk.Rd</code></div>
     </div>
 
@@ -67,66 +67,63 @@ includes the feature coordinates (<code>muscomic</code>).</p></dd>
 <dt id="arg-bulk-lrr">bulk.lrr<a class="anchor" aria-label="anchor" href="#arg-bulk-lrr"></a></dt>
 <dd><p>A data frame containing log R ratio per genomic segments from
 bulk sequencing data (<code>data.frame</code>). One row per segment and 4 columns
-ordered as followed: chromosome (<code>integer</code>), start position (<code>integer</code>),
+ordered as followed: chromosome (<code>character</code>), start position (<code>integer</code>),
 end position (<code>integer</code>), and Log R ratio value (<code>numeric</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame of single-cell omic features, with columns: <code>CHROM</code>, <code>start</code>,
-<code>end</code>, and <code>bulk.lrr</code>, where <code>bulk.lrr</code> corresponds to the log R ratio values
-retrieved from bulk data matching the feature coordinates.</p>
+    <p>A data frame of single-cell omic features, with columns corresponding
+to <code>CHROM</code>, <code>start</code>, <code>end</code>, and <code>bulk.lrr</code>, where <code>bulk.lrr</code> corresponds to
+the log R ratio values retrieved from bulk data matching the feature
+coordinates.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>example data: <code><a href="bulk_lrr.html">bulk_lrr</a></code>
-functions: <code><a href="muscomic-class.html">muscomic</a></code>, <code><a href="muscadet-class.html">muscadet</a></code></p></div>
+    <div class="dont-index">
+<ul><li><p>example data: <code><a href="exdata_bulk_lrr.html">exdata_bulk_lrr</a></code></p></li>
+<li><p>functions: <code><a href="muscomic-class.html">muscomic</a></code>, <code><a href="muscadet-class.html">muscadet</a></code></p></li>
+</ul></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create a muscomic object</span></span></span>
-<span class="r-in"><span><span class="va">atac</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  type <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
-<span class="r-in"><span>  mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_tumor</span>,</span></span>
-<span class="r-in"><span>  allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_tumor</span>,</span></span>
-<span class="r-in"><span>  features <span class="op">=</span> <span class="va">peaks</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># or use a muscomic object inside a muscadet object</span></span></span>
-<span class="r-in"><span><span class="va">atac</span> <span class="op">&lt;-</span> <span class="fu">slot</span><span class="op">(</span><span class="va">muscadet_obj</span>, <span class="st">"omics"</span><span class="op">)</span><span class="op">[[</span><span class="st">"ATAC"</span><span class="op">]</span><span class="op">]</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Load bulk Log R ratio data frame</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">bulk_lrr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bulk_lrr</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   CHROM     start       end         lrr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1     16100  78558400 -0.17422897</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1  78558700  80533900 -0.85006857</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1  80534279  80603200 -0.17219191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1  80603500  99964900 -0.86685361</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     1  99965200 122514900 -0.15990417</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     1 122520400 124588600  0.05119736</span>
-<span class="r-in"><span><span class="co"># or use the one inside a muscadet object</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">slot</span><span class="op">(</span><span class="va">muscadet_obj</span>, <span class="st">"bulk.data"</span><span class="op">)</span><span class="op">[[</span><span class="st">"log.ratio"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   CHROM     start       end         lrr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1     16100  78558400 -0.17422897</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1  78558700  80533900 -0.85006857</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1  80534279  80603200 -0.17219191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1  80603500  99964900 -0.86685361</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     1  99965200 122514900 -0.15990417</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     1 122520400 124588600  0.05119736</span>
+<span class="r-in"><span><span class="co"># muscomic object inside a muscadet object</span></span></span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">ATAC</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A muscomic object </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  type: ATAC </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  label: scATAC-seq </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cells: 71 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  counts: 71 cells x 1200 features (peaks)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  logratio: 71 cells x 213 features (windows of peaks)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  variant positions: 681</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Bulk Log R ratio data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">bulk.data</span><span class="op">$</span><span class="va">logratio</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   CHROM     start       end        lrr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     3     11900  64709600  0.1229632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     3  64710100  65331100 -0.1631371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     3  65331200  93784800  0.1271516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     3  93784900 165334700  0.1507467</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     3 165335000 165426322 -0.2682795</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     3 165426671 197495900  0.1484524</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">features_bulk_lrr</span> <span class="op">&lt;-</span> <span class="fu">getLogRatioBulk</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="va">atac</span>,</span></span>
-<span class="r-in"><span>  bulk.lrr <span class="op">=</span> <span class="va">bulk_lrr</span> <span class="co"># or slot(muscadet_obj, "bulk.data")[["log.ratio"]]</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">ATAC</span>,</span></span>
+<span class="r-in"><span>  bulk.lrr <span class="op">=</span> <span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">bulk.data</span><span class="op">$</span><span class="va">logratio</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">features_bulk_lrr</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   CHROM     start       end   bulk.lrr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1 102000001 112000000 -0.1599042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1 104000001 114000000 -0.1599042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1 106000001 116000000 -0.1599042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1 108000001 118000000 -0.1599042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     1 110000001 120000000 -0.1599042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     1 228000001 238000000 -0.1641702</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   CHROM    start      end  bulk.lrr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     3        1 10000000 0.1229632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     3  2000001 12000000 0.1229632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     3  4000001 14000000 0.1229632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     3  6000001 16000000 0.1229632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     3  8000001 18000000 0.1229632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     3 10000001 20000000 0.1229632</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -135,7 +132,7 @@ functions: <code><a href="muscomic-class.html">muscomic</a></code>, <code><a hre
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

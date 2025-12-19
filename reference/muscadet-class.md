@@ -52,29 +52,28 @@ Functions related to `muscadet` objects:
 
 ``` r
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-muscadet_obj
+exdata_muscadet
 #> A muscadet object 
 #>  2 omics: ATAC, RNA 
 #>  types: ATAC, RNA 
 #>  labels: scATAC-seq, scRNA-seq 
-#>  coverage data matrix: log.ratio, log.ratio 
-#>  cells: 112, 119 (common: 84, total: 147) 
-#>  features: 133, 349 
-#>  feature labels: windows of peaks, genes 
-#>  variant positions: 691, 373 
-#>  data from paired bulk sequencing: WGS 
-#>  clustering: partitions = 0.6, 0.8, 1 ; optimal partition = 1 
-#>  CNA calling: 2 clusters ; 47 consensus segments including 1 CNA segments 
+#>  cells: 71, 69 (common: 63, total: 77) 
+#>  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) 
+#>  logratio: 71 cells x 213 features (windows of peaks), 69 cells x 212 features (genes) 
+#>  variant positions: 681, 359 
+#>  bulk data: WGS 
+#>  clustering: partitions = 0.1, 0.3, 0.5 ; optimal partition = 0.5 
+#>  CNA calling: 2 clusters ; 3 consensus segments including 0 CNA segments 
 #>  genome: hg38 
 
-str(muscadet_obj, max.level = 2)
+str(exdata_muscadet, max.level = 2)
 #> Formal class 'muscadet' [package "muscadet"] with 5 slots
 #>   ..@ omics     :List of 2
 #>   ..@ bulk.data :List of 2
 #>   ..@ clustering:List of 9
-#>   ..@ cnacalling:List of 21
+#>   ..@ cnacalling:List of 20
 #>   ..@ genome    : chr "hg38"
 
 ```

@@ -21,7 +21,7 @@ preProcSample2(
   cval = 25,
   gbuild = "hg38",
   hetscale = TRUE,
-  ndepth = 5,
+  ndepth = 1,
   ndepthmax = 1000
 )
 ```
@@ -144,13 +144,13 @@ correlation.
 ## Examples
 
 ``` r
-library("facets")
+library(facets)
 
 # Load example muscadet object
-# data("muscadet_obj")
+# data("exdata_muscadet")
 
-counts <- muscadet_obj$cnacalling$combined.counts
-counts <- counts[complete.cases(counts),]
+counts <- exdata_muscadet$cnacalling$combined.counts
+counts <- counts[complete.cases(counts), 1:8]
 counts_clus <- counts[which(counts$cluster == 1),]
 result <- preProcSample2(counts_clus)
 ```

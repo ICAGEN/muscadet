@@ -22,13 +22,13 @@ CreateMuscadetObject(
   A list of
   [`muscomic`](https://icagen.github.io/muscadet/reference/muscomic-class.md)
   objects (`list`). The names of the list will set the names of omics in
-  the final object, if the list is unamed, the type is taken instead.
+  the final object, if the list is unnamed, the type is taken instead.
 
 - bulk.lrr:
 
   A data frame containing log R ratio per genomic segments from bulk
   sequencing data (`data.frame`). One row per segment and 4 columns
-  ordered as followed: chromosome (`integer`), start position
+  ordered as followed: chromosome (`character`), start position
   (`integer`), end position (`integer`), and Log R ratio value
   (`numeric`).
 
@@ -69,33 +69,33 @@ can't have identical labels (slot `label.omic`).
 # Create muscomic objects
 atac <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_tumor,
-  allele_counts = allele_counts_atac_tumor,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_tumor,
+  allele_counts = exdata_allele_counts_atac_tumor,
+  features = exdata_peaks
 )
 rna <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_tumor,
-  allele_counts = allele_counts_rna_tumor,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_tumor,
+  allele_counts = exdata_allele_counts_rna_tumor,
+  features = exdata_genes
 )
 atac_ref <- CreateMuscomicObject(
   type = "ATAC",
-  mat_counts = mat_counts_atac_ref,
-  allele_counts = allele_counts_atac_ref,
-  features = peaks
+  mat_counts = exdata_mat_counts_atac_ref,
+  allele_counts = exdata_allele_counts_atac_ref,
+  features = exdata_peaks
 )
 rna_ref <- CreateMuscomicObject(
   type = "RNA",
-  mat_counts = mat_counts_rna_ref,
-  allele_counts = allele_counts_rna_ref,
-  features = genes
+  mat_counts = exdata_mat_counts_rna_ref,
+  allele_counts = exdata_allele_counts_rna_ref,
+  features = exdata_genes
 )
 
 # Create muscadet objects
 muscadet <- CreateMuscadetObject(
   omics = list(atac, rna),
-  bulk.lrr = bulk_lrr,
+  bulk.lrr = exdata_bulk_lrr,
   bulk.label = "WGS",
   genome = "hg38"
 )

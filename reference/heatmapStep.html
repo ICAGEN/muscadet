@@ -13,7 +13,7 @@ computeLogRatioRNA() with the argument all_steps = TRUE."><meta property="og:ima
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@ computeLogRatioRNA() with the argument all_steps = TRUE."><meta property="og:ima
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Create heatmap and distribution plots of the different steps of computing log R ratios</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/plots.R" class="external-link"><code>R/plots.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/plots.R" class="external-link"><code>R/plots.R</code></a></small>
       <div class="d-none name"><code>heatmapStep.Rd</code></div>
     </div>
 
@@ -121,33 +121,29 @@ heatmaps-histograms plot to the specified file.</p>
 <span class="r-in"><span><span class="co"># Create muscomic objects</span></span></span>
 <span class="r-in"><span><span class="va">atac</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    type <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
-<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_tumor</span>,</span></span>
-<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_tumor</span>,</span></span>
-<span class="r-in"><span>    features <span class="op">=</span> <span class="va">peaks</span></span></span>
+<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_atac_tumor</span>,</span></span>
+<span class="r-in"><span>    features <span class="op">=</span> <span class="va">exdata_peaks</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rna</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    type <span class="op">=</span> <span class="st">"RNA"</span>,</span></span>
-<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_rna_tumor</span>,</span></span>
-<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_rna_tumor</span>,</span></span>
-<span class="r-in"><span>    features <span class="op">=</span> <span class="va">genes</span></span></span>
+<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_rna_tumor</span>,</span></span>
+<span class="r-in"><span>    features <span class="op">=</span> <span class="va">exdata_genes</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">atac_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    type <span class="op">=</span> <span class="st">"ATAC"</span>,</span></span>
-<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_ref</span>,</span></span>
-<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_ref</span>,</span></span>
-<span class="r-in"><span>    features <span class="op">=</span> <span class="va">peaks</span></span></span>
+<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_atac_ref</span>,</span></span>
+<span class="r-in"><span>    features <span class="op">=</span> <span class="va">exdata_peaks</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rna_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    type <span class="op">=</span> <span class="st">"RNA"</span>,</span></span>
-<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_rna_ref</span>,</span></span>
-<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_rna_ref</span>,</span></span>
-<span class="r-in"><span>    features <span class="op">=</span> <span class="va">genes</span></span></span>
+<span class="r-in"><span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_rna_ref</span>,</span></span>
+<span class="r-in"><span>    features <span class="op">=</span> <span class="va">exdata_genes</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create muscadet objects</span></span></span>
 <span class="r-in"><span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="CreateMuscadetObject.html">CreateMuscadetObject</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    omics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">atac</span>, <span class="va">rna</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    bulk.lrr <span class="op">=</span> <span class="va">bulk_lrr</span>,</span></span>
+<span class="r-in"><span>    bulk.lrr <span class="op">=</span> <span class="va">exdata_bulk_lrr</span>,</span></span>
 <span class="r-in"><span>    bulk.label <span class="op">=</span> <span class="st">"WGS"</span>,</span></span>
 <span class="r-in"><span>    genome <span class="op">=</span> <span class="st">"hg38"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -161,7 +157,7 @@ heatmaps-histograms plot to the specified file.</p>
 <span class="r-in"><span>    matTumor <span class="op">=</span> <span class="fu"><a href="muscadet-methods.html">matCounts</a></span><span class="op">(</span><span class="va">muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span>,</span></span>
 <span class="r-in"><span>    matRef <span class="op">=</span> <span class="fu"><a href="muscadet-methods.html">matCounts</a></span><span class="op">(</span><span class="va">muscadet_ref</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span>,</span></span>
 <span class="r-in"><span>    peaksCoord <span class="op">=</span> <span class="fu"><a href="muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span>,</span></span>
-<span class="r-in"><span>    genome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/methods/slot.html" class="external-link">slot</a></span><span class="op">(</span><span class="va">muscadet</span>, <span class="st">"genome"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    genome <span class="op">=</span> <span class="va">muscadet</span><span class="op">$</span><span class="va">genome</span>,</span></span>
 <span class="r-in"><span>    minReads <span class="op">=</span> <span class="fl">1</span>, <span class="co"># low value for example subsampled datasets</span></span></span>
 <span class="r-in"><span>    minPeaks <span class="op">=</span> <span class="fl">1</span>, <span class="co"># low value for example subsampled datasets</span></span></span>
 <span class="r-in"><span>    all_steps <span class="op">=</span> <span class="cn">TRUE</span></span></span>
@@ -172,7 +168,7 @@ heatmaps-histograms plot to the specified file.</p>
 <span class="r-in"><span><span class="fu">heatmapStep</span><span class="op">(</span>obj <span class="op">=</span> <span class="va">obj_atac_all</span>,</span></span>
 <span class="r-in"><span>            step <span class="op">=</span> <span class="st">"step01"</span>,</span></span>
 <span class="r-in"><span>            filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"step01.png"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>            title <span class="op">=</span> <span class="st">"Example data - Step 01"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>            title <span class="op">=</span> <span class="st">"Example dataset - Step 01"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot heatmap and distribution of values for all steps</span></span></span>
 <span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">step</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"step"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">obj_atac_all</span><span class="op">)</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -192,7 +188,7 @@ heatmaps-histograms plot to the specified file.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

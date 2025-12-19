@@ -11,7 +11,7 @@ are assigned to the allelic slots of omics."><meta property="og:image" content="
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@ are assigned to the allelic slots of omics."><meta property="og:image" content="
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Add allele counts to a <code>muscadet</code> object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/R/utils.R" class="external-link"><code>R/utils.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/R/utils.R" class="external-link"><code>R/utils.R</code></a></small>
       <div class="d-none name"><code>addAlleleCounts.Rd</code></div>
     </div>
 
@@ -65,7 +65,7 @@ are assigned to the <code>allelic</code> slots of <code>omics</code>.</p>
 allele counts for a specific omic (<code>list</code>). The list must have the same
 length and order as the number of omics in the <code>x</code> object. Each data frames
 must contain the following columns : <code>cell</code>, <code>id</code>, <code>CHROM</code>, <code>POS</code>, <code>REF</code>,
-<code>ALT</code>, <code>RD</code>, <code>AD</code>, <code>DP</code>, <code>GT</code>. See <a href="allele_counts.html">allele_counts</a> for details.</p></dd>
+<code>ALT</code>, <code>RD</code>, <code>AD</code>, <code>DP</code>, <code>GT</code>. See <a href="exdata_allele_counts.html">exdata_allele_counts</a> for details.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -79,7 +79,7 @@ must contain the following columns : <code>cell</code>, <code>id</code>, <code>C
 ratios and cell clustering, they are not mandatory at the creation of
 <code>muscomic</code> and <code>muscadet</code> objects. The allele counts data can be added to
 objects later with this <code>addAlleleCounts</code> function, before using the
-<code><a href="mergeCounts.html">mergeCounts()</a></code> function.</p>
+<code><a href="aggregateCounts.html">aggregateCounts()</a></code> function.</p>
 <p>This function is also useful to add allele counts for individual-specific
 variant positions to a common <code>muscadet</code> object, for example for the
 reference <code>muscadet</code> object: a common <code>muscadet</code> object with reference
@@ -90,22 +90,22 @@ sequencing) before Copy Number Alterations (CNAs) calling.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="CreateMuscomicObject.html">CreateMuscomicObject()</a></code>, <code><a href="mergeCounts.html">mergeCounts()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="CreateMuscomicObject.html">CreateMuscomicObject()</a></code>, <code><a href="aggregateCounts.html">aggregateCounts()</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example muscadet object</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj")</span></span></span>
-<span class="r-in"><span><span class="co"># data("muscadet_obj_ref")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet")</span></span></span>
+<span class="r-in"><span><span class="co"># data("exdata_muscadet_ref")</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Add allele counts data frames to muscadet objects</span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu">addAlleleCounts</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">muscadet_obj</span>,</span></span>
-<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">allele_counts_atac_tumor</span>, <span class="va">allele_counts_rna_tumor</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">muscadet_obj_ref</span> <span class="op">&lt;-</span> <span class="fu">addAlleleCounts</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">muscadet_obj_ref</span>,</span></span>
-<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">allele_counts_atac_ref</span>, <span class="va">allele_counts_rna_ref</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu">addAlleleCounts</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">exdata_muscadet</span>,</span></span>
+<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">exdata_allele_counts_atac_tumor</span>, <span class="va">exdata_allele_counts_rna_tumor</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exdata_muscadet_ref</span> <span class="op">&lt;-</span> <span class="fu">addAlleleCounts</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">exdata_muscadet_ref</span>,</span></span>
+<span class="r-in"><span>    allele_counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">exdata_allele_counts_atac_ref</span>, <span class="va">exdata_allele_counts_rna_ref</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -114,7 +114,7 @@ sequencing) before Copy Number Alterations (CNAs) calling.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.1.3/vignettes/muscadet.qmd" class="external-link"><code>vignettes/muscadet.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/vignettes/muscadet.qmd" class="external-link"><code>vignettes/muscadet.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -74,11 +74,11 @@
 
 
 
-    <p><code>muscadet</code> (<strong>mu</strong>ltiomics <strong>s</strong>ingle-cell <strong>c</strong>opy number <strong>a</strong>lterations <strong>det</strong>ection) is an R package for identifying copy number alterations (CNAs) in cancer cells from single-cell multiomics data.</p>
+    <p><code>muscadet</code> (<strong>mu</strong>ltiomics <strong>s</strong>ingle-cell <strong>c</strong>opy number <strong>a</strong>lterations <strong>det</strong>ection) is an R package designed to identify somatic copy number alterations (CNAs) in cancer cells using single-cell multiomics data. The package supports analyses ranging from a single omics layer to multiple omics measured on the same cells, and is designed to accommodate partially missing-modality scenarios. <code>muscadet</code> enables the identification of tumor subclones through multi-omic cell clustering and provides downstream tools for CNA inference within a unified and reproducible workflow.</p>
 <section class="section level2" data-number="1"><h2 data-number="1" id="installation">
 <span class="header-section-number">1</span> Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the latest version directly from GitHub.</p>
+<p>The latest version of muscadet can be installed directly from GitHub:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
@@ -87,19 +87,25 @@
 </section><section class="section level2" data-number="2"><h2 data-number="2" id="inputs-and-objects-creation">
 <span class="header-section-number">2</span> Inputs and objects creation<a class="anchor" aria-label="anchor" href="#inputs-and-objects-creation"></a>
 </h2>
+<div>
+<blockquote>
+<p><strong>Important note on example data</strong></p>
+<p>The example dataset included in <code>muscadet</code> is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.</p>
+</blockquote>
+</div>
 <section class="level2" data-number="2.1"><h3 data-number="2.1" id="muscomic">
 <span class="header-section-number">2.1</span> muscomic<a class="anchor" aria-label="anchor" href="#muscomic"></a>
 </h3>
-<p>The <code>muscomic</code> objects (see <code><a href="../reference/muscomic-class.html">?muscomic</a></code>) are primary objects for the muscadet analysis, created using the <code><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject()</a></code> function with the following inputs:</p>
+<p>The <code>muscomic</code> objects (see <code><a href="../reference/muscomic-class.html">?muscomic</a></code>) are the primary objects used throughout the muscadet workflow. Each <code>muscomic</code> object represents a single omics layer and serves as the basic building block for downstream multi-omic integration, clustering, and copy-number analysis in muscadet. They are created using the <code><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject()</a></code> function and encapsulate all information related to a single omics modality. The function requires the following inputs:</p>
 <ul>
 <li>
-<code>type</code>: a type of omic, <code>"RNA"</code> and <code>"ATAC"</code> being the ones currently supported. Note that for other DNA types omics, the <code>"ATAC"</code> type can be used.</li>
+<code>type</code>: the type of omic modality, currently <code>"RNA"</code> and <code>"ATAC"</code> are supported. Other DNA-based modalities can be provided using the <code>"ATAC"</code> type.</li>
 <li>
-<code>mat_counts</code>: a raw count matrix (see <code><a href="../reference/mat_counts.html">?mat_counts</a></code>).</li>
+<code>mat_counts</code>: a raw count matrix with cells as rows and features as columns (see <code><a href="../reference/exdata_mat_counts.html">?exdata_mat_counts</a></code>).</li>
 <li>
-<code>allele_counts</code>: a table of raw counts per allele (see <code><a href="../reference/allele_counts.html">?allele_counts</a></code>) <em>(optional, can be added later during analysis)</em>.</li>
+<code>allele_counts</code>: a data frame of raw allele-specific counts (see <code><a href="../reference/exdata_allele_counts.html">?exdata_allele_counts</a></code>) <em>(optional, can be added later in the analysis workflow)</em>.</li>
 <li>
-<code>features</code>: a table of features coordinates (see <code><a href="../reference/features.html">?features</a></code>).</li>
+<code>features</code>: a data frame containing genomic coordinates of features (see <code><a href="../reference/exdata_features.html">?exdata_features</a></code>).</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
@@ -107,51 +113,56 @@
 <span></span>
 <span><span class="co"># Load example dataset inputs:</span></span>
 <span><span class="co"># Matrices of raw counts per features</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mat_counts_atac_tumor"</span>, <span class="st">"mat_counts_rna_tumor"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_mat_counts_atac_tumor"</span>, <span class="st">"exdata_mat_counts_rna_tumor"</span><span class="op">)</span></span>
 <span><span class="co"># Table of raw counts per allele</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"allele_counts_atac_tumor"</span>, <span class="st">"allele_counts_rna_tumor"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_allele_counts_atac_tumor"</span>, <span class="st">"exdata_allele_counts_rna_tumor"</span><span class="op">)</span></span>
 <span><span class="co"># Table of feature coordinates</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"peaks"</span>, <span class="st">"genes"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_peaks"</span>, <span class="st">"exdata_genes"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create individual omic objects</span></span>
 <span><span class="va">atac</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span>
 <span>    type <span class="op">=</span> <span class="st">"ATAC"</span>,</span>
-<span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_tumor</span>, </span>
-<span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_tumor</span>, </span>
-<span>    features <span class="op">=</span> <span class="va">peaks</span><span class="op">)</span></span>
+<span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_atac_tumor</span>, </span>
+<span>    allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_atac_tumor</span>, </span>
+<span>    features <span class="op">=</span> <span class="va">exdata_peaks</span><span class="op">)</span></span>
 <span><span class="va">rna</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span>
 <span>    type <span class="op">=</span> <span class="st">"RNA"</span>,</span>
-<span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_rna_tumor</span>,</span>
-<span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_rna_tumor</span>,</span>
-<span>    features <span class="op">=</span> <span class="va">genes</span><span class="op">)</span></span>
+<span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_rna_tumor</span>,</span>
+<span>    allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_rna_tumor</span>,</span>
+<span>    features <span class="op">=</span> <span class="va">exdata_genes</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">atac</span></span>
-<span><span class="co">#&gt; A muscomic object of type ATAC labelled scATAC-seq containing: </span></span>
-<span><span class="co">#&gt;  mat.counts coverage data matrix </span></span>
-<span><span class="co">#&gt;  112 cells </span></span>
-<span><span class="co">#&gt;  1000 features: peaks </span></span>
-<span><span class="co">#&gt;  691 variant positions</span></span>
+<span><span class="co">#&gt; A muscomic object </span></span>
+<span><span class="co">#&gt;  type: ATAC </span></span>
+<span><span class="co">#&gt;  label: scATAC-seq </span></span>
+<span><span class="co">#&gt;  cells: 71 </span></span>
+<span><span class="co">#&gt;  counts: 71 cells x 1200 features (peaks)</span></span>
+<span><span class="co">#&gt;  logratio: None</span></span>
+<span><span class="co">#&gt;  variant positions: 681</span></span>
 <span></span>
 <span><span class="va">rna</span></span>
-<span><span class="co">#&gt; A muscomic object of type RNA labelled scRNA-seq containing: </span></span>
-<span><span class="co">#&gt;  mat.counts coverage data matrix </span></span>
-<span><span class="co">#&gt;  119 cells </span></span>
-<span><span class="co">#&gt;  500 features: genes </span></span>
-<span><span class="co">#&gt;  373 variant positions</span></span></code></pre></div>
+<span><span class="co">#&gt; A muscomic object </span></span>
+<span><span class="co">#&gt;  type: RNA </span></span>
+<span><span class="co">#&gt;  label: scRNA-seq </span></span>
+<span><span class="co">#&gt;  cells: 69 </span></span>
+<span><span class="co">#&gt;  counts: 69 cells x 300 features (genes)</span></span>
+<span><span class="co">#&gt;  logratio: None</span></span>
+<span><span class="co">#&gt;  variant positions: 359</span></span></code></pre></div>
 </div>
 </section><section class="level2" data-number="2.2"><h3 data-number="2.2" id="muscadet">
 <span class="header-section-number">2.2</span> muscadet<a class="anchor" aria-label="anchor" href="#muscadet"></a>
 </h3>
-<p>The <code>muscadet</code> objects (see <code><a href="../reference/muscadet-class.html">?muscadet</a></code>) consists of one or several <code>muscomic</code> objects, along with additional information and it will store downstream analysis results. They can be created using the <code><a href="../reference/CreateMuscadetObject.html">CreateMuscadetObject()</a></code> function with a list of <code>muscomic</code> objects as input as well as bulk coverage information (see <code><a href="../reference/bulk_lrr.html">?bulk_lrr</a></code>) and the genome assembly to use.</p>
+<p>The <code>muscadet</code> objects (see <code><a href="../reference/muscadet-class.html">?muscadet</a></code>) are higher-level containers that group one or more <code>muscomic</code> objects together with additional metadata and analysis results. They are used to store and manage the outputs of downstream steps, including clustering, and CNA calling.</p>
+<p>A <code>muscadet</code> object is created using the <code><a href="../reference/CreateMuscadetObject.html">CreateMuscadetObject()</a></code> function, which takes as input a list of <code>muscomic</code> objects, optional bulk coverage information (see <code><a href="../reference/exdata_bulk_lrr.html">?exdata_bulk_lrr</a></code>), and the genome assembly to be used for the analysis.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Table of coverage information (log ratio) from bulk data (i.e. WGS)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"bulk_lrr"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_bulk_lrr"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create multiomic muscadet object</span></span>
 <span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreateMuscadetObject.html">CreateMuscadetObject</a></span><span class="op">(</span></span>
 <span>    omics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ATAC <span class="op">=</span> <span class="va">atac</span>, RNA <span class="op">=</span> <span class="va">rna</span><span class="op">)</span>,</span>
-<span>    bulk.lrr <span class="op">=</span> <span class="va">bulk_lrr</span>,</span>
+<span>    bulk.lrr <span class="op">=</span> <span class="va">exdata_bulk_lrr</span>,</span>
 <span>    bulk.label <span class="op">=</span> <span class="st">"WGS"</span>,</span>
 <span>    genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
 <span><span class="va">muscadet</span></span>
@@ -159,52 +170,32 @@
 <span><span class="co">#&gt;  2 omics: ATAC, RNA </span></span>
 <span><span class="co">#&gt;  types: ATAC, RNA </span></span>
 <span><span class="co">#&gt;  labels: scATAC-seq, scRNA-seq </span></span>
-<span><span class="co">#&gt;  coverage data matrix: mat.counts, mat.counts </span></span>
-<span><span class="co">#&gt;  cells: 112, 119 (common: 84, total: 147) </span></span>
-<span><span class="co">#&gt;  features: 1000, 500 </span></span>
-<span><span class="co">#&gt;  feature labels: peaks, genes </span></span>
-<span><span class="co">#&gt;  variant positions: 691, 373 </span></span>
-<span><span class="co">#&gt;  data from paired bulk sequencing: WGS </span></span>
+<span><span class="co">#&gt;  cells: 71, 69 (common: 63, total: 77) </span></span>
+<span><span class="co">#&gt;  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) </span></span>
+<span><span class="co">#&gt;  logratio: None</span></span>
+<span><span class="co">#&gt;  </span></span>
+<span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
+<span><span class="co">#&gt;  bulk data: WGS </span></span>
 <span><span class="co">#&gt;  clustering: None </span></span>
 <span><span class="co">#&gt;  CNA calling: None </span></span>
 <span><span class="co">#&gt;  genome: hg38</span></span></code></pre></div>
 </div>
-<p>An example of a complete <code>muscadet</code> object with a demo dataset is included in the package.</p>
+<p>The reference cells data must be stored in its own <code>muscadet</code> object</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Example muscadet object</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"muscadet_obj"</span><span class="op">)</span></span>
-<span><span class="va">muscadet_obj</span></span>
-<span><span class="co">#&gt; A muscadet object </span></span>
-<span><span class="co">#&gt;  2 omics: ATAC, RNA </span></span>
-<span><span class="co">#&gt;  types: ATAC, RNA </span></span>
-<span><span class="co">#&gt;  labels: scATAC-seq, scRNA-seq </span></span>
-<span><span class="co">#&gt;  coverage data matrix: log.ratio, log.ratio </span></span>
-<span><span class="co">#&gt;  cells: 112, 119 (common: 84, total: 147) </span></span>
-<span><span class="co">#&gt;  features: 133, 349 </span></span>
-<span><span class="co">#&gt;  feature labels: windows of peaks, genes </span></span>
-<span><span class="co">#&gt;  variant positions: 691, 373 </span></span>
-<span><span class="co">#&gt;  data from paired bulk sequencing: WGS </span></span>
-<span><span class="co">#&gt;  clustering: partitions = 0.6, 0.8, 1 ; optimal partition = 1 </span></span>
-<span><span class="co">#&gt;  CNA calling: 2 clusters ; 47 consensus segments including 1 CNA segments </span></span>
-<span><span class="co">#&gt;  genome: hg38</span></span></code></pre></div>
-</div>
-<p>Create another <code>muscadet</code> object with reference cells data.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mat_counts_atac_ref"</span>, <span class="st">"mat_counts_rna_ref"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"allele_counts_atac_ref"</span>, <span class="st">"allele_counts_rna_ref"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_mat_counts_atac_ref"</span>, <span class="st">"exdata_mat_counts_rna_ref"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_allele_counts_atac_ref"</span>, <span class="st">"exdata_allele_counts_rna_ref"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">atac_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span>
 <span>    type <span class="op">=</span> <span class="st">"ATAC"</span>,</span>
-<span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_atac_ref</span>,</span>
-<span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_atac_ref</span>,</span>
-<span>    features <span class="op">=</span> <span class="va">peaks</span><span class="op">)</span></span>
+<span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_atac_ref</span>,</span>
+<span>    allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_atac_ref</span>,</span>
+<span>    features <span class="op">=</span> <span class="va">exdata_peaks</span><span class="op">)</span></span>
 <span><span class="va">rna_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreateMuscomicObject.html">CreateMuscomicObject</a></span><span class="op">(</span></span>
 <span>    type <span class="op">=</span> <span class="st">"RNA"</span>,</span>
-<span>    mat_counts <span class="op">=</span> <span class="va">mat_counts_rna_ref</span>,</span>
-<span>    allele_counts <span class="op">=</span> <span class="va">allele_counts_rna_ref</span>,</span>
-<span>    features <span class="op">=</span> <span class="va">genes</span><span class="op">)</span></span>
+<span>    mat_counts <span class="op">=</span> <span class="va">exdata_mat_counts_rna_ref</span>,</span>
+<span>    allele_counts <span class="op">=</span> <span class="va">exdata_allele_counts_rna_ref</span>,</span>
+<span>    features <span class="op">=</span> <span class="va">exdata_genes</span><span class="op">)</span></span>
 <span><span class="va">muscadet_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreateMuscadetObject.html">CreateMuscadetObject</a></span><span class="op">(</span></span>
 <span>    omics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ATAC <span class="op">=</span> <span class="va">atac_ref</span>, RNA <span class="op">=</span> <span class="va">rna_ref</span><span class="op">)</span>,</span>
 <span>    genome <span class="op">=</span> <span class="st">"hg38"</span><span class="op">)</span></span>
@@ -213,12 +204,45 @@
 <span><span class="co">#&gt;  2 omics: ATAC, RNA </span></span>
 <span><span class="co">#&gt;  types: ATAC, RNA </span></span>
 <span><span class="co">#&gt;  labels: scATAC-seq, scRNA-seq </span></span>
-<span><span class="co">#&gt;  coverage data matrix: mat.counts, mat.counts </span></span>
-<span><span class="co">#&gt;  cells: 99, 97 (common: 78, total: 118) </span></span>
-<span><span class="co">#&gt;  features: 1000, 500 </span></span>
-<span><span class="co">#&gt;  feature labels: peaks, genes </span></span>
-<span><span class="co">#&gt;  variant positions: 691, 373 </span></span>
-<span><span class="co">#&gt;  data from paired bulk sequencing: None </span></span>
+<span><span class="co">#&gt;  cells: 95, 93 (common: 85, total: 103) </span></span>
+<span><span class="co">#&gt;  counts: 95 cells x 1200 features (peaks), 93 cells x 300 features (genes) </span></span>
+<span><span class="co">#&gt;  logratio: None</span></span>
+<span><span class="co">#&gt;  </span></span>
+<span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
+<span><span class="co">#&gt;  bulk data: None </span></span>
+<span><span class="co">#&gt;  clustering: None </span></span>
+<span><span class="co">#&gt;  CNA calling: None </span></span>
+<span><span class="co">#&gt;  genome: hg38</span></span></code></pre></div>
+</div>
+<p>Examples of complete <code>muscadet</code> objects are included in the example dataset of the package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Example of muscadet object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"exdata_muscadet"</span>, <span class="st">"exdata_muscadet_ref"</span><span class="op">)</span></span>
+<span><span class="va">exdata_muscadet</span></span>
+<span><span class="co">#&gt; A muscadet object </span></span>
+<span><span class="co">#&gt;  2 omics: ATAC, RNA </span></span>
+<span><span class="co">#&gt;  types: ATAC, RNA </span></span>
+<span><span class="co">#&gt;  labels: scATAC-seq, scRNA-seq </span></span>
+<span><span class="co">#&gt;  cells: 71, 69 (common: 63, total: 77) </span></span>
+<span><span class="co">#&gt;  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) </span></span>
+<span><span class="co">#&gt;  logratio: 71 cells x 213 features (windows of peaks), 69 cells x 212 features (genes) </span></span>
+<span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
+<span><span class="co">#&gt;  bulk data: WGS </span></span>
+<span><span class="co">#&gt;  clustering: partitions = 0.1, 0.3, 0.5 ; optimal partition = 0.5 </span></span>
+<span><span class="co">#&gt;  CNA calling: 2 clusters ; 3 consensus segments including 0 CNA segments </span></span>
+<span><span class="co">#&gt;  genome: hg38</span></span>
+<span><span class="va">exdata_muscadet_ref</span></span>
+<span><span class="co">#&gt; A muscadet object </span></span>
+<span><span class="co">#&gt;  2 omics: ATAC, RNA </span></span>
+<span><span class="co">#&gt;  types: ATAC, RNA </span></span>
+<span><span class="co">#&gt;  labels: scATAC-seq, scRNA-seq </span></span>
+<span><span class="co">#&gt;  cells: 95, 93 (common: 85, total: 103) </span></span>
+<span><span class="co">#&gt;  counts: 95 cells x 1200 features (peaks), 93 cells x 300 features (genes) </span></span>
+<span><span class="co">#&gt;  logratio: None</span></span>
+<span><span class="co">#&gt;  </span></span>
+<span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
+<span><span class="co">#&gt;  bulk data: None </span></span>
 <span><span class="co">#&gt;  clustering: None </span></span>
 <span><span class="co">#&gt;  CNA calling: None </span></span>
 <span><span class="co">#&gt;  genome: hg38</span></span></code></pre></div>
@@ -232,93 +256,93 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.github.io/seurat-object/" class="external-link">SeuratObject</a></span><span class="op">)</span> <span class="co"># Cells() and Features() methods imported from SeuratObject</span></span>
 <span></span>
 <span><span class="co"># Cell names</span></span>
-<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span> <span class="co"># list of cells, one element per omic</span></span>
-<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span> <span class="co"># element of the list</span></span>
-<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">ATAC</span><span class="op">)</span> <span class="co"># cells for muscomic object</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">union</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">)</span> <span class="co"># all cells</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">intersect</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">)</span> <span class="co"># common cells</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span> <span class="co"># list of cells, one element per omic</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span> <span class="co"># element of the list</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">ATAC</span><span class="op">)</span> <span class="co"># cells for muscomic object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">union</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">)</span> <span class="co"># all cells</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">intersect</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">)</span> <span class="co"># common cells</span></span>
 <span></span>
 <span><span class="co"># Feature names</span></span>
-<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
-<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
+<span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
 <span></span>
 <span><span class="co"># Matrix of raw counts</span></span>
-<span><span class="fu"><a href="../reference/muscadet-methods.html">matCounts</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
-<span><span class="fu"><a href="../reference/muscadet-methods.html">matCounts</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">ATAC</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/muscadet-methods.html">matCounts</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
+<span><span class="fu"><a href="../reference/muscadet-methods.html">matCounts</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">ATAC</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Matrix of log ratios</span></span>
-<span><span class="fu"><a href="../reference/muscadet-methods.html">matLogRatio</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
-<span><span class="fu"><a href="../reference/muscadet-methods.html">matLogRatio</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
+<span><span class="fu"><a href="../reference/muscadet-methods.html">matLogRatio</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
+<span><span class="fu"><a href="../reference/muscadet-methods.html">matLogRatio</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
 <span></span>
 <span><span class="co"># Table of feature coordinates</span></span>
-<span><span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
-<span><span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">RNA</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span> <span class="co"># list, one element per omic</span></span>
+<span><span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">RNA</span></span></code></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.github.io/seurat-object/" class="external-link">SeuratObject</a></span><span class="op">)</span> <span class="co"># Cells() and Features() methods imported from SeuratObject</span></span>
 <span></span>
 <span><span class="co"># number of cells in total</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">union</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 147</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">union</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 77</span></span>
 <span><span class="co"># number of common cells</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">intersect</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 84</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">intersect</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 63</span></span>
 <span><span class="co"># number of cells per omic</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span>, <span class="va">length</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span>, <span class="va">length</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $ATAC</span></span>
-<span><span class="co">#&gt; [1] 112</span></span>
+<span><span class="co">#&gt; [1] 71</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $RNA</span></span>
-<span><span class="co">#&gt; [1] 119</span></span>
+<span><span class="co">#&gt; [1] 69</span></span>
 <span><span class="co"># number of features per omic</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span>, <span class="va">length</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Features</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span>, <span class="va">length</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $ATAC</span></span>
-<span><span class="co">#&gt; [1] 133</span></span>
+<span><span class="co">#&gt; [1] 213</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $RNA</span></span>
-<span><span class="co">#&gt; [1] 349</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 212</span></span></code></pre></div>
 </div>
 </section></section><section class="section level2" data-number="3"><h2 data-number="3" id="compute-log-ratios">
 <span class="header-section-number">3</span> Compute log ratios<a class="anchor" aria-label="anchor" href="#compute-log-ratios"></a>
 </h2>
-<p>Compute genome-wide coverage profiles as log ratio (LRR) matrices with <code><a href="../reference/computeLogRatio.html">computeLogRatio()</a></code> for every omic present in the muscadet object.</p>
+<p>Genome-wide coverage profiles are computed as log R ratio (LRR) matrices using the <code><a href="../reference/computeLogRatio.html">computeLogRatio()</a></code> function for each omics modality contained in the muscadet object. This step transforms raw count data into normalized coverage profiles along the genome, which are used for downstream clustering analysis.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compute log R ratios from scATAC-seq read counts</span></span>
-<span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeLogRatio.html">computeLogRatio</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">muscadet</span>,</span>
-<span>    reference <span class="op">=</span> <span class="va">muscadet_ref</span>,</span>
+<span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeLogRatio.html">computeLogRatio</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">exdata_muscadet</span>,</span>
+<span>    reference <span class="op">=</span> <span class="va">exdata_muscadet_ref</span>,</span>
 <span>    omic <span class="op">=</span> <span class="st">"ATAC"</span>,</span>
 <span>    method <span class="op">=</span> <span class="st">"ATAC"</span>,</span>
-<span>    minReads <span class="op">=</span> <span class="fl">1</span>, <span class="co"># low value for small example dataset</span></span>
+<span>    minReads <span class="op">=</span> <span class="fl">0.5</span>, <span class="co"># low value for small example dataset</span></span>
 <span>    minPeaks <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># low value for small example dataset</span></span>
 <span></span>
 <span><span class="co"># Compute log R ratios from scRNA-seq read counts</span></span>
-<span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeLogRatio.html">computeLogRatio</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">muscadet</span>,</span>
-<span>    reference <span class="op">=</span> <span class="va">muscadet_ref</span>,</span>
+<span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/computeLogRatio.html">computeLogRatio</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">exdata_muscadet</span>,</span>
+<span>    reference <span class="op">=</span> <span class="va">exdata_muscadet_ref</span>,</span>
 <span>    omic <span class="op">=</span> <span class="st">"RNA"</span>,</span>
 <span>    method <span class="op">=</span> <span class="st">"RNA"</span>,</span>
 <span>    refReads <span class="op">=</span> <span class="fl">2</span>, <span class="co"># low value for small example dataset</span></span>
 <span>    refMeanReads <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span> </span></code></pre></div>
 </div>
-<p>To adjust filters applied to features by <code><a href="../reference/computeLogRatio.html">computeLogRatio()</a></code>, you can check distribution of data and filter status of features.</p>
+<p>To customize or refine the feature filtering applied by <code><a href="../reference/computeLogRatio.html">computeLogRatio()</a></code>, users can inspect the data distributions and review the filter status of individual features before proceeding with downstream analyses.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ATAC_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ATAC_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">ATAC</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">ATAC_features</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">nPeaks</span>, y <span class="op">=</span> <span class="va">meanReads.ref</span>, color <span class="op">=</span> <span class="va">keep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1</span> , linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># minPeaks threshold</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># minReads threshold</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0.5</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># minReads threshold</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Number of peaks (minPeaks)"</span>, y <span class="op">=</span> <span class="st">"Mean of reads in reference cells (minReads)"</span>,</span>
 <span>         title <span class="op">=</span> <span class="st">"ATAC features (windows of peaks) filtered by thresholds"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in scale_y_log10(): log-10 transformation introduced infinite values.</span></span>
-<span><span class="co">#&gt; Warning: Removed 197 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning in scale_y_log10(): log-10 transformation introduced infinite values.</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/check%20features%20filters-1.png" width="672"></p>
@@ -327,7 +351,7 @@
 </div>
 <div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">RNA_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span><span class="op">$</span><span class="va">RNA</span>  </span>
+<span><span class="va">RNA_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muscadet-methods.html">coordFeatures</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">$</span><span class="va">RNA</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">RNA_features</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sumReads.ref</span>, y <span class="op">=</span> <span class="va">meanReads.ref</span>, color <span class="op">=</span> <span class="va">keep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -338,7 +362,7 @@
 <span>         title <span class="op">=</span> <span class="st">"RNA features (genes) filtered by thresholds"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in scale_x_log10(): log-10 transformation introduced infinite values.</span></span>
-<span><span class="co">#&gt; Warning in scale_y_log10(): log-10 transformation introduced infinite values.</span></span></code></pre></div>
+<span><span class="co">#&gt; log-10 transformation introduced infinite values.</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/check%20features%20filters-2.png" width="672"></p>
@@ -349,98 +373,126 @@
 </section><section class="section level2" data-number="4"><h2 data-number="4" id="multimodal-integrated-clustering">
 <span class="header-section-number">4</span> Multimodal integrated clustering<a class="anchor" aria-label="anchor" href="#multimodal-integrated-clustering"></a>
 </h2>
-<p>The cells are clustered based on log ratio profiles with <code><a href="../reference/clusterMuscadet.html">clusterMuscadet()</a></code>, two methods are available:</p>
+<p>Cells are clustered based on their log ratio profiles using the <code><a href="../reference/clusterMuscadet.html">clusterMuscadet()</a></code> function. Two clustering strategies are currently available:</p>
 <ul>
-<li>
-<code>method = "seurat"</code>: Seurat’s graph-based clustering. It consists of a nearest neighbors graph construction on a weighted combination of two modalities from selected dimensions of PCA and cluster determination (see <code><a href="../reference/cluster_seurat.html">cluster_seurat()</a></code>).</li>
-<li>
-<code>method = "hclust"</code>: Integration by Similarity Network Fusion (SNF) followed by hierarchical clustering (see <code><a href="../reference/cluster_hclust.html">cluster_hclust()</a></code>).</li>
+<li><p><strong><code>method = "seurat"</code></strong>: Graph-based clustering using the <a href="https://satijalab.org/seurat/" class="external-link"><code>Seurat</code></a> package. This approach constructs a nearest-neighbor graph from a weighted combination of multiple modalities, using selected principal components from each modality, followed by community detection to identify clusters (see <code><a href="../reference/cluster_seurat.html">cluster_seurat()</a></code>).</p></li>
+<li><p><strong><code>method = "hclust"</code></strong>: Multi-omic integration via Similarity Network Fusion (SNF), followed by hierarchical clustering of the fused similarity matrix to identify cell clusters (see <code><a href="../reference/cluster_hclust.html">cluster_hclust()</a></code>).</p></li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Set seed for clustering reproducibility</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="co"># Perform clustering with "seurat" method</span></span>
-<span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">muscadet_obj</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"seurat"</span>,</span>
-<span>  res_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
-<span>  dims_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span>,</span>
-<span>  knn_seurat <span class="op">=</span> <span class="fl">10</span>, <span class="co"># adapted to low number of cells in example data</span></span>
-<span>  knn_range_seurat <span class="op">=</span> <span class="fl">30</span> <span class="co"># adapted to low number of cells in example data</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="va">exdata_muscadet</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"seurat"</span>,</span>
+<span>    res_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>    dims_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>    knn_seurat <span class="op">=</span> <span class="fl">10</span>, <span class="co"># adapted to low number of cells in example data</span></span>
+<span>    knn_range_seurat <span class="op">=</span> <span class="fl">30</span> <span class="co"># adapted to low number of cells in example data</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Clustering method: 'seurat'</span></span>
+<span><span class="co">#&gt; Resolutions to compute: 0.1, 0.3, 0.5</span></span>
+<span><span class="co">#&gt; Number of selected dimensions: 10, 10</span></span>
+<span><span class="co">#&gt; Clustering algorithm selected: 4 (Leiden)</span></span>
+<span><span class="co">#&gt; Performing PCA...</span></span>
+<span><span class="co">#&gt; Finding neighbors and constructing graph...</span></span>
+<span><span class="co">#&gt; Computing UMAP...</span></span>
+<span><span class="co">#&gt; Finding clusters...</span></span>
+<span><span class="co">#&gt; Imputing clusters...</span></span>
+<span><span class="co">#&gt; Computing Silhouette scores...</span></span>
+<span><span class="co">#&gt; Done.</span></span></code></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Set seed for clustering reproducibility</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Perform clustering with "hclust" method</span></span>
-<span><span class="va">muscadet_obj2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">muscadet_obj</span>,</span>
+<span><span class="va">exdata_muscadet2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterMuscadet.html">clusterMuscadet</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">exdata_muscadet</span>,</span>
 <span>  k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"hclust"</span>,</span>
 <span>  dist_method <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
 <span>  hclust_method <span class="op">=</span> <span class="st">"ward.D"</span>,</span>
-<span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Number of cells per cluster per partition</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span>, <span class="va">table</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $`0.6`</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span>, <span class="va">table</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $`0.1`</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  1 </span></span>
+<span><span class="co">#&gt; 77 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`0.3`</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  1  2 </span></span>
-<span><span class="co">#&gt; 84 63 </span></span>
+<span><span class="co">#&gt; 41 36 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $`0.8`</span></span>
+<span><span class="co">#&gt; $`0.5`</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  1  2  3 </span></span>
-<span><span class="co">#&gt; 62 58 27 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $`1`</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  1  2  3  4  5 </span></span>
-<span><span class="co">#&gt; 54 25 34 20 14</span></span></code></pre></div>
+<span><span class="co">#&gt; 34 30 13</span></span></code></pre></div>
 </div>
 </section><section class="section level2" data-number="5"><h2 data-number="5" id="clustering-visualization">
 <span class="header-section-number">5</span> Clustering visualization<a class="anchor" aria-label="anchor" href="#clustering-visualization"></a>
 </h2>
-<p>The genome-wide coverage profiles and clusters are visualized as a heatmap using <code><a href="../reference/heatmapMuscadet.html">heatmapMuscadet()</a></code> on a chosen clustering partition stored in the <code>muscadet</code> object.</p>
+<p>The distribution of cells across clustering partitions at different resolutions can be explored using <code><a href="https://lazappi.github.io/clustree/reference/clustree.html" class="external-link">clustree()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Plot heatmap </span></span>
-<span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
-<span>    <span class="va">muscadet_obj</span>,</span>
-<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"heatmap_res0.6.png"</span><span class="op">)</span>,</span>
-<span>    partition <span class="op">=</span> <span class="fl">0.6</span>,</span>
-<span>    title <span class="op">=</span> <span class="st">"Example | res=0.6"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lazappi/clustree" class="external-link">clustree</a></span><span class="op">)</span></span>
+<span><span class="co"># Build clustree</span></span>
+<span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span>, <span class="va">as.data.frame</span><span class="op">)</span></span>
+<span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">cbind</span>, <span class="va">partitions</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">partitions</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"res_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://lazappi.github.io/clustree/reference/clustree.html" class="external-link">clustree</a></span><span class="op">(</span><span class="va">partitions</span>, prefix <span class="op">=</span> <span class="st">"res_"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="muscadet_files/figure-html/clustree-1.png" width="672"></p>
+</figure>
 </div>
-<p><img src="figures/heatmap_res0.6.png" id="fig-ht" class="quarto-figure quarto-figure-center" style="width:100.0%" alt="Heatmap of log ratios"> An heatmap of log ratio averages per clusters can also be plotted.</p>
+</div>
+</div>
+<p>Genome-wide coverage profiles, along with the identified clusters, can be visualized as a heatmap with <code><a href="../reference/heatmapMuscadet.html">heatmapMuscadet()</a></code>, on a selected clustering partition stored in the <code>muscadet</code> object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot heatmap </span></span>
+<span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
+<span>    <span class="va">exdata_muscadet</span>,</span>
+<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"heatmap_res0.3.png"</span><span class="op">)</span>,</span>
+<span>    partition <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Example | res=0.3"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p><img src="figures/heatmap_res0.3.png" id="fig-ht" class="quarto-figure quarto-figure-center" style="width:100.0%" alt="Heatmap of log ratios"> Additionally, an aggregated heatmap showing the average log ratio values per cluster can be plotted to summarize copy-number patterns across subclonal populations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot heatmap of log ratio averages per cluster</span></span>
 <span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
-<span>    <span class="va">muscadet_obj</span>,</span>
-<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"heatmap_res0.6_averages.png"</span><span class="op">)</span>,</span>
-<span>    partition <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>    <span class="va">exdata_muscadet</span>,</span>
+<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"heatmap_res0.3_averages.png"</span><span class="op">)</span>,</span>
+<span>    partition <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>    averages <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    title <span class="op">=</span> <span class="st">"Example | res=0.6 | Averages per cluster"</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Example | res=0.3 | Averages per cluster"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div id="fig-htavg" class="quarto-float quarto-figure quarto-figure-center" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig"><div aria-describedby="fig-htavg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/heatmap_res0.6_averages.png" class="quarto-figure quarto-figure-center" style="width:100.0%">
+<img src="figures/heatmap_res0.3_averages.png" class="quarto-figure quarto-figure-center" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-htavg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure 1: Heatmap of log ratios averages per cluster
 </figcaption></figure>
 </div>
-<p>The integrated genome-wide coverage profiles are projected into a low-dimensional space using Uniform Manifold Approximation and Projection (UMAP).</p>
+<p>To visualize the integrated genome-wide coverage profiles, the data can be projected into a low-dimensional space using Uniform Manifold Approximation and Projection (UMAP). This projection provides an intuitive view of cell relationships, allowing users to explore subclonal structure and similarity between cells based on their multi-omic copy-number profiles.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotUMAP.html">plotUMAP</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotUMAP.html">plotUMAP</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, partition <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/umap-1.png" width="672"></p>
@@ -451,24 +503,24 @@ Figure 1: Heatmap of log ratios averages per cluster
 </section><section class="section level2" data-number="6"><h2 data-number="6" id="clustering-validation">
 <span class="header-section-number">6</span> Clustering validation<a class="anchor" aria-label="anchor" href="#clustering-validation"></a>
 </h2>
-<p>To validate and select the clustering partition, Silhouette scores are stored in the <code>muscadet</code> object and are visualized using <code><a href="../reference/plotSil.html">plotSil()</a></code> and other clustering validation indexes with <code><a href="../reference/plotIndexes.html">plotIndexes()</a></code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># View stored silhouette average widths per partition</span></span>
-<span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">silhouette</span><span class="op">$</span><span class="va">sil.w.avg</span></span>
-<span><span class="co">#&gt; $`0.6`</span></span>
-<span><span class="co">#&gt; [1] 0.09474151</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $`0.8`</span></span>
-<span><span class="co">#&gt; [1] 0.1093522</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $`1`</span></span>
-<span><span class="co">#&gt; [1] 0.1456324</span></span></code></pre></div>
-</div>
+<p>To assess the quality of the clustering partitions, Silhouette scores are computed and stored in the <code>muscadet</code> object. These scores can be visualized using <code><a href="../reference/plotSil.html">plotSil()</a></code>. Additional clustering validation metrics are also available and can be explored with <code><a href="../reference/plotIndexes.html">plotIndexes()</a></code>. Together, these tools help guide the selection of the most appropriate clustering partition for downstream analyses.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># View stored silhouette average widths per partition</span></span>
+<span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">silhouette</span><span class="op">$</span><span class="va">sil.w.avg</span></span>
+<span><span class="co">#&gt; $`0.1`</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`0.3`</span></span>
+<span><span class="co">#&gt; [1] 0.1706987</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $`0.5`</span></span>
+<span><span class="co">#&gt; [1] 0.2172253</span></span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Silhouette plot for individual clustering partition</span></span>
-<span><span class="fu"><a href="../reference/plotSil.html">plotSil</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/plotSil.html">plotSil</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, partition <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div id="fig-sil" class="quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-fig"><div aria-describedby="fig-sil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -481,9 +533,10 @@ Figure 2: Silhouette plot for a clustering partition
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot clustering indexes for every stored partitions</span></span>
-<span><span class="fu"><a href="../reference/plotIndexes.html">plotIndexes</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, index <span class="op">=</span> <span class="st">"silhouette"</span><span class="op">)</span></span></code></pre></div>
+<span></span>
+<span><span class="fu"><a href="../reference/plotIndexes.html">plotIndexes</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div id="fig-sil2" class="quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-fig"><div aria-describedby="fig-sil2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -495,81 +548,99 @@ Figure 3: Plot of Silhouette scores across partitions
 </div>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Plot clustering indexes for every stored partitions</span></span>
-<span><span class="fu"><a href="../reference/plotIndexes.html">plotIndexes</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<div id="fig-indexes" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig"><div aria-describedby="fig-indexes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="muscadet_files/figure-html/fig-indexes-1.png" width="672">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-indexes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 4: Plot of clustering validation indexes across partitions
-</figcaption></figure>
-</div>
-</div>
-</div>
 </section><section class="section level2" data-number="7"><h2 data-number="7" id="cna-calling">
 <span class="header-section-number">7</span> CNA calling<a class="anchor" aria-label="anchor" href="#cna-calling"></a>
 </h2>
-<p>First, a clustering partition must be selected using <code><a href="../reference/assignClusters.html">assignClusters()</a></code>.</p>
+<p>Before calling CNAs, a clustering partition must be selected using <code><a href="../reference/assignClusters.html">assignClusters()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assignClusters.html">assignClusters</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, partition <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assignClusters.html">assignClusters</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, partition <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">$</span><span class="va">cnacalling</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">cnacalling</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  1  2 </span></span>
-<span><span class="co">#&gt; 84 63</span></span></code></pre></div>
+<span><span class="co">#&gt; 41 36</span></span></code></pre></div>
 </div>
-<p>Then, run <code><a href="../reference/mergeCounts.html">mergeCounts()</a></code> using both the sample (tumor cells) and reference (normal cells) <code>muscadet</code> objects, to combine counts per cluster from multiple omics from both.</p>
+<p>Next, use <code><a href="../reference/aggregateCounts.html">aggregateCounts()</a></code> with both the sample (tumor cells) and reference (normal cells) <code>muscadet</code> objects to combine counts per cluster across all omics.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Merge counts per cluster from all omics from both sample and reference</span></span>
-<span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mergeCounts.html">mergeCounts</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, <span class="va">muscadet_obj_ref</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Aggregate counts per cluster from all omics from both sample and reference</span></span>
+<span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/aggregateCounts.html">aggregateCounts</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, <span class="va">exdata_muscadet_ref</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Clusters used: 1 (41 cells), 2 (36 cells)</span></span>
+<span><span class="co">#&gt; Allelic data processing...</span></span>
+<span><span class="co">#&gt; Coverage data processing...</span></span>
+<span><span class="co">#&gt; Combining allelic and coverage data...</span></span></code></pre></div>
 </div>
-<p>Finally, run <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> to call CNA segments</p>
+<p>Finally, run <code><a href="../reference/cnaCalling.html">cnaCalling()</a></code> to infer CNA segments for each cluster.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">muscadet_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cnaCalling.html">cnaCalling</a></span><span class="op">(</span></span>
-<span>    <span class="va">muscadet_obj</span>,</span>
-<span>    omics.coverage <span class="op">=</span> <span class="st">"ATAC"</span>, <span class="co"># only ATAC coverage used</span></span>
+<code class="sourceCode R"><span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cnaCalling.html">cnaCalling</a></span><span class="op">(</span></span>
+<span>    <span class="va">exdata_muscadet</span>,</span>
 <span>    depthmin.a.clusters <span class="op">=</span> <span class="fl">3</span>, <span class="co"># set low thresholds for example data</span></span>
 <span>    depthmin.c.clusters <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    depthmin.a.allcells <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>    depthmin.c.allcells <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>    depthmin.c.nor <span class="op">=</span> <span class="fl">0</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>    depthmin.c.nor <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; - Analysis per cluster -</span></span>
+<span><span class="co">#&gt; Initial number of positions: 2455</span></span>
+<span><span class="co">#&gt; Initial number of allelic positions: 1313</span></span>
+<span><span class="co">#&gt; Initial number of coverage positions: 1142</span></span>
+<span><span class="co">#&gt; Integrating omics...</span></span>
+<span><span class="co">#&gt; Filtering allelic positions: tumor depth &gt;= 3 reads</span></span>
+<span><span class="co">#&gt; Filtering coverage positions: tumor depth &gt;= 5 reads</span></span>
+<span><span class="co">#&gt; Filtering coverage positions: normal depth &gt;= 1 reads</span></span>
+<span><span class="co">#&gt; Allelic positions kept: 126</span></span>
+<span><span class="co">#&gt; Coverage positions kept: 438</span></span>
+<span><span class="co">#&gt; Final number of positions: 564</span></span>
+<span><span class="co">#&gt; Performing segmentation per cluster...</span></span>
+<span><span class="co">#&gt; Finding diploid log R ratio on clusters...</span></span>
+<span><span class="co">#&gt; Diploid log R ratio = -0.09</span></span>
+<span><span class="co">#&gt; Computing cell fractions and copy numbers on clusters...</span></span>
+<span><span class="co">#&gt; - Analysis on all cells -</span></span>
+<span><span class="co">#&gt; Aggregating allelic counts of all cells...</span></span>
+<span><span class="co">#&gt; Filtering allelic positions: tumor depth &gt;= 3 reads</span></span>
+<span><span class="co">#&gt; Allelic positions kept: 186</span></span>
+<span><span class="co">#&gt; Aggregating coverage counts of all cells...</span></span>
+<span><span class="co">#&gt; Filtering coverage positions: tumor depth &gt;= 5 reads</span></span>
+<span><span class="co">#&gt; Filtering coverage positions: normal depth &gt;= 1 reads</span></span>
+<span><span class="co">#&gt; Coverage positions kept: 315</span></span>
+<span><span class="co">#&gt; Final number of positions: 501</span></span>
+<span><span class="co">#&gt; Performing segmentation on all cells...</span></span>
+<span><span class="co">#&gt; Computing cell fractions and copy numbers on all cells...</span></span>
+<span><span class="co">#&gt; - Consensus segments accross clusters -</span></span>
+<span><span class="co">#&gt; Finding consensus segments...</span></span>
+<span><span class="co">#&gt; 3 consensus segments identified, 0 CNA segments identified</span></span>
+<span><span class="co">#&gt; Done.</span></span></code></pre></div>
 </div>
 <div>
 <blockquote>
 <p><strong>Note</strong></p>
-<p>Filters <code>depthmin[...]</code> set by default might not be suited on your data, adapting them is recommended.</p>
+<p>The default minimum depth (<code>depthmin.[...]</code>) filters may not be suitable for all datasets. It is recommended to inspect your data and adjust these parameters accordingly.</p>
 </blockquote>
 </div>
 <div>
 <blockquote>
 <p><strong>Note</strong></p>
-<p>The <code>omics.coverage</code> can be set to <code>"ATAC"</code> to only use ATAC coverage for CNA detection as DNA signal tends to be less noisy than RNA.</p>
+<p>The <code>omics.coverage</code> parameter can be set to one or more specific omics types (e.g., <code>"ATAC"</code> or <code>"RNA"</code>). This allows the CNA calling procedure to prioritize coverage from the selected omics, which can be useful when the signal from other modalities is noisy or less reliable.</p>
 </blockquote>
 </div>
 </section><section class="section level2" data-number="8"><h2 data-number="8" id="cna-profiles">
 <span class="header-section-number">8</span> CNA profiles<a class="anchor" aria-label="anchor" href="#cna-profiles"></a>
 </h2>
-<p>The resulting CNA calls are visualized using <code><a href="../reference/plotProfile.html">plotProfile()</a></code> that generates a multi-panel profile plot per cluster summarizing:</p>
+<p>The resulting CNA calls can be visualized using <code><a href="../reference/plotProfile.html">plotProfile()</a></code>, which generates a multi-panel profile per cluster summarizing:</p>
 <ul>
-<li>Coverage per feature: log R ratios values of genes/peaks, segment medians and diploid log ratio (purple line) - deviations from 0 indicate gains (positive) or losses (negative) in coverage.</li>
-<li>Allele data: log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians - deviation from 0 suggests allelic imbalance, useful to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.</li>
-<li>Copy number calls at each segment - total and minor copy numbers.</li>
-<li>CNA status classification of each segment - gain, loss or copy-neutral LOH.</li>
-<li>Fraction of cells estimated to harbor the CNA at each segment.</li>
+<li>Coverage per feature: log ratios values of genes/peaks, segment medians and diploid log ratio (purple line). Deviations from 0 indicate gains (positive) or losses (negative) in coverage.</li>
+<li>Allele data: log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians. Deviation from 0 suggests allelic imbalance, used to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.</li>
+<li>Copy number calls: total and minor copy numbers per segment.</li>
+<li>CNA status classification: gain, loss or copy-neutral LOH statuses per segment.</li>
+<li>Cellular fraction: proportion of cells estimated to harbor the CNA at each segment.</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, data <span class="op">=</span> <span class="fl">1</span>, title <span class="op">=</span> <span class="st">"Cluster 1 profile"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, data <span class="op">=</span> <span class="st">"1"</span>, title <span class="op">=</span> <span class="st">"Cluster 1 profile"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/plot%20profile%201-1.png" width="672"></p>
@@ -579,7 +650,7 @@ Figure 4: Plot of clustering validation indexes across partitions
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, data <span class="op">=</span> <span class="st">"allcells"</span>, title <span class="op">=</span> <span class="st">"Profile for all cells"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, data <span class="op">=</span> <span class="st">"allcells"</span>, title <span class="op">=</span> <span class="st">"Profile for all cells"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/plot%20profile%20allcells-1.png" width="672"></p>
@@ -587,21 +658,13 @@ Figure 4: Plot of clustering validation indexes across partitions
 </div>
 </div>
 </div>
-<p>The complete CNA profile of the sample across clusters is visualized using <code><a href="../reference/plotCNA.html">plotCNA()</a></code>.</p>
+<p>To view the complete CNA profile of the sample across clusters, use <code><a href="../reference/plotCNA.html">plotCNA()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">muscadet_obj</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, cf.gradient <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/plot%20CNA-1.png" width="672"></p>
-</figure>
-</div>
-</div>
-<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">muscadet_obj</span>, cf.gradient <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure><p><img src="muscadet_files/figure-html/plot%20CNA-2.png" width="672"></p>
 </figure>
 </div>
 </div>
@@ -702,7 +765,7 @@ Figure 4: Plot of clustering validation indexes across partitions
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Marie Denoulet, Nils Giordano, Eric Letouzé, Céline Vallot, Stéphane Minvielle.</p>
+  <p>Developed by Marie Denoulet, Nils Giordano, Stéphane Minvielle, Céline Vallot, Eric Letouzé.</p>
 </div>
 
 <div class="pkgdown-footer-right">
