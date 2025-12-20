@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   data-prep: data-prep.html
   muscadet: muscadet.html
-last_built: 2025-12-20T11:45Z
+last_built: 2025-12-20T12:14Z
 urls:
   reference: https://icagen.github.io/muscadet/reference
   article: https://icagen.github.io/muscadet/articles
