@@ -41,19 +41,9 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os != 'macOS'
         with:
+          extra-packages: any::rcmdcheck
           needs: check
-          extra-packages: any::rcmdcheck, any::sessioninfo
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        if: runner.os == 'macOS'
-        with:
-          needs: check
-          extra-packages: any::rcmdcheck, any::sessioninfo
-          use-pak: false
-        env:
-          R_PKG_TYPE: source
 
       - uses: r-lib/actions/check-r-package@v2
         with:
