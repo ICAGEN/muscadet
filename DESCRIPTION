@@ -54,6 +54,7 @@ Imports:
     stats,
     uwot
 Suggests: 
+    clusterSim,
     fpc,
     ggrepel,
     knitr,
