@@ -41,14 +41,21 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
+        if: runner.os != 'macOS'
         with:
           extra-packages: any::rcmdcheck, any::sessioninfo
           needs: check
-        env:
-          ANY_CRAN_MIRROR: "https://cran.rstudio.com"
-          PKGCACHE_HTTP_RETRIES: "10"
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: runner.os == 'macOS'
+        with:
+          extra-packages: any::rcmdcheck, any::sessioninfo
+          needs: check
           options: |
-            list(pkg.type = "both")
+            list(pkg.type = "source")
+        env:
+          R_REMOTES_UPGRADE: "always"
+          PKG_TYPE: "source"
 
       - uses: r-lib/actions/check-r-package@v2
         with:
