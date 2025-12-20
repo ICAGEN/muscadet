@@ -179,7 +179,8 @@ test_that("plotIndexes() returns a ggplot object - silhouette", {
 test_that("plotIndexes() returns a ggplot object - other indexes", {
     skip_on_cran()
     skip_if_not_installed("ggplot2")
-    testthat::skip_if_not_installed("fpc")
+    skip_if_not_installed("fpc")
+    skip_if_not_installed("clusterSim")
 
     data("exdata_muscadet", package = "muscadet")
 
