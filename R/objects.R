@@ -943,10 +943,10 @@ setMethod(
         line_logratio <- paste("logratio:", if (all(sapply(omic_logratio, is.null))) {
             "None\n"
         } else {
-            paste(sapply(omic_logratio[!sapply(omic_logratio, is.null)], function(x) {
+            paste(paste(sapply(omic_logratio[!sapply(omic_logratio, is.null)], function(x) {
                 paste0(x[1], " cells x ", x[2], " features (", x[3], ")")
-            }), collapse = ", ")
-        }, "\n")
+            }), collapse = ", "), "\n")
+        })
 
 
         # CNA calling summary
