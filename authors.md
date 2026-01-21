@@ -23,7 +23,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ICAGEN/muscadet/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ICAGEN/muscadet/blob/v0.2.1/DESCRIPTION)
 
 Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).
 *muscadet: Multiomics Single-Cell Copy Number Alterations Detection*. R
