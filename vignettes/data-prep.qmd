@@ -51,7 +51,7 @@ See `?exdata_mat_counts` for full documentation.
 
 ```{r}
 #| label: tbl-mat-counts
-#| tbl-cap: "Allele counts table example"
+#| tbl-cap: "Counts matrix example"
 
 data("exdata_mat_counts_atac_tumor")
 kable(exdata_mat_counts_atac_tumor[1:8, 30:34])

@@ -8,3 +8,7 @@
 ^vignettes/\.quarto$
 ^vignettes/*_files$
 ^LICENSE\.md$
+^vignettes/articles$
+^vignettes/articles/\.quarto$
+^vignettes/articles/*_files$
+^vignettes/articles/.*\.qmd\.orig$

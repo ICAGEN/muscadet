@@ -279,8 +279,8 @@ exdata_muscadet <- clusterMuscadet(
     method = "seurat",
     res_range = c(0.1, 0.3, 0.5),
     dims_list = list(1:10, 1:10),
-    knn_seurat = 10, # adapted to low number of cells in example data
-    knn_range_seurat = 30 # adapted to low number of cells in example data
+    knn_seurat = 10, # adapted to low number of cells in example data, default is 20
+    knn_range_seurat = 30 # adapted to low number of cells in example data, default is 200
 )
 ```
 
@@ -318,11 +318,22 @@ The distribution of cells across clustering partitions at different resolutions 
 #| eval: !expr has_clustree
 
 library(clustree)
-# Build clustree
-partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
-partitions <- do.call(cbind, partitions)
+library(dplyr)
+
+# Extract common cells across omics
+# (clustering is performed on cells common to all omic modalities, cells missing one modality are imputed afterward and included in the output)
+common_cells <- sort(Reduce(intersect, Cells(exdata_muscadet)))
+
+# Construct clustree input
+partitions <- exdata_muscadet@clustering$clusters %>%
+  dplyr::bind_rows(.id = "res") %>%
+  dplyr::select(common_cells) %>%
+  t()
 colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
-clustree(partitions, prefix = "res_")
+
+# Plot clustering tree
+clustree(partitions, prefix = "res_", node_label = "size")
+
 ```
 
 Genome-wide coverage profiles, along with the identified clusters, can be visualized as a heatmap with `heatmapMuscadet()`, on a selected clustering partition stored in the `muscadet` object. 
@@ -334,13 +345,13 @@ Genome-wide coverage profiles, along with the identified clusters, can be visual
 # Plot heatmap 
 heatmapMuscadet(
     exdata_muscadet,
-    filename = file.path("figures", "heatmap_res0.3.png"),
+    filename = file.path("figures", "exdata_heatmap_res0.3.png"),
     partition = 0.3,
     title = "Example | res=0.3"
 )
 ```
 
-![Heatmap of log ratios](figures/heatmap_res0.3.png){#fig-ht width=100% fig-align="center"}
+![Heatmap of log ratios](figures/exdata_heatmap_res0.3.png){#fig-ht width=100% fig-align="center"}
 Additionally, an aggregated heatmap showing the average log ratio values per cluster can be plotted to summarize copy-number patterns across subclonal populations.
 
 ```{r}
@@ -349,14 +360,14 @@ Additionally, an aggregated heatmap showing the average log ratio values per clu
 # Plot heatmap of log ratio averages per cluster
 heatmapMuscadet(
     exdata_muscadet,
-    filename = file.path("figures", "heatmap_res0.3_averages.png"),
+    filename = file.path("figures", "exdata_heatmap_res0.3_averages.png"),
     partition = 0.3,
     averages = TRUE,
     title = "Example | res=0.3 | Averages per cluster"
 )
 ```
 
-![Heatmap of log ratios averages per cluster](figures/heatmap_res0.3_averages.png){#fig-htavg width=100% fig-align="center"}
+![Heatmap of log ratios averages per cluster](figures/exdata_heatmap_res0.3_averages.png){#fig-htavg width=100% fig-align="center"}
 
 To visualize the integrated genome-wide coverage profiles, the data can be projected into a low-dimensional space using Uniform Manifold Approximation and Projection (UMAP). This projection provides an intuitive view of cell relationships, allowing users to explore subclonal structure and similarity between cells based on their multi-omic copy-number profiles.
 
@@ -427,10 +438,10 @@ Finally, run `cnaCalling()` to infer CNA segments for each cluster.
 #| eval: true
 exdata_muscadet <- cnaCalling(
     exdata_muscadet,
-    depthmin.a.clusters = 3, # set low thresholds for example data
-    depthmin.c.clusters = 5,
-    depthmin.a.allcells = 3,
-    depthmin.c.allcells = 5,
+    depthmin.a.clusters = 3, # low threshold for example data, default is 30
+    depthmin.c.clusters = 5, # low threshold for example data, default is 50
+    depthmin.a.allcells = 3, # low threshold for example data, default is 30
+    depthmin.c.allcells = 5, # low threshold for example data, default is 50
     depthmin.c.nor = 1
 )
 ```
@@ -474,6 +485,13 @@ plotCNA(exdata_muscadet, cf.gradient = FALSE)
 ```
 
 
+# Citing muscadet
+
+If you find `muscadet` useful for your work please cite it using the following citation:
+
+```{r}
+citation("muscadet")
+```
 
 
 
