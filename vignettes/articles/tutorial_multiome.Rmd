@@ -1,9 +1,9 @@
 ---
-title: "Multi-Omic Copy Number Analysis Tutorial"
+title: "Multiomic copy number analysis tutorial"
 date: "January 21, 2026"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{Multi-Omic Copy Number Analysis Tutorial}
+  %\VignetteIndexEntry{Multiomic copy number analysis tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 depends:

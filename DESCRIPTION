@@ -1,7 +1,7 @@
 Package: muscadet
 Type: Package
 Title: Multiomics Single-Cell Copy Number Alterations Detection
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Marie", "Denoulet", , "marie.denoulet@univ-nantes.fr", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-9668-0439")),
