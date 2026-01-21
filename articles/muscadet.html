@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/data-prep.html">Preparation of input data</a></li>
+    <li><a class="dropdown-item" href="../articles/tutorial_multiome.html">Multiomic copy number analysis tutorial</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -173,7 +174,6 @@
 <span><span class="co">#&gt;  cells: 71, 69 (common: 63, total: 77) </span></span>
 <span><span class="co">#&gt;  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) </span></span>
 <span><span class="co">#&gt;  logratio: None</span></span>
-<span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
 <span><span class="co">#&gt;  bulk data: WGS </span></span>
 <span><span class="co">#&gt;  clustering: None </span></span>
@@ -207,7 +207,6 @@
 <span><span class="co">#&gt;  cells: 95, 93 (common: 85, total: 103) </span></span>
 <span><span class="co">#&gt;  counts: 95 cells x 1200 features (peaks), 93 cells x 300 features (genes) </span></span>
 <span><span class="co">#&gt;  logratio: None</span></span>
-<span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
 <span><span class="co">#&gt;  bulk data: None </span></span>
 <span><span class="co">#&gt;  clustering: None </span></span>
@@ -240,7 +239,6 @@
 <span><span class="co">#&gt;  cells: 95, 93 (common: 85, total: 103) </span></span>
 <span><span class="co">#&gt;  counts: 95 cells x 1200 features (peaks), 93 cells x 300 features (genes) </span></span>
 <span><span class="co">#&gt;  logratio: None</span></span>
-<span><span class="co">#&gt;  </span></span>
 <span><span class="co">#&gt;  variant positions: 681, 359 </span></span>
 <span><span class="co">#&gt;  bulk data: None </span></span>
 <span><span class="co">#&gt;  clustering: None </span></span>
@@ -389,8 +387,8 @@
 <span>    method <span class="op">=</span> <span class="st">"seurat"</span>,</span>
 <span>    res_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>    dims_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
-<span>    knn_seurat <span class="op">=</span> <span class="fl">10</span>, <span class="co"># adapted to low number of cells in example data</span></span>
-<span>    knn_range_seurat <span class="op">=</span> <span class="fl">30</span> <span class="co"># adapted to low number of cells in example data</span></span>
+<span>    knn_seurat <span class="op">=</span> <span class="fl">10</span>, <span class="co"># adapted to low number of cells in example data, default is 20</span></span>
+<span>    knn_range_seurat <span class="op">=</span> <span class="fl">30</span> <span class="co"># adapted to low number of cells in example data, default is 200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Clustering method: 'seurat'</span></span>
 <span><span class="co">#&gt; Resolutions to compute: 0.1, 0.3, 0.5</span></span>
@@ -446,11 +444,30 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lazappi/clustree" class="external-link">clustree</a></span><span class="op">)</span></span>
-<span><span class="co"># Build clustree</span></span>
-<span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span>, <span class="va">as.data.frame</span><span class="op">)</span></span>
-<span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">cbind</span>, <span class="va">partitions</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Extract common cells across omics</span></span>
+<span><span class="co"># (clustering is performed on cells common to all omic modalities, cells missing one modality are imputed afterward and included in the output)</span></span>
+<span><span class="va">common_cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">intersect</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/Cells.html" class="external-link">Cells</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Construct clustree input</span></span>
+<span><span class="va">partitions</span> <span class="op">&lt;-</span> <span class="va">exdata_muscadet</span><span class="op">@</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"res"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">common_cells</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.</span></span>
+<span><span class="co">#&gt; ℹ Please use `all_of()` or `any_of()` instead.</span></span>
+<span><span class="co">#&gt;   # Was:</span></span>
+<span><span class="co">#&gt;   data %&gt;% select(common_cells)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   # Now:</span></span>
+<span><span class="co">#&gt;   data %&gt;% select(all_of(common_cells))</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">partitions</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"res_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">$</span><span class="va">clustering</span><span class="op">$</span><span class="va">clusters</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://lazappi.github.io/clustree/reference/clustree.html" class="external-link">clustree</a></span><span class="op">(</span><span class="va">partitions</span>, prefix <span class="op">=</span> <span class="st">"res_"</span><span class="op">)</span></span></code></pre></div>
+<span></span>
+<span><span class="co"># Plot clustering tree</span></span>
+<span><span class="fu"><a href="https://lazappi.github.io/clustree/reference/clustree.html" class="external-link">clustree</a></span><span class="op">(</span><span class="va">partitions</span>, prefix <span class="op">=</span> <span class="st">"res_"</span>, node_label <span class="op">=</span> <span class="st">"size"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/clustree-1.png" width="672"></p>
@@ -464,18 +481,18 @@
 <code class="sourceCode R"><span><span class="co"># Plot heatmap </span></span>
 <span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
 <span>    <span class="va">exdata_muscadet</span>,</span>
-<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"heatmap_res0.3.png"</span><span class="op">)</span>,</span>
+<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"exdata_heatmap_res0.3.png"</span><span class="op">)</span>,</span>
 <span>    partition <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>    title <span class="op">=</span> <span class="st">"Example | res=0.3"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<p><img src="figures/heatmap_res0.3.png" id="fig-ht" class="quarto-figure quarto-figure-center" style="width:100.0%" alt="Heatmap of log ratios"> Additionally, an aggregated heatmap showing the average log ratio values per cluster can be plotted to summarize copy-number patterns across subclonal populations.</p>
+<p><img src="figures/exdata_heatmap_res0.3.png" id="fig-ht" class="quarto-figure quarto-figure-center" style="width:100.0%" alt="Heatmap of log ratios"> Additionally, an aggregated heatmap showing the average log ratio values per cluster can be plotted to summarize copy-number patterns across subclonal populations.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot heatmap of log ratio averages per cluster</span></span>
 <span><span class="fu"><a href="../reference/heatmapMuscadet.html">heatmapMuscadet</a></span><span class="op">(</span></span>
 <span>    <span class="va">exdata_muscadet</span>,</span>
-<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"heatmap_res0.3_averages.png"</span><span class="op">)</span>,</span>
+<span>    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="st">"exdata_heatmap_res0.3_averages.png"</span><span class="op">)</span>,</span>
 <span>    partition <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>    averages <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    title <span class="op">=</span> <span class="st">"Example | res=0.3 | Averages per cluster"</span></span>
@@ -483,7 +500,7 @@
 </div>
 <div id="fig-htavg" class="quarto-float quarto-figure quarto-figure-center" data-fig-align="center">
 <figure class="quarto-float quarto-float-fig"><div aria-describedby="fig-htavg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/heatmap_res0.3_averages.png" class="quarto-figure quarto-figure-center" style="width:100.0%">
+<img src="figures/exdata_heatmap_res0.3_averages.png" class="quarto-figure quarto-figure-center" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-htavg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure 1: Heatmap of log ratios averages per cluster
@@ -578,10 +595,10 @@ Figure 3: Plot of Silhouette scores across partitions
 <div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">exdata_muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cnaCalling.html">cnaCalling</a></span><span class="op">(</span></span>
 <span>    <span class="va">exdata_muscadet</span>,</span>
-<span>    depthmin.a.clusters <span class="op">=</span> <span class="fl">3</span>, <span class="co"># set low thresholds for example data</span></span>
-<span>    depthmin.c.clusters <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>    depthmin.a.allcells <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>    depthmin.c.allcells <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>    depthmin.a.clusters <span class="op">=</span> <span class="fl">3</span>, <span class="co"># low threshold for example data, default is 30</span></span>
+<span>    depthmin.c.clusters <span class="op">=</span> <span class="fl">5</span>, <span class="co"># low threshold for example data, default is 50</span></span>
+<span>    depthmin.a.allcells <span class="op">=</span> <span class="fl">3</span>, <span class="co"># low threshold for example data, default is 30</span></span>
+<span>    depthmin.c.allcells <span class="op">=</span> <span class="fl">5</span>, <span class="co"># low threshold for example data, default is 50</span></span>
 <span>    depthmin.c.nor <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; - Analysis per cluster -</span></span>
@@ -668,6 +685,29 @@ Figure 3: Plot of Silhouette scores across partitions
 </figure>
 </div>
 </div>
+</div>
+</section><section class="section level2" data-number="9"><h2 data-number="9" id="citing-muscadet">
+<span class="header-section-number">9</span> Citing muscadet<a class="anchor" aria-label="anchor" href="#citing-muscadet"></a>
+</h2>
+<p>If you find <code>muscadet</code> useful for your work please cite it using the following citation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"muscadet"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; To cite package 'muscadet' in publications use:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).</span></span>
+<span><span class="co">#&gt;   _muscadet: Multiomics Single-Cell Copy Number Alterations Detection_.</span></span>
+<span><span class="co">#&gt;   R package version 0.2.1, &lt;https://github.com/ICAGEN/muscadet&gt;.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   @Manual{,</span></span>
+<span><span class="co">#&gt;     title = {muscadet: Multiomics Single-Cell Copy Number Alterations Detection},</span></span>
+<span><span class="co">#&gt;     author = {Marie Denoulet and Nils Giordano and Stéphane Minvielle and Céline Vallot and Eric Letouzé},</span></span>
+<span><span class="co">#&gt;     year = {2026},</span></span>
+<span><span class="co">#&gt;     note = {R package version 0.2.1},</span></span>
+<span><span class="co">#&gt;     url = {https://github.com/ICAGEN/muscadet},</span></span>
+<span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

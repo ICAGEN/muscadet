@@ -1,5 +1,25 @@
 # Changelog
 
+## muscadet 0.2.1
+
+#### Bug Fixes, Minor Updates
+
+- Correct the [`show()`](https://rdrr.io/r/methods/show.html) method for
+  muscadet objects.
+- Update and fix
+  [`plotProfile()`](https://icagen.github.io/muscadet/reference/plotProfile.md):
+  `allele.type` argument default setting is now “vaf” ; mirror segment
+  medians for “vaf” allelic type are fixed ; `lor.colors` argument
+  becomes `var.colors` argument ; minor corrections of y axis labels
+  rotation and x axis margins.
+
+#### Documentation
+
+- Add a new article to the documentation website, titled **“Multiomic
+  copy number analysis tutorial”**, presenting a complete step-by-step
+  workflow on real data. Note that the input data are not included with
+  the package; all results in the tutorial are pre-computed.
+
 ## muscadet 0.2.0
 
 #### Additions

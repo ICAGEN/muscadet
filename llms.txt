@@ -2,8 +2,8 @@
 
 ### *multiomics single-cell copy number alterations detection*
 
-**muscadet is an R package for identifying copy number alterations
-(CNAs) in cancer cells from single-cell multiomics data.**
+`muscadet` is an R package for identifying copy number alterations
+(CNAs) in cancer cells from single-cell multiomics data.
 
 #### Key features of `muscadet`:
 
@@ -328,3 +328,5 @@ Example data used for examples and practicing functions
   data](https://icagen.github.io/muscadet/articles/data-prep.md):
 - [Introduction to
   muscadet](https://icagen.github.io/muscadet/articles/muscadet.md):
+- [Multiomic copy number analysis
+  tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.md):

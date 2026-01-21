@@ -25,14 +25,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/ICAGEN/muscadet/blob/main/DESCRIPTION)
 
-Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2025).
+Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).
 *muscadet: Multiomics Single-Cell Copy Number Alterations Detection*. R
-package version 0.2.0, <https://github.com/ICAGEN/muscadet>.
+package version 0.2.1, <https://github.com/ICAGEN/muscadet>.
 
     @Manual{,
       title = {muscadet: Multiomics Single-Cell Copy Number Alterations Detection},
       author = {Marie Denoulet and Nils Giordano and Stéphane Minvielle and Céline Vallot and Eric Letouzé},
-      year = {2025},
-      note = {R package version 0.2.0},
+      year = {2026},
+      note = {R package version 0.2.1},
       url = {https://github.com/ICAGEN/muscadet},
     }

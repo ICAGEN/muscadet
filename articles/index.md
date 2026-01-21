@@ -6,3 +6,5 @@
   data](https://icagen.github.io/muscadet/articles/data-prep.md):
 - [Introduction to
   muscadet](https://icagen.github.io/muscadet/articles/muscadet.md):
+- [Multiomic copy number analysis
+  tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.md):

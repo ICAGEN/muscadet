@@ -51,7 +51,7 @@ kable(exdata_mat_counts_atac_tumor[1:8, 30:34])
 | samplename_ACATCATCAGGCTTCG-1 |                   0 |                   3 |                   0 |                   0 |                   0 |
 | samplename_ACCAAACTCTAACCTT-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
 
-Table 1: Allele counts table example
+Table 1: Counts matrix example
 
 - From Seurat/Signac analysis:
 

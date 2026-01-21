@@ -132,7 +132,6 @@ muscadet
 #>  cells: 71, 69 (common: 63, total: 77) 
 #>  counts: 71 cells x 1200 features (peaks), 69 cells x 300 features (genes) 
 #>  logratio: None
-#>  
 #>  variant positions: 681, 359 
 #>  bulk data: WGS 
 #>  clustering: None 
@@ -167,7 +166,6 @@ muscadet_ref
 #>  cells: 95, 93 (common: 85, total: 103) 
 #>  counts: 95 cells x 1200 features (peaks), 93 cells x 300 features (genes) 
 #>  logratio: None
-#>  
 #>  variant positions: 681, 359 
 #>  bulk data: None 
 #>  clustering: None 
@@ -202,7 +200,6 @@ exdata_muscadet_ref
 #>  cells: 95, 93 (common: 85, total: 103) 
 #>  counts: 95 cells x 1200 features (peaks), 93 cells x 300 features (genes) 
 #>  logratio: None
-#>  
 #>  variant positions: 681, 359 
 #>  bulk data: None 
 #>  clustering: None 
@@ -365,8 +362,8 @@ exdata_muscadet <- clusterMuscadet(
     method = "seurat",
     res_range = c(0.1, 0.3, 0.5),
     dims_list = list(1:10, 1:10),
-    knn_seurat = 10, # adapted to low number of cells in example data
-    knn_range_seurat = 30 # adapted to low number of cells in example data
+    knn_seurat = 10, # adapted to low number of cells in example data, default is 20
+    knn_range_seurat = 30 # adapted to low number of cells in example data, default is 200
 )
 #> Clustering method: 'seurat'
 #> Resolutions to compute: 0.1, 0.3, 0.5
@@ -426,11 +423,30 @@ package.
 
 ``` r
 library(clustree)
-# Build clustree
-partitions <- lapply(exdata_muscadet$clustering$clusters, as.data.frame)
-partitions <- do.call(cbind, partitions)
+library(dplyr)
+
+# Extract common cells across omics
+# (clustering is performed on cells common to all omic modalities, cells missing one modality are imputed afterward and included in the output)
+common_cells <- sort(Reduce(intersect, Cells(exdata_muscadet)))
+
+# Construct clustree input
+partitions <- exdata_muscadet@clustering$clusters %>%
+  dplyr::bind_rows(.id = "res") %>%
+  dplyr::select(common_cells) %>%
+  t()
+#> Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
+#> ℹ Please use `all_of()` or `any_of()` instead.
+#>   # Was:
+#>   data %>% select(common_cells)
+#> 
+#>   # Now:
+#>   data %>% select(all_of(common_cells))
+#> 
+#> See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
 colnames(partitions) <- paste0("res_", names(exdata_muscadet$clustering$clusters))
-clustree(partitions, prefix = "res_")
+
+# Plot clustering tree
+clustree(partitions, prefix = "res_", node_label = "size")
 ```
 
 ![](muscadet_files/figure-html/clustree-1.png)
@@ -444,29 +460,29 @@ on a selected clustering partition stored in the `muscadet` object.
 # Plot heatmap 
 heatmapMuscadet(
     exdata_muscadet,
-    filename = file.path("figures", "heatmap_res0.3.png"),
+    filename = file.path("figures", "exdata_heatmap_res0.3.png"),
     partition = 0.3,
     title = "Example | res=0.3"
 )
 ```
 
-![Heatmap of log ratios](figures/heatmap_res0.3.png) Additionally, an
-aggregated heatmap showing the average log ratio values per cluster can
-be plotted to summarize copy-number patterns across subclonal
-populations.
+![Heatmap of log ratios](figures/exdata_heatmap_res0.3.png)
+Additionally, an aggregated heatmap showing the average log ratio values
+per cluster can be plotted to summarize copy-number patterns across
+subclonal populations.
 
 ``` r
 # Plot heatmap of log ratio averages per cluster
 heatmapMuscadet(
     exdata_muscadet,
-    filename = file.path("figures", "heatmap_res0.3_averages.png"),
+    filename = file.path("figures", "exdata_heatmap_res0.3_averages.png"),
     partition = 0.3,
     averages = TRUE,
     title = "Example | res=0.3 | Averages per cluster"
 )
 ```
 
-![](figures/heatmap_res0.3_averages.png)
+![](figures/exdata_heatmap_res0.3_averages.png)
 
 Figure 1: Heatmap of log ratios averages per cluster
 
@@ -564,10 +580,10 @@ to infer CNA segments for each cluster.
 ``` r
 exdata_muscadet <- cnaCalling(
     exdata_muscadet,
-    depthmin.a.clusters = 3, # set low thresholds for example data
-    depthmin.c.clusters = 5,
-    depthmin.a.allcells = 3,
-    depthmin.c.allcells = 5,
+    depthmin.a.clusters = 3, # low threshold for example data, default is 30
+    depthmin.c.clusters = 5, # low threshold for example data, default is 50
+    depthmin.a.allcells = 3, # low threshold for example data, default is 30
+    depthmin.c.allcells = 5, # low threshold for example data, default is 50
     depthmin.c.nor = 1
 )
 #> - Analysis per cluster -
@@ -655,3 +671,27 @@ plotCNA(exdata_muscadet, cf.gradient = FALSE)
 ```
 
 ![](muscadet_files/figure-html/plot%20CNA-1.png)
+
+## 9 Citing muscadet
+
+If you find `muscadet` useful for your work please cite it using the
+following citation:
+
+``` r
+citation("muscadet")
+#> To cite package 'muscadet' in publications use:
+#> 
+#>   Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).
+#>   _muscadet: Multiomics Single-Cell Copy Number Alterations Detection_.
+#>   R package version 0.2.1, <https://github.com/ICAGEN/muscadet>.
+#> 
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @Manual{,
+#>     title = {muscadet: Multiomics Single-Cell Copy Number Alterations Detection},
+#>     author = {Marie Denoulet and Nils Giordano and Stéphane Minvielle and Céline Vallot and Eric Letouzé},
+#>     year = {2026},
+#>     note = {R package version 0.2.1},
+#>     url = {https://github.com/ICAGEN/muscadet},
+#>   }
+```

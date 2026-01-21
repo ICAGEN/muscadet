@@ -13,10 +13,10 @@ plotProfile(
   x,
   data,
   title = NULL,
-  allelic.type = "lor",
+  allelic.type = "vaf",
   point.cex = c(0.4, 0.5),
   chrom.colors = c("slategrey", "skyblue"),
-  lor.colors = c("peachpuff2", "paleturquoise3"),
+  var.colors = c("peachpuff2", "paleturquoise3"),
   cn.colors = c("grey20", "brown2"),
   cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF"),
   cf.colors = c("white", "grey20", "bisque2"),
@@ -47,7 +47,7 @@ plotProfile(
 
   A character string indicating the allelic metric to plot: "lor" for
   log odds ratio or "vaf" for variant allele frequency. Default is
-  "lor".
+  "vaf".
 
 - point.cex:
 
@@ -60,9 +60,9 @@ plotProfile(
   A character vector of length 2 defining alternating chromosome colors.
   Default is `c("slategrey", "skyblue")`.
 
-- lor.colors:
+- var.colors:
 
-  A character vector of length 2 for log odds ratio point colors
+  A character vector of length 2 for variant positions point colors
   depending of variant allele frequency in all cells. Use "none" to use
   the alternating chromosome colors (defined by `chrom.colors`). Default
   is `c("peachpuff2", "paleturquoise3")`.
