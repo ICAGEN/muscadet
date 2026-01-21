@@ -8,10 +8,10 @@ plotProfile(
   x,
   data,
   title = NULL,
-  allelic.type = "lor",
+  allelic.type = "vaf",
   point.cex = c(0.4, 0.5),
   chrom.colors = c("slategrey", "skyblue"),
-  lor.colors = c("peachpuff2", "paleturquoise3"),
+  var.colors = c("peachpuff2", "paleturquoise3"),
   cn.colors = c("grey20", "brown2"),
   cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF"),
   cf.colors = c("white", "grey20", "bisque2"),
@@ -30,7 +30,7 @@ be visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
 
 \item{allelic.type}{A character string indicating the allelic metric to plot:
 "lor" for log odds ratio or "vaf" for variant allele frequency. Default is
-"lor".}
+"vaf".}
 
 \item{point.cex}{Numeric vector of length 1 or 2 specifying the size of
 points in the plots. If a single value is provided, it will be replicated
@@ -39,7 +39,7 @@ for both plots. Default is \code{c(0.4, 0.5)}.}
 \item{chrom.colors}{A character vector of length 2 defining alternating
 chromosome colors. Default is \code{c("slategrey", "skyblue")}.}
 
-\item{lor.colors}{A character vector of length 2 for log odds ratio point
+\item{var.colors}{A character vector of length 2 for variant positions point
 colors depending of variant allele frequency in all cells. Use "none" to
 use the alternating chromosome colors (defined by \code{chrom.colors}). Default
 is \code{c("peachpuff2", "paleturquoise3")}.}

@@ -418,21 +418,11 @@ heatmapMuscadet <- function(x,
 
     # Set default color palette for clusters if not provided
     if (is.null(colors)) {
-        colors <- c(
-            "#FABC2A",
-            "#7FC97F",
-            "#EE6C4D",
-            "#39ADBD",
-            "#BEAED4",
-            "#FEE672",
-            "#F76F8E",
-            "#487BEA",
-            "#B67BE6",
-            "#F38D68",
-            "#7FD8BE",
-            "#F2AFC0"
-        )
+        colors <- rep(
+            c("#FABC2A", "#7FC97F", "#EE6C4D", "#39ADBD", "#BEAED4", "#FEE672", "#F76F8E",
+              "#487BEA", "#B67BE6", "#F38D68", "#7FD8BE", "#F2AFC0"), 3)
     }
+
     # Set palette
     palette(colors)
 
@@ -984,20 +974,9 @@ plotSil <- function(x,
 
     # Set default color palette for clusters if not provided
     if (is.null(colors)) {
-        colors <- c(
-            "#FABC2A",
-            "#7FC97F",
-            "#EE6C4D",
-            "#39ADBD",
-            "#BEAED4",
-            "#FEE672",
-            "#F76F8E",
-            "#487BEA",
-            "#B67BE6",
-            "#F38D68",
-            "#7FD8BE",
-            "#F2AFC0"
-        )
+        colors <- rep(
+            c("#FABC2A", "#7FC97F", "#EE6C4D", "#39ADBD", "#BEAED4", "#FEE672", "#F76F8E",
+              "#487BEA", "#B67BE6", "#F38D68", "#7FD8BE", "#F2AFC0"), 3)
     }
 
     # Generate a default title if none is provided
@@ -1374,13 +1353,13 @@ plotIndexes <- function(x,
 #' @param title An optional title for the plot. Default is `NULL`.
 #' @param allelic.type A character string indicating the allelic metric to plot:
 #'   "lor" for log odds ratio or "vaf" for variant allele frequency. Default is
-#'   "lor".
+#'   "vaf".
 #' @param point.cex Numeric vector of length 1 or 2 specifying the size of
 #'   points in the plots. If a single value is provided, it will be replicated
 #'   for both plots. Default is `c(0.4, 0.5)`.
 #' @param chrom.colors A character vector of length 2 defining alternating
 #'   chromosome colors. Default is `c("slategrey", "skyblue")`.
-#' @param lor.colors A character vector of length 2 for log odds ratio point
+#' @param var.colors A character vector of length 2 for variant positions point
 #'   colors depending of variant allele frequency in all cells. Use "none" to
 #'   use the alternating chromosome colors (defined by `chrom.colors`). Default
 #'   is `c("peachpuff2", "paleturquoise3")`.
@@ -1427,10 +1406,10 @@ plotIndexes <- function(x,
 plotProfile <- function(x,
                         data,
                         title = NULL,
-                        allelic.type = "lor",
+                        allelic.type = "vaf",
                         point.cex = c(0.4, 0.5),
                         chrom.colors = c("slategrey", "skyblue"),
-                        lor.colors = c("peachpuff2", "paleturquoise3"),
+                        var.colors = c("peachpuff2", "paleturquoise3"),
                         cn.colors = c("grey20", "brown2"),
                         cna.colors = c(
                             "gain" = "#EF6F6AFF",
@@ -1450,9 +1429,9 @@ plotProfile <- function(x,
         "`point.cex` must be numeric." = is.numeric(point.cex),
         "`chrom.colors` must be a character vector of length 2." = is.character(chrom.colors) &&
             length(chrom.colors) == 2,
-        "`lor.colors` must be a character vector of length 2 or `none`." = (is.character(lor.colors) &&
-                                                                                length(lor.colors) == 2) ||
-            all(lor.colors == "none"),
+        "`var.colors` must be a character vector of length 2 or `none`." = (is.character(var.colors) &&
+                                                                                length(var.colors) == 2) ||
+            all(var.colors == "none"),
         "`cn.colors` must be a character vector of length 2." = is.character(cn.colors) &&
             length(cn.colors) == 2,
         "`cf.colors `must be a character vector of length 3." = is.character(cf.colors) &&
@@ -1533,7 +1512,8 @@ plotProfile <- function(x,
     par(
         mar = c(0.25, 3, 0.25, 1),
         mgp = c(1.75, 0.6, 0),
-        oma = c(3, 1.5, 1.5, 0)
+        oma = c(3, 1.5, 1.5, 0),
+        xaxs = "i"
     )
 
     # 1- Plot the LRR data -----------------------------------------------------
@@ -1544,8 +1524,11 @@ plotProfile <- function(x,
         col = chrom.colors[chrcol],
         ylab = "Log R ratio",
         cex.lab = 1.5,
-        xaxt = "n"
+        xaxt = "n",
+        yaxt = "n"
     )
+    # Add y axis labels with rotation for horizontal labels
+    axis(2, las = 2)
     # Add chromosomes boundaries
     abline(v = chrbdry, lwd = 0.25)
     # # Add LRR median
@@ -1563,10 +1546,10 @@ plotProfile <- function(x,
     )
 
     # 2- Plot the LOR data -----------------------------------------------------
-    if (any(lor.colors == "none")) {
+    if (any(var.colors == "none")) {
         cols <- chrom.colors[chrcol]
     } else {
-        cols <- lor.colors[pos$colVAR]
+        cols <- var.colors[pos$colVAR]
     }
     if (allelic.type == "lor") {
         plot(
@@ -1577,9 +1560,14 @@ plotProfile <- function(x,
             ylab = "Log odds ratio",
             cex.lab = 1.5,
             ylim = c(-4, 4),
-            xaxt = "n"
+            xaxt = "n",
+            yaxt = "n"
         )
+        # Add y axis labels with rotation for horizontal labels
+        axis(2, las = 2)
+        # Add chromosomes boundaries
         abline(v = chrbdry, lwd = 0.25)
+        # Add segments medians
         segments(segstart,
                  sqrt(abs(segs$mafR)),
                  segend,
@@ -1601,14 +1589,27 @@ plotProfile <- function(x,
             ylab = "Variant allele frequency",
             cex.lab = 1.5,
             ylim = c(0, 1),
-            xaxt = "n"
+            xaxt = "n",
+            yaxt = "n"
         )
+        # Add y axis labels with rotation for horizontal labels
+        axis(2, las = 2)
+        # Add chromosomes boundaries
         abline(v = chrbdry, lwd = 0.25)
+        # Add segments medians
         segments(
             segstart,
             segs$vafT.median,
             segend,
             segs$vafT.median,
+            lwd = 1.75,
+            col = seg.color
+        )
+        segments(
+            segstart,
+            1 - segs$vafT.median,
+            segend,
+            1 - segs$vafT.median,
             lwd = 1.75,
             col = seg.color
         )
@@ -1634,8 +1635,12 @@ plotProfile <- function(x,
         type = "n",
         ylab = "Copy number",
         cex.lab = 1.5,
-        xaxt = "n"
+        xaxt = "n",
+        yaxt = "n"
     )
+    # Add y axis labels with rotation for horizontal labels
+    axis(2, las = 2)
+    # Add chromosomes boundaries
     abline(v = chrbdry, lwd = 0.25)
     # Add lcn
     segments(segstart,
@@ -2009,20 +2014,9 @@ plotUMAP <- function(x,
 
     # Set default color palette for clusters if not provided
     if (is.null(colors)) {
-        colors <- c(
-            "#FABC2A",
-            "#7FC97F",
-            "#EE6C4D",
-            "#39ADBD",
-            "#BEAED4",
-            "#FEE672",
-            "#F76F8E",
-            "#487BEA",
-            "#B67BE6",
-            "#F38D68",
-            "#7FD8BE",
-            "#F2AFC0"
-        )
+        colors <- rep(
+            c("#FABC2A", "#7FC97F", "#EE6C4D", "#39ADBD", "#BEAED4", "#FEE672", "#F76F8E",
+              "#487BEA", "#B67BE6", "#F38D68", "#7FD8BE", "#F2AFC0"), 3)
     }
 
     # Get common cells
