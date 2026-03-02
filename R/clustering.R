@@ -28,7 +28,7 @@
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
-#' @inheritDotParams cluster_seurat res_range dims_list algorithm knn_seurat knn_range_seurat
+#' @inheritDotParams cluster_seurat res_range dims_list algorithm leiden_method knn_seurat knn_range_seurat
 #' @inheritDotParams cluster_hclust k_range dist_method hclust_method weights
 #'
 #'
