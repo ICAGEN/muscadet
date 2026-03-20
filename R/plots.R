@@ -1860,7 +1860,7 @@ plotCNA <- function(x,
     df <- df[complete.cases(df$cluster), ]
 
     # Compute proportions of cells per cluster for y axis
-    prop_clus <- unique(df$prop.cluster[!is.na(df$prop.cluster)])
+    prop_clus <- tapply(df$prop.cluster, df$cluster, function(x) x[!is.na(x)][1])
     prop_starts <- c(0, cumsum(prop_clus[-length(prop_clus)]))
     prop_ends <- cumsum(prop_clus)
     names(prop_starts) <- unique(df$cluster[!is.na(df$cluster)])
@@ -1873,7 +1873,7 @@ plotCNA <- function(x,
         dplyr::mutate(start.y = prop_starts[as.character(.data$cluster)], end.y = prop_ends[as.character(.data$cluster)])
 
     # Ordered levels for CNA states
-    df$cna_state <- factor(df$cna_state, levels = cna_states[cna_states %in% unique(na.omit(data$cna_state))])
+    df$cna_state <- factor(df$cna_state, levels = cna_states[cna_states %in% unique(na.omit(df$cna_state))])
 
     # Construct plot
     cna_plot <- ggplot2::ggplot(
