@@ -857,7 +857,10 @@ cnaCalling <- function(
     gbuild <- x$genome
     rcmat <- x@cnacalling$combined.counts
     chromlevels <- levels(rcmat$Chromosome)
-    clusters <- as.character(x@cnacalling$clusters)
+    clusters <- setNames(
+        as.character(x@cnacalling$clusters),
+        names(x@cnacalling$clusters)
+    )
     ncells <- table(clusters)
 
     # Determine chromosome number for X based on genome build
