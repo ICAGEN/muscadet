@@ -7,8 +7,9 @@
 plotCNA(
   x,
   title = NULL,
+  labels = "auto",
   cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF"),
-  cf.gradient = TRUE
+  cf.gradient = FALSE
 )
 }
 \arguments{
@@ -17,12 +18,17 @@ visualized (generated using \code{\link[=cnaCalling]{cnaCalling()}}).}
 
 \item{title}{An optional title for the plot. Default is \code{NULL}.}
 
+\item{labels}{Labels for clusters. One of \code{"auto"} (cluster and cell
+number information), \code{"clusters"} (cluster identifier), or
+\code{"cells"} (number of cells), or a vector of length equal to the number
+of clusters, or \code{NULL} for no labels. Default is \code{"auto"}.}
+
 \item{cna.colors}{A vector of 3 colors for CNA states: gain, loss, and cnloh
 (or named vector where names are "gain", "loss", and "cnloh" and the values
 are their respective colors). Default is \code{c("gain" = "#EF6F6AFF", "loss" = "#6699CCFF", "cnloh" = "#44AA99FF")}.}
 
 \item{cf.gradient}{Logical. If \code{TRUE} adds a alpha transparency gradient on
-CNA color block based on the cell fraction. Default is \code{TRUE}.}
+CNA color block based on the cell fraction. Default is \code{FALSE}.}
 }
 \value{
 A ggplot object representing the CNA segments plot.

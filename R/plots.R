@@ -1751,8 +1751,12 @@ plotProfile <- function(x,
 #'   (or named vector where names are "gain", "loss", and "cnloh" and the values
 #'   are their respective colors). Default is `c("gain" = "#EF6F6AFF", "loss" =
 #'   "#6699CCFF", "cnloh" = "#44AA99FF")`.
+#' @param labels Labels for clusters. One of `"auto"` (cluster and cell
+#'   number information), `"clusters"` (cluster identifier), or
+#'   `"cells"` (number of cells), or a vector of length equal to the number
+#'   of clusters, or `NULL` for no labels. Default is `"auto"`.
 #' @param cf.gradient Logical. If `TRUE` adds a alpha transparency gradient on
-#'   CNA color block based on the cell fraction. Default is `TRUE`.
+#'   CNA color block based on the cell fraction. Default is `FALSE`.
 #'
 #' @return A ggplot object representing the CNA segments plot.
 #'
@@ -1787,12 +1791,13 @@ plotProfile <- function(x,
 #'
 plotCNA <- function(x,
                     title = NULL,
+                    labels = "auto",
                     cna.colors = c(
                         "gain" = "#EF6F6AFF",
                         "loss" = "#6699CCFF",
                         "cnloh" = "#44AA99FF"
                     ),
-                    cf.gradient = TRUE
+                    cf.gradient = FALSE
                     ) {
     # Argument checks
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
@@ -1806,21 +1811,31 @@ plotCNA <- function(x,
     # Keep only autosomes to display
     data <- data[!data$chrom %in% c("X", "Y", "M"), ]
 
-    # Check for colors
+    # Set CNA colors
     cna_states <- c("gain", "loss", "cnloh")
-    if(!is.null(names(cna.colors))) {
-        if(!all(cna_states %in% names(cna.colors))) {
-            cna.colors <- cna.colors[1:3]
-            names(cna.colors) <- cna_states
+    default_colors <- c(
+        "gain" = "#EF6F6AFF",
+        "loss" = "#6699CCFF",
+        "cnloh" = "#44AA99FF"
+    )
+
+    if (!is.null(names(cna.colors))) {
+        # Named vector: check all required names are present
+        missing <- setdiff(cna_states, names(cna.colors))
+        if (length(missing) > 0) {
+            # Fill missing states with defaults
+            cna.colors[missing] <- default_colors[missing]
         }
-    }
-    if (is.null(names(cna.colors)) & length(cna.colors) <= 3) {
-        names(cna.colors) <- cna_states[1:length(cna.colors)]
-    } else if (length(cna.colors) > 3) {
-        cna.colors <- cna.colors[1:3]
-        if (is.null(names(cna.colors))) {
-            names(cna.colors) <- cna_states
+        # Reorder to canonical order
+        cna.colors <- cna.colors[cna_states]
+
+    } else {
+        # Unnamed vector: positional assignment
+        if (length(cna.colors) != 3) {
+            # Pad with defaults for missing positions
+            cna.colors <- c(cna.colors, default_colors[(length(cna.colors) + 1):3])
         }
+        names(cna.colors) <- cna_states
     }
 
     # Extract genome
@@ -1878,6 +1893,34 @@ plotCNA <- function(x,
     # Ordered levels for CNA states
     df$cna_state <- factor(df$cna_state, levels = cna_states[cna_states %in% unique(na.omit(df$cna_state))])
 
+    # Set labels
+    if (!is.null(labels)) {
+
+        if (is.numeric(labels)) {
+            labels <- as.character(labels)
+        }
+        if (is.character(labels) && length(labels) == 1) {
+            # Keyword mode
+            labels <- match.arg(labels, choices = c("auto", "clusters", "cells"))
+            labels <- switch(
+                labels,
+                auto = paste0("cluster ", names(ncells), "\n", ncells[names(ncells)], " cells"),
+                clusters = unique(df$cluster),
+                cells = paste0(ncells[names(ncells)], " cells")
+            )
+        } else if (is.character(labels) || is.factor(labels)) {
+            # User-supplied vector mode
+            n_clusters <- length(unique(df$cluster))
+            if (length(labels) != n_clusters) {
+                stop(paste("`labels` must be a vector of length", n_clusters))
+            }
+        } else {
+            stop(
+                "`labels` must be \"auto\", \"clusters\", \"cells\", or a vector of length matching the number of clusters."
+            )
+        }
+    }
+
     # Construct plot
     cna_plot <- ggplot2::ggplot(
         df,
@@ -1915,7 +1958,7 @@ plotCNA <- function(x,
             trans = "reverse",
             limits = c(1, 0),
             breaks = props_breaks,
-            labels = paste0("cluster ", unique(df$cluster), "\n", ncells, " cells")
+            labels = labels
         ) +
         # set colors for the calls and remove the name
         scale_fill_manual(
