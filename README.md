@@ -27,7 +27,10 @@
 
 ### Installation
 
-You can install the latest version of `muscadet` from GitHub:
+We recommand using the following conda package `r-muscadet`: 
+[https://anaconda.org/channels/nigiord/packages/r-muscadet](https://anaconda.org/channels/nigiord/packages/r-muscadet/overview)
+
+Alternatively, you can install the latest version of `muscadet` directly from GitHub:
 
 ```r
 library(devtools)
