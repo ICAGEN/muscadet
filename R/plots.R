@@ -57,9 +57,9 @@
 #'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()] with
 #'   `which = 'row'`), and must have a unique name (`name` argument in
 #'   [`rowAnnotation()`][ComplexHeatmap::rowAnnotation()] or
-#'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()]). If
-#'   `averages =FALSE`, annotations must concern cells, while if `averages = TRUE`
-#'   they must concern clusters. Default is `NULL`, no row annotations is added.
+#'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()]). If `averages
+#'   = FALSE`, annotations must concern cells, while if `averages = TRUE` they
+#'   must concern clusters. Default is `NULL`, no row annotations is added.
 #'
 #' @param white_scale Numeric vector of length 2 or a list of numeric vectors
 #'   (`numeric` vector or `list`).
@@ -742,13 +742,14 @@ heatmapMuscadet <- function(x,
             if (x@clustering$params$method == "seurat") {
                 # 2. Clustering seurat from the muscadet object clustering with common cells
                 clusters <- x@clustering$clusters[[as.character(partition)]]
-                n_cells <- table(clusters[common_cells])[unique(clusters[common_cells])]
 
                 # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
                 if (length(common_cells) > 1) {
                     row_split <- factor(clusters[common_cells], levels = unique(clusters))
+                    n_cells <- table(clusters[common_cells])[levels(droplevels(row_split))]
                 } else {
                     row_split <- NULL
+                    n_cells <- table(clusters[common_cells])
                 }
 
                 # Draw heatmap
@@ -787,13 +788,15 @@ heatmapMuscadet <- function(x,
             if (is.null(clusters) & is.null(partition)) {
                 clusters <- x@cnacalling$clusters
             }
-            n_cells <- table(clusters[common_cells])
+
 
             # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
             if (length(common_cells) > 1) {
                 row_split <- factor(clusters[common_cells], levels = unique(clusters))
+                n_cells <- table(clusters[common_cells])[levels(droplevels(row_split))]
             } else {
                 row_split <- NULL
+                n_cells <- table(clusters[common_cells])
             }
 
             # Draw heatmap

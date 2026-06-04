@@ -68,9 +68,8 @@ annotation (using \code{\link[ComplexHeatmap:rowAnnotation]{rowAnnotation()}} or
 \code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}} with
 \code{which = 'row'}), and must have a unique name (\code{name} argument in
 \code{\link[ComplexHeatmap:rowAnnotation]{rowAnnotation()}} or
-\code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}}). If
-\code{averages =FALSE}, annotations must concern cells, while if \code{averages = TRUE}
-they must concern clusters. Default is \code{NULL}, no row annotations is added.}
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}}). If \code{averages = FALSE}, annotations must concern cells, while if \code{averages = TRUE} they
+must concern clusters. Default is \code{NULL}, no row annotations is added.}
 
 \item{white_scale}{Numeric vector of length 2 or a list of numeric vectors
 (\code{numeric} vector or \code{list}).
