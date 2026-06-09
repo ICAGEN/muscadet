@@ -72,12 +72,71 @@ test_that("cnaCalling() returns a correct output", {
                                depthmin.a.allcells = 3,
                                depthmin.c.allcells = 5,
                                depthmin.c.nor = 1,
+                               filter.homozygous = FALSE,
                                quiet = TRUE)
 
     expect_s4_class(muscadet_cna, "muscadet")
     expect_length(muscadet_cna$cnacalling, 20)
 })
 
+
+test_that("cnaCalling() returns a correct output when filter.homozygous = TRUE", {
+
+    data("exdata_muscadet", package = "muscadet")
+
+    muscadet_cna <- cnaCalling(exdata_muscadet,
+                               depthmin.a.clusters = 3, # set low thresholds for example data
+                               depthmin.c.clusters = 5,
+                               depthmin.a.allcells = 3,
+                               depthmin.c.allcells = 5,
+                               depthmin.c.nor = 1,
+                               vafmean.win = 5,
+                               quiet = TRUE)
+
+    expect_s4_class(muscadet_cna, "muscadet")
+    expect_length(muscadet_cna$cnacalling, 20)
+})
+
+
+test_that("cnaCalling() returns less positions when filter.homozygous = TRUE", {
+
+    data("exdata_muscadet", package = "muscadet")
+
+    muscadet_cna <- cnaCalling(exdata_muscadet,
+                               depthmin.a.clusters = 3, # set low thresholds for example data
+                               depthmin.c.clusters = 5,
+                               depthmin.a.allcells = 3,
+                               depthmin.c.allcells = 5,
+                               depthmin.c.nor = 1,
+                               filter.homozygous = FALSE,
+                               quiet = TRUE)
+
+    muscadet_cna_filtered <- cnaCalling(exdata_muscadet,
+                               depthmin.a.clusters = 3,
+                               depthmin.c.clusters = 5,
+                               depthmin.a.allcells = 3,
+                               depthmin.c.allcells = 5,
+                               depthmin.c.nor = 1,
+                               vafmean.win = 5,
+                               quiet = TRUE)
+
+    expect_true(nrow(muscadet_cna_filtered$cnacalling$combined.counts.filtered)
+                    <= nrow(muscadet_cna$cnacalling$combined.counts.filtered))
+})
+
+test_that("cnaCalling() must have a positive vafmean.win value when filter.homozygous = TRUE",{
+
+    data("exdata_muscadet", package = "muscadet")
+
+   expect_error(muscadet_cna <- cnaCalling(exdata_muscadet,
+                               depthmin.a.clusters = 3, # set low thresholds for example data
+                               depthmin.c.clusters = 5,
+                               depthmin.a.allcells = 3,
+                               depthmin.c.allcells = 5,
+                               depthmin.c.nor = 1,
+                               vafmean.win = -1,
+                               quiet = TRUE))
+})
 
 test_that("preProcSample2() returns a correct ouput", {
 
