@@ -666,6 +666,26 @@ aggregateCounts <- function(x,
 #' @param dipLogR Optional. Numeric value specifying an expected log ratio for
 #'   diploid regions to use for the analysis. If `NULL`, by default, the diploid
 #'   log ratio is estimated automatically from the data.
+#' @param filter.homozygous Logical. If `TRUE`, filters out homozygous allelic
+#'   positions in non-deletion regions, as they cause noise in the allelic
+#'   imbalance signal. Recommended when allele positions are derived
+#'   from a common SNPs database rather than individual-specific heterozygous
+#'   positions called from bulk sequencing. Default is `TRUE`.
+#' @param vaf.thresh Threshold applied to the transformed VAF (`VAF.abs = 0.5 -
+#'   |VAF - 0.5|`) below which a position is considered homozygous and filtered
+#'   out within non-deletion regions (used when `filter.homozygous = TRUE`)
+#'   (default: `0.1`).
+#' @param vafmean.win Window size for computing the running mean of VAF per
+#'   cluster and per chromosome, used to assess the local allelic context of
+#'   each position (used when `filter.homozygous = TRUE`) (default: `50`). If greater than 1, interpreted
+#'   as an absolute number of positions. If between `0` and `1`,
+#'   interpreted as a fraction of the total positions on the chromosome, with a
+#'   minimum of 10 positions.
+#' @param vafmean.thresh Running mean VAF threshold used to identify deletion
+#'   regions (used when `filter.homozygous = TRUE`) (default: `0.02`). Positions
+#'   where the local VAF running mean is below this threshold are considered to
+#'   be in a deletion region and are excluded from homozygous filtering to avoid
+#'   removing signal.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
@@ -740,6 +760,31 @@ aggregateCounts <- function(x,
 #'   \item \code{ploidy}: Ploidy used for the CNA analysis.
 #' }
 #'
+#' @details
+#' ## Homozygous position filtering
+#'
+#' When `filter.homozygous = TRUE`, homozygous allelic positions are removed
+#' prior to CNA calling to reduce noise in the allelic imbalance signal. This
+#' filter is particularly relevant when allele positions for allele counts are derived from a common
+#' SNPs database, which includes positions that are
+#' homozygous in the individual, unlike heterozygous positions specifically
+#' called from individual bulk sequencing data.
+#'
+#' For each cluster and each chromosome, a running mean of VAF is computed over
+#' a window of `vafmean.win` positions. This local VAF context is used to
+#' distinguish two types of regions:
+#'
+#' - **Non-deletion regions** (running mean VAF `>= vafmean.thresh`): positions
+#' with a VAF below `vaf.thresh` are considered homozygous and filtered out, as
+#' they contribute noise to the allelic imbalance signal without carrying
+#' informative heterozygous signal. The threshold is applied to a transformed
+#' VAF defined as `VAF.abs = 0.5 - |VAF - 0.5|`, which measures the deviation
+#' from homozygosity.
+#' - **Deletion regions** (running mean VAF `< vafmean.thresh`): the filter is
+#' not applied, as most positions are expected to be homozygous due to the
+#' deletion-induced allelic imbalance. Filtering here would remove genuine
+#' signal rather than noise.
+#'
 #' @seealso [assignClusters()], [aggregateCounts()],[preProcSample2()]
 #'
 #' @source This function uses several functions from the
@@ -771,6 +816,7 @@ aggregateCounts <- function(x,
 #' @import facets
 #' @import pctGCdata
 #' @importFrom GenomicRanges GRanges
+#' @importFrom caTools runmean
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 #'
@@ -784,6 +830,17 @@ aggregateCounts <- function(x,
 #'
 #' exdata_muscadet <- cnaCalling(
 #'     exdata_muscadet,
+#'     omics.coverage = "ATAC",
+#'     depthmin.a.clusters = 3, # set low thresholds for example data
+#'     depthmin.c.clusters = 5,
+#'     depthmin.a.allcells = 3,
+#'     depthmin.c.allcells = 5,
+#'     depthmin.c.nor = 0
+#' )
+#'
+#' exdata_muscadet <- cnaCalling(
+#'     exdata_muscadet,
+#'     filter.homozygous = FALSE, # without homozygous filter
 #'     omics.coverage = "ATAC",
 #'     depthmin.a.clusters = 3, # set low thresholds for example data
 #'     depthmin.c.clusters = 5,
@@ -813,6 +870,10 @@ cnaCalling <- function(
         minoverlap = 1e6,
         ploidy = "auto",
         dipLogR = NULL,
+        filter.homozygous = TRUE,
+        vaf.thresh = 0.1,
+        vafmean.thresh = 0.02,
+        vafmean.win = 50,
         quiet = FALSE
 ) {
 
@@ -835,7 +896,10 @@ cnaCalling <- function(
         is.numeric(cval1),
         is.numeric(cval2),
         is.numeric(clonal.thresh),
-        is.numeric(dist.breakpoints)
+        is.numeric(dist.breakpoints),
+        is.numeric(vaf.thresh),
+        is.numeric(vafmean.thresh),
+        is.numeric(vafmean.win)
     )
     stopifnot(
         "The `ploidy` argument must be either numeric or 'median' or 'auto'." =
@@ -934,6 +998,74 @@ cnaCalling <- function(
 
     allelic_rcmat <- na.omit(allelic_rcmat)
 
+    # ==========================================================================
+    # Filter homozygous position from common SNP
+
+    filter_homozygous <- function(df,
+                                  vaf.thresh = 0.1,
+                                  vafmean.thresh = 0.02,
+                                  vafmean.win = 50) {
+        # Compute VAF per cluster
+        df <- df %>%
+            dplyr::mutate(VAF = .data$TUM.RD / .data$TUM.DP,
+                          VAF.abs = 0.5 - abs(.data$VAF - 0.5))
+
+        # Compute running means per chromosome per cluster
+        if (vafmean.win > 1) {
+            df <- df %>%
+                dplyr::group_by(.data$cluster, .data$Chromosome) %>%
+                dplyr::mutate(
+                    runm = caTools::runmean(
+                        .data$VAF.abs,
+                        k = vafmean.win,
+                        endrule = "mean",
+                        align = "center"
+                    )
+                )
+        }
+        else if (vafmean.win > 0 & vafmean.win <= 1) {
+            df <- df %>%
+                dplyr::group_by(.data$cluster, .data$Chromosome) %>%
+                dplyr::mutate(runm = caTools::runmean(
+                    .data$VAF.abs,
+                    k = max(10, floor(vafmean.win * dplyr::n())),
+                    endrule = "mean",
+                    align = "center"
+                )) %>%
+                dplyr::ungroup()
+        }
+
+        # Filter homozygous positions
+        df <- df %>%
+            dplyr::filter((.data$VAF.abs > vaf.thresh |
+                               .data$runm < vafmean.thresh)) %>%
+            dplyr::select(-c("VAF", "VAF.abs", "runm"))
+
+        return(as.data.frame(df))
+    }
+
+    # ==========================================================================
+
+    if (filter.homozygous) {
+        msg("Filtering homozygous positions...")
+        n_before  <- nrow(allelic_rcmat)
+
+        allelic_rcmat <- filter_homozygous(
+            allelic_rcmat,
+            vaf.thresh = vaf.thresh,
+            vafmean.thresh = vafmean.thresh,
+            vafmean.win = vafmean.win
+        )
+        n_after <- nrow(allelic_rcmat)
+        n_removed <- n_before - n_after
+
+        msg(paste0(
+            "Homozygous filter: ",
+            n_removed, " / ", n_before,
+            " positions removed, ",
+            n_after, " positions retained."
+        ))
+    }
     # ==========================================================================
     # Process coverage counts
 
@@ -1163,6 +1295,28 @@ cnaCalling <- function(
         dplyr::arrange(.data$Chromosome, .data$Position, .data$cluster)
 
     allelic_rcmat_allcells <- na.omit(allelic_rcmat_allcells)
+
+    if (filter.homozygous) {
+        msg("Filtering homozygous positions of all cells...")
+        n_before  <- nrow(allelic_rcmat_allcells)
+
+        allelic_rcmat_allcells <- filter_homozygous(
+            df = allelic_rcmat_allcells,
+            vaf.thresh = vaf.thresh,
+            vafmean.thresh = vafmean.thresh,
+            vafmean.win = vafmean.win
+        )
+
+        n_after <- nrow(allelic_rcmat_allcells)
+        n_removed <- n_before - n_after
+
+        message(paste0(
+            "Homozygous filter: ",
+            n_removed, " / ", n_before,
+            " positions removed, ",
+            n_after, " positions retained."
+        ))
+    }
 
     msg("Allelic positions kept: ", nrow(allelic_rcmat_allcells))
 

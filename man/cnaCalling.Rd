@@ -42,6 +42,10 @@ cnaCalling(
   minoverlap = 1e+06,
   ploidy = "auto",
   dipLogR = NULL,
+  filter.homozygous = TRUE,
+  vaf.thresh = 0.1,
+  vafmean.thresh = 0.02,
+  vafmean.win = 50,
   quiet = FALSE
 )
 }
@@ -115,6 +119,29 @@ value (default: \code{"auto"}).}
 \item{dipLogR}{Optional. Numeric value specifying an expected log ratio for
 diploid regions to use for the analysis. If \code{NULL}, by default, the diploid
 log ratio is estimated automatically from the data.}
+
+\item{filter.homozygous}{Logical. If \code{TRUE}, filters out homozygous allelic
+positions in non-deletion regions, as they cause noise in the allelic
+imbalance signal. Recommended when allele positions are derived
+from a common SNPs database rather than individual-specific heterozygous
+positions called from bulk sequencing. Default is \code{TRUE}.}
+
+\item{vaf.thresh}{Threshold applied to the transformed VAF (\verb{VAF.abs = 0.5 - |VAF - 0.5|}) below which a position is considered homozygous and filtered
+out within non-deletion regions (used when \code{filter.homozygous = TRUE})
+(default: \code{0.1}).}
+
+\item{vafmean.thresh}{Running mean VAF threshold used to identify deletion
+regions (used when \code{filter.homozygous = TRUE}) (default: \code{0.02}). Positions
+where the local VAF running mean is below this threshold are considered to
+be in a deletion region and are excluded from homozygous filtering to avoid
+removing signal.}
+
+\item{vafmean.win}{Window size for computing the running mean of VAF per
+cluster and per chromosome, used to assess the local allelic context of
+each position (used when \code{filter.homozygous = TRUE}) (default: \code{50}). If greater than 1, interpreted
+as an absolute number of positions. If between \code{0} and \code{1},
+interpreted as a fraction of the total positions on the chromosome, with a
+minimum of 10 positions.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
@@ -195,6 +222,33 @@ Performs copy number alteration (CNA) analysis on a
 \code{\link[=muscadet-class]{muscadet}} object by processing allelic and coverage counts
 across clusters and evaluating cell fractions and copy numbers.
 }
+\details{
+\subsection{Homozygous position filtering}{
+
+When \code{filter.homozygous = TRUE}, homozygous allelic positions are removed
+prior to CNA calling to reduce noise in the allelic imbalance signal. This
+filter is particularly relevant when allele positions for allele counts are derived from a common
+SNPs database, which includes positions that are
+homozygous in the individual, unlike heterozygous positions specifically
+called from individual bulk sequencing data.
+
+For each cluster and each chromosome, a running mean of VAF is computed over
+a window of \code{vafmean.win} positions. This local VAF context is used to
+distinguish two types of regions:
+\itemize{
+\item \strong{Non-deletion regions} (running mean VAF \verb{>= vafmean.thresh}): positions
+with a VAF below \code{vaf.thresh} are considered homozygous and filtered out, as
+they contribute noise to the allelic imbalance signal without carrying
+informative heterozygous signal. The threshold is applied to a transformed
+VAF defined as \verb{VAF.abs = 0.5 - |VAF - 0.5|}, which measures the deviation
+from homozygosity.
+\item \strong{Deletion regions} (running mean VAF \verb{< vafmean.thresh}): the filter is
+not applied, as most positions are expected to be homozygous due to the
+deletion-induced allelic imbalance. Filtering here would remove genuine
+signal rather than noise.
+}
+}
+}
 \examples{
 library("facets")
 
@@ -203,6 +257,17 @@ library("facets")
 
 exdata_muscadet <- cnaCalling(
     exdata_muscadet,
+    omics.coverage = "ATAC",
+    depthmin.a.clusters = 3, # set low thresholds for example data
+    depthmin.c.clusters = 5,
+    depthmin.a.allcells = 3,
+    depthmin.c.allcells = 5,
+    depthmin.c.nor = 0
+)
+
+exdata_muscadet <- cnaCalling(
+    exdata_muscadet,
+    filter.homozygous = FALSE, # without homozygous filter
     omics.coverage = "ATAC",
     depthmin.a.clusters = 3, # set low thresholds for example data
     depthmin.c.clusters = 5,

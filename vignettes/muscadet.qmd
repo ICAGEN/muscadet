@@ -446,6 +446,13 @@ exdata_muscadet <- cnaCalling(
 )
 ```
 
+::: {.callout-important}
+Set `filter.homozygous = FALSE` when allele counts are derived from individual-specific heterozygous positions called from bulk sequencing data.
+This filter is applied prior to CNA calling to reduce noise in the allelic imbalance signal caused by homozygous positions. It is specifically designed
+for allele counts positions derived from a common SNPs database, which includes homozygous positions by definition, and is not needed when allelic positions
+are already restricted to heterozygous calls.
+:::
+
 ::: {.callout-note}
 The default minimum depth (`depthmin.[...]`) filters may not be suitable for all datasets. It is recommended to inspect your data and adjust these parameters accordingly.
 :::
