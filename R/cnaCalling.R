@@ -339,7 +339,7 @@ aggregateCounts <- function(x,
 
         # Bind variables (for data.table use)
         RD.omic <- AD.omic <- DP.omic <- NULL
-        cluster <- omic <- CHROM <- POS <- DP <- NULL
+        cluster <- omic <- CHROM <- POS <- DP <- id <- NULL
 
         # Extract clusters
         clusters <- x@cnacalling$clusters
@@ -403,7 +403,7 @@ aggregateCounts <- function(x,
 
         # Bind variables (for data.table use)
         RD.omic <- AD.omic <- DP.omic <- NULL
-        omic <- CHROM <- POS <- DP <- NULL
+        omic <- CHROM <- POS <- DP <- id <- NULL
 
         # Sum across cells per omic
         res <- data.table::rbindlist(lapply(names(reference@omics), function(omic_name) {
@@ -439,7 +439,7 @@ aggregateCounts <- function(x,
     extract_coverage_for_sample <- function(x) {
 
         # Bind variables (for data.table use)
-        DP.omic <- cluster <- omic <- CHROM <- POS <- DP <- NULL
+        DP.omic <- cluster <- omic <- CHROM <- POS <- DP <- id <- NULL
 
         # Extract clusters
         clusters <- x@cnacalling$clusters
@@ -497,7 +497,7 @@ aggregateCounts <- function(x,
     extract_coverage_for_ref <- function(reference) {
 
         # Bind variables (for data.table use)
-        DP.omic <- cluster <- omic <- CHROM <- POS <- DP <- NULL
+        DP.omic <- cluster <- omic <- CHROM <- POS <- DP <- id <- NULL
 
         # Sum across cells per omic
         res <- data.table::rbindlist(lapply(names(reference@omics), function(omic_name) {
