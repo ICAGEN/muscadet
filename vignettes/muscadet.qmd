@@ -55,8 +55,16 @@ devtools::install_github("ICAGEN/muscadet")
 # Inputs and objects creation
 
 ::: {.callout-important}
-## Important note on example data
+## Important
 The example dataset included in `muscadet` is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.
+
+See the [Multiomic copy number analysis tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.html) 
+for more detailed results on a real dataset.
+:::
+
+::: {.callout-note}
+## Note
+For detailed information about input formats and preprocessing steps, see the [Preparation of input data vignette](https://icagen.github.io/muscadet/articles/data-prep.html).
 :::
 
 ## muscomic
@@ -466,12 +474,18 @@ The `omics.coverage` parameter can be set to one or more specific omics types (e
 
 The resulting CNA calls can be visualized using `plotProfile()`, which generates a multi-panel profile per cluster summarizing:
 
-* Coverage per feature: log ratios values of genes/peaks, segment medians and diploid log ratio (purple line). Deviations from 0 indicate gains (positive) or losses (negative) in coverage.
-* Allele data: log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians. Deviation from 0 suggests allelic imbalance, used to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.
-* Copy number calls: total and minor copy numbers per segment.
-* CNA status classification: gain, loss or copy-neutral LOH statuses per segment.
-* Cellular fraction: proportion of cells estimated to harbor the CNA at each segment.
+* **Coverage per feature:** log ratios values of genes/peaks, segment medians and diploid log ratio (purple line). Deviations from 0 indicate gains (positive) or losses (negative) in coverage.
+* **Allele data:** log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians. Deviation from 0 suggests allelic imbalance, used to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.
+* **Copy number calls:** total and minor copy numbers per segment.
+* **CNA status classification:** gain, loss or copy-neutral LOH statuses per segment.
+* **Cellular fraction:** proportion of cells estimated to harbor the CNA at each segment.
 
+::: {.callout-note}
+Example data are intentionally kept minimal for package size reasons and does not provide enough signal for CNA calling.
+It is provided for demonstration of the workflow only. 
+See the [Multiomic copy number analysis tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.html) 
+for more detailed results on a real dataset.
+:::
 
 ```{r}
 #| label: plot profile 1
@@ -488,7 +502,7 @@ To view the complete CNA profile of the sample across clusters, use `plotCNA()`.
 ```{r}
 #| label: plot CNA
 #| warning: false
-plotCNA(exdata_muscadet, cf.gradient = FALSE)
+plotCNA(exdata_muscadet)
 ```
 
 

@@ -54,7 +54,7 @@ The goals of this tutorial are to:
 
 > **Note**
 >
-> The data used in this analysis are not publicly available; however, the example dataset included in the `muscadet` package can be used instead to test functionalities, in that case please refer to the [Get Started vignette](https://icagen.github.io/muscadet/articles/muscadet.html) for guidance.
+> The data used in this analysis are not available within the package; however, the example dataset included in the `muscadet` package can be used instead to test functionalities, in that case please refer to the [Get Started vignette](https://icagen.github.io/muscadet/articles/muscadet.html) for guidance.
 
 The dataset used in this tutorial consists of:
 
@@ -531,7 +531,7 @@ for (p in names(muscadet$clustering$clusters)) {
     )
 
     plotUMAP(muscadet, partition = p, title = title)
-    ggsave(filename)
+    ggsave(filename, dpi = 100)
 }
 ```
 
@@ -622,7 +622,8 @@ for (p in names(muscadet$clustering$clusters)) {
         filename,
         partition = p,
         title = title,
-        averages = TRUE)
+        averages = TRUE,
+        png_res = 100)
 }
 
 ```
@@ -672,7 +673,7 @@ for (p in names(muscadet$clustering$clusters)) {
     )
 
     plotSil(muscadet, partition = p, title = title)
-    ggsave(filename)
+    ggsave(filename, dpi = 100)
 }
 ```
 
@@ -729,21 +730,31 @@ muscadet <- aggregateCounts(muscadet, muscadet_ref)
 
 CNA calling is performed using the `cnaCalling()` function, which segments pseudo-bulk profiles and infers copy number alterations. This function integrates coverage and allelic data to segment chromosomes and to produce cluster-level copy number calls.
 
-> **Note**
+> **Important: `omics.coverage`**
 >
-> In this dataset, ATAC-derived coverage profiles exhibit cleaner signal than RNA-derived profiles. To avoid introducing noise in that case, CNA calling is restricted to ATAC coverage by setting `omics.coverage = "ATAC"`.
+> In this dataset, ATAC-derived coverage profiles exhibit cleaner signal than RNA-derived profiles. To avoid introducing noise in that case,
+> CNA calling is restricted to ATAC coverage by setting `omics.coverage = "ATAC"`.
+> Note that this selection applies only to coverage data; allelic information can still be used from multiple omics.
+> Coverage from multiple omics can be used if both are reliable and comparable.
 
-Note that this selection applies only to coverage data; allelic information can still be used from multiple omics. Coverage from multiple omics can be used if both are reliable and comparable.
-
-> **Important**
+> **Important: `filter.homozygous`**
 >
-> During CNA calling, a series of filters based on minimum value thresholds (`depthmin.*.*`) are applied to remove noise. The default thresholds are tailored to this dataset, but they may need to be adjusted for other datasets with different characteristics or sequencing depth.
+> `filter.homozygous` is set to `FALSE` as allele counts are derived from individual-specific heterozygous positions called from bulk sequencing data.
+> When allele counts positions are derived from a common SNPs database, set `filter.homozygous = TRUE` (default) to reduce noise in the allelic imbalance
+> signal caused by homozygous positions.
+
+> **Important: depth filters (`depthmin.*.*`)**
+>
+> During CNA calling, depth filters (`depthmin.*.*`) are applied to remove noise.
+> The default thresholds are tailored to this dataset, but they may need to be adjusted for other datasets with different characteristics or sequencing depth.
 
 
 ```{r}
 #| message: false
 # CNA calling
-muscadet <- cnaCalling(muscadet, omics.coverage = "ATAC")
+muscadet <- cnaCalling(muscadet,
+                       omics.coverage = "ATAC",
+                       filter.homozygous = FALSE)
 ```
 
 
@@ -777,14 +788,14 @@ for (i in unique(muscadet$cnacalling$clusters)) {
 
     filename <- file.path("figures", paste0("CNAprofile_", i, ".png"))
 
-    png(filename, width = 15, height = 7.5, units = "in", res = 150)
+    png(filename, width = 15, height = 7.5, units = "in", res = 100)
     plotProfile(muscadet, data = i, title = paste("Cluster:", i))
     dev.off()
 }
 
 # All cells
 filename <- file.path("figures", paste0("CNAprofile_allcells.png"))
-png(filename, width = 15, height = 7.5, units = "in", res = 150)
+png(filename, width = 15, height = 7.5, units = "in", res = 100)
 plotProfile(muscadet, data = "allcells", title = "All cells")
 dev.off()
 ```
@@ -805,7 +816,7 @@ Additionnally, a complete CNA profile of all clusters at the sample-level can be
 #| message: false
 #| warning: false
 
-CNAplot <- plotCNA(muscadet, cf.gradient = FALSE)
+CNAplot <- plotCNA(muscadet)
 ggsave("figures/CNAplot.png", CNAplot, width = 7, height = 4, units = "in")
 ```
 
@@ -840,7 +851,7 @@ UMAP_coord_rna$cluster <- factor(clusters[match(UMAP_coord_rna$cell, names(clust
 
 palette_clusters <- c("#FABC2A", "#7FC97F", "#EE6C4D")
 
-UMAP_atac <- ggplot(UMAP_coord_atac, aes(x = UMAP_1 , y = UMAP_2, color = cluster)) +
+UMAP_atac <- ggplot(UMAP_coord_atac, aes(x = UMAP_1, y = UMAP_2, color = cluster)) +
     geom_point(size = 1.2) +
     scale_color_manual(name = "", values = setNames(palette_clusters, sort(unique(
     UMAP_coord_atac$cluster
@@ -857,9 +868,9 @@ UMAP_atac <- ggplot(UMAP_coord_atac, aes(x = UMAP_1 , y = UMAP_2, color = cluste
         axis.text = element_blank(),
         axis.ticks = element_blank(),
     )
-ggsave("figures/UMAP_atac.png", UMAP_atac)
+ggsave("figures/UMAP_atac.png", UMAP_atac, dpi = 100)
 
-UMAP_rna <- ggplot(UMAP_coord_rna, aes(x = UMAP_1 , y = UMAP_2, color = cluster)) +
+UMAP_rna <- ggplot(UMAP_coord_rna, aes(x = UMAP_1, y = UMAP_2, color = cluster)) +
     geom_point(size = 1.2) +
     scale_color_manual(name = "", values = setNames(palette_clusters, sort(unique(
         UMAP_coord_rna$cluster
@@ -876,7 +887,7 @@ UMAP_rna <- ggplot(UMAP_coord_rna, aes(x = UMAP_1 , y = UMAP_2, color = cluster)
         axis.text = element_blank(),
         axis.ticks = element_blank()
     )
-ggsave("figures/UMAP_rna.png", UMAP_rna)
+ggsave("figures/UMAP_rna.png", UMAP_rna, dpi = 100)
 ```
 
 ![Copy number clusters projected on ATAC UMAP](figures/UMAP_atac.png){width=60% fig-align="center"}

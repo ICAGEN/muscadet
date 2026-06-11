@@ -37,7 +37,7 @@ Documentation on example data inputs:
 * Matched bulk coverage (log R ratio): [`?exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.html)
 
 ::: {.callout-important}
-## Important note on example data
+## Important
 The example dataset included in `muscadet` is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.
 :::
 
@@ -155,15 +155,35 @@ The processed common SNP table for `hg38` can be downloaded here:
 
 Other common SNP databases can also be used as an alternative:
 
-* [gnomAD](https://gnomad.broadinstitute.org/) database: [data here](https://gnomad.broadinstitute.org/downloads)
-* [1000G](https://www.internationalgenome.org/) database: [data here](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
+* [gnomAD](https://gnomad.broadinstitute.org/) - [downloads](https://gnomad.broadinstitute.org/downloads)
+* [1000 Genomes](https://www.internationalgenome.org/) - [downloads](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
 
 ## Count reads from single cells
 
 [SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)[^2] is used to get read counts per allele from single cell BAM files.
 
-> *From [SCReadCounts documentation](https://horvathlab.github.io/NGS/SCReadCounts/)*:
-> The program `scReadCounts` manages the sequential execution of programs `readCounts` and `readCountsMatrix`, collects the necessary arguments for successful execution, and avoids unnecessary execution of the expensive `readCounts` tool if possible. `readCounts` requires three input files: a pooled single cell alignment, a list of genomic positions of interest, and the barcodes file (barcodes.tsv) . Optionally, `readCounts` can be user-configured for *read filtering* and *cell-barcode handling*, including restriction to barcodes of interest (achieved through specifying barcodes file - barcodes.tsv). `readCounts` utilizes the barcode information from the pooled single cell alignments and **outputs the variant and reference read counts (nvar and nref, respectively), for each barcode (cell), restricted to those present in the barcodes file, in a tab separated text file**. This file is then used as an input for the second program - `readCountsMatrix` - which, upon providing an output prefix, generates two outputs: (1) a cell-position matrix with absolute nvar and nref counts, and (2) a cell-position matrix with the expressed VAFRNA. VAFRNA is estimated at a user-defined threshold of minimum required sequencing reads (minR); default minR = 5. `readCountsMatrix` is time-efficient and can be re-run multiple times at various minR thresholds. Together, these tools facilitate single-cell level assessment of read counts. 
+> *From [SCReadCounts
+documentation](https://horvathlab.github.io/NGS/SCReadCounts/):*
+> 
+> The program `scReadCounts` manages the sequential execution of programs
+`readCounts` and `readCountsMatrix`, collects the necessary arguments for
+successful execution, and avoids unnecessary execution of the expensive
+`readCounts` tool if possible. `readCounts` requires three input files: a pooled
+single cell alignment, a list of genomic positions of interest, and the barcodes
+file (barcodes.tsv) . Optionally, `readCounts` can be user-configured for 
+*read filtering* and *cell-barcode handling*, including restriction to barcodes
+of interest (achieved through specifying barcodes file - barcodes.tsv).
+`readCounts` utilizes the barcode information from the pooled single cell
+alignments and **outputs the variant and reference read counts (nvar and nref,
+respectively), for each barcode (cell), restricted to those present in the
+barcodes file, in a tab separated text file**. This file is then used as an
+input for the second program - `readCountsMatrix` - which, upon providing an
+output prefix, generates two outputs: (1) a cell-position matrix with absolute
+nvar and nref counts, and (2) a cell-position matrix with the expressed VAFRNA.
+VAFRNA is estimated at a user-defined threshold of minimum required sequencing
+reads (minR); default minR = 5. `readCountsMatrix` is time-efficient and can be
+re-run multiple times at various minR thresholds. Together, these tools
+facilitate single-cell level assessment of read counts.
 
 
 As the desired output is the tab separated text file with variant and reference read counts for each barcode, the command [`readCounts`](https://horvathlab.github.io/NGS/ReadCounts/) is preferred to avoid unnecessary large matrix outputs from `readCountsMatrix`.
