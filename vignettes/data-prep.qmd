@@ -142,12 +142,16 @@ Allele count positions are already restricted to heterozygous calls and the filt
 ### Panels of common SNPs
 
 When individual bulk sequencing data is not available, allele counts can be derived from a reference panel of common SNPs. 
-We recommend using the **Common dbSNP 155** track (hg38) from UCSC ([UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables)), 
+
+For `hg38`, we recommend using the **Common dbSNP 155** track (hg38) from UCSC ([UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables)), 
 which contains variants and their associated minor allele frequencies (MAF), filtered for single nucleotide variants (SNVs) only. 
 
-We recommend filtering positions with a MAF below 0.2, based on the highest MAF across the three projects 
-**1000 Genomes**, **TOPMED**, and **gnomAD**, to ensure sufficient heterozygosity. 
+We recommend filtering positions with a MAF below `0.2`, based on the highest MAF across the three projects 
+1000 Genomes, TOPMED, and gnomAD, to ensure sufficient heterozygosity. 
 The resulting common SNP table should follow a VCF-like format with one row per position and columns `CHROM`, `POS`, `ID`, `REF`, `ALT`.
+
+The processed common SNP table for `hg38` can be downloaded here:
+[hg38.dbSnp155Common.filtered.vcf.gz (v0.2.2)](https://github.com/ICAGEN/muscadet/releases/download/v0.2.2/hg38.dbSnp155Common.filtered.vcf.gz)
 
 Other common SNP databases can also be used as an alternative:
 

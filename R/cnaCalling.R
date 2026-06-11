@@ -637,6 +637,26 @@ aggregateCounts <- function(x,
 #'   (default: 50).
 #' @param depthmin.c.nor Minimum coverage depth for normal sample (default: 1000).
 #' @param depthmax.nor Optional. Maximum depth for normal sample (default: `NULL`).
+#' @param filter.homozygous Logical. If `TRUE`, filters out homozygous allelic
+#'   positions in non-deletion regions, as they cause noise in the allelic
+#'   imbalance signal. Recommended when allele positions are derived
+#'   from a common SNPs database rather than individual-specific heterozygous
+#'   positions called from bulk sequencing. Default is `TRUE`.
+#' @param vaf.thresh Threshold applied to the transformed VAF (Variant Allele
+#'   Frequency) (`VAF.abs = 0.5 - |VAF - 0.5|`) below which a position is
+#'   considered homozygous and filtered out within non-deletion regions (used
+#'   when `filter.homozygous = TRUE`) (default: `0.1`).
+#' @param vafmean.win Window size for computing the running mean of VAF (Variant
+#'   Allele Frequency) per cluster and per chromosome, used to assess the local
+#'   allelic context of each position (used when `filter.homozygous = TRUE`)
+#'   (default: `50`). If greater than `1`, interpreted as an absolute number of
+#'   positions. If between `0` and `1`, interpreted as a fraction of the total
+#'   positions on the chromosome, with a minimum of 10 positions.
+#' @param vafmean.thresh Running mean VAF (Variant Allele Frequency)  threshold
+#'   used to identify deletion regions (used when `filter.homozygous = TRUE`)
+#'   (default: `0.02`). Positions where the local VAF running mean is below this
+#'   threshold are considered to be in a deletion region and are excluded from
+#'   homozygous filtering to avoid removing signal.
 #' @param het.thresh VAF (Variant Allele Frequency) threshold to call variant
 #'   positions heterozygous for [preProcSample2()] (default: 0.25).
 #' @param snp.nbhd Window size for selecting SNP loci to reduce serial
@@ -666,26 +686,6 @@ aggregateCounts <- function(x,
 #' @param dipLogR Optional. Numeric value specifying an expected log ratio for
 #'   diploid regions to use for the analysis. If `NULL`, by default, the diploid
 #'   log ratio is estimated automatically from the data.
-#' @param filter.homozygous Logical. If `TRUE`, filters out homozygous allelic
-#'   positions in non-deletion regions, as they cause noise in the allelic
-#'   imbalance signal. Recommended when allele positions are derived
-#'   from a common SNPs database rather than individual-specific heterozygous
-#'   positions called from bulk sequencing. Default is `TRUE`.
-#' @param vaf.thresh Threshold applied to the transformed VAF (`VAF.abs = 0.5 -
-#'   |VAF - 0.5|`) below which a position is considered homozygous and filtered
-#'   out within non-deletion regions (used when `filter.homozygous = TRUE`)
-#'   (default: `0.1`).
-#' @param vafmean.win Window size for computing the running mean of VAF per
-#'   cluster and per chromosome, used to assess the local allelic context of
-#'   each position (used when `filter.homozygous = TRUE`) (default: `50`). If greater than 1, interpreted
-#'   as an absolute number of positions. If between `0` and `1`,
-#'   interpreted as a fraction of the total positions on the chromosome, with a
-#'   minimum of 10 positions.
-#' @param vafmean.thresh Running mean VAF threshold used to identify deletion
-#'   regions (used when `filter.homozygous = TRUE`) (default: `0.02`). Positions
-#'   where the local VAF running mean is below this threshold are considered to
-#'   be in a deletion region and are excluded from homozygous filtering to avoid
-#'   removing signal.
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
 #'
@@ -858,6 +858,10 @@ cnaCalling <- function(
         depthmin.c.allcells = 50,
         depthmin.c.nor = 1000,
         depthmax.nor = NULL,
+        filter.homozygous = TRUE,
+        vaf.thresh = 0.1,
+        vafmean.thresh = 0.02,
+        vafmean.win = 50,
         het.thresh = 0.25,
         snp.nbhd = 250,
         hetscale = TRUE,
@@ -870,10 +874,6 @@ cnaCalling <- function(
         minoverlap = 1e6,
         ploidy = "auto",
         dipLogR = NULL,
-        filter.homozygous = TRUE,
-        vaf.thresh = 0.1,
-        vafmean.thresh = 0.02,
-        vafmean.win = 50,
         quiet = FALSE
 ) {
 
@@ -890,16 +890,16 @@ cnaCalling <- function(
         is.numeric(depthmin.a.allcells),
         is.numeric(depthmin.c.allcells),
         is.numeric(depthmin.c.nor),
+        is.numeric(vaf.thresh),
+        is.numeric(vafmean.thresh),
+        is.numeric(vafmean.win),
         is.numeric(het.thresh),
         is.numeric(snp.nbhd),
         is.numeric(min.nhet),
         is.numeric(cval1),
         is.numeric(cval2),
         is.numeric(clonal.thresh),
-        is.numeric(dist.breakpoints),
-        is.numeric(vaf.thresh),
-        is.numeric(vafmean.thresh),
-        is.numeric(vafmean.win)
+        is.numeric(dist.breakpoints)
     )
     stopifnot(
         "The `ploidy` argument must be either numeric or 'median' or 'auto'." =

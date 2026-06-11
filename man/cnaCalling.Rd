@@ -30,6 +30,10 @@ cnaCalling(
   depthmin.c.allcells = 50,
   depthmin.c.nor = 1000,
   depthmax.nor = NULL,
+  filter.homozygous = TRUE,
+  vaf.thresh = 0.1,
+  vafmean.thresh = 0.02,
+  vafmean.win = 50,
   het.thresh = 0.25,
   snp.nbhd = 250,
   hetscale = TRUE,
@@ -42,10 +46,6 @@ cnaCalling(
   minoverlap = 1e+06,
   ploidy = "auto",
   dipLogR = NULL,
-  filter.homozygous = TRUE,
-  vaf.thresh = 0.1,
-  vafmean.thresh = 0.02,
-  vafmean.win = 50,
   quiet = FALSE
 )
 }
@@ -78,6 +78,30 @@ default, \code{NULL} selects all available data.}
 \item{depthmin.c.nor}{Minimum coverage depth for normal sample (default: 1000).}
 
 \item{depthmax.nor}{Optional. Maximum depth for normal sample (default: \code{NULL}).}
+
+\item{filter.homozygous}{Logical. If \code{TRUE}, filters out homozygous allelic
+positions in non-deletion regions, as they cause noise in the allelic
+imbalance signal. Recommended when allele positions are derived
+from a common SNPs database rather than individual-specific heterozygous
+positions called from bulk sequencing. Default is \code{TRUE}.}
+
+\item{vaf.thresh}{Threshold applied to the transformed VAF (Variant Allele
+Frequency) (\verb{VAF.abs = 0.5 - |VAF - 0.5|}) below which a position is
+considered homozygous and filtered out within non-deletion regions (used
+when \code{filter.homozygous = TRUE}) (default: \code{0.1}).}
+
+\item{vafmean.thresh}{Running mean VAF (Variant Allele Frequency)  threshold
+used to identify deletion regions (used when \code{filter.homozygous = TRUE})
+(default: \code{0.02}). Positions where the local VAF running mean is below this
+threshold are considered to be in a deletion region and are excluded from
+homozygous filtering to avoid removing signal.}
+
+\item{vafmean.win}{Window size for computing the running mean of VAF (Variant
+Allele Frequency) per cluster and per chromosome, used to assess the local
+allelic context of each position (used when \code{filter.homozygous = TRUE})
+(default: \code{50}). If greater than \code{1}, interpreted as an absolute number of
+positions. If between \code{0} and \code{1}, interpreted as a fraction of the total
+positions on the chromosome, with a minimum of 10 positions.}
 
 \item{het.thresh}{VAF (Variant Allele Frequency) threshold to call variant
 positions heterozygous for \code{\link[=preProcSample2]{preProcSample2()}} (default: 0.25).}
@@ -119,29 +143,6 @@ value (default: \code{"auto"}).}
 \item{dipLogR}{Optional. Numeric value specifying an expected log ratio for
 diploid regions to use for the analysis. If \code{NULL}, by default, the diploid
 log ratio is estimated automatically from the data.}
-
-\item{filter.homozygous}{Logical. If \code{TRUE}, filters out homozygous allelic
-positions in non-deletion regions, as they cause noise in the allelic
-imbalance signal. Recommended when allele positions are derived
-from a common SNPs database rather than individual-specific heterozygous
-positions called from bulk sequencing. Default is \code{TRUE}.}
-
-\item{vaf.thresh}{Threshold applied to the transformed VAF (\verb{VAF.abs = 0.5 - |VAF - 0.5|}) below which a position is considered homozygous and filtered
-out within non-deletion regions (used when \code{filter.homozygous = TRUE})
-(default: \code{0.1}).}
-
-\item{vafmean.thresh}{Running mean VAF threshold used to identify deletion
-regions (used when \code{filter.homozygous = TRUE}) (default: \code{0.02}). Positions
-where the local VAF running mean is below this threshold are considered to
-be in a deletion region and are excluded from homozygous filtering to avoid
-removing signal.}
-
-\item{vafmean.win}{Window size for computing the running mean of VAF per
-cluster and per chromosome, used to assess the local allelic context of
-each position (used when \code{filter.homozygous = TRUE}) (default: \code{50}). If greater than 1, interpreted
-as an absolute number of positions. If between \code{0} and \code{1},
-interpreted as a fraction of the total positions on the chromosome, with a
-minimum of 10 positions.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
