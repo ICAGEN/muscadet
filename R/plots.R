@@ -82,7 +82,11 @@
 #'   vector). If `NULL` (default), it uses predefined colors.
 #'
 #' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
-#'   with the .png extension (`numeric`). Default is `300`.
+#'   with the `.png` extension (`numeric`). Default is `300`.
+#'
+#' @param raster_quality Integer controlling the rasterization quality of
+#'   heatmap tiles passed to [ComplexHeatmap::Heatmap()]. Values higher than 1
+#'   produce sharper tiles at the cost of larger file sizes. Default is `3`.
 #'
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
@@ -272,7 +276,9 @@ heatmapMuscadet <- function(x,
                             row_annots = NULL,
                             white_scale = c(0.3, 0.7),
                             colors = NULL,
+                            dim_scale = 1,
                             png_res = 300,
+                            raster_quality = 3,
                             quiet = FALSE) {
 
     ## x ------
@@ -414,6 +420,16 @@ heatmapMuscadet <- function(x,
         stop(
             "`white_scale` must be either a numeric vector of length 2 or a list of such vectors."
         )
+    }
+
+    ## Validate dim_scale ------
+    if (!is.numeric(dim_scale) || length(dim_scale) != 1 || dim_scale <= 0) {
+        stop("`scale` must be a single positive numeric value.")
+    }
+
+    ## Validate raster_quality ------
+    if (!is.numeric(raster_quality) || length(raster_quality) != 1 || raster_quality < 1) {
+        stop("`raster_quality` must be a single numeric value >= 1.")
     }
 
     # Set default color palette for clusters if not provided
@@ -592,14 +608,14 @@ heatmapMuscadet <- function(x,
             row_title_gp = grid::gpar(fontsize = 10),
             column_title_gp = grid::gpar(fontsize = 10),
             border_gp = grid::gpar(col = "black", lwd = 1),
-            heatmap_height = unit(12, "cm"),
-            heatmap_width = unit(18, "cm"),
+            heatmap_height = unit(12 * dim_scale, "cm"),
+            heatmap_width = unit(18 * dim_scale, "cm"),
             col = circlize::colorRamp2(col_breaks, c(
                 "#00008E", "white", "white", "#630000"
             )),
             row_title_rot = 0,
             raster_device = "png",
-            raster_quality = 3
+            raster_quality = raster_quality
         )
 
         # Add empty chromosome annotation
@@ -2335,6 +2351,14 @@ add_labels <- function(
 #' @param colors A character vector of 4 colors used for the color scale of the
 #'   heatmap (`character` vector). Default is `c("#00008E", "white", "white",
 #'   "#630000")`.
+#' @param dim_scale Numeric scaling factor applied to the auto-computed width
+#'   and height of each heatmap. Values below `1` reduce output dimensions (e.g.
+#'   `0.5` halves both dimensions). Default is `1`.
+#' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
+#'   with the `.png` extension (`numeric`). Default is `300`.
+#' @param raster_quality Integer controlling the rasterization quality of
+#'   heatmap tiles passed to [ComplexHeatmap::Heatmap()]. Values higher than 1
+#'   produce sharper tiles at the cost of larger file sizes. Default is `3`.
 #'
 #' @return The function does not return any value but saves a
 #'   heatmaps-histograms plot to the specified file.
@@ -2421,7 +2445,10 @@ heatmapStep <- function(obj,
                         title = NULL,
                         col_quantiles = c(0.1, 0.4, 0.6, 0.9),
                         col_breaks = NULL,
-                        colors = c("#00008E", "white", "white", "#630000")) {
+                        colors = c("#00008E", "white", "white", "#630000"),
+                        dim_scale = 1,
+                        png_res = 300,
+                        raster_quality = 3) {
 
     if (!requireNamespace("patchwork", quietly = TRUE)) {
         stop("Package 'patchwork' is required for this function. Install it with install.packages('patchwork').")
@@ -2460,9 +2487,6 @@ heatmapStep <- function(obj,
         stopifnot("`col_breaks` must contain at least two distinct values." =
                       length(unique(col_breaks)) >= 2)
     }
-    # if (!is.null(col_quantiles) && !is.null(col_breaks)) {
-    #     message("Both `col_quantiles` and `col_breaks` are provided. Only `col_breaks` is used.")
-    # }
 
     # colors
     if (!is.character(colors) || length(colors) != 4) {
@@ -2522,7 +2546,7 @@ heatmapStep <- function(obj,
         heatmap_width = unit(18, "cm"),
         col = col_fun,
         raster_device = "png",
-        raster_quality = 3
+        raster_quality = raster_quality
     )
 
     ht_Ref <- ComplexHeatmap::Heatmap(
@@ -2539,11 +2563,11 @@ heatmapStep <- function(obj,
         column_split = chrom,
         column_title_gp = grid::gpar(fontsize = 10),
         border_gp = grid::gpar(col = "black", lwd = 1),
-        heatmap_height = unit(12, "cm"),
-        heatmap_width = unit(18, "cm"),
+        heatmap_height = unit(12 * dim_scale, "cm"),
+        heatmap_width = unit(18 * dim_scale, "cm"),
         col = col_fun,
         raster_device = "png",
-        raster_quality = 3
+        raster_quality = raster_quality
     )
 
     # Draw heatmaps
@@ -2666,7 +2690,7 @@ heatmapStep <- function(obj,
             width = ht_Tum_2@ht_list_param[["width"]] * 1.75,
             height = ht_Tum_2@ht_list_param[["height"]] * 2.1,
             units = "mm",
-            res = 300
+            res = png_res
         )
         print(final_plot)
         dev.off()

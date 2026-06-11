@@ -16,7 +16,9 @@ heatmapMuscadet(
   row_annots = NULL,
   white_scale = c(0.3, 0.7),
   colors = NULL,
+  dim_scale = 1,
   png_res = 300,
+  raster_quality = 3,
   quiet = FALSE
 )
 }
@@ -93,7 +95,11 @@ loss of coverage, and are represented as white on the heatmap. Default is
 vector). If \code{NULL} (default), it uses predefined colors.}
 
 \item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
-with the .png extension (\code{numeric}). Default is \code{300}.}
+with the \code{.png} extension (\code{numeric}). Default is \code{300}.}
+
+\item{raster_quality}{Integer controlling the rasterization quality of
+heatmap tiles passed to \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}. Values higher than 1
+produce sharper tiles at the cost of larger file sizes. Default is \code{3}.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}
