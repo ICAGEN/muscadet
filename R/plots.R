@@ -81,6 +81,10 @@
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). If `NULL` (default), it uses predefined colors.
 #'
+#' @param dim_scale Numeric scaling factor applied to the auto-computed width
+#'   and height of each heatmap. Values below `1` reduce output dimensions (e.g.
+#'   `0.5` halves both dimensions). Default is `1`.
+#'
 #' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
 #'   with the `.png` extension (`numeric`). Default is `300`.
 #'

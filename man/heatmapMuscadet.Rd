@@ -94,6 +94,10 @@ loss of coverage, and are represented as white on the heatmap. Default is
 \item{colors}{Vector of colors for the cluster annotation (\code{character}
 vector). If \code{NULL} (default), it uses predefined colors.}
 
+\item{dim_scale}{Numeric scaling factor applied to the auto-computed width
+and height of each heatmap. Values below \code{1} reduce output dimensions (e.g.
+\code{0.5} halves both dimensions). Default is \code{1}.}
+
 \item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
 with the \code{.png} extension (\code{numeric}). Default is \code{300}.}
 
