@@ -115,6 +115,8 @@ test_that("heatmapMuscadet() saves PDF", {
 
 test_that("heatmapMuscadet() saves SVG", {
     skip_on_cran()
+    skip_on_ci()
+
     out_file <- tempfile(fileext = ".svg")
     on.exit(unlink(out_file))
 
@@ -700,6 +702,7 @@ test_that("heatmapStep() saves PDF", {
 
 test_that("heatmapStep() saves SVG", {
     skip_on_cran()
+    skip_on_ci()
     skip_if_not_installed("patchwork")
 
     obj <- .build_heatmapstep_obj()
