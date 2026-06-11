@@ -37,10 +37,13 @@ library(devtools)
 devtools::install_github("ICAGEN/muscadet")
 ```
 
-- To get started, read the [Get Started vignette](https://icagen.github.io/muscadet/articles/muscadet.html) 
-to learn about the `muscadet` workflow and function usage on demo example data.
-- To prepare inputs, read the [Preparation of input data vignette](https://icagen.github.io/muscadet/articles/data-prep.html) 
+- To **get started**, read the [Get Started vignette](https://icagen.github.io/muscadet/articles/muscadet.html) 
+to learn about the `muscadet` workflow and function usage on **demo example data**.
+- To **prepare inputs**, read the [Preparation of input data vignette](https://icagen.github.io/muscadet/articles/data-prep.html) 
 to get details on the inputs for `muscadet` and how to prepare them.
+- For more details and **examples on a real dataset**, a [Multiomic copy number analysis tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.html) 
+using 10x Genomics Multiome scATAC-seq and scRNA-seq data from multiple myeloma cells is available.
+
 
 ### Citation
 
