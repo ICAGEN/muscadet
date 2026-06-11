@@ -1,3 +1,33 @@
+# muscadet 0.2.2
+
+### Additions
+- `cnaCalling()`: add `filter.homozygous` argument (default: `TRUE`) to filter
+  homozygous allelic positions in non-deletion regions prior to CNA calling,
+  to reduce noise in the allelic imbalance signal. Designed for use cases where
+  allele counts are derived from a common SNPs database rather than
+  individual-specific heterozygous positions called from bulk sequencing data.
+  Supporting arguments `vaf.thresh`, `vafmean.win`, and `vafmean.thresh` control
+  the filtering behaviour.
+- `plotCNA()`: add `labels` argument to control cluster label display
+  (`"auto"`, `"clusters"`, `"cells"`, or a custom character vector).
+- `heatmapMuscadet()` and `heatmapStep()`: add `dim_scale` argument to scale output dimensions and `raster_quality` argument to control heatmap tile rasterization quality. Both arguments allow finer control over output file size. Defaults preserve previous behaviour (`dim_scale = 1`, `raster_quality = 3`).
+
+### Bug fixes
+- `plotCNA()`: fix incorrect behaviour when clusters have identical proportions, caused by applying `unique()` to proportion values and an incorrect variable name.
+- `plotCNA()`: improve `cna.colors` argument validation, named vectors with missing or unknown state names now produce informative warnings and are filled with defaults rather than failing silently. 
+-  `plotCNA()`: set `cf.gradient` default to `FALSE`.
+- `heatmapMuscadet()`: fix incorrect number of cells displayed in the cluster annotation when a single cluster is present or when `averages = TRUE`.
+- `cnaCalling()`: fix unnamed cluster vector in `$cnacalling$clusters` slot when some clusters are skipped during CNA calling (due to low cell number), which compromised downstream usage.
+- `createMuscadetObject()`: prevent silent introduction of `NA` chromosome names from bulk LRR data. Chromosome names in `bulk.lrr` are now validated against omics coordinate features; unmatched chromosomes are removed with a warning.
+- `clusterMuscadet()`: fix missing `leiden_method` argument inheritance from `cluster_seurat()`.
+
+### Documentation
+- `cnaCalling()`: update documentation with new `filter.homozygous` arguments
+  and a dedicated details section describing the filtering logic.
+- Update *get started* and *tutorial* vignettes to add usage notes for `filter.homozygous`depending on the allele counts input type.
+- Update *preparation of input data* vignette to add details about the common SNP database, including MAF filtering recommendations, and download link to hg38 common SNP data (UCSC dbSNP 155 Common SNP filtered MAF > 0.2) provided along the release.
+- Add the script for processing and MAF filtering of hg38 common SNP data at `data-raw/hg38.dbSnp155Common.processing.R`.
+
 # muscadet 0.2.1
 
 ### Bug Fixes, Minor Updates
