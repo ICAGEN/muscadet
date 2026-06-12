@@ -48,6 +48,9 @@ by \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{1} = origina
 Louvain algorithm with multilevel refinement; \code{3} = SLM algorithm; \code{4} =
 Leiden algorithm). Default is \code{4} for Leiden algorithm as recommended,
 see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
+    \item{\code{leiden_method}}{Character string to choose from which package for
+running leiden algorithm, either leidenbase ("leidenbase") or igraph
+("igraph") packages (\code{character}). Default is "igraph".}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
 graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).

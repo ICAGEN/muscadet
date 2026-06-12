@@ -16,7 +16,9 @@ heatmapMuscadet(
   row_annots = NULL,
   white_scale = c(0.3, 0.7),
   colors = NULL,
+  dim_scale = 1,
   png_res = 300,
+  raster_quality = 3,
   quiet = FALSE
 )
 }
@@ -68,9 +70,8 @@ annotation (using \code{\link[ComplexHeatmap:rowAnnotation]{rowAnnotation()}} or
 \code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}} with
 \code{which = 'row'}), and must have a unique name (\code{name} argument in
 \code{\link[ComplexHeatmap:rowAnnotation]{rowAnnotation()}} or
-\code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}}). If
-\code{averages =FALSE}, annotations must concern cells, while if \code{averages = TRUE}
-they must concern clusters. Default is \code{NULL}, no row annotations is added.}
+\code{\link[ComplexHeatmap:HeatmapAnnotation]{HeatmapAnnotation()}}). If \code{averages = FALSE}, annotations must concern cells, while if \code{averages = TRUE} they
+must concern clusters. Default is \code{NULL}, no row annotations is added.}
 
 \item{white_scale}{Numeric vector of length 2 or a list of numeric vectors
 (\code{numeric} vector or \code{list}).
@@ -93,8 +94,16 @@ loss of coverage, and are represented as white on the heatmap. Default is
 \item{colors}{Vector of colors for the cluster annotation (\code{character}
 vector). If \code{NULL} (default), it uses predefined colors.}
 
+\item{dim_scale}{Numeric scaling factor applied to the auto-computed width
+and height of each heatmap. Values below \code{1} reduce output dimensions (e.g.
+\code{0.5} halves both dimensions). Default is \code{1}.}
+
 \item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
-with the .png extension (\code{numeric}). Default is \code{300}.}
+with the \code{.png} extension (\code{numeric}). Default is \code{300}.}
+
+\item{raster_quality}{Integer controlling the rasterization quality of
+heatmap tiles passed to \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}. Values higher than 1
+produce sharper tiles at the cost of larger file sizes. Default is \code{3}.}
 
 \item{quiet}{Logical. If \code{TRUE}, suppresses informative messages during
 execution. Default is \code{FALSE}.}

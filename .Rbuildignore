@@ -12,3 +12,5 @@
 ^vignettes/articles/\.quarto$
 ^vignettes/articles/*_files$
 ^vignettes/articles/.*\.qmd\.orig$
+^doc$
+^Meta$

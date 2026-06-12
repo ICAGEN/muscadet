@@ -339,8 +339,9 @@ CreateMuscomicObject <- function(type = c("ATAC", "RNA"),
 #'   list is unnamed, the type is taken instead.
 #' @param bulk.lrr A data frame containing log R ratio per genomic segments from
 #'   bulk sequencing data (`data.frame`). One row per segment and 4 columns
-#'   ordered as followed: chromosome (`character`), start position (`integer`),
-#'   end position (`integer`), and Log R ratio value (`numeric`).
+#'   ordered as followed: chromosome (`character`, matching the chromosomes
+#'   names present in `omics`, e.g. "1" to "22", "X", "Y"), start position
+#'   (`integer`), end position (`integer`), and Log R ratio value (`numeric`).
 #' @param bulk.label Label for bulk data (`character` string).
 #' @param genome Reference genome name among: "hg38", "hg19" and "mm10"
 #'   (`character` string). "hg38" by default.
@@ -473,8 +474,18 @@ CreateMuscadetObject <- function(omics,
       bulk.lrr$lrr <- as.numeric(bulk.lrr$lrr)
       # Remove "chr" in CHROM if necessary
       bulk.lrr$CHROM <- gsub("chr", "", bulk.lrr$CHROM)
-      # Order chromosomes
+      # Get chromosome names from omics
       chromorder <- c(as.character(1:22), "X", "Y")
+      chrom_omics <- unique(unlist(lapply(omics, function(x) levels(coordFeatures(x)$CHROM))))
+      chrom_omics <- chromorder[chromorder %in% chrom_omics]
+      # Make sure no unknown chromosomes are present
+      unk_chrom <- setdiff(unique(bulk.lrr$CHROM), chrom_omics)
+      if(length(unk_chrom) !=0) {
+          warning(paste0("The `bulk.lrr` dataframe contains chromosome name(s) not present in `omics`: ",
+                        unk_chrom, ". The corresponding rows of `bulk.lrr` are removed for consistency in downstream analysis."))
+          bulk.lrr <- bulk.lrr[bulk.lrr$CHROM != unk_chrom, ]
+      }
+      # Reorder the chromosomes
       bulk.lrr$CHROM <- ordered(bulk.lrr$CHROM, levels = chromorder[chromorder %in% unique(bulk.lrr$CHROM)])
       # Reorder data
       bulk.lrr <- bulk.lrr[order(bulk.lrr$CHROM, bulk.lrr$start), ]

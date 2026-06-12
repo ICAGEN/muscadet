@@ -45,7 +45,7 @@
 makeAllelicSparse <- function(allele_counts) {
 
     # Bind variables (for data.table use)
-    CHROM <- POS <- REF <- ALT <- NULL
+    CHROM <- POS <- REF <- ALT <- id <- NULL
 
     # Check input columns
     required_cols <- c("cell", "CHROM", "POS", "REF", "ALT", "RD", "AD")

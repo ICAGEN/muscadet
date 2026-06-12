@@ -57,9 +57,9 @@
 #'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()] with
 #'   `which = 'row'`), and must have a unique name (`name` argument in
 #'   [`rowAnnotation()`][ComplexHeatmap::rowAnnotation()] or
-#'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()]). If
-#'   `averages =FALSE`, annotations must concern cells, while if `averages = TRUE`
-#'   they must concern clusters. Default is `NULL`, no row annotations is added.
+#'   [`HeatmapAnnotation()`][ComplexHeatmap::HeatmapAnnotation()]). If `averages
+#'   = FALSE`, annotations must concern cells, while if `averages = TRUE` they
+#'   must concern clusters. Default is `NULL`, no row annotations is added.
 #'
 #' @param white_scale Numeric vector of length 2 or a list of numeric vectors
 #'   (`numeric` vector or `list`).
@@ -81,8 +81,16 @@
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). If `NULL` (default), it uses predefined colors.
 #'
+#' @param dim_scale Numeric scaling factor applied to the auto-computed width
+#'   and height of each heatmap. Values below `1` reduce output dimensions (e.g.
+#'   `0.5` halves both dimensions). Default is `1`.
+#'
 #' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
-#'   with the .png extension (`numeric`). Default is `300`.
+#'   with the `.png` extension (`numeric`). Default is `300`.
+#'
+#' @param raster_quality Integer controlling the rasterization quality of
+#'   heatmap tiles passed to [ComplexHeatmap::Heatmap()]. Values higher than 1
+#'   produce sharper tiles at the cost of larger file sizes. Default is `3`.
 #'
 #' @param quiet Logical. If `TRUE`, suppresses informative messages during
 #'   execution. Default is `FALSE`.
@@ -272,7 +280,9 @@ heatmapMuscadet <- function(x,
                             row_annots = NULL,
                             white_scale = c(0.3, 0.7),
                             colors = NULL,
+                            dim_scale = 1,
                             png_res = 300,
+                            raster_quality = 3,
                             quiet = FALSE) {
 
     ## x ------
@@ -414,6 +424,16 @@ heatmapMuscadet <- function(x,
         stop(
             "`white_scale` must be either a numeric vector of length 2 or a list of such vectors."
         )
+    }
+
+    ## Validate dim_scale ------
+    if (!is.numeric(dim_scale) || length(dim_scale) != 1 || dim_scale <= 0) {
+        stop("`scale` must be a single positive numeric value.")
+    }
+
+    ## Validate raster_quality ------
+    if (!is.numeric(raster_quality) || length(raster_quality) != 1 || raster_quality < 1) {
+        stop("`raster_quality` must be a single numeric value >= 1.")
     }
 
     # Set default color palette for clusters if not provided
@@ -592,14 +612,14 @@ heatmapMuscadet <- function(x,
             row_title_gp = grid::gpar(fontsize = 10),
             column_title_gp = grid::gpar(fontsize = 10),
             border_gp = grid::gpar(col = "black", lwd = 1),
-            heatmap_height = unit(12, "cm"),
-            heatmap_width = unit(18, "cm"),
+            heatmap_height = unit(12 * dim_scale, "cm"),
+            heatmap_width = unit(18 * dim_scale, "cm"),
             col = circlize::colorRamp2(col_breaks, c(
                 "#00008E", "white", "white", "#630000"
             )),
             row_title_rot = 0,
             raster_device = "png",
-            raster_quality = 3
+            raster_quality = raster_quality
         )
 
         # Add empty chromosome annotation
@@ -742,13 +762,14 @@ heatmapMuscadet <- function(x,
             if (x@clustering$params$method == "seurat") {
                 # 2. Clustering seurat from the muscadet object clustering with common cells
                 clusters <- x@clustering$clusters[[as.character(partition)]]
-                n_cells <- table(clusters[common_cells])[unique(clusters[common_cells])]
 
                 # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
                 if (length(common_cells) > 1) {
                     row_split <- factor(clusters[common_cells], levels = unique(clusters))
+                    n_cells <- table(clusters[common_cells])[levels(droplevels(row_split))]
                 } else {
                     row_split <- NULL
+                    n_cells <- table(clusters[common_cells])
                 }
 
                 # Draw heatmap
@@ -787,13 +808,15 @@ heatmapMuscadet <- function(x,
             if (is.null(clusters) & is.null(partition)) {
                 clusters <- x@cnacalling$clusters
             }
-            n_cells <- table(clusters[common_cells])
+
 
             # row_split: Handle the case of a single row (with averages = TRUE and a single cluster)
             if (length(common_cells) > 1) {
                 row_split <- factor(clusters[common_cells], levels = unique(clusters))
+                n_cells <- table(clusters[common_cells])[levels(droplevels(row_split))]
             } else {
                 row_split <- NULL
+                n_cells <- table(clusters[common_cells])
             }
 
             # Draw heatmap
@@ -1748,8 +1771,12 @@ plotProfile <- function(x,
 #'   (or named vector where names are "gain", "loss", and "cnloh" and the values
 #'   are their respective colors). Default is `c("gain" = "#EF6F6AFF", "loss" =
 #'   "#6699CCFF", "cnloh" = "#44AA99FF")`.
+#' @param labels Labels for clusters. One of `"auto"` (cluster and cell
+#'   number information), `"clusters"` (cluster identifier), or
+#'   `"cells"` (number of cells), or a vector of length equal to the number
+#'   of clusters, or `NULL` for no labels. Default is `"auto"`.
 #' @param cf.gradient Logical. If `TRUE` adds a alpha transparency gradient on
-#'   CNA color block based on the cell fraction. Default is `TRUE`.
+#'   CNA color block based on the cell fraction. Default is `FALSE`.
 #'
 #' @return A ggplot object representing the CNA segments plot.
 #'
@@ -1784,12 +1811,13 @@ plotProfile <- function(x,
 #'
 plotCNA <- function(x,
                     title = NULL,
+                    labels = "auto",
                     cna.colors = c(
                         "gain" = "#EF6F6AFF",
                         "loss" = "#6699CCFF",
                         "cnloh" = "#44AA99FF"
                     ),
-                    cf.gradient = TRUE
+                    cf.gradient = FALSE
                     ) {
     # Argument checks
     stopifnot("Input object `x` must be of class `muscadet`." = inherits(x, "muscadet"))
@@ -1803,21 +1831,31 @@ plotCNA <- function(x,
     # Keep only autosomes to display
     data <- data[!data$chrom %in% c("X", "Y", "M"), ]
 
-    # Check for colors
+    # Set CNA colors
     cna_states <- c("gain", "loss", "cnloh")
-    if(!is.null(names(cna.colors))) {
-        if(!all(cna_states %in% names(cna.colors))) {
-            cna.colors <- cna.colors[1:3]
-            names(cna.colors) <- cna_states
+    default_colors <- c(
+        "gain" = "#EF6F6AFF",
+        "loss" = "#6699CCFF",
+        "cnloh" = "#44AA99FF"
+    )
+
+    if (!is.null(names(cna.colors))) {
+        # Named vector: check all required names are present
+        missing <- setdiff(cna_states, names(cna.colors))
+        if (length(missing) > 0) {
+            # Fill missing states with defaults
+            cna.colors[missing] <- default_colors[missing]
         }
-    }
-    if (is.null(names(cna.colors)) & length(cna.colors) <= 3) {
-        names(cna.colors) <- cna_states[1:length(cna.colors)]
-    } else if (length(cna.colors) > 3) {
-        cna.colors <- cna.colors[1:3]
-        if (is.null(names(cna.colors))) {
-            names(cna.colors) <- cna_states
+        # Reorder to canonical order
+        cna.colors <- cna.colors[cna_states]
+
+    } else {
+        # Unnamed vector: positional assignment
+        if (length(cna.colors) != 3) {
+            # Pad with defaults for missing positions
+            cna.colors <- c(cna.colors, default_colors[(length(cna.colors) + 1):3])
         }
+        names(cna.colors) <- cna_states
     }
 
     # Extract genome
@@ -1860,7 +1898,7 @@ plotCNA <- function(x,
     df <- df[complete.cases(df$cluster), ]
 
     # Compute proportions of cells per cluster for y axis
-    prop_clus <- unique(df$prop.cluster[!is.na(df$prop.cluster)])
+    prop_clus <- tapply(df$prop.cluster, df$cluster, function(x) x[!is.na(x)][1])
     prop_starts <- c(0, cumsum(prop_clus[-length(prop_clus)]))
     prop_ends <- cumsum(prop_clus)
     names(prop_starts) <- unique(df$cluster[!is.na(df$cluster)])
@@ -1873,7 +1911,35 @@ plotCNA <- function(x,
         dplyr::mutate(start.y = prop_starts[as.character(.data$cluster)], end.y = prop_ends[as.character(.data$cluster)])
 
     # Ordered levels for CNA states
-    df$cna_state <- factor(df$cna_state, levels = cna_states[cna_states %in% unique(na.omit(data$cna_state))])
+    df$cna_state <- factor(df$cna_state, levels = cna_states[cna_states %in% unique(na.omit(df$cna_state))])
+
+    # Set labels
+    if (!is.null(labels)) {
+
+        if (is.numeric(labels)) {
+            labels <- as.character(labels)
+        }
+        if (is.character(labels) && length(labels) == 1) {
+            # Keyword mode
+            labels <- match.arg(labels, choices = c("auto", "clusters", "cells"))
+            labels <- switch(
+                labels,
+                auto = paste0("cluster ", names(ncells), "\n", ncells[names(ncells)], " cells"),
+                clusters = unique(df$cluster),
+                cells = paste0(ncells[names(ncells)], " cells")
+            )
+        } else if (is.character(labels) || is.factor(labels)) {
+            # User-supplied vector mode
+            n_clusters <- length(unique(df$cluster))
+            if (length(labels) != n_clusters) {
+                stop(paste("`labels` must be a vector of length", n_clusters))
+            }
+        } else {
+            stop(
+                "`labels` must be \"auto\", \"clusters\", \"cells\", or a vector of length matching the number of clusters."
+            )
+        }
+    }
 
     # Construct plot
     cna_plot <- ggplot2::ggplot(
@@ -1912,7 +1978,7 @@ plotCNA <- function(x,
             trans = "reverse",
             limits = c(1, 0),
             breaks = props_breaks,
-            labels = paste0("cluster ", unique(df$cluster), "\n", ncells, " cells")
+            labels = labels
         ) +
         # set colors for the calls and remove the name
         scale_fill_manual(
@@ -2289,6 +2355,14 @@ add_labels <- function(
 #' @param colors A character vector of 4 colors used for the color scale of the
 #'   heatmap (`character` vector). Default is `c("#00008E", "white", "white",
 #'   "#630000")`.
+#' @param dim_scale Numeric scaling factor applied to the auto-computed width
+#'   and height of each heatmap. Values below `1` reduce output dimensions (e.g.
+#'   `0.5` halves both dimensions). Default is `1`.
+#' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
+#'   with the `.png` extension (`numeric`). Default is `300`.
+#' @param raster_quality Integer controlling the rasterization quality of
+#'   heatmap tiles passed to [ComplexHeatmap::Heatmap()]. Values higher than 1
+#'   produce sharper tiles at the cost of larger file sizes. Default is `3`.
 #'
 #' @return The function does not return any value but saves a
 #'   heatmaps-histograms plot to the specified file.
@@ -2375,7 +2449,10 @@ heatmapStep <- function(obj,
                         title = NULL,
                         col_quantiles = c(0.1, 0.4, 0.6, 0.9),
                         col_breaks = NULL,
-                        colors = c("#00008E", "white", "white", "#630000")) {
+                        colors = c("#00008E", "white", "white", "#630000"),
+                        dim_scale = 1,
+                        png_res = 300,
+                        raster_quality = 3) {
 
     if (!requireNamespace("patchwork", quietly = TRUE)) {
         stop("Package 'patchwork' is required for this function. Install it with install.packages('patchwork').")
@@ -2414,9 +2491,6 @@ heatmapStep <- function(obj,
         stopifnot("`col_breaks` must contain at least two distinct values." =
                       length(unique(col_breaks)) >= 2)
     }
-    # if (!is.null(col_quantiles) && !is.null(col_breaks)) {
-    #     message("Both `col_quantiles` and `col_breaks` are provided. Only `col_breaks` is used.")
-    # }
 
     # colors
     if (!is.character(colors) || length(colors) != 4) {
@@ -2476,7 +2550,7 @@ heatmapStep <- function(obj,
         heatmap_width = unit(18, "cm"),
         col = col_fun,
         raster_device = "png",
-        raster_quality = 3
+        raster_quality = raster_quality
     )
 
     ht_Ref <- ComplexHeatmap::Heatmap(
@@ -2493,11 +2567,11 @@ heatmapStep <- function(obj,
         column_split = chrom,
         column_title_gp = grid::gpar(fontsize = 10),
         border_gp = grid::gpar(col = "black", lwd = 1),
-        heatmap_height = unit(12, "cm"),
-        heatmap_width = unit(18, "cm"),
+        heatmap_height = unit(12 * dim_scale, "cm"),
+        heatmap_width = unit(18 * dim_scale, "cm"),
         col = col_fun,
         raster_device = "png",
-        raster_quality = 3
+        raster_quality = raster_quality
     )
 
     # Draw heatmaps
@@ -2620,7 +2694,7 @@ heatmapStep <- function(obj,
             width = ht_Tum_2@ht_list_param[["width"]] * 1.75,
             height = ht_Tum_2@ht_list_param[["height"]] * 2.1,
             units = "mm",
-            res = 300
+            res = png_res
         )
         print(final_plot)
         dev.off()

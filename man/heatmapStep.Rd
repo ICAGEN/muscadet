@@ -12,7 +12,10 @@ heatmapStep(
   title = NULL,
   col_quantiles = c(0.1, 0.4, 0.6, 0.9),
   col_breaks = NULL,
-  colors = c("#00008E", "white", "white", "#630000")
+  colors = c("#00008E", "white", "white", "#630000"),
+  dim_scale = 1,
+  png_res = 300,
+  raster_quality = 3
 )
 }
 \arguments{
@@ -43,6 +46,17 @@ Default is \code{NULL}.}
 
 \item{colors}{A character vector of 4 colors used for the color scale of the
 heatmap (\code{character} vector). Default is \code{c("#00008E", "white", "white", "#630000")}.}
+
+\item{dim_scale}{Numeric scaling factor applied to the auto-computed width
+and height of each heatmap. Values below \code{1} reduce output dimensions (e.g.
+\code{0.5} halves both dimensions). Default is \code{1}.}
+
+\item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
+with the \code{.png} extension (\code{numeric}). Default is \code{300}.}
+
+\item{raster_quality}{Integer controlling the rasterization quality of
+heatmap tiles passed to \code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}. Values higher than 1
+produce sharper tiles at the cost of larger file sizes. Default is \code{3}.}
 }
 \value{
 The function does not return any value but saves a

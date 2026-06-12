@@ -12,8 +12,9 @@ includes the feature coordinates (\code{muscomic}).}
 
 \item{bulk.lrr}{A data frame containing log R ratio per genomic segments from
 bulk sequencing data (\code{data.frame}). One row per segment and 4 columns
-ordered as followed: chromosome (\code{character}), start position (\code{integer}),
-end position (\code{integer}), and Log R ratio value (\code{numeric}).}
+ordered as followed: chromosome (\code{character}, matching the chromosomes
+names present in \code{omics}, e.g. "1" to "22", "X", "Y"), start position
+(\code{integer}), end position (\code{integer}), and Log R ratio value (\code{numeric}).}
 }
 \value{
 A data frame of single-cell omic features, with columns corresponding
