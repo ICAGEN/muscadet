@@ -15,13 +15,14 @@ unified and reproducible workflow.
 The latest version of muscadet can be installed directly from GitHub:
 
 ``` r
+
 library(devtools)
 devtools::install_github("ICAGEN/muscadet")
 ```
 
 ## 2 Inputs and objects creation
 
-> **Important note on example data**
+> **Important**
 >
 > The example dataset included in `muscadet` is a toy dataset designed
 > for demonstration purposes only. It is deliberately minimal and
@@ -30,6 +31,16 @@ devtools::install_github("ICAGEN/muscadet")
 > explore the package features. Because of this strong simplification,
 > the results obtained from this dataset should not be interpreted as
 > biologically meaningful or methodologically representative.
+>
+> See the [Multiomic copy number analysis
+> tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.html)
+> for more detailed results on a real dataset.
+
+> **Note**
+>
+> For detailed information about input formats and preprocessing steps,
+> see the [Preparation of input data
+> vignette](https://icagen.github.io/muscadet/articles/data-prep.html).
 
 ### 2.1 muscomic
 
@@ -57,6 +68,7 @@ modality. The function requires the following inputs:
   [`?exdata_features`](https://icagen.github.io/muscadet/reference/exdata_features.md)).
 
 ``` r
+
 library(muscadet)
 
 # Load example dataset inputs:
@@ -115,6 +127,7 @@ bulk coverage information (see
 and the genome assembly to be used for the analysis.
 
 ``` r
+
 # Table of coverage information (log ratio) from bulk data (i.e. WGS)
 data("exdata_bulk_lrr")
 
@@ -142,6 +155,7 @@ muscadet
 The reference cells data must be stored in its own `muscadet` object
 
 ``` r
+
 data("exdata_mat_counts_atac_ref", "exdata_mat_counts_rna_ref")
 data("exdata_allele_counts_atac_ref", "exdata_allele_counts_rna_ref")
 
@@ -177,6 +191,7 @@ Examples of complete `muscadet` objects are included in the example
 dataset of the package.
 
 ``` r
+
 # Example of muscadet object
 data("exdata_muscadet", "exdata_muscadet_ref")
 exdata_muscadet
@@ -213,6 +228,7 @@ Several method functions are available to access data within
 `muscadet`/`muscomic` objects.
 
 ``` r
+
 library(SeuratObject) # Cells() and Features() methods imported from SeuratObject
 
 # Cell names
@@ -240,6 +256,7 @@ coordFeatures(exdata_muscadet)$RNA
 ```
 
 ``` r
+
 library(SeuratObject) # Cells() and Features() methods imported from SeuratObject
 
 # number of cells in total
@@ -274,6 +291,7 @@ step transforms raw count data into normalized coverage profiles along
 the genome, which are used for downstream clustering analysis.
 
 ``` r
+
 # Compute log R ratios from scATAC-seq read counts
 exdata_muscadet <- computeLogRatio(
     x = exdata_muscadet,
@@ -299,6 +317,7 @@ users can inspect the data distributions and review the filter status of
 individual features before proceeding with downstream analyses.
 
 ``` r
+
 library(ggplot2)
 
 ATAC_features <- coordFeatures(exdata_muscadet)$ATAC
@@ -317,6 +336,7 @@ ggplot(ATAC_features, aes(x = nPeaks, y = meanReads.ref, color = keep)) +
 ![](muscadet_files/figure-html/check%20features%20filters-1.png)
 
 ``` r
+
 
 RNA_features <- coordFeatures(exdata_muscadet)$RNA
 
@@ -353,6 +373,7 @@ function. Two clustering strategies are currently available:
   [`cluster_hclust()`](https://icagen.github.io/muscadet/reference/cluster_hclust.md)).
 
 ``` r
+
 # Set seed for clustering reproducibility
 set.seed(123) 
 
@@ -379,6 +400,7 @@ exdata_muscadet <- clusterMuscadet(
 ```
 
 ``` r
+
 # Set seed for clustering reproducibility
 set.seed(123)
 
@@ -395,6 +417,7 @@ exdata_muscadet2 <- clusterMuscadet(
 ```
 
 ``` r
+
 # Number of cells per cluster per partition
 lapply(exdata_muscadet$clustering$clusters, table)
 #> $`0.1`
@@ -422,6 +445,7 @@ from the [`clustree`](https://lazappi.github.io/clustree/index.html)
 package.
 
 ``` r
+
 library(clustree)
 library(dplyr)
 
@@ -457,6 +481,7 @@ be visualized as a heatmap with
 on a selected clustering partition stored in the `muscadet` object.
 
 ``` r
+
 # Plot heatmap 
 heatmapMuscadet(
     exdata_muscadet,
@@ -472,6 +497,7 @@ per cluster can be plotted to summarize copy-number patterns across
 subclonal populations.
 
 ``` r
+
 # Plot heatmap of log ratio averages per cluster
 heatmapMuscadet(
     exdata_muscadet,
@@ -494,6 +520,7 @@ subclonal structure and similarity between cells based on their
 multi-omic copy-number profiles.
 
 ``` r
+
 plotUMAP(exdata_muscadet, partition = 0.3)
 ```
 
@@ -512,6 +539,7 @@ Together, these tools help guide the selection of the most appropriate
 clustering partition for downstream analyses.
 
 ``` r
+
 # View stored silhouette average widths per partition
 exdata_muscadet$clustering$silhouette$sil.w.avg
 #> $`0.1`
@@ -525,6 +553,7 @@ exdata_muscadet$clustering$silhouette$sil.w.avg
 ```
 
 ``` r
+
 # Silhouette plot for individual clustering partition
 plotSil(exdata_muscadet, partition = 0.3)
 ```
@@ -534,6 +563,7 @@ plotSil(exdata_muscadet, partition = 0.3)
 Figure 2: Silhouette plot for a clustering partition
 
 ``` r
+
 # Plot clustering indexes for every stored partitions
 
 plotIndexes(exdata_muscadet)
@@ -549,10 +579,12 @@ Before calling CNAs, a clustering partition must be selected using
 [`assignClusters()`](https://icagen.github.io/muscadet/reference/assignClusters.md).
 
 ``` r
+
 exdata_muscadet <- assignClusters(exdata_muscadet, partition = 0.3)
 ```
 
 ``` r
+
 table(exdata_muscadet$cnacalling$clusters)
 #> 
 #>  1  2 
@@ -565,6 +597,7 @@ with both the sample (tumor cells) and reference (normal cells)
 `muscadet` objects to combine counts per cluster across all omics.
 
 ``` r
+
 # Aggregate counts per cluster from all omics from both sample and reference
 exdata_muscadet <- aggregateCounts(exdata_muscadet, exdata_muscadet_ref)
 #> Clusters used: 1 (41 cells), 2 (36 cells)
@@ -578,6 +611,7 @@ Finally, run
 to infer CNA segments for each cluster.
 
 ``` r
+
 exdata_muscadet <- cnaCalling(
     exdata_muscadet,
     depthmin.a.clusters = 3, # low threshold for example data, default is 30
@@ -592,24 +626,28 @@ exdata_muscadet <- cnaCalling(
 #> Initial number of coverage positions: 1142
 #> Integrating omics...
 #> Filtering allelic positions: tumor depth >= 3 reads
+#> Filtering homozygous positions...
+#> Homozygous filter: 31 / 126 positions removed, 95 positions retained.
 #> Filtering coverage positions: tumor depth >= 5 reads
 #> Filtering coverage positions: normal depth >= 1 reads
-#> Allelic positions kept: 126
+#> Allelic positions kept: 95
 #> Coverage positions kept: 438
-#> Final number of positions: 564
+#> Final number of positions: 533
 #> Performing segmentation per cluster...
 #> Finding diploid log R ratio on clusters...
-#> Diploid log R ratio = -0.09
+#> Diploid log R ratio = 0.138
 #> Computing cell fractions and copy numbers on clusters...
 #> - Analysis on all cells -
 #> Aggregating allelic counts of all cells...
 #> Filtering allelic positions: tumor depth >= 3 reads
-#> Allelic positions kept: 186
+#> Filtering homozygous positions of all cells...
+#> Homozygous filter: 48 / 186 positions removed, 138 positions retained.
+#> Allelic positions kept: 138
 #> Aggregating coverage counts of all cells...
 #> Filtering coverage positions: tumor depth >= 5 reads
 #> Filtering coverage positions: normal depth >= 1 reads
 #> Coverage positions kept: 315
-#> Final number of positions: 501
+#> Final number of positions: 453
 #> Performing segmentation on all cells...
 #> Computing cell fractions and copy numbers on all cells...
 #> - Consensus segments accross clusters -
@@ -617,6 +655,17 @@ exdata_muscadet <- cnaCalling(
 #> 3 consensus segments identified, 0 CNA segments identified
 #> Done.
 ```
+
+> **Important**
+>
+> Set `filter.homozygous = FALSE` when allele counts are derived from
+> individual-specific heterozygous positions called from bulk sequencing
+> data. This filter is applied prior to CNA calling to reduce noise in
+> the allelic imbalance signal caused by homozygous positions. It is
+> specifically designed for allele counts positions derived from a
+> common SNPs database, which includes homozygous positions by
+> definition, and is not needed when allelic positions are already
+> restricted to heterozygous calls.
 
 > **Note**
 >
@@ -638,26 +687,37 @@ The resulting CNA calls can be visualized using
 [`plotProfile()`](https://icagen.github.io/muscadet/reference/plotProfile.md),
 which generates a multi-panel profile per cluster summarizing:
 
-- Coverage per feature: log ratios values of genes/peaks, segment
+- **Coverage per feature:** log ratios values of genes/peaks, segment
   medians and diploid log ratio (purple line). Deviations from 0
   indicate gains (positive) or losses (negative) in coverage.
-- Allele data: log odds ratio values (log-odds of reference vs
+- **Allele data:** log odds ratio values (log-odds of reference vs
   alternative allele counts) at variant position and segment medians.
   Deviation from 0 suggests allelic imbalance, used to distinguish LOH,
   copy-neutral LOH, or allele-specific CNAs.
-- Copy number calls: total and minor copy numbers per segment.
-- CNA status classification: gain, loss or copy-neutral LOH statuses per
-  segment.
-- Cellular fraction: proportion of cells estimated to harbor the CNA at
-  each segment.
+- **Copy number calls:** total and minor copy numbers per segment.
+- **CNA status classification:** gain, loss or copy-neutral LOH statuses
+  per segment.
+- **Cellular fraction:** proportion of cells estimated to harbor the CNA
+  at each segment.
+
+> **Note**
+>
+> Example data are intentionally kept minimal for package size reasons
+> and does not provide enough signal for CNA calling. It is provided for
+> demonstration of the workflow only. See the [Multiomic copy number
+> analysis
+> tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.html)
+> for more detailed results on a real dataset.
 
 ``` r
+
 plotProfile(exdata_muscadet, data = "1", title = "Cluster 1 profile", point.cex = 0.8)
 ```
 
 ![](muscadet_files/figure-html/plot%20profile%201-1.png)
 
 ``` r
+
 plotProfile(exdata_muscadet, data = "allcells", title = "Profile for all cells", point.cex = 0.8)
 ```
 
@@ -667,7 +727,8 @@ To view the complete CNA profile of the sample across clusters, use
 [`plotCNA()`](https://icagen.github.io/muscadet/reference/plotCNA.md).
 
 ``` r
-plotCNA(exdata_muscadet, cf.gradient = FALSE)
+
+plotCNA(exdata_muscadet)
 ```
 
 ![](muscadet_files/figure-html/plot%20CNA-1.png)
@@ -678,12 +739,13 @@ If you find `muscadet` useful for your work please cite it using the
 following citation:
 
 ``` r
+
 citation("muscadet")
 #> To cite package 'muscadet' in publications use:
 #> 
 #>   Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).
 #>   _muscadet: Multiomics Single-Cell Copy Number Alterations Detection_.
-#>   R package version 0.2.1, <https://github.com/ICAGEN/muscadet>.
+#>   R package version 0.2.2, <https://github.com/ICAGEN/muscadet>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -691,7 +753,7 @@ citation("muscadet")
 #>     title = {muscadet: Multiomics Single-Cell Copy Number Alterations Detection},
 #>     author = {Marie Denoulet and Nils Giordano and Stéphane Minvielle and Céline Vallot and Eric Letouzé},
 #>     year = {2026},
-#>     note = {R package version 0.2.1},
+#>     note = {R package version 0.2.2},
 #>     url = {https://github.com/ICAGEN/muscadet},
 #>   }
 ```

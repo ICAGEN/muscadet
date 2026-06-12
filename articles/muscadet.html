@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="muscadet_files/libs/quarto-html/popper.min.js"></script><script src="muscadet_files/libs/quarto-html/tippy.umd.min.js"></script><link href="muscadet_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="muscadet_files/libs/quarto-html/light-border.css" rel="stylesheet">
@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.2.1/vignettes/muscadet.qmd" class="external-link"><code>vignettes/muscadet.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/vignettes/muscadet.qmd" class="external-link"><code>vignettes/muscadet.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -90,8 +90,15 @@
 </h2>
 <div>
 <blockquote>
-<p><strong>Important note on example data</strong></p>
+<p><strong>Important</strong></p>
 <p>The example dataset included in <code>muscadet</code> is a toy dataset designed for demonstration purposes only. It is deliberately minimal and contains a reduced genomic representation (three chromosomes). Its sole purpose is to illustrate how to run the main functions and explore the package features. Because of this strong simplification, the results obtained from this dataset should not be interpreted as biologically meaningful or methodologically representative.</p>
+<p>See the <a href="https://icagen.github.io/muscadet/articles/tutorial_multiome.html">Multiomic copy number analysis tutorial</a> for more detailed results on a real dataset.</p>
+</blockquote>
+</div>
+<div>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>For detailed information about input formats and preprocessing steps, see the <a href="https://icagen.github.io/muscadet/articles/data-prep.html">Preparation of input data vignette</a>.</p>
 </blockquote>
 </div>
 <section class="level2" data-number="2.1"><h3 data-number="2.1" id="muscomic">
@@ -607,30 +614,40 @@ Figure 3: Plot of Silhouette scores across partitions
 <span><span class="co">#&gt; Initial number of coverage positions: 1142</span></span>
 <span><span class="co">#&gt; Integrating omics...</span></span>
 <span><span class="co">#&gt; Filtering allelic positions: tumor depth &gt;= 3 reads</span></span>
+<span><span class="co">#&gt; Filtering homozygous positions...</span></span>
+<span><span class="co">#&gt; Homozygous filter: 31 / 126 positions removed, 95 positions retained.</span></span>
 <span><span class="co">#&gt; Filtering coverage positions: tumor depth &gt;= 5 reads</span></span>
 <span><span class="co">#&gt; Filtering coverage positions: normal depth &gt;= 1 reads</span></span>
-<span><span class="co">#&gt; Allelic positions kept: 126</span></span>
+<span><span class="co">#&gt; Allelic positions kept: 95</span></span>
 <span><span class="co">#&gt; Coverage positions kept: 438</span></span>
-<span><span class="co">#&gt; Final number of positions: 564</span></span>
+<span><span class="co">#&gt; Final number of positions: 533</span></span>
 <span><span class="co">#&gt; Performing segmentation per cluster...</span></span>
 <span><span class="co">#&gt; Finding diploid log R ratio on clusters...</span></span>
-<span><span class="co">#&gt; Diploid log R ratio = -0.09</span></span>
+<span><span class="co">#&gt; Diploid log R ratio = 0.138</span></span>
 <span><span class="co">#&gt; Computing cell fractions and copy numbers on clusters...</span></span>
 <span><span class="co">#&gt; - Analysis on all cells -</span></span>
 <span><span class="co">#&gt; Aggregating allelic counts of all cells...</span></span>
 <span><span class="co">#&gt; Filtering allelic positions: tumor depth &gt;= 3 reads</span></span>
-<span><span class="co">#&gt; Allelic positions kept: 186</span></span>
+<span><span class="co">#&gt; Filtering homozygous positions of all cells...</span></span>
+<span><span class="co">#&gt; Homozygous filter: 48 / 186 positions removed, 138 positions retained.</span></span>
+<span><span class="co">#&gt; Allelic positions kept: 138</span></span>
 <span><span class="co">#&gt; Aggregating coverage counts of all cells...</span></span>
 <span><span class="co">#&gt; Filtering coverage positions: tumor depth &gt;= 5 reads</span></span>
 <span><span class="co">#&gt; Filtering coverage positions: normal depth &gt;= 1 reads</span></span>
 <span><span class="co">#&gt; Coverage positions kept: 315</span></span>
-<span><span class="co">#&gt; Final number of positions: 501</span></span>
+<span><span class="co">#&gt; Final number of positions: 453</span></span>
 <span><span class="co">#&gt; Performing segmentation on all cells...</span></span>
 <span><span class="co">#&gt; Computing cell fractions and copy numbers on all cells...</span></span>
 <span><span class="co">#&gt; - Consensus segments accross clusters -</span></span>
 <span><span class="co">#&gt; Finding consensus segments...</span></span>
 <span><span class="co">#&gt; 3 consensus segments identified, 0 CNA segments identified</span></span>
 <span><span class="co">#&gt; Done.</span></span></code></pre></div>
+</div>
+<div>
+<blockquote>
+<p><strong>Important</strong></p>
+<p>Set <code>filter.homozygous = FALSE</code> when allele counts are derived from individual-specific heterozygous positions called from bulk sequencing data. This filter is applied prior to CNA calling to reduce noise in the allelic imbalance signal caused by homozygous positions. It is specifically designed for allele counts positions derived from a common SNPs database, which includes homozygous positions by definition, and is not needed when allelic positions are already restricted to heterozygous calls.</p>
+</blockquote>
 </div>
 <div>
 <blockquote>
@@ -649,12 +666,23 @@ Figure 3: Plot of Silhouette scores across partitions
 </h2>
 <p>The resulting CNA calls can be visualized using <code><a href="../reference/plotProfile.html">plotProfile()</a></code>, which generates a multi-panel profile per cluster summarizing:</p>
 <ul>
-<li>Coverage per feature: log ratios values of genes/peaks, segment medians and diploid log ratio (purple line). Deviations from 0 indicate gains (positive) or losses (negative) in coverage.</li>
-<li>Allele data: log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians. Deviation from 0 suggests allelic imbalance, used to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.</li>
-<li>Copy number calls: total and minor copy numbers per segment.</li>
-<li>CNA status classification: gain, loss or copy-neutral LOH statuses per segment.</li>
-<li>Cellular fraction: proportion of cells estimated to harbor the CNA at each segment.</li>
+<li>
+<strong>Coverage per feature:</strong> log ratios values of genes/peaks, segment medians and diploid log ratio (purple line). Deviations from 0 indicate gains (positive) or losses (negative) in coverage.</li>
+<li>
+<strong>Allele data:</strong> log odds ratio values (log-odds of reference vs alternative allele counts) at variant position and segment medians. Deviation from 0 suggests allelic imbalance, used to distinguish LOH, copy-neutral LOH, or allele-specific CNAs.</li>
+<li>
+<strong>Copy number calls:</strong> total and minor copy numbers per segment.</li>
+<li>
+<strong>CNA status classification:</strong> gain, loss or copy-neutral LOH statuses per segment.</li>
+<li>
+<strong>Cellular fraction:</strong> proportion of cells estimated to harbor the CNA at each segment.</li>
 </ul>
+<div>
+<blockquote>
+<p><strong>Note</strong></p>
+<p>Example data are intentionally kept minimal for package size reasons and does not provide enough signal for CNA calling. It is provided for demonstration of the workflow only. See the <a href="https://icagen.github.io/muscadet/articles/tutorial_multiome.html">Multiomic copy number analysis tutorial</a> for more detailed results on a real dataset.</p>
+</blockquote>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, data <span class="op">=</span> <span class="st">"1"</span>, title <span class="op">=</span> <span class="st">"Cluster 1 profile"</span>, point.cex <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
@@ -678,7 +706,7 @@ Figure 3: Plot of Silhouette scores across partitions
 <p>To view the complete CNA profile of the sample across clusters, use <code><a href="../reference/plotCNA.html">plotCNA()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">exdata_muscadet</span>, cf.gradient <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">exdata_muscadet</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure><p><img src="muscadet_files/figure-html/plot%20CNA-1.png" width="672"></p>
@@ -697,7 +725,7 @@ Figure 3: Plot of Silhouette scores across partitions
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).</span></span>
 <span><span class="co">#&gt;   _muscadet: Multiomics Single-Cell Copy Number Alterations Detection_.</span></span>
-<span><span class="co">#&gt;   R package version 0.2.1, &lt;https://github.com/ICAGEN/muscadet&gt;.</span></span>
+<span><span class="co">#&gt;   R package version 0.2.2, &lt;https://github.com/ICAGEN/muscadet&gt;.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -705,7 +733,7 @@ Figure 3: Plot of Silhouette scores across partitions
 <span><span class="co">#&gt;     title = {muscadet: Multiomics Single-Cell Copy Number Alterations Detection},</span></span>
 <span><span class="co">#&gt;     author = {Marie Denoulet and Nils Giordano and Stéphane Minvielle and Céline Vallot and Eric Letouzé},</span></span>
 <span><span class="co">#&gt;     year = {2026},</span></span>
-<span><span class="co">#&gt;     note = {R package version 0.2.1},</span></span>
+<span><span class="co">#&gt;     note = {R package version 0.2.2},</span></span>
 <span><span class="co">#&gt;     url = {https://github.com/ICAGEN/muscadet},</span></span>
 <span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>

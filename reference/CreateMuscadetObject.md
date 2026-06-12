@@ -28,7 +28,8 @@ CreateMuscadetObject(
 
   A data frame containing log R ratio per genomic segments from bulk
   sequencing data (`data.frame`). One row per segment and 4 columns
-  ordered as followed: chromosome (`character`), start position
+  ordered as followed: chromosome (`character`, matching the chromosomes
+  names present in `omics`, e.g. "1" to "22", "X", "Y"), start position
   (`integer`), end position (`integer`), and Log R ratio value
   (`numeric`).
 

@@ -95,6 +95,12 @@ clusterMuscadet(
       [`cluster_seurat()`](https://icagen.github.io/muscadet/reference/cluster_seurat.md)
       Details section.
 
+  `leiden_method`
+
+  :   Character string to choose from which package for running leiden
+      algorithm, either leidenbase ("leidenbase") or igraph ("igraph")
+      packages (`character`). Default is "igraph".
+
   `knn_seurat`
 
   :   Integer specifying the number of nearest neighbors used for graph

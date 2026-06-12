@@ -21,28 +21,38 @@
 
 ### Installation
 
-You can install the latest version of `muscadet` from GitHub:
+We recommand using the following conda package `r-muscadet`:
+[https://anaconda.org/channels/nigiord/packages/r-muscadet](https://anaconda.org/channels/nigiord/packages/r-muscadet/overview)
+
+Alternatively, you can install the latest version of `muscadet` directly
+from GitHub:
 
 ``` r
+
 library(devtools)
 devtools::install_github("ICAGEN/muscadet")
 ```
 
-- To get started, read the [Get Started
+- To **get started**, read the [Get Started
   vignette](https://icagen.github.io/muscadet/articles/muscadet.html) to
-  learn about the `muscadet` workflow and function usage on demo example
-  data.
-- To prepare inputs, read the [Preparation of input data
+  learn about the `muscadet` workflow and function usage on **demo
+  example data**.
+- To **prepare inputs**, read the [Preparation of input data
   vignette](https://icagen.github.io/muscadet/articles/data-prep.html)
   to get details on the inputs for `muscadet` and how to prepare them.
+- For more details and **examples on a real dataset**, a [Multiomic copy
+  number analysis
+  tutorial](https://icagen.github.io/muscadet/articles/tutorial_multiome.html)
+  using 10x Genomics Multiome scATAC-seq and scRNA-seq data from
+  multiple myeloma cells is available.
 
 ### Citation
 
 To cite the `muscadet` package in publications, use:
 
-> Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2025).
+> Denoulet M, Giordano N, Minvielle S, Vallot C, Letouzé E (2026).
 > *muscadet: Multiomics Single-Cell Copy Number Alterations Detection*.
-> R package version 0.2.0, <https://icagen.github.io/muscadet/>,
+> R package version 0.2.2, <https://icagen.github.io/muscadet/>,
 > <https://github.com/ICAGEN/muscadet>.
 
 ### Communications

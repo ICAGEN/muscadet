@@ -24,10 +24,10 @@ The goals of this tutorial are to:
 
 > **Note**
 >
-> The data used in this analysis are not publicly available; however,
-> the example dataset included in the `muscadet` package can be used
-> instead to test functionalities, in that case please refer to the [Get
-> Started
+> The data used in this analysis are not available within the package;
+> however, the example dataset included in the `muscadet` package can be
+> used instead to test functionalities, in that case please refer to the
+> [Get Started
 > vignette](https://icagen.github.io/muscadet/articles/muscadet.html)
 > for guidance.
 
@@ -49,6 +49,7 @@ Load the `muscadet` package. Additionally, this tutorial uses the
 following packages: `clustree`, `dplyr`, and `ggplot2`.
 
 ``` r
+
 library(muscadet)
 library(clustree)
 library(dplyr)
@@ -77,6 +78,7 @@ The following inputs are loaded:
 > vignette](https://icagen.github.io/muscadet/articles/data-prep.html).
 
 ``` r
+
 # Matrices of raw counts
 mat_counts_atac_tumor <- readRDS(file.path(inputdir, "mat_counts_atac_tumor.Rds"))
 mat_counts_rna_tumor <- readRDS(file.path(inputdir, "mat_counts_rna_tumor.Rds"))
@@ -98,6 +100,7 @@ wgs_lrr <- read.delim(file.path(inputdir, "wgs_lrr.tsv"))
 ```
 
 ``` r
+
 # Inspect dimensions of count matrices
 df <- data.frame(
     ATAC_tumor = dim(mat_counts_atac_tumor),
@@ -116,6 +119,7 @@ kable(t(df), col.names = c("Cells", "Features"))
 | RNA_ref    | 19526 |    23394 |
 
 ``` r
+
 # Inspect number of unique variant positions and cells
 df <- data.frame(
     ATAC_tumor = c(
@@ -142,6 +146,7 @@ kable(t(df), col.names = c("Cells", "Variant positions"))
 | RNA_ref    | 25758 |            220287 |
 
 ``` r
+
 # Inspect number of features
 nrow(peaks_coord)
 ```
@@ -149,6 +154,7 @@ nrow(peaks_coord)
     ## [1] 239968
 
 ``` r
+
 nrow(genes_coord)
 ```
 
@@ -175,6 +181,7 @@ are not required - and typically not included - for the reference
 object.
 
 ``` r
+
 # Tumor cells
 omic_atac <- CreateMuscomicObject(
     type = "ATAC",
@@ -224,6 +231,7 @@ muscadet_ref <- CreateMuscadetObject(
 > to a later step.
 
 ``` r
+
 # To add allele counts later in the analysis
 muscadet <- addAlleleCounts(
     muscadet,
@@ -240,6 +248,7 @@ muscadet_ref <- addAlleleCounts(
 The content of the `muscadet` objects can be seen:
 
 ``` r
+
 # Inspect objects
 muscadet
 ```
@@ -258,6 +267,7 @@ muscadet
     ##  genome: hg38
 
 ``` r
+
 muscadet_ref
 ```
 
@@ -284,6 +294,7 @@ The `muscadet` class of objects contains 5 slots:
 - `genome`: reference genome information used throughout the analysis
 
 ``` r
+
 str(muscadet, 2)
 ```
 
@@ -298,6 +309,7 @@ To access information in `muscomic` and `muscadet` objects several
 functions can be used:
 
 ``` r
+
 # Get feature coordinates data frame
 coordFeatures(omic_atac)
 coordFeatures(muscadet)$ATAC
@@ -325,6 +337,7 @@ gains or losses. These resulting log R ratio matrices are stored
 directly within the `muscadet` objects returned by the function.
 
 ``` r
+
 # compute log R ratios for ATAC
 muscadet <- computeLogRatio(
     x = muscadet,
@@ -404,6 +417,7 @@ users are encouraged to inspect the underlying data distributions and to
 examine the filtering status of individual features.
 
 ``` r
+
 library(ggplot2)
 
 ATAC_features <- coordFeatures(muscadet)$ATAC
@@ -484,6 +498,7 @@ Printing clusters sizes tables at this stage is helpful to view the
 number of cells per cluster per partitions.
 
 ``` r
+
 # Clustering
 muscadet <- clusterMuscadet(
     muscadet,
@@ -510,6 +525,7 @@ str(muscadet$clustering, 1)
     ##  $ partition.opt: chr "0.3"
 
 ``` r
+
 lapply(muscadet$clustering$clusters, table)
 ```
 
@@ -549,6 +565,7 @@ lapply(muscadet$clustering$clusters, table)
 > be adjusted depending on dataset size and complexity.
 
 ``` r
+
 # Extract variance info
 get_variance_df <- function(pc_obj, label) {
     data.frame(
@@ -628,6 +645,7 @@ This step helps to:
   interpretability and biological relevance
 
 ``` r
+
 # Clustering visualization - clustree
 library(clustree)
 library(dplyr)
@@ -670,6 +688,7 @@ not necessarily indicate problems, as some biologically meaningful
 structure may not be fully captured in two dimensions.
 
 ``` r
+
 # clustering visualization - silhouette widths
 for (p in names(muscadet$clustering$clusters)) {
 
@@ -682,7 +701,7 @@ for (p in names(muscadet$clustering$clusters)) {
     )
 
     plotUMAP(muscadet, partition = p, title = title)
-    ggsave(filename)
+    ggsave(filename, dpi = 100)
 }
 ```
 
@@ -755,6 +774,7 @@ and CNA calling.
 > default value) if higher-quality output is desired.
 
 ``` r
+
 # clustering visualization - genome-wide coverage heatmaps
 for (p in names(muscadet$clustering$clusters)) {
 
@@ -796,6 +816,7 @@ Heatmap of log R ratios - res 0.4
 Heatmap of log R ratios - res 0.5
 
 ``` r
+
 for (p in names(muscadet$clustering$clusters)) {
 
     filename <- file.path("figures", paste0("heatmap_res_", p, "_av.png"))
@@ -812,7 +833,8 @@ for (p in names(muscadet$clustering$clusters)) {
         filename,
         partition = p,
         title = title,
-        averages = TRUE)
+        averages = TRUE,
+        png_res = 100)
 }
 ```
 
@@ -876,6 +898,7 @@ appropriate resolution.
 > validation indices.
 
 ``` r
+
 # clustering visualization - silhouette widths
 for (p in names(muscadet$clustering$clusters)) {
 
@@ -888,7 +911,7 @@ for (p in names(muscadet$clustering$clusters)) {
     )
 
     plotSil(muscadet, partition = p, title = title)
-    ggsave(filename)
+    ggsave(filename, dpi = 100)
 }
 ```
 
@@ -937,6 +960,7 @@ profiles for downstream analysis.
 > in downstream analysis for this tutorial.
 
 ``` r
+
 # Assign the chosen clustering partition
 muscadet <- assignClusters(muscadet, partition = 0.2)
 table(muscadet$cnacalling$clusters)
@@ -968,6 +992,7 @@ Reference counts are aggregated similarly across all cells and omics to
 remain consistent and comparable.
 
 ``` r
+
 # Merge all counts from all omics from both sample and reference
 muscadet <- aggregateCounts(muscadet, muscadet_ref)
 ```
@@ -980,28 +1005,38 @@ function, which segments pseudo-bulk profiles and infers copy number
 alterations. This function integrates coverage and allelic data to
 segment chromosomes and to produce cluster-level copy number calls.
 
-> **Note**
+> **Important: `omics.coverage`**
 >
 > In this dataset, ATAC-derived coverage profiles exhibit cleaner signal
 > than RNA-derived profiles. To avoid introducing noise in that case,
 > CNA calling is restricted to ATAC coverage by setting
-> `omics.coverage = "ATAC"`.
+> `omics.coverage = "ATAC"`. Note that this selection applies only to
+> coverage data; allelic information can still be used from multiple
+> omics. Coverage from multiple omics can be used if both are reliable
+> and comparable.
 
-Note that this selection applies only to coverage data; allelic
-information can still be used from multiple omics. Coverage from
-multiple omics can be used if both are reliable and comparable.
-
-> **Important**
+> **Important: `filter.homozygous`**
 >
-> During CNA calling, a series of filters based on minimum value
-> thresholds (`depthmin.*.*`) are applied to remove noise. The default
-> thresholds are tailored to this dataset, but they may need to be
-> adjusted for other datasets with different characteristics or
-> sequencing depth.
+> `filter.homozygous` is set to `FALSE` as allele counts are derived
+> from individual-specific heterozygous positions called from bulk
+> sequencing data. When allele counts positions are derived from a
+> common SNPs database, set `filter.homozygous = TRUE` (default) to
+> reduce noise in the allelic imbalance signal caused by homozygous
+> positions.
+
+> **Important: depth filters (`depthmin.*.*`)**
+>
+> During CNA calling, depth filters (`depthmin.*.*`) are applied to
+> remove noise. The default thresholds are tailored to this dataset, but
+> they may need to be adjusted for other datasets with different
+> characteristics or sequencing depth.
 
 ``` r
+
 # CNA calling
-muscadet <- cnaCalling(muscadet, omics.coverage = "ATAC")
+muscadet <- cnaCalling(muscadet,
+                       omics.coverage = "ATAC",
+                       filter.homozygous = FALSE)
 ```
 
 The output is stored within the `muscadet` object and includes:
@@ -1038,19 +1073,20 @@ provide a global overview but should not replace cluster-level
 interpretation.
 
 ``` r
+
 # Per cluster
 for (i in unique(muscadet$cnacalling$clusters)) {
 
     filename <- file.path("figures", paste0("CNAprofile_", i, ".png"))
 
-    png(filename, width = 15, height = 7.5, units = "in", res = 150)
+    png(filename, width = 15, height = 7.5, units = "in", res = 100)
     plotProfile(muscadet, data = i, title = paste("Cluster:", i))
     dev.off()
 }
 
 # All cells
 filename <- file.path("figures", paste0("CNAprofile_allcells.png"))
-png(filename, width = 15, height = 7.5, units = "in", res = 150)
+png(filename, width = 15, height = 7.5, units = "in", res = 100)
 plotProfile(muscadet, data = "allcells", title = "All cells")
 dev.off()
 ```
@@ -1081,7 +1117,8 @@ sample-level can be visualize using
 [`plotCNA()`](https://icagen.github.io/muscadet/reference/plotCNA.md).
 
 ``` r
-CNAplot <- plotCNA(muscadet, cf.gradient = FALSE)
+
+CNAplot <- plotCNA(muscadet)
 ggsave("figures/CNAplot.png", CNAplot, width = 7, height = 4, units = "in")
 ```
 
@@ -1108,6 +1145,7 @@ CNA analysis, integrating genomic and functional information in a single
 visualization.
 
 ``` r
+
 library(ggplot2)
 
 # import UMAP coordinates based on chromatin accessibility and expression
@@ -1121,7 +1159,7 @@ UMAP_coord_rna$cluster <- factor(clusters[match(UMAP_coord_rna$cell, names(clust
 
 palette_clusters <- c("#FABC2A", "#7FC97F", "#EE6C4D")
 
-UMAP_atac <- ggplot(UMAP_coord_atac, aes(x = UMAP_1 , y = UMAP_2, color = cluster)) +
+UMAP_atac <- ggplot(UMAP_coord_atac, aes(x = UMAP_1, y = UMAP_2, color = cluster)) +
     geom_point(size = 1.2) +
     scale_color_manual(name = "", values = setNames(palette_clusters, sort(unique(
     UMAP_coord_atac$cluster
@@ -1138,9 +1176,9 @@ UMAP_atac <- ggplot(UMAP_coord_atac, aes(x = UMAP_1 , y = UMAP_2, color = cluste
         axis.text = element_blank(),
         axis.ticks = element_blank(),
     )
-ggsave("figures/UMAP_atac.png", UMAP_atac)
+ggsave("figures/UMAP_atac.png", UMAP_atac, dpi = 100)
 
-UMAP_rna <- ggplot(UMAP_coord_rna, aes(x = UMAP_1 , y = UMAP_2, color = cluster)) +
+UMAP_rna <- ggplot(UMAP_coord_rna, aes(x = UMAP_1, y = UMAP_2, color = cluster)) +
     geom_point(size = 1.2) +
     scale_color_manual(name = "", values = setNames(palette_clusters, sort(unique(
         UMAP_coord_rna$cluster
@@ -1157,7 +1195,7 @@ UMAP_rna <- ggplot(UMAP_coord_rna, aes(x = UMAP_1 , y = UMAP_2, color = cluster)
         axis.text = element_blank(),
         axis.ticks = element_blank()
     )
-ggsave("figures/UMAP_rna.png", UMAP_rna)
+ggsave("figures/UMAP_rna.png", UMAP_rna, dpi = 100)
 ```
 
 ![Copy number clusters projected on ATAC
@@ -1168,11 +1206,11 @@ UMAP](figures/UMAP_rna.png)
 
 ## Key parameters to tune
 
-| **Step**                | **Parameter**                                                           | **Argument**                                                    | **Notes**                                                                              |
-|-------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| **Compute log R ratio** | Feature filters: remove low-quality or poorly covered features          | `minReads`, `minPeaks` (ATAC); `refReads`, `refMeanReads` (RNA) | Adjust depending on dataset coverage                                                   |
-|                         | Window/smoothing: define size of genomic windows                        | `windowSize`, `slidingSize` (ATAC); `genesPerWindow` (RNA)      | Choose based on desired resolution of CNAs                                             |
-| **Clustering**          | Range for partitions: explore multiple resolutions or cluster numbers   | `res_range` (Seurat-based); `k_range` (hclust)                  | Select based on cluster stability and biological interpretability                      |
-|                         | Selected dimensions from low-dimensional embeddings (Seurat-based only) | `dims_list` (Seurat-based)                                      | Choose top dimensions capturing most variance; adjust for noise and dataset complexity |
-| **CNA calling**         | Omic selection for coverage: use the most reliable omic to reduce noise | `omics.coverage`                                                | `"ATAC"` or `"RNA"`; multiple omics can be used if both are reliable                   |
-|                         | Feature/position filters: remove poorly covered positions or variants   | `depthmin.*.*`                                                  | Adjust depending on sequencing depth and data quality                                  |
+| **Step** | **Parameter** | **Argument** | **Notes** |
+|----|----|----|----|
+| **Compute log R ratio** | Feature filters: remove low-quality or poorly covered features | `minReads`, `minPeaks` (ATAC); `refReads`, `refMeanReads` (RNA) | Adjust depending on dataset coverage |
+|  | Window/smoothing: define size of genomic windows | `windowSize`, `slidingSize` (ATAC); `genesPerWindow` (RNA) | Choose based on desired resolution of CNAs |
+| **Clustering** | Range for partitions: explore multiple resolutions or cluster numbers | `res_range` (Seurat-based); `k_range` (hclust) | Select based on cluster stability and biological interpretability |
+|  | Selected dimensions from low-dimensional embeddings (Seurat-based only) | `dims_list` (Seurat-based) | Choose top dimensions capturing most variance; adjust for noise and dataset complexity |
+| **CNA calling** | Omic selection for coverage: use the most reliable omic to reduce noise | `omics.coverage` | `"ATAC"` or `"RNA"`; multiple omics can be used if both are reliable |
+|  | Feature/position filters: remove poorly covered positions or variants | `depthmin.*.*` | Adjust depending on sequencing depth and data quality |

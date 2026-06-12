@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Multiomic copy number analysis tutorial">
 </head>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muscadet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,9 +64,9 @@
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Multiomic copy number analysis tutorial</h1>
             
-            <h4 data-toc-skip class="date">January 21, 2026</h4>
+            <h4 data-toc-skip class="date">June 11, 2026</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.2.1/vignettes/articles/tutorial_multiome.Rmd" class="external-link"><code>vignettes/articles/tutorial_multiome.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/vignettes/articles/tutorial_multiome.Rmd" class="external-link"><code>vignettes/articles/tutorial_multiome.Rmd</code></a></small>
       <div class="d-none name"><code>tutorial_multiome.Rmd</code></div>
     </div>
 
@@ -95,10 +95,10 @@ embeddings</li>
 </h2>
 <blockquote>
 <p><strong>Note</strong></p>
-<p>The data used in this analysis are not publicly available; however,
-the example dataset included in the <code>muscadet</code> package can be
-used instead to test functionalities, in that case please refer to the
-<a href="https://icagen.github.io/muscadet/articles/muscadet.html">Get
+<p>The data used in this analysis are not available within the package;
+however, the example dataset included in the <code>muscadet</code>
+package can be used instead to test functionalities, in that case please
+refer to the <a href="https://icagen.github.io/muscadet/articles/muscadet.html">Get
 Started vignette</a> for guidance.</p>
 </blockquote>
 <p>The dataset used in this tutorial consists of:</p>
@@ -748,7 +748,7 @@ structure may not be fully captured in two dimensions.</p>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span>    <span class="fu"><a href="../reference/plotUMAP.html">plotUMAP</a></span><span class="op">(</span><span class="va">muscadet</span>, partition <span class="op">=</span> <span class="va">p</span>, title <span class="op">=</span> <span class="va">title</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="va">filename</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="va">filename</span>, dpi <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <div class="float">
 <img src="figures/UMAP_res_0.1.png" style="width:60.0%" fig-align="center" alt="UMAP plot - res 0.1"><div class="figcaption">UMAP plot - res 0.1</div>
@@ -862,7 +862,8 @@ value) if higher-quality output is desired.</p>
 <span>        <span class="va">filename</span>,</span>
 <span>        partition <span class="op">=</span> <span class="va">p</span>,</span>
 <span>        title <span class="op">=</span> <span class="va">title</span>,</span>
-<span>        averages <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>        averages <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        png_res <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <div class="float">
 <img src="figures/heatmap_res_0.1_av.png" style="width:100.0%" fig-align="center" alt="Heatmap of log R ratios averages per cluster - res 0.1"><div class="figcaption">Heatmap of log R ratios averages per cluster -
@@ -927,7 +928,7 @@ compute and visualize complementary clustering validation indices.</p>
 <span>    <span class="op">)</span></span>
 <span></span>
 <span>    <span class="fu"><a href="../reference/plotSil.html">plotSil</a></span><span class="op">(</span><span class="va">muscadet</span>, partition <span class="op">=</span> <span class="va">p</span>, title <span class="op">=</span> <span class="va">title</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="va">filename</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="va">filename</span>, dpi <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <div class="float">
 <img src="figures/plotSil_res_0.1.png" style="width:70.0%" fig-align="center" alt="Silhouette plot - res 0.1"><div class="figcaption">Silhouette plot - res 0.1</div>
@@ -1005,26 +1006,37 @@ function, which segments pseudo-bulk profiles and infers copy number
 alterations. This function integrates coverage and allelic data to
 segment chromosomes and to produce cluster-level copy number calls.</p>
 <blockquote>
-<p><strong>Note</strong></p>
+<p><strong>Important: <code>omics.coverage</code></strong></p>
 <p>In this dataset, ATAC-derived coverage profiles exhibit cleaner
 signal than RNA-derived profiles. To avoid introducing noise in that
 case, CNA calling is restricted to ATAC coverage by setting
-<code>omics.coverage = "ATAC"</code>.</p>
+<code>omics.coverage = "ATAC"</code>. Note that this selection applies
+only to coverage data; allelic information can still be used from
+multiple omics. Coverage from multiple omics can be used if both are
+reliable and comparable.</p>
 </blockquote>
-<p>Note that this selection applies only to coverage data; allelic
-information can still be used from multiple omics. Coverage from
-multiple omics can be used if both are reliable and comparable.</p>
 <blockquote>
-<p><strong>Important</strong></p>
-<p>During CNA calling, a series of filters based on minimum value
-thresholds (<code>depthmin.*.*</code>) are applied to remove noise. The
-default thresholds are tailored to this dataset, but they may need to be
-adjusted for other datasets with different characteristics or sequencing
-depth.</p>
+<p><strong>Important: <code>filter.homozygous</code></strong></p>
+<p><code>filter.homozygous</code> is set to <code>FALSE</code> as allele
+counts are derived from individual-specific heterozygous positions
+called from bulk sequencing data. When allele counts positions are
+derived from a common SNPs database, set
+<code>filter.homozygous = TRUE</code> (default) to reduce noise in the
+allelic imbalance signal caused by homozygous positions.</p>
+</blockquote>
+<blockquote>
+<p><strong>Important: depth filters
+(<code>depthmin.*.*</code>)</strong></p>
+<p>During CNA calling, depth filters (<code>depthmin.*.*</code>) are
+applied to remove noise. The default thresholds are tailored to this
+dataset, but they may need to be adjusted for other datasets with
+different characteristics or sequencing depth.</p>
 </blockquote>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># CNA calling</span></span>
-<span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cnaCalling.html">cnaCalling</a></span><span class="op">(</span><span class="va">muscadet</span>, omics.coverage <span class="op">=</span> <span class="st">"ATAC"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">muscadet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cnaCalling.html">cnaCalling</a></span><span class="op">(</span><span class="va">muscadet</span>,</span>
+<span>                       omics.coverage <span class="op">=</span> <span class="st">"ATAC"</span>,</span>
+<span>                       filter.homozygous <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>The output is stored within the <code>muscadet</code> object and
 includes:</p>
 <ul>
@@ -1070,14 +1082,14 @@ interpretation.</p>
 <span></span>
 <span>    <span class="va">filename</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"CNAprofile_"</span>, <span class="va">i</span>, <span class="st">".png"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">7.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">7.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">muscadet</span>, data <span class="op">=</span> <span class="va">i</span>, title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Cluster:"</span>, <span class="va">i</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># All cells</span></span>
 <span><span class="va">filename</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"CNAprofile_allcells.png"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">7.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="va">filename</span>, width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">7.5</span>, units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plotProfile.html">plotProfile</a></span><span class="op">(</span><span class="va">muscadet</span>, data <span class="op">=</span> <span class="st">"allcells"</span>, title <span class="op">=</span> <span class="st">"All cells"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## quartz_off_screen </span></span>
@@ -1098,7 +1110,7 @@ interpretation.</p>
 <p>Additionnally, a complete CNA profile of all clusters at the
 sample-level can be visualize using <code><a href="../reference/plotCNA.html">plotCNA()</a></code>.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">CNAplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">muscadet</span>, cf.gradient <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">CNAplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotCNA.html">plotCNA</a></span><span class="op">(</span><span class="va">muscadet</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"figures/CNAplot.png"</span>, <span class="va">CNAplot</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">4</span>, units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figures/CNAplot.png" style="width:100.0%" fig-align="center" alt="Complete CNA profile"><div class="figcaption">Complete CNA profile</div>
@@ -1136,7 +1148,7 @@ visualization.</p>
 <span></span>
 <span><span class="va">palette_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#FABC2A"</span>, <span class="st">"#7FC97F"</span>, <span class="st">"#EE6C4D"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">UMAP_atac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">UMAP_coord_atac</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">UMAP_1</span> , y <span class="op">=</span> <span class="va">UMAP_2</span>, color <span class="op">=</span> <span class="va">cluster</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">UMAP_atac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">UMAP_coord_atac</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">UMAP_1</span>, y <span class="op">=</span> <span class="va">UMAP_2</span>, color <span class="op">=</span> <span class="va">cluster</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">""</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">palette_clusters</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span></span>
 <span>    <span class="va">UMAP_coord_atac</span><span class="op">$</span><span class="va">cluster</span></span>
@@ -1153,9 +1165,9 @@ visualization.</p>
 <span>        axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>        axis.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    <span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"figures/UMAP_atac.png"</span>, <span class="va">UMAP_atac</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"figures/UMAP_atac.png"</span>, <span class="va">UMAP_atac</span>, dpi <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">UMAP_rna</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">UMAP_coord_rna</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">UMAP_1</span> , y <span class="op">=</span> <span class="va">UMAP_2</span>, color <span class="op">=</span> <span class="va">cluster</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">UMAP_rna</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">UMAP_coord_rna</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">UMAP_1</span>, y <span class="op">=</span> <span class="va">UMAP_2</span>, color <span class="op">=</span> <span class="va">cluster</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">""</span>, values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">palette_clusters</span>, <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span></span>
 <span>        <span class="va">UMAP_coord_rna</span><span class="op">$</span><span class="va">cluster</span></span>
@@ -1172,7 +1184,7 @@ visualization.</p>
 <span>        axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>        axis.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"figures/UMAP_rna.png"</span>, <span class="va">UMAP_rna</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"figures/UMAP_rna.png"</span>, <span class="va">UMAP_rna</span>, dpi <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/UMAP_atac.png" style="width:60.0%" fig-align="center" alt="Copy number clusters projected on ATAC UMAP"><img src="figures/UMAP_rna.png" style="width:60.0%" fig-align="center" alt="Copy number clusters projected on RNA UMAP"></p>
 <hr>
 </div>

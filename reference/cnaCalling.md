@@ -17,6 +17,10 @@ cnaCalling(
   depthmin.c.allcells = 50,
   depthmin.c.nor = 1000,
   depthmax.nor = NULL,
+  filter.homozygous = TRUE,
+  vaf.thresh = 0.1,
+  vafmean.thresh = 0.02,
+  vafmean.win = 50,
   het.thresh = 0.25,
   snp.nbhd = 250,
   hetscale = TRUE,
@@ -103,6 +107,39 @@ from Tumor Sequencing*. R package version 0.6.2,
 - depthmax.nor:
 
   Optional. Maximum depth for normal sample (default: `NULL`).
+
+- filter.homozygous:
+
+  Logical. If `TRUE`, filters out homozygous allelic positions in
+  non-deletion regions, as they cause noise in the allelic imbalance
+  signal. Recommended when allele positions are derived from a common
+  SNPs database rather than individual-specific heterozygous positions
+  called from bulk sequencing. Default is `TRUE`.
+
+- vaf.thresh:
+
+  Threshold applied to the transformed VAF (Variant Allele Frequency)
+  (`VAF.abs = 0.5 - |VAF - 0.5|`) below which a position is considered
+  homozygous and filtered out within non-deletion regions (used when
+  `filter.homozygous = TRUE`) (default: `0.1`).
+
+- vafmean.thresh:
+
+  Running mean VAF (Variant Allele Frequency) threshold used to identify
+  deletion regions (used when `filter.homozygous = TRUE`) (default:
+  `0.02`). Positions where the local VAF running mean is below this
+  threshold are considered to be in a deletion region and are excluded
+  from homozygous filtering to avoid removing signal.
+
+- vafmean.win:
+
+  Window size for computing the running mean of VAF (Variant Allele
+  Frequency) per cluster and per chromosome, used to assess the local
+  allelic context of each position (used when
+  `filter.homozygous = TRUE`) (default: `50`). If greater than `1`,
+  interpreted as an absolute number of positions. If between `0` and
+  `1`, interpreted as a fraction of the total positions on the
+  chromosome, with a minimum of 10 positions.
 
 - het.thresh:
 
@@ -275,6 +312,33 @@ Details of the cnacalling slot:
 
 - `ploidy`: Ploidy used for the CNA analysis.
 
+## Details
+
+### Homozygous position filtering
+
+When `filter.homozygous = TRUE`, homozygous allelic positions are
+removed prior to CNA calling to reduce noise in the allelic imbalance
+signal. This filter is particularly relevant when allele positions for
+allele counts are derived from a common SNPs database, which includes
+positions that are homozygous in the individual, unlike heterozygous
+positions specifically called from individual bulk sequencing data.
+
+For each cluster and each chromosome, a running mean of VAF is computed
+over a window of `vafmean.win` positions. This local VAF context is used
+to distinguish two types of regions:
+
+- **Non-deletion regions** (running mean VAF `>= vafmean.thresh`):
+  positions with a VAF below `vaf.thresh` are considered homozygous and
+  filtered out, as they contribute noise to the allelic imbalance signal
+  without carrying informative heterozygous signal. The threshold is
+  applied to a transformed VAF defined as `VAF.abs = 0.5 - |VAF - 0.5|`,
+  which measures the deviation from homozygosity.
+
+- **Deletion regions** (running mean VAF `< vafmean.thresh`): the filter
+  is not applied, as most positions are expected to be homozygous due to
+  the deletion-induced allelic imbalance. Filtering here would remove
+  genuine signal rather than noise.
+
 ## References
 
 - [`facets`](https://rdrr.io/pkg/facets/man/facets-package.html)
@@ -302,6 +366,52 @@ library("facets")
 
 exdata_muscadet <- cnaCalling(
     exdata_muscadet,
+    omics.coverage = "ATAC",
+    depthmin.a.clusters = 3, # set low thresholds for example data
+    depthmin.c.clusters = 5,
+    depthmin.a.allcells = 3,
+    depthmin.c.allcells = 5,
+    depthmin.c.nor = 0
+)
+#> - Analysis per cluster -
+#> Initial number of positions: 2455
+#> Initial number of allelic positions: 1313
+#> Initial number of coverage positions: 1142
+#> Integrating omics...
+#> Filtering allelic positions: tumor depth >= 3 reads
+#> Filtering homozygous positions...
+#> Homozygous filter: 31 / 126 positions removed, 95 positions retained.
+#> Selecting coverage data from omic(s): ATAC
+#> Filtering coverage positions: tumor depth >= 5 reads
+#> Filtering coverage positions: normal depth >= 0 reads
+#> Allelic positions kept: 95
+#> Coverage positions kept: 154
+#> Final number of positions: 249
+#> Performing segmentation per cluster...
+#> Finding diploid log R ratio on clusters...
+#> Diploid log R ratio = -0.137
+#> Computing cell fractions and copy numbers on clusters...
+#> - Analysis on all cells -
+#> Aggregating allelic counts of all cells...
+#> Filtering allelic positions: tumor depth >= 3 reads
+#> Filtering homozygous positions of all cells...
+#> Homozygous filter: 48 / 186 positions removed, 138 positions retained.
+#> Allelic positions kept: 138
+#> Aggregating coverage counts of all cells...
+#> Filtering coverage positions: tumor depth >= 5 reads
+#> Filtering coverage positions: normal depth >= 0 reads
+#> Coverage positions kept: 150
+#> Final number of positions: 288
+#> Performing segmentation on all cells...
+#> Computing cell fractions and copy numbers on all cells...
+#> - Consensus segments accross clusters -
+#> Finding consensus segments...
+#> 6 consensus segments identified, 0 CNA segments identified
+#> Done.
+
+exdata_muscadet <- cnaCalling(
+    exdata_muscadet,
+    filter.homozygous = FALSE, # without homozygous filter
     omics.coverage = "ATAC",
     depthmin.a.clusters = 3, # set low thresholds for example data
     depthmin.c.clusters = 5,

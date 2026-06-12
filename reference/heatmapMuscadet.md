@@ -29,7 +29,9 @@ heatmapMuscadet(
   row_annots = NULL,
   white_scale = c(0.3, 0.7),
   colors = NULL,
+  dim_scale = 1,
   png_res = 300,
+  raster_quality = 3,
   quiet = FALSE
 )
 ```
@@ -113,7 +115,7 @@ heatmapMuscadet(
   [`rowAnnotation()`](https://rdrr.io/pkg/ComplexHeatmap/man/rowAnnotation.html)
   or
   [`HeatmapAnnotation()`](https://rdrr.io/pkg/ComplexHeatmap/man/HeatmapAnnotation.html)).
-  If `averages =FALSE`, annotations must concern cells, while if
+  If `averages = FALSE`, annotations must concern cells, while if
   `averages = TRUE` they must concern clusters. Default is `NULL`, no
   row annotations is added.
 
@@ -145,11 +147,26 @@ heatmapMuscadet(
   Vector of colors for the cluster annotation (`character` vector). If
   `NULL` (default), it uses predefined colors.
 
+- dim_scale:
+
+  Numeric scaling factor applied to the auto-computed width and height
+  of each heatmap. Values below `1` reduce output dimensions (e.g. `0.5`
+  halves both dimensions). Default is `1`.
+
 - png_res:
 
   Resolution in ppi for
   [`grDevices::png()`](https://rdrr.io/r/grDevices/png.html) if
-  `filename` ends with the .png extension (`numeric`). Default is `300`.
+  `filename` ends with the `.png` extension (`numeric`). Default is
+  `300`.
+
+- raster_quality:
+
+  Integer controlling the rasterization quality of heatmap tiles passed
+  to
+  [`ComplexHeatmap::Heatmap()`](https://rdrr.io/pkg/ComplexHeatmap/man/Heatmap.html).
+  Values higher than 1 produce sharper tiles at the cost of larger file
+  sizes. Default is `3`.
 
 - quiet:
 

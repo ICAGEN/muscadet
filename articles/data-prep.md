@@ -11,7 +11,7 @@ Documentation on example data inputs:
 - Matched bulk coverage (log R ratio):
   [`?exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.html)
 
-> **Important note on example data**
+> **Important**
 >
 > The example dataset included in `muscadet` is a toy dataset designed
 > for demonstration purposes only. It is deliberately minimal and
@@ -36,26 +36,28 @@ See
 for full documentation.
 
 ``` r
+
 data("exdata_mat_counts_atac_tumor")
 kable(exdata_mat_counts_atac_tumor[1:8, 30:34])
 ```
 
-|                               | 3_14380209_14380709 | 3_14432174_14432674 | 3_14946687_14947187 | 3_15050333_15050833 | 3_15241296_15241796 |
-|:------------------------------|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|
-| samplename_AACTTAGTCCTCATCA-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
-| samplename_AAGAATCAGGTGTTAC-1 |                   0 |                   2 |                   0 |                   0 |                   0 |
-| samplename_AAGCCACGTTAGTACG-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
-| samplename_AATAACCGTAGTTGGC-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
-| samplename_AATCCTAAGGTCCTAG-1 |                   0 |                   1 |                   0 |                   0 |                   0 |
-| samplename_AATTTCCTCGAAGTGA-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
-| samplename_ACATCATCAGGCTTCG-1 |                   0 |                   3 |                   0 |                   0 |                   0 |
-| samplename_ACCAAACTCTAACCTT-1 |                   0 |                   0 |                   0 |                   0 |                   0 |
+|  | 3_14380209_14380709 | 3_14432174_14432674 | 3_14946687_14947187 | 3_15050333_15050833 | 3_15241296_15241796 |
+|:---|---:|---:|---:|---:|---:|
+| samplename_AACTTAGTCCTCATCA-1 | 0 | 0 | 0 | 0 | 0 |
+| samplename_AAGAATCAGGTGTTAC-1 | 0 | 2 | 0 | 0 | 0 |
+| samplename_AAGCCACGTTAGTACG-1 | 0 | 0 | 0 | 0 | 0 |
+| samplename_AATAACCGTAGTTGGC-1 | 0 | 0 | 0 | 0 | 0 |
+| samplename_AATCCTAAGGTCCTAG-1 | 0 | 1 | 0 | 0 | 0 |
+| samplename_AATTTCCTCGAAGTGA-1 | 0 | 0 | 0 | 0 | 0 |
+| samplename_ACATCATCAGGCTTCG-1 | 0 | 3 | 0 | 0 | 0 |
+| samplename_ACCAAACTCTAACCTT-1 | 0 | 0 | 0 | 0 | 0 |
 
 Table 1: Counts matrix example
 
 - From Seurat/Signac analysis:
 
 ``` r
+
 library(Seurat) # Seurat v5
 library(Signac)
 
@@ -70,6 +72,7 @@ mat_counts_ATAC <- atac_small[["peaks"]]$counts
 - From ArchR/SummarizedExperiment analysis:
 
 ``` r
+
 library(SummarizedExperiment)
 # RangedSummarizedExperiment class object
 se <- readRDS("<SummarizedExperiment_path>") 
@@ -107,19 +110,20 @@ See
 for full documentation.
 
 ``` r
+
 data("exdata_allele_counts_atac_tumor")
 rownames(exdata_allele_counts_atac_tumor) <- NULL
 kable(head(exdata_allele_counts_atac_tumor))
 ```
 
-| cell                          | id            | CHROM |     POS | REF | ALT |  RD |  AD |  DP | GT   |
-|:------------------------------|:--------------|------:|--------:|:----|:----|----:|----:|----:|:-----|
-| samplename_CCGGTTAAGGAGCAAC-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   1 |   0 |   1 | 0\|1 |
-| samplename_CTTGCTCAGTTAGCCG-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   0 |   1 |   1 | 0\|1 |
-| samplename_CTTTAGTTCTAGCTAA-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   1 |   0 |   1 | 0\|1 |
-| samplename_GCGCCTTGTTCCGGGA-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   0 |   1 |   1 | 0\|1 |
-| samplename_GGTCTTGAGCAAGGGT-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   0 |   1 |   1 | 0\|1 |
-| samplename_GTCAAACTCTAGCGTG-1 | 3_3126620_T_G |     3 | 3126620 | T   | G   |   1 |   0 |   1 | 0\|1 |
+| cell | id | CHROM | POS | REF | ALT | RD | AD | DP | GT |
+|:---|:---|---:|---:|:---|:---|---:|---:|---:|:---|
+| samplename_CCGGTTAAGGAGCAAC-1 | 3_3126620_T_G | 3 | 3126620 | T | G | 1 | 0 | 1 | 0\|1 |
+| samplename_CTTGCTCAGTTAGCCG-1 | 3_3126620_T_G | 3 | 3126620 | T | G | 0 | 1 | 1 | 0\|1 |
+| samplename_CTTTAGTTCTAGCTAA-1 | 3_3126620_T_G | 3 | 3126620 | T | G | 1 | 0 | 1 | 0\|1 |
+| samplename_GCGCCTTGTTCCGGGA-1 | 3_3126620_T_G | 3 | 3126620 | T | G | 0 | 1 | 1 | 0\|1 |
+| samplename_GGTCTTGAGCAAGGGT-1 | 3_3126620_T_G | 3 | 3126620 | T | G | 0 | 1 | 1 | 0\|1 |
+| samplename_GTCAAACTCTAGCGTG-1 | 3_3126620_T_G | 3 | 3126620 | T | G | 1 | 0 | 1 | 0\|1 |
 
 Table 2: Allele counts table example
 
@@ -134,8 +138,8 @@ Single variant positions can be derived from:
 #### 2.1.1 Individual-specific heterozygous positions from bulk data
 
 Single heterozygous positions can be retrieved by running
-[FACETS](https://github.com/mskcc/facets)[¹](#fn1) on matched WGS/WES
-normal samples.
+[FACETS](https://github.com/mskcc/facets)[^1] on matched WGS/WES normal
+samples.
 
 Use `snp-pileup` to extract allele counts from bulk BAM files at known
 sites (VCF of common SNPs from the [NCBI
@@ -146,25 +150,57 @@ to keep only heterozygous positions well covered.
 See [FACETS snp-pileup
 documentation](https://github.com/mskcc/facets/blob/master/inst/extcode/README.txt).
 
+> **Important**
+>
+> When using individual-specific heterozygous positions from bulk
+> sequencing, set `filter.homozygous = FALSE` in
+> [`cnaCalling()`](https://icagen.github.io/muscadet/reference/cnaCalling.md).
+> Allele count positions are already restricted to heterozygous calls
+> and the filter is not needed.
+
 #### 2.1.2 Panels of common SNPs
 
-- [gnomAD](https://gnomad.broadinstitute.org/) database: [data
-  here](https://gnomad.broadinstitute.org/downloads)
-- [1000G](https://www.internationalgenome.org/) database: [data
-  here](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
+When individual bulk sequencing data is not available, allele counts can
+be derived from a reference panel of common SNPs.
+
+For `hg38`, we recommend using the **Common dbSNP 155** track (hg38)
+from UCSC ([UCSC Table
+Browser](https://genome.ucsc.edu/cgi-bin/hgTables)), which contains
+variants and their associated minor allele frequencies (MAF), filtered
+for single nucleotide variants (SNVs) only.
+
+We recommend filtering positions with a MAF below `0.2`, based on the
+highest MAF across the three projects 1000 Genomes, TOPMED, and gnomAD,
+to ensure sufficient heterozygosity. The resulting common SNP table
+should follow a VCF-like format with one row per position and columns
+`CHROM`, `POS`, `ID`, `REF`, `ALT`. (Processing of hg38 Common dbSNP 155
+track data at
+[`data-raw/hg38.dbSnp155Common.processing.R`](https://github.com/ICAGEN/muscadet/tree/2b508a92299b4d3ba03197c957a84f60537cd75f/data-raw))
+
+The processed common SNP table for `hg38` can be downloaded here:
+[hg38.dbSnp155Common.filtered.vcf.gz
+(v0.2.2)](https://github.com/ICAGEN/muscadet/releases/download/v0.2.2/hg38.dbSnp155Common.filtered.vcf.gz)
+
+Other common SNP databases can also be used as an alternative:
+
+- [gnomAD](https://gnomad.broadinstitute.org/) -
+  [downloads](https://gnomad.broadinstitute.org/downloads)
+- [1000 Genomes](https://www.internationalgenome.org/) -
+  [downloads](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20220422_3202_phased_SNV_INDEL_SV/)
 
 ### 2.2 Count reads from single cells
 
-[SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)[²](#fn2)
-is used to get read counts per allele from single cell BAM files.
+[SCReadCounts](https://horvathlab.github.io/NGS/SCReadCounts/)[^2] is
+used to get read counts per allele from single cell BAM files.
 
 > *From [SCReadCounts
-> documentation](https://horvathlab.github.io/NGS/SCReadCounts/)*: The
-> program `scReadCounts` manages the sequential execution of programs
-> `readCounts` and `readCountsMatrix`, collects the necessary arguments
-> for successful execution, and avoids unnecessary execution of the
-> expensive `readCounts` tool if possible. `readCounts` requires three
-> input files: a pooled single cell alignment, a list of genomic
+> documentation](https://horvathlab.github.io/NGS/SCReadCounts/):*
+>
+> The program `scReadCounts` manages the sequential execution of
+> programs `readCounts` and `readCountsMatrix`, collects the necessary
+> arguments for successful execution, and avoids unnecessary execution
+> of the expensive `readCounts` tool if possible. `readCounts` requires
+> three input files: a pooled single cell alignment, a list of genomic
 > positions of interest, and the barcodes file (barcodes.tsv) .
 > Optionally, `readCounts` can be user-configured for *read filtering*
 > and *cell-barcode handling*, including restriction to barcodes of
@@ -217,6 +253,7 @@ counts) can be formatted to fit `muscadet` input requirement with
 ([Table 3](#tbl-process-allele1), [Table 4](#tbl-process-allele2)).
 
 ``` r
+
 # Example data frame of readCounts results
 readcounts <- data.frame(
   CHROM = c("1", "1", "2"),
@@ -237,18 +274,20 @@ readcounts$VAF <- round(readcounts$SNVCount / readcounts$GoodReads, 4)
 ```
 
 ``` r
+
 kable(readcounts)
 ```
 
-| CHROM |   POS | REF | ALT | ReadGroup | SNVCountForward | SNVCountReverse | RefCountForward | RefCountReverse | SNVCount | RefCount | GoodReads | %BadRead |    VAF |
-|:------|------:|:----|:----|:----------|----------------:|----------------:|----------------:|----------------:|---------:|---------:|----------:|---------:|-------:|
-| 1     | 10101 | A   | G   | cell1     |               5 |               4 |              20 |              18 |        9 |       38 |        47 |        0 | 0.1915 |
-| 1     | 20202 | G   | A   | cell1     |              10 |               6 |              15 |              12 |       16 |       27 |        43 |        0 | 0.3721 |
-| 2     | 30303 | T   | C   | cell1     |               3 |               2 |              10 |               8 |        5 |       18 |        23 |        0 | 0.2174 |
+| CHROM | POS | REF | ALT | ReadGroup | SNVCountForward | SNVCountReverse | RefCountForward | RefCountReverse | SNVCount | RefCount | GoodReads | %BadRead | VAF |
+|:---|---:|:---|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 10101 | A | G | cell1 | 5 | 4 | 20 | 18 | 9 | 38 | 47 | 0 | 0.1915 |
+| 1 | 20202 | G | A | cell1 | 10 | 6 | 15 | 12 | 16 | 27 | 43 | 0 | 0.3721 |
+| 2 | 30303 | T | C | cell1 | 3 | 2 | 10 | 8 | 5 | 18 | 23 | 0 | 0.2174 |
 
 Table 3: Example of readCounts output
 
 ``` r
+
 kable(process_allele(readcounts))
 ```
 
@@ -271,6 +310,7 @@ See
 for full documentation.
 
 ``` r
+
 data("exdata_peaks")
 kable(head(exdata_peaks))
 ```
@@ -291,6 +331,7 @@ Table 5: Features coordinates table example
 - From Seurat/Signac
 
 ``` r
+
 library(Signac)
 # Example Seurat class object from Signac
 data("atac_small") 
@@ -309,6 +350,7 @@ colnames(peaks_coord) <- c("CHROM", "start", "end", "id")
 - From ArchR/SummarizedExperiment:
 
 ``` r
+
 library(SummarizedExperiment)
 # RangedSummarizedExperiment class object
 se <- readRDS("<SummarizedExperiment_path>") 
@@ -324,6 +366,7 @@ colnames(peaks_coord) <- c("CHROM", "start", "end", "id")
 ### 3.2 Genes
 
 ``` r
+
 # Use your own annotation
 genes_coord <- read.delim( "<genes_gtf_file>")
 genes_coord <- genes_coord[, c("seqnames", "start", "end", "gene_name")]
@@ -349,6 +392,7 @@ rownames(genes_coord) <- NULL
 > coordinates data frames.
 >
 > ``` r
+>
 > # Cell names format must match between different assays
 > intersect(rownames(mat_counts_ATAC), rownames(mat_counts_RNA))
 >
@@ -368,13 +412,14 @@ and will be displayed at the bottom of log ratio heatmaps for validation
 purposes ([Table 6](#tbl-bulk-lrr)).
 
 Log ratios for bulk sequencing can be obtained through
-[FACETS](https://github.com/mskcc/facets)[³](#fn3) analysis.
+[FACETS](https://github.com/mskcc/facets)[^3] analysis.
 
 See
 [`?exdata_bulk_lrr`](https://icagen.github.io/muscadet/reference/exdata_bulk_lrr.md)
 for full documentation.
 
 ``` r
+
 data("exdata_bulk_lrr")
 kable(head(exdata_bulk_lrr))
 ```
@@ -390,16 +435,16 @@ kable(head(exdata_bulk_lrr))
 
 Table 6: Bulk log ratios table example
 
-------------------------------------------------------------------------
+[^1]: Shen R, Seshan VE. **FACETS: allele-specific copy number and
+    clonal heterogeneity analysis tool for high-throughput DNA
+    sequencing.** *Nucleic Acids Res* (2016).
+    <https://www.doi.org/10.1093/nar/gkw520>
 
-1.  Shen R, Seshan VE. **FACETS: allele-specific copy number and clonal
-    heterogeneity analysis tool for high-throughput DNA sequencing.**
-    *Nucleic Acids Res* (2016). <https://www.doi.org/10.1093/nar/gkw520>
-
-2.  Prashant, N.M., Alomran, N., Chen, Y. et al. **SCReadCounts:
+[^2]: Prashant, N.M., Alomran, N., Chen, Y. et al. **SCReadCounts:
     estimation of cell-level SNVs expression from scRNA-seq data.** *BMC
     Genomics* (2021). <https://doi.org/10.1186/s12864-021-07974-8>
 
-3.  Shen R, Seshan VE. **FACETS: allele-specific copy number and clonal
-    heterogeneity analysis tool for high-throughput DNA sequencing.**
-    *Nucleic Acids Res* (2016). <https://www.doi.org/10.1093/nar/gkw520>
+[^3]: Shen R, Seshan VE. **FACETS: allele-specific copy number and
+    clonal heterogeneity analysis tool for high-throughput DNA
+    sequencing.** *Nucleic Acids Res* (2016).
+    <https://www.doi.org/10.1093/nar/gkw520>

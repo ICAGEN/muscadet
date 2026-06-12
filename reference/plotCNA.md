@@ -12,8 +12,9 @@ on the proportion of cells in each cluster.
 plotCNA(
   x,
   title = NULL,
+  labels = "auto",
   cna.colors = c(gain = "#EF6F6AFF", loss = "#6699CCFF", cnloh = "#44AA99FF"),
-  cf.gradient = TRUE
+  cf.gradient = FALSE
 )
 ```
 
@@ -30,6 +31,13 @@ plotCNA(
 
   An optional title for the plot. Default is `NULL`.
 
+- labels:
+
+  Labels for clusters. One of `"auto"` (cluster and cell number
+  information), `"clusters"` (cluster identifier), or `"cells"` (number
+  of cells), or a vector of length equal to the number of clusters, or
+  `NULL` for no labels. Default is `"auto"`.
+
 - cna.colors:
 
   A vector of 3 colors for CNA states: gain, loss, and cnloh (or named
@@ -40,7 +48,7 @@ plotCNA(
 - cf.gradient:
 
   Logical. If `TRUE` adds a alpha transparency gradient on CNA color
-  block based on the cell fraction. Default is `TRUE`.
+  block based on the cell fraction. Default is `FALSE`.
 
 ## Value
 

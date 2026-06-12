@@ -18,7 +18,10 @@ heatmapStep(
   title = NULL,
   col_quantiles = c(0.1, 0.4, 0.6, 0.9),
   col_breaks = NULL,
-  colors = c("#00008E", "white", "white", "#630000")
+  colors = c("#00008E", "white", "white", "#630000"),
+  dim_scale = 1,
+  png_res = 300,
+  raster_quality = 3
 )
 ```
 
@@ -69,6 +72,27 @@ heatmapStep(
   A character vector of 4 colors used for the color scale of the heatmap
   (`character` vector). Default is
   `c("#00008E", "white", "white", "#630000")`.
+
+- dim_scale:
+
+  Numeric scaling factor applied to the auto-computed width and height
+  of each heatmap. Values below `1` reduce output dimensions (e.g. `0.5`
+  halves both dimensions). Default is `1`.
+
+- png_res:
+
+  Resolution in ppi for
+  [`grDevices::png()`](https://rdrr.io/r/grDevices/png.html) if
+  `filename` ends with the `.png` extension (`numeric`). Default is
+  `300`.
+
+- raster_quality:
+
+  Integer controlling the rasterization quality of heatmap tiles passed
+  to
+  [`ComplexHeatmap::Heatmap()`](https://rdrr.io/pkg/ComplexHeatmap/man/Heatmap.html).
+  Values higher than 1 produce sharper tiles at the cost of larger file
+  sizes. Default is `3`.
 
 ## Value
 

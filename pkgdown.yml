@@ -1,11 +1,11 @@
-pandoc: 3.1.11
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   data-prep: data-prep.html
   muscadet: muscadet.html
   articles/tutorial_multiome: tutorial_multiome.html
-last_built: 2026-01-21T12:14Z
+last_built: 2026-06-12T08:28Z
 urls:
   reference: https://icagen.github.io/muscadet/reference
   article: https://icagen.github.io/muscadet/articles

@@ -92,6 +92,7 @@ object.
 ## Examples
 
 ``` r
+
 # Minimal example
 mat <- Matrix::sparseMatrix(
     i = c(1, 1, 2),
