@@ -66,7 +66,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/v0.2.2/vignettes/data-prep.qmd" class="external-link"><code>vignettes/data-prep.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ICAGEN/muscadet/blob/main/vignettes/data-prep.qmd" class="external-link"><code>vignettes/data-prep.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -391,7 +391,7 @@ Table 2: Allele counts table example
 </h4>
 <p>When individual bulk sequencing data is not available, allele counts can be derived from a reference panel of common SNPs.</p>
 <p>For <code>hg38</code>, we recommend using the <strong>Common dbSNP 155</strong> track (hg38) from UCSC (<a href="https://genome.ucsc.edu/cgi-bin/hgTables" class="external-link">UCSC Table Browser</a>), which contains variants and their associated minor allele frequencies (MAF), filtered for single nucleotide variants (SNVs) only.</p>
-<p>We recommend filtering positions with a MAF below <code>0.2</code>, based on the highest MAF across the three projects 1000 Genomes, TOPMED, and gnomAD, to ensure sufficient heterozygosity. The resulting common SNP table should follow a VCF-like format with one row per position and columns <code>CHROM</code>, <code>POS</code>, <code>ID</code>, <code>REF</code>, <code>ALT</code>. (Processing of hg38 Common dbSNP 155 track data at <a href="https://github.com/ICAGEN/muscadet/tree/2b508a92299b4d3ba03197c957a84f60537cd75f/data-raw" class="external-link"><code>data-raw/hg38.dbSnp155Common.processing.R</code></a>)</p>
+<p>We recommend filtering positions with a MAF below <code>0.2</code>, based on the highest MAF across the three projects 1000 Genomes, TOPMED, and gnomAD, to ensure sufficient heterozygosity. The resulting common SNP table should follow a VCF-like format with one row per position and columns <code>CHROM</code>, <code>POS</code>, <code>ID</code>, <code>REF</code>, <code>ALT</code>. (Processing of hg38 Common dbSNP 155 track data at <a href="https://github.com/ICAGEN/muscadet/tree/main/data-raw" class="external-link"><code>data-raw/hg38.dbSnp155Common.processing.R</code></a>)</p>
 <p>The processed common SNP table for <code>hg38</code> can be downloaded here: <a href="https://github.com/ICAGEN/muscadet/releases/download/v0.2.2/hg38.dbSnp155Common.filtered.vcf.gz" class="external-link">hg38.dbSnp155Common.filtered.vcf.gz (v0.2.2)</a></p>
 <p>Other common SNP databases can also be used as an alternative:</p>
 <ul>

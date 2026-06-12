@@ -175,7 +175,7 @@ to ensure sufficient heterozygosity. The resulting common SNP table
 should follow a VCF-like format with one row per position and columns
 `CHROM`, `POS`, `ID`, `REF`, `ALT`. (Processing of hg38 Common dbSNP 155
 track data at
-[`data-raw/hg38.dbSnp155Common.processing.R`](https://github.com/ICAGEN/muscadet/tree/2b508a92299b4d3ba03197c957a84f60537cd75f/data-raw))
+[`data-raw/hg38.dbSnp155Common.processing.R`](https://github.com/ICAGEN/muscadet/tree/main/data-raw))
 
 The processed common SNP table for `hg38` can be downloaded here:
 [hg38.dbSnp155Common.filtered.vcf.gz
