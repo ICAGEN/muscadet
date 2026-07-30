@@ -77,7 +77,7 @@ status and cell fractions.
 # data("exdata_muscadet")
 
 # Plot profile for first cluster
-pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
+pdf("CNAprofile_cluster1.pdf", width = 15, height = 7.5) # Save as PDF
 plotProfile(exdata_muscadet, data = "1", title = "Example dataset - cluster 1")
 dev.off()
 

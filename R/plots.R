@@ -1416,7 +1416,7 @@ plotIndexes <- function(x,
 #' # data("exdata_muscadet")
 #'
 #' # Plot profile for first cluster
-#' pdf("CNAprofile_allcells.pdf", width = 15, height = 7.5) # Save as PDF
+#' pdf("CNAprofile_cluster1.pdf", width = 15, height = 7.5) # Save as PDF
 #' plotProfile(exdata_muscadet, data = "1", title = "Example dataset - cluster 1")
 #' dev.off()
 #'
@@ -1827,6 +1827,7 @@ plotCNA <- function(x,
 
     # Extract number of cells per cluster
     ncells <- x@cnacalling$ncells
+    ncells <- ncells[order(as.numeric(names(ncells)))]
 
     # Keep only autosomes to display
     data <- data[!data$chrom %in% c("X", "Y", "M"), ]
@@ -1897,6 +1898,10 @@ plotCNA <- function(x,
     # Remove consensus segs that have no data in a cluster
     df <- df[complete.cases(df$cluster), ]
 
+    # Order clusters numerically
+    df$cluster <- factor(df$cluster,
+                         levels = sort(unique(as.numeric(as.character(df$cluster)))))
+
     # Compute proportions of cells per cluster for y axis
     prop_clus <- tapply(df$prop.cluster, df$cluster, function(x) x[!is.na(x)][1])
     prop_starts <- c(0, cumsum(prop_clus[-length(prop_clus)]))
@@ -1925,7 +1930,7 @@ plotCNA <- function(x,
             labels <- switch(
                 labels,
                 auto = paste0("cluster ", names(ncells), "\n", ncells[names(ncells)], " cells"),
-                clusters = unique(df$cluster),
+                clusters = levels(df$cluster),
                 cells = paste0(ncells[names(ncells)], " cells")
             )
         } else if (is.character(labels) || is.factor(labels)) {
