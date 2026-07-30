@@ -166,8 +166,8 @@ nrow(obj_rna_all$step08$matTumor)
 
 }
 \seealso{
-Other computeLogRatio: 
-\code{\link{computeLogRatio}()},
-\code{\link{computeLogRatioATAC}()}
+Other computeLogRatio:
+\code{\link[=computeLogRatio]{computeLogRatio()}},
+\code{\link[=computeLogRatioATAC]{computeLogRatioATAC()}}
 }
 \concept{computeLogRatio}

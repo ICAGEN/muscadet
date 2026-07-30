@@ -7,7 +7,7 @@
 \alias{mm10_chrom}
 \title{Genome chromosome sizes (internal data)}
 \format{
-A \code{\link[GenomicRanges:GRanges-class]{GRanges}} object containing:
+A \code{\link[GenomicRanges:GRanges]{GRanges}} object containing:
 \describe{
 \item{\code{seqnames}}{Chromosome name: 1 to 22, X and Y for human ; and 1 to
 19, X and Y for mouse (\code{Rle}).}
@@ -16,7 +16,7 @@ A \code{\link[GenomicRanges:GRanges-class]{GRanges}} object containing:
 }
 }
 \description{
-\code{\link[GenomicRanges:GRanges-class]{GRanges}} objects containing
+\code{\link[GenomicRanges:GRanges]{GRanges}} objects containing
 chromosomes sizes for hg38, hg19 and mm10 genome assemblies.
 }
 \note{

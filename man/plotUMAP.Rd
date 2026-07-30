@@ -60,9 +60,9 @@ UMAP plot. Default is \code{3}.}
 
 \item{...}{Additional arguments passed to \code{\link[=add_labels]{add_labels()}} providing an
 underlying geom for label names (\code{\link[ggplot2:geom_text]{geom_text}},
-\code{\link[ggplot2:geom_text]{geom_label}},
+\code{\link[ggplot2:geom_label]{geom_label}},
 \code{\link[ggrepel:geom_text_repel]{geom_text_repel}}, or
-\code{\link[ggrepel:geom_text_repel]{geom_label_repel}}).}
+\code{\link[ggrepel:geom_label_repel]{geom_label_repel}}).}
 }
 \value{
 A \code{ggplot} object.

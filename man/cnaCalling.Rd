@@ -7,12 +7,12 @@
 This function uses several functions from the
 \code{\link[facets:facets-package]{facets}} package, including:
 \itemize{
-\item \code{\link[facets:facets-internal]{facets::clustersegs()}}
+\item \code{\link[facets:clustersegs]{facets::clustersegs()}}
 \item \code{\link[facets:emcncf]{facets::emcncf()}}
-\item \code{\link[facets:facets-internal]{facets::findDiploidLogR()}}
+\item \code{\link[facets:findDiploidLogR]{facets::findDiploidLogR()}}
 \item \code{\link[facets:fitcncf]{facets::fitcncf()}}
 \item \code{\link[facets:procSample]{facets::procSample()}}
-\item \code{\link[facets:facets-internal]{facets::procSnps()}}
+\item \code{\link[facets:procSnps]{facets::procSnps()}}
 \item adapted function \code{\link[=preProcSample2]{preProcSample2()}}
 }
 

@@ -41,7 +41,7 @@ running leiden algorithm, either leidenbase ("leidenbase") or igraph
 ("igraph") packages (\code{character}). Default is "igraph".}
 
 \item{knn_seurat}{Integer specifying the number of nearest neighbors used for
-graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+graph construction with \code{\link[Seurat:Seurat]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
 Default is \code{20}.}
 
@@ -65,7 +65,7 @@ A list containing:
 \describe{
 \item{params}{List of parameters used for clustering (\code{list}).}
 \item{pcs}{List of principal components summaries for each omic (\code{list} of
-\code{\link[stats:prcomp]{summary.prcomp}}).}
+\code{\link[stats:summary.prcomp]{summary.prcomp}}).}
 \item{nn}{Nearest neighbors object (\code{\link[SeuratObject:Neighbor-class]{Neighbor}}).}
 \item{graph}{Shared nearest neighbors graph (\code{\link[SeuratObject:Graph-class]{Graph}}).}
 \item{dist}{Distance matrix derived from the graph (\code{matrix}).}

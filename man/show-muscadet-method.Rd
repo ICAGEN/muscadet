@@ -31,6 +31,6 @@ show(slot(exdata_muscadet, "omics")[[1]])
 
 }
 \seealso{
-\linkS4class{muscadet}, \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
+\link[=muscadet-class]{muscadet}, \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
 }
 \keyword{internal}

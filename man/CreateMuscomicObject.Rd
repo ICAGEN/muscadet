@@ -110,6 +110,6 @@ atac2
 \seealso{
 \itemize{
 \item \code{\link[=CreateMuscadetObject]{CreateMuscadetObject()}}
-\item \linkS4class{muscomic}, \linkS4class{muscadet}
+\item \link[=muscomic-class]{muscomic}, \link[=muscadet-class]{muscadet}
 }
 }

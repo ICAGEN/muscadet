@@ -36,7 +36,7 @@ Used to determine whether a segment is classified as gain, loss, or neutral.}
 
 \item{minoverlap}{A non-negative integer specifying the minimum overlap
 between a cluster specific segment and a consensus segment (see
-\code{\link[IRanges:findOverlaps-methods]{IRanges::findOverlaps()}}) (\code{integer}). Default: \code{1e6}.}
+\code{\link[IRanges:findOverlaps]{IRanges::findOverlaps()}}) (\code{integer}). Default: \code{1e6}.}
 
 \item{clonal.thresh}{Minimum cell proportion to label a
 segment as clonal. Default: \code{1e6}.}

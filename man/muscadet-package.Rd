@@ -23,6 +23,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Marie Denoulet \email{marie.denoulet@univ-nantes.fr} (\href{https://orcid.org/0000-0002-9668-0439}{ORCID})
   \item Nils Giordano \email{nils.giordano@univ-nantes.fr} (\href{https://orcid.org/0000-0003-2549-6631}{ORCID})
   \item Stéphane Minvielle \email{stephane.minvielle@univ-nantes.fr} (\href{https://orcid.org/0000-0003-1389-312X}{ORCID})
   \item Céline Vallot \email{celine.vallot@curie.fr} (\href{https://orcid.org/0000-0003-1601-2359}{ORCID})

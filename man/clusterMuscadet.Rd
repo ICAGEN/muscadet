@@ -34,7 +34,7 @@ than one omic.}
 execution. Default is \code{FALSE}.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=cluster_seurat]{cluster_seurat}}, \code{\link[=cluster_hclust]{cluster_hclust}}
+  Arguments passed on to \code{\link{cluster_seurat}}, \code{\link{cluster_hclust}}
   \describe{
     \item{\code{res_range}}{A numeric non-negative vector specifying the resolution
 values to use for \code{\link[Seurat:FindClusters]{Seurat::FindClusters()}} (\code{numeric} vector). Default is
@@ -52,7 +52,7 @@ see \code{\link[=cluster_seurat]{cluster_seurat()}} Details section.}
 running leiden algorithm, either leidenbase ("leidenbase") or igraph
 ("igraph") packages (\code{character}). Default is "igraph".}
     \item{\code{knn_seurat}}{Integer specifying the number of nearest neighbors used for
-graph construction with \code{\link[Seurat:Seurat-package]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
+graph construction with \code{\link[Seurat:Seurat]{Seurat::Seurat()}} functions \code{\link[Seurat:FindNeighbors]{Seurat::FindNeighbors()}}
 (\code{k.param}) or \code{\link[Seurat:FindMultiModalNeighbors]{Seurat::FindMultiModalNeighbors()}} (\code{k.nn}) (\code{integer}).
 Default is \code{20}.}
     \item{\code{knn_range_seurat}}{Integer specifying the approximate number of nearest
@@ -146,7 +146,7 @@ clustree(partitions, prefix = "res_")
 \seealso{
 Methodology and functionality:
 \itemize{
-\item \linkS4class{muscadet}
+\item \link[=muscadet-class]{muscadet}
 \item \code{\link[=cluster_seurat]{cluster_seurat()}} for graph-based clustering using \code{\link[Seurat:Seurat-package]{Seurat}}.
 \item \code{\link[=cluster_hclust]{cluster_hclust()}} for hierarchical clustering of SNF-fused distances.
 \item \code{\link[=weightedSNF]{weightedSNF()}} for weighted Similarity Network Fusion (SNF).

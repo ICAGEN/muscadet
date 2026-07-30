@@ -81,6 +81,6 @@ muscadet_ref <- CreateMuscadetObject(
 \seealso{
 \itemize{
 \item \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
-\item \linkS4class{muscomic}, \linkS4class{muscadet}
+\item \link[=muscomic-class]{muscomic}, \link[=muscadet-class]{muscadet}
 }
 }

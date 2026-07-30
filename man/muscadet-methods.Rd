@@ -94,7 +94,7 @@ and \code{\link[=muscadet-class]{muscadet}} objects.
 \item \code{Cells()}: Get cell identifiers (addition of methods for \code{muscomic} and
 \code{muscadet} to \code{\link[SeuratObject:Cells]{SeuratObject::Cells()}}).
 \item \code{Features()}: Get feature identifiers (addition of methods for \code{muscomic}
-and \code{muscadet} to \code{\link[SeuratObject:Cells]{SeuratObject::Features()}}).
+and \code{muscadet} to \code{\link[SeuratObject:Features]{SeuratObject::Features()}}).
 \item \code{coordFeatures()}: Get coordinates of features data frames.
 \item \code{matCounts()}: Get raw count matrices.
 \item \code{matLogRatio()}: Get log R ratio matrices.
@@ -142,5 +142,5 @@ matLogRatio(exdata_muscadet$ATAC)
 
 }
 \seealso{
-\linkS4class{muscomic}, \linkS4class{muscadet}
+\link[=muscomic-class]{muscomic}, \link[=muscadet-class]{muscadet}
 }

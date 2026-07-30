@@ -24,7 +24,6 @@ BugReports: https://github.com/ICAGEN/muscadet/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 biocViews:
 Imports: 
@@ -79,3 +78,4 @@ Remotes:
     mskcc/facets,
     veseshan/pctGCdata
 VignetteBuilder: quarto
+Config/roxygen2/version: 8.0.0

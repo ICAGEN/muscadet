@@ -32,16 +32,16 @@ instead of plain text (\code{geom_text}). Default is \code{FALSE}.}
 \item{...}{Additional arguments passed to the corresponding underlying geom:
 \itemize{
 \item \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{FALSE})
-\item \code{\link[ggplot2:geom_text]{ggplot2::geom_label()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{TRUE})
+\item \code{\link[ggplot2:geom_label]{ggplot2::geom_label()}} (\code{repel}= \code{FALSE} and \code{label.box} = \code{TRUE})
 \item \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_text_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{FALSE})
-\item \code{\link[ggrepel:geom_text_repel]{ggrepel::geom_label_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{TRUE})
+\item \code{\link[ggrepel:geom_label_repel]{ggrepel::geom_label_repel()}} (\code{repel}= \code{TRUE} and \code{label.box} = \code{TRUE})
 }}
 }
 \value{
 A ggplot2 layer  (\code{\link[ggplot2:geom_text]{geom_text}},
-\code{\link[ggplot2:geom_text]{geom_label}},
+\code{\link[ggplot2:geom_label]{geom_label}},
 \code{\link[ggrepel:geom_text_repel]{geom_text_repel}}, or
-\code{\link[ggrepel:geom_text_repel]{geom_label_repel}}).
+\code{\link[ggrepel:geom_label_repel]{geom_label_repel}}).
 }
 \description{
 This function adds labels at the median position of each group to a ggplot
@@ -55,11 +55,11 @@ positions for each label group.
 
 If \code{repel = TRUE}, it uses
 \code{\link[ggrepel:geom_text_repel]{geom_text_repel()}} (\code{label.box = FALSE})
-or \code{\link[ggrepel:geom_text_repel]{geom_label_repel()}} (\code{label.box =
+or \code{\link[ggrepel:geom_label_repel]{geom_label_repel()}} (\code{label.box =
 TRUE}).
 
 If \code{repel = FALSE}, it uses \code{\link[ggplot2:geom_text]{geom_text()}} (\code{label.box
-= FALSE}) or \code{\link[ggplot2:geom_text]{geom_label()}} (\code{label.box = TRUE}).
+= FALSE}) or \code{\link[ggplot2:geom_label]{geom_label()}} (\code{label.box = TRUE}).
 
 If \code{repel = TRUE}, the \code{\link[ggrepel:ggrepel]{ggprepel}} package must be
 installed.

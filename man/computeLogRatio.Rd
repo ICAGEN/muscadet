@@ -48,7 +48,7 @@ the log ratio computation are kept and returned (\code{logical}). IMPORTANT: if
 of the log ratio computation (see Value section). Default is \code{FALSE}.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=computeLogRatioATAC]{computeLogRatioATAC}}, \code{\link[=computeLogRatioRNA]{computeLogRatioRNA}}
+  Arguments passed on to \code{\link{computeLogRatioATAC}}, \code{\link{computeLogRatioRNA}}
   \describe{
     \item{\code{windowSize}}{Size of windows in base pairs (\code{integer} value). By default: \code{10e6} (10
 Mbp).}
@@ -154,8 +154,8 @@ muscadet <- computeLogRatio(
 
 }
 \seealso{
-Other computeLogRatio: 
-\code{\link{computeLogRatioATAC}()},
-\code{\link{computeLogRatioRNA}()}
+Other computeLogRatio:
+\code{\link[=computeLogRatioATAC]{computeLogRatioATAC()}},
+\code{\link[=computeLogRatioRNA]{computeLogRatioRNA()}}
 }
 \concept{computeLogRatio}

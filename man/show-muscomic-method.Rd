@@ -26,6 +26,6 @@ atac <- CreateMuscomicObject(
 atac
 }
 \seealso{
-\linkS4class{muscomic}, \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
+\link[=muscomic-class]{muscomic}, \code{\link[=CreateMuscomicObject]{CreateMuscomicObject()}}
 }
 \keyword{internal}
