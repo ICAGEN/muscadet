@@ -81,9 +81,19 @@
 #' @param colors Vector of colors for the cluster annotation (`character`
 #'   vector). If `NULL` (default), it uses predefined colors.
 #'
-#' @param dim_scale Numeric scaling factor applied to the auto-computed width
-#'   and height of each heatmap. Values below `1` reduce output dimensions (e.g.
-#'   `0.5` halves both dimensions). Default is `1`.
+#' @param heatmap_width Width of one heatmap passed to
+#'   [ComplexHeatmap::Heatmap()]. Default is `18`cm. See
+#'   [https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#size-of-the-heatmap](https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#size-of-the-heatmap)
+#'   for more details.
+#'
+#' @param heatmap_height Height of one heatmap passed to
+#'   [ComplexHeatmap::Heatmap()]. Default is `12`cm. See
+#'   [https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#size-of-the-heatmap](https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#size-of-the-heatmap)
+#'   for more details.
+#'
+#' @param dim_scale Numeric scaling factor applied to the width and height of
+#'   each heatmap. Values below `1` reduce output dimensions (e.g. `0.5` halves
+#'   both dimensions). Default is `1`.
 #'
 #' @param png_res Resolution in ppi for [grDevices::png()] if `filename` ends
 #'   with the `.png` extension (`numeric`). Default is `300`.
@@ -280,6 +290,8 @@ heatmapMuscadet <- function(x,
                             row_annots = NULL,
                             white_scale = c(0.3, 0.7),
                             colors = NULL,
+                            heatmap_width = 18,
+                            heatmap_height = 12,
                             dim_scale = 1,
                             png_res = 300,
                             raster_quality = 3,
@@ -612,8 +624,8 @@ heatmapMuscadet <- function(x,
             row_title_gp = grid::gpar(fontsize = 10),
             column_title_gp = grid::gpar(fontsize = 10),
             border_gp = grid::gpar(col = "black", lwd = 1),
-            heatmap_height = unit(12 * dim_scale, "cm"),
-            heatmap_width = unit(18 * dim_scale, "cm"),
+            heatmap_width = unit(heatmap_width * dim_scale, "cm"),
+            heatmap_height = unit(heatmap_height * dim_scale, "cm"),
             col = circlize::colorRamp2(col_breaks, c(
                 "#00008E", "white", "white", "#630000"
             )),

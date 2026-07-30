@@ -16,6 +16,8 @@ heatmapMuscadet(
   row_annots = NULL,
   white_scale = c(0.3, 0.7),
   colors = NULL,
+  heatmap_width = 18,
+  heatmap_height = 12,
   dim_scale = 1,
   png_res = 300,
   raster_quality = 3,
@@ -94,9 +96,19 @@ loss of coverage, and are represented as white on the heatmap. Default is
 \item{colors}{Vector of colors for the cluster annotation (\code{character}
 vector). If \code{NULL} (default), it uses predefined colors.}
 
-\item{dim_scale}{Numeric scaling factor applied to the auto-computed width
-and height of each heatmap. Values below \code{1} reduce output dimensions (e.g.
-\code{0.5} halves both dimensions). Default is \code{1}.}
+\item{heatmap_width}{Width of one heatmap passed to
+\code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}. Default is \code{18}cm. See
+\url{https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#size-of-the-heatmap}
+for more details.}
+
+\item{heatmap_height}{Height of one heatmap passed to
+\code{\link[ComplexHeatmap:Heatmap]{ComplexHeatmap::Heatmap()}}. Default is \code{12}cm. See
+\url{https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#size-of-the-heatmap}
+for more details.}
+
+\item{dim_scale}{Numeric scaling factor applied to the width and height of
+each heatmap. Values below \code{1} reduce output dimensions (e.g. \code{0.5} halves
+both dimensions). Default is \code{1}.}
 
 \item{png_res}{Resolution in ppi for \code{\link[grDevices:png]{grDevices::png()}} if \code{filename} ends
 with the \code{.png} extension (\code{numeric}). Default is \code{300}.}
@@ -111,8 +123,8 @@ execution. Default is \code{FALSE}.}
 \value{
 A list containing:
 \itemize{
-\item \code{plot}: A \code{\link[grid:grid.grob]{gTree}} object created with \code{\link[grid:grid.grab]{grid::grid.grab()}}
-(\code{\link[grid:grid.grob]{gTree}}).
+\item \code{plot}: A \code{\link[grid:gTree]{gTree}} object created with \code{\link[grid:grid.grab]{grid::grid.grab()}}
+(\code{\link[grid:gTree]{gTree}}).
 \item \code{width}: Width of the heatmap plot in mm (\code{\link[grid:unit]{unit}}).
 \item \code{height}: Height of the heatmap plot in mm (\code{\link[grid:unit]{unit}}).
 }
